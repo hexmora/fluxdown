@@ -1,6 +1,6 @@
 import type { IBlockState } from '@fluxdown/types';
-import type { IReadableClosure } from 'functive';
 import type { Root as HastRoot } from 'hast';
+import type { IReadableClosure } from 'stative';
 
 import type { ShadPosition } from '../shad-progress';
 

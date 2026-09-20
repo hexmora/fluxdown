@@ -7,7 +7,7 @@ import type {
   IRepairPlugin,
   PluginSet,
 } from '@fluxdown/types';
-/** @jsxImportSource functive */
+/** @jsxImportSource stative */
 
 import { Shad, Smooth } from '@fluxdown/core-presets/mapper';
 import { HoistFootnoteRehypePlugin } from '@fluxdown/core-presets/rehype';
@@ -21,7 +21,7 @@ import {
   MutableState,
   render,
   S,
-} from 'functive';
+} from 'stative';
 
 import type { IPatchItem } from '../..';
 import type {

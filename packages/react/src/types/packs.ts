@@ -5,8 +5,8 @@ import type { BlockCompilerConfig, IPatchItem, MapperPluggable } from '@fluxdown
 import type { ShadConfig as CoreShadConfig, SmoothConfig } from '@fluxdown/core-presets/mapper';
 import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-presets/base';
 import type { IPluggable, IRehypePlugin, IRemarkPlugin, IRepairPlugin } from '@fluxdown/types';
-import type { IReadableClosure } from 'functive';
 import type { CSSProperties, ReactNode } from 'react';
+import type { IReadableClosure } from 'stative';
 
 import type { Theme } from './theme';
 

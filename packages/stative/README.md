@@ -1,12 +1,12 @@
 **English** | [简体中文](./docs/README.zh-CN.md)
 
-# functive
+# stative
 
 **Composable reactive state, independent of any UI framework.**
 
 Build derived state from changing inputs and compose it into reusable units called **state closures**. Each closure exposes a current value, follows its dependencies, and manages the lifetime of its child computations.
 
-`functive` powers [Fluxdown](../../README.md)'s core and can also be used independently for application state and data processing.
+`stative` powers [Fluxdown](../../README.md)'s core and can also be used independently for application state and data processing.
 
 ## Features
 
@@ -21,13 +21,13 @@ Build derived state from changing inputs and compose it into reusable units call
 ### Install
 
 ```sh
-npm install functive
+npm install stative
 ```
 
 ### Create and observe derived state
 
 ```ts
-import { MutableState, render, S } from "functive";
+import { MutableState, render, S } from "stative";
 
 const Scale = ({ input, factor }: { input: number; factor: number }) => input * factor;
 
@@ -65,7 +65,7 @@ All three forms use the same `render(S([Scale, inputs]))` pattern:
 Use `once` to connect reactive inputs and build a state flow. Here is the same `Scale` declared with `once`:
 
 ```ts
-import { type IReadableClosure, once, useMap } from "functive";
+import { type IReadableClosure, once, useMap } from "stative";
 
 const Scale = once(({ input, factor }: { input: IReadableClosure<number>; factor: number }) =>
   useMap(input, (value) => value * factor),
@@ -79,7 +79,7 @@ const Scale = once(({ input, factor }: { input: IReadableClosure<number>; factor
 Extend `BaseStateClosure` when a class fits your application better:
 
 ```ts
-import { BaseStateClosure, type IReadableClosure } from "functive";
+import { BaseStateClosure, type IReadableClosure } from "stative";
 
 class Scale extends BaseStateClosure<number, { input: IReadableClosure<number>; factor: number }> {
   protected render() {
@@ -100,10 +100,10 @@ Wrap static objects and ordinary callbacks in `D(value)` when passing them to `o
 
 ## Optional JSX
 
-JSX can describe the same computations as `S`. For TypeScript, set `jsx` to `"react-jsx"` and `jsxImportSource` to `"functive"` in your compiler options, then use a `.tsx` file:
+JSX can describe the same computations as `S`. For TypeScript, set `jsx` to `"react-jsx"` and `jsxImportSource` to `"stative"` in your compiler options, then use a `.tsx` file:
 
 ```tsx
-import { MutableState, render } from "functive";
+import { MutableState, render } from "stative";
 
 const Scale = ({ input, factor }: { input: number; factor: number }) => input * factor;
 
@@ -116,7 +116,7 @@ scaled.destroy();
 input.destroy();
 ```
 
-This JSX describes reactive computations using `functive`'s own runtime. It does not require React.
+This JSX describes reactive computations using `stative`'s own runtime. It does not require React.
 
 ## Contributing
 

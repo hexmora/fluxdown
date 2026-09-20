@@ -1,12 +1,12 @@
 [English](../README.md) | **简体中文**
 
-# functive
+# stative
 
 **可组合的响应式状态，独立于任何 UI 框架。**
 
 从不断变化的输入派生状态，并将它们组合成可复用的**状态闭包（state closures）**。每个闭包提供当前值，跟随依赖变化，并管理子计算的生命周期。
 
-`functive` 为 [Fluxdown](../../../docs/README.zh-CN.md) 的核心提供支持，也可以独立用于应用状态管理和数据处理。
+`stative` 为 [Fluxdown](../../../docs/README.zh-CN.md) 的核心提供支持，也可以独立用于应用状态管理和数据处理。
 
 ## 特点
 
@@ -21,13 +21,13 @@
 ### 安装
 
 ```sh
-npm install functive
+npm install stative
 ```
 
 ### 创建并订阅派生状态
 
 ```ts
-import { MutableState, render, S } from "functive";
+import { MutableState, render, S } from "stative";
 
 const Scale = ({ input, factor }: { input: number; factor: number }) => input * factor;
 
@@ -65,7 +65,7 @@ input.destroy();
 使用 `once` 连接响应式输入并构建状态流。下面用 `once` 声明同样的 `Scale`：
 
 ```ts
-import { type IReadableClosure, once, useMap } from "functive";
+import { type IReadableClosure, once, useMap } from "stative";
 
 const Scale = once(({ input, factor }: { input: IReadableClosure<number>; factor: number }) =>
   useMap(input, (value) => value * factor),
@@ -79,7 +79,7 @@ const Scale = once(({ input, factor }: { input: IReadableClosure<number>; factor
 如果类更适合你的应用，可以继承 `BaseStateClosure`：
 
 ```ts
-import { BaseStateClosure, type IReadableClosure } from "functive";
+import { BaseStateClosure, type IReadableClosure } from "stative";
 
 class Scale extends BaseStateClosure<number, { input: IReadableClosure<number>; factor: number }> {
   protected render() {
@@ -100,10 +100,10 @@ class Scale extends BaseStateClosure<number, { input: IReadableClosure<number>; 
 
 ## 可选的 JSX 写法
 
-JSX 可以描述与 `S` 相同的计算。使用 TypeScript 时，在编译选项中将 `jsx` 设为 `"react-jsx"`，将 `jsxImportSource` 设为 `"functive"`，然后使用 `.tsx` 文件：
+JSX 可以描述与 `S` 相同的计算。使用 TypeScript 时，在编译选项中将 `jsx` 设为 `"react-jsx"`，将 `jsxImportSource` 设为 `"stative"`，然后使用 `.tsx` 文件：
 
 ```tsx
-import { MutableState, render } from "functive";
+import { MutableState, render } from "stative";
 
 const Scale = ({ input, factor }: { input: number; factor: number }) => input * factor;
 
@@ -116,7 +116,7 @@ scaled.destroy();
 input.destroy();
 ```
 
-这里的 JSX 使用 `functive` 自身的运行时来描述响应式计算，无需 React。
+这里的 JSX 使用 `stative` 自身的运行时来描述响应式计算，无需 React。
 
 ## 参与贡献
 

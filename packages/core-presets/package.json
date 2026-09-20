@@ -93,7 +93,6 @@
     "@types/hast": "catalog:",
     "@types/mdast": "catalog:",
     "@types/unist": "catalog:",
-    "functive": "workspace:*",
     "hast-util-sanitize": "catalog:",
     "lodash-es": "catalog:",
     "mdast-util-from-markdown": "catalog:",
@@ -117,6 +116,7 @@
     "remark-breaks": "catalog:",
     "rxjs": "catalog:",
     "shallow-equal": "catalog:",
+    "stative": "workspace:*",
     "unified": "catalog:"
   },
   "devDependencies": {

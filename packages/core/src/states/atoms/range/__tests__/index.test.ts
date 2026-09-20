@@ -1,4 +1,4 @@
-import { render } from 'functive';
+import { render } from 'stative';
 
 import { Range } from '../index';
 

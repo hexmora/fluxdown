@@ -5,8 +5,8 @@ import type {
   RepairPluginSystemConfig,
 } from '@fluxdown/types';
 
-import { Destructible } from 'functive';
 import { noop } from 'lodash-es';
+import { Destructible } from 'stative';
 
 export abstract class BaseRepairPlugin extends Destructible implements IRepairPlugin {
   readonly config: RepairPluginSystemConfig = {};

@@ -16,7 +16,7 @@
 - **纯响应式。** 文本、配置和插件都响应状态变化，渲染结果自动更新，无需手动刷新。
 - **高度可定制。** 自定义样式，也可以用自己的组件渲染链接、代码块等元素。
 - **插件化。** 通过可组合的插件扩展 Markdown 语法与渲染方式。
-- **核心层框架无关。** [`@fluxdown/core`](../packages/core/docs/README.zh-CN.md) 基于框架无关的 [`functive`](../packages/functive/docs/README.zh-CN.md) 包构建，可用于实现不同 UI 框架的渲染器。
+- **核心层框架无关。** [`@fluxdown/core`](../packages/core/docs/README.zh-CN.md) 基于框架无关的 [`stative`](../packages/stative/docs/README.zh-CN.md) 包构建，可用于实现不同 UI 框架的渲染器。
 
 ## 快速上手：React
 

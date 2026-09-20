@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
-import { MutableState } from 'functive';
 import { type ReactNode } from 'react';
+import { MutableState } from 'stative';
 
 import { RootReconciler } from '../components/root-reconciler';
 

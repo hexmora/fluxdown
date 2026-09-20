@@ -1,8 +1,8 @@
 import type { IRenderPatchItem } from '@fluxdown/core';
 import type { IReactRenderPlugin } from '@fluxdown/react-presets/base';
-import type { IReactiveState } from 'functive';
 import type { Element, ElementContent, Parent, RootContent } from 'hast';
 import type { ReactNode } from 'react';
+import type { IReactiveState } from 'stative';
 
 import {
   getReactProps,

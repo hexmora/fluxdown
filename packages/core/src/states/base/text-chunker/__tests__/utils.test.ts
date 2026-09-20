@@ -1,8 +1,8 @@
 import type { IRawPatchItem } from '@fluxdown/types';
 
 import { expectTypeOf } from 'expect-type';
-import { BatchScheduler, type IReactiveState, MutableState, render, S } from 'functive';
 import { cloneDeep } from 'lodash-es';
+import { BatchScheduler, type IReactiveState, MutableState, render, S } from 'stative';
 
 import { type IBlockSection, TextChunker } from '../index';
 import { type ChunkedPatch, chunkPatchesByTexts, chunkTextOfMarkdown } from '../utils';

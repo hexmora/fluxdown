@@ -1,9 +1,9 @@
 import type { IBlockState } from '@fluxdown/types';
 import type { Root as HastRoot } from 'hast';
 
-import { once, useClearable, useMap } from 'functive';
 import { last } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
+import { once, useClearable, useMap } from 'stative';
 
 import type { ShadBlockEntry, ShadBlocksInputs } from './type';
 

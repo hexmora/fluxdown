@@ -1,4 +1,4 @@
-import { BatchScheduler } from 'functive';
+import { BatchScheduler } from 'stative';
 
 import { StepSmoothScheduler } from '../utils/smooth';
 import {

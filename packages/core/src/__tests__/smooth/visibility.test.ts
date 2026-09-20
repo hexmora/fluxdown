@@ -1,5 +1,5 @@
 import { Smooth } from '@fluxdown/core-presets/mapper';
-import { BatchScheduler, ReactiveState, render, S } from 'functive';
+import { BatchScheduler, ReactiveState, render, S } from 'stative';
 
 import type { HastRoot } from '../../typings';
 

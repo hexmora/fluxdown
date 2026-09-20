@@ -5,6 +5,7 @@ import type { Plugin } from 'unified';
 
 import { BaseRehypePlugin } from '@fluxdown/core-presets/rehype';
 import { assert } from '@fluxdown/utils';
+import { first, last } from 'lodash-es';
 import {
   D,
   type IReadableClosure,
@@ -14,8 +15,7 @@ import {
   render,
   S,
   useFlatten,
-} from 'functive';
-import { first, last } from 'lodash-es';
+} from 'stative';
 
 import type { HastRoot } from '../../../typings';
 import type { MapperPluggable } from '../../base';

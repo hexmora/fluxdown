@@ -2,7 +2,7 @@ import type { IRenderPatchItem } from '@fluxdown/core';
 import type { ReactNode } from 'react';
 
 import { act, render, screen } from '@testing-library/react';
-import { MutableState } from 'functive';
+import { MutableState } from 'stative';
 
 import { PatchReconciler } from '..';
 

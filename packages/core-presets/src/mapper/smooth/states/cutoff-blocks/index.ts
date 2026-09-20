@@ -1,7 +1,7 @@
 import type { IBlockState } from '@fluxdown/types';
 
-import { once, useClearable, useCombineMap, useMap } from 'functive';
 import { shallowEqual } from 'shallow-equal';
+import { once, useClearable, useCombineMap, useMap } from 'stative';
 
 import type { CutoffBlockEntry, CutoffBlocksInputs } from './type';
 

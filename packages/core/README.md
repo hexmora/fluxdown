@@ -6,7 +6,7 @@
 
 Turn Markdown into reactive content blocks and connect them to your own renderer. `@fluxdown/core` handles Markdown processing and updates, while you choose the UI framework or output format.
 
-Use it to build a framework integration or work with Markdown as structured data. For a ready-to-use React component, see [Fluxdown](../../README.md#quick-start-react). Core's state flows are powered by [`functive`](../functive/README.md).
+Use it to build a framework integration or work with Markdown as structured data. For a ready-to-use React component, see [Fluxdown](../../README.md#quick-start-react). Core's state flows are powered by [`stative`](../stative/README.md).
 
 ## Features
 
@@ -21,7 +21,7 @@ Use it to build a framework integration or work with Markdown as structured data
 ### Install
 
 ```sh
-npm install @fluxdown/core functive
+npm install @fluxdown/core stative
 ```
 
 ### Process streaming Markdown
@@ -32,7 +32,7 @@ npm install @fluxdown/core functive
 import { BaseRenderer, Core, type HastRoot } from "@fluxdown/core";
 import type { IBlockState } from "@fluxdown/types";
 import type { ElementContent, Parent } from "hast";
-import { D, MutableState, render, S } from "functive";
+import { D, MutableState, render, S } from "stative";
 
 type MarkdownBlock = IBlockState<HastRoot>;
 
@@ -69,7 +69,7 @@ text.destroy();
 
 Pass the full Markdown text received so far to `text.next`, appending each new chunk to the previous text. The example keeps repairs enabled for incomplete Markdown throughout the stream.
 
-`D(BlocksRenderer)` passes the renderer class as a static value. `render` creates the core instance, and `core.value.value` gives its current output array. See the [`functive` guide](../functive/README.md) for more on state closures and input values.
+`D(BlocksRenderer)` passes the renderer class as a static value. `render` creates the core instance, and `core.value.value` gives its current output array. See the [`stative` guide](../stative/README.md) for more on state closures and input values.
 
 ## Rendering and updates
 

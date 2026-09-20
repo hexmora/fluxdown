@@ -1,4 +1,4 @@
-import { BatchScheduler, once, ReactiveState, useClearable } from 'functive';
+import { BatchScheduler, once, ReactiveState, useClearable } from 'stative';
 
 import type { CompletedInputs } from './type';
 

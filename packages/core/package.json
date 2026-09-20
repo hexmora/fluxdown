@@ -65,13 +65,13 @@
     "@fluxdown/utils": "workspace:*",
     "@types/hast": "catalog:",
     "@types/mdast": "catalog:",
-    "functive": "workspace:*",
     "lodash-es": "catalog:",
     "marked": "catalog:",
     "remark-parse": "catalog:",
     "remark-rehype": "catalog:",
     "rxjs": "catalog:",
     "shallow-equal": "catalog:",
+    "stative": "workspace:*",
     "unified": "catalog:"
   },
   "devDependencies": {

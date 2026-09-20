@@ -1,6 +1,6 @@
 import { useStateValue } from '@fluxdown/react-presets/base';
-import { toState } from 'functive';
 import { memo, useMemo } from 'react';
+import { toState } from 'stative';
 
 import type { BlockReconcilerProps } from './type';
 

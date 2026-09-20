@@ -9,7 +9,7 @@ import {
   render,
   S,
   toClosure,
-} from 'functive';
+} from 'stative';
 
 import type { SmoothBaseInputs, SmoothInputs } from '..';
 import type { CutoffBlocksInputs, SmoothCursorInputs } from '../states';

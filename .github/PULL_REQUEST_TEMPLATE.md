@@ -6,12 +6,12 @@ Use a Conventional Commit PR title that matches the intended squash commit:
   <type>(<scope>): <summary>
 
 Common types: feat, fix, docs, chore, refactor, test, build, ci.
-The scope is optional; use the affected package or area (e.g. core, functive, react).
+The scope is optional; use the affected package or area (e.g. core, stative, react).
 Keep the summary imperative, concise, and focused on the final change.
 
 Examples:
   feat(core): add smooth streaming state closures
-  refactor(functive): unify state closure construction and ownership
+  refactor(stative): unify state closure construction and ownership
   docs: add Fluxdown brand assets
 
 Remove any optional sections that do not apply to this pull request.

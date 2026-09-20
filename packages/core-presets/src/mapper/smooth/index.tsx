@@ -1,10 +1,10 @@
 /**
- * @jsxImportSource functive
+ * @jsxImportSource stative
  */
 
 import type { IBlockState, IPluggableConfig } from '@fluxdown/types';
 
-import { D, type JSXDescriptor, once, useDefaults } from 'functive';
+import { D, type JSXDescriptor, once, useDefaults } from 'stative';
 
 import type { SmoothBaseInputs, SmoothInputs } from './type';
 

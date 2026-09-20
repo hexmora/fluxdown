@@ -6,7 +6,7 @@
 
 将 Markdown 转为响应式内容块，并连接到自己的渲染器。`@fluxdown/core` 负责 Markdown 的处理与更新，UI 框架和输出格式由你选择。
 
-可以用它构建框架集成，也可以将 Markdown 作为结构化数据处理。如果需要开箱即用的 React 组件，请参阅 [Fluxdown](../../../docs/README.zh-CN.md#快速上手react)。Core 的状态流由 [`functive`](../../functive/docs/README.zh-CN.md) 提供支持。
+可以用它构建框架集成，也可以将 Markdown 作为结构化数据处理。如果需要开箱即用的 React 组件，请参阅 [Fluxdown](../../../docs/README.zh-CN.md#快速上手react)。Core 的状态流由 [`stative`](../../stative/docs/README.zh-CN.md) 提供支持。
 
 ## 特点
 
@@ -21,7 +21,7 @@
 ### 安装
 
 ```sh
-npm install @fluxdown/core functive
+npm install @fluxdown/core stative
 ```
 
 ### 处理流式 Markdown
@@ -32,7 +32,7 @@ npm install @fluxdown/core functive
 import { BaseRenderer, Core, type HastRoot } from "@fluxdown/core";
 import type { IBlockState } from "@fluxdown/types";
 import type { ElementContent, Parent } from "hast";
-import { D, MutableState, render, S } from "functive";
+import { D, MutableState, render, S } from "stative";
 
 type MarkdownBlock = IBlockState<HastRoot>;
 
@@ -69,7 +69,7 @@ text.destroy();
 
 向 `text.next` 传入当前已收到的完整 Markdown 文本，每收到一个新片段，就将它追加到之前的文本。示例在整个流式过程中始终开启对不完整 Markdown 的修复。
 
-`D(BlocksRenderer)` 将渲染器类作为静态值传入。`render` 创建 Core 实例，`core.value.value` 获取当前的输出数组。有关状态闭包和输入值的更多说明，请参阅 [`functive` 指南](../../functive/docs/README.zh-CN.md)。
+`D(BlocksRenderer)` 将渲染器类作为静态值传入。`render` 创建 Core 实例，`core.value.value` 获取当前的输出数组。有关状态闭包和输入值的更多说明，请参阅 [`stative` 指南](../../stative/docs/README.zh-CN.md)。
 
 ## 渲染与更新
 

@@ -1,5 +1,5 @@
-import type { IDestructible } from 'functive';
 import type { Root as MdastRoot } from 'mdast';
+import type { IDestructible } from 'stative';
 import type { Plugin } from 'unified';
 import type { Node } from 'unist';
 

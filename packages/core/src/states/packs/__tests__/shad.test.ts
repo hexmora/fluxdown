@@ -4,6 +4,7 @@ import type { ElementContent, Parent } from 'hast';
 
 import { Shad } from '@fluxdown/core-presets/mapper';
 import { assert } from '@fluxdown/utils';
+import { last } from 'lodash-es';
 import {
   D,
   type IReadableClosure,
@@ -14,8 +15,7 @@ import {
   S,
   useFlatten,
   useMap,
-} from 'functive';
-import { last } from 'lodash-es';
+} from 'stative';
 
 import type { HastRoot } from '../../../typings';
 import type { MapperPluggable } from '../../base';

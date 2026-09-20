@@ -90,6 +90,16 @@
         "name": "@fluxdown/mdast",
         "directory": "packages/mdast"
       }
+    },
+    {
+      "from": {
+        "name": "functive",
+        "directory": "packages/functive"
+      },
+      "to": {
+        "name": "stative",
+        "directory": "packages/stative"
+      }
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
-  "name": "functive",
-  "version": "0.5.2",
+  "name": "stative",
+  "version": "1.0.1",
   "description": "Headless reactive primitives for Fluxdown streaming state.",
   "keywords": [
     "headless",
@@ -10,7 +10,7 @@
     "rxjs",
     "streaming"
   ],
-  "homepage": "https://github.com/hexmora/fluxdown/tree/main/packages/functive#readme",
+  "homepage": "https://github.com/hexmora/fluxdown/tree/main/packages/stative#readme",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },
@@ -18,7 +18,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hexmora/fluxdown.git",
-    "directory": "packages/functive"
+    "directory": "packages/stative"
   },
   "files": [
     "dist/esm",
@@ -65,7 +65,7 @@
   "scripts": {
     "build": "rslib build",
     "lint": "oxlint .",
-    "test": "jest --config ../../jest.config.ts --selectProjects functive --runInBand",
+    "test": "jest --config ../../jest.config.ts --selectProjects stative --runInBand",
     "typecheck": "tsc --noEmit",
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },

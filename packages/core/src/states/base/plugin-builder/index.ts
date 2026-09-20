@@ -1,8 +1,8 @@
 import type { IPluginWithConfig } from '@fluxdown/types';
-import type { IDestructible } from 'functive';
+import type { IDestructible } from 'stative';
 
 import { cacheDiffMap } from '@fluxdown/utils';
-import { once, useClearable, useMap } from 'functive';
+import { once, useClearable, useMap } from 'stative';
 
 import type { PluginBuilderInputs, PluginEntry } from './type';
 

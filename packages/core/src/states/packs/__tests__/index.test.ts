@@ -32,6 +32,7 @@ import {
   type RepairPluginSystemConfig,
 } from '@fluxdown/types';
 import { expectTypeOf } from 'expect-type';
+import { first, last, nth } from 'lodash-es';
 import {
   D,
   type IReactiveState,
@@ -40,8 +41,7 @@ import {
   ReactiveState,
   render,
   S,
-} from 'functive';
-import { first, last, nth } from 'lodash-es';
+} from 'stative';
 
 import type { HastRoot } from '../../../typings';
 import type { BlockCompilerConfig } from '../../hast';

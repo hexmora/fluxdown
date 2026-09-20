@@ -1,11 +1,12 @@
 /**
- * @jsxImportSource functive
+ * @jsxImportSource stative
  */
 
 import type { IBlockState } from '@fluxdown/types';
 
 import { PluginPriority } from '@fluxdown/types';
 import { expectTypeOf } from 'expect-type';
+import { reverse, sortBy } from 'lodash-es';
 import {
   BatchScheduler,
   type IReadableClosure,
@@ -17,8 +18,7 @@ import {
   useClearable,
   useCombineMap,
   useMap,
-} from 'functive';
-import { reverse, sortBy } from 'lodash-es';
+} from 'stative';
 
 import type { MapperInputs, MapperPluggable } from '..';
 import type { HastRoot } from '../../../../typings';

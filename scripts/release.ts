@@ -353,10 +353,10 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
 
     let typeSmoke = '';
 
-    if (specifiers.includes('functive')) {
+    if (specifiers.includes('stative')) {
       typeSmoke = `
-import { D, render, type JSXDescriptor } from 'functive';
-import { jsx } from 'functive/jsx-runtime';
+import { D, render, type JSXDescriptor } from 'stative';
+import { jsx } from 'stative/jsx-runtime';
 const descriptor: JSXDescriptor<number> = jsx(() => 42, {});
 render(descriptor);
 jsx(({ x }: { x: number }) => x, { x: D(42) });

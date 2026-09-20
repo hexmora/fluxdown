@@ -61,7 +61,7 @@
     "@types/hast": "catalog:",
     "@types/mdast": "catalog:",
     "@types/unist": "catalog:",
-    "functive": "workspace:*",
+    "stative": "workspace:*",
     "unified": "catalog:"
   },
   "devDependencies": {

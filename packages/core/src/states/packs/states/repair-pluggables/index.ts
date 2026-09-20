@@ -1,7 +1,7 @@
 import type { IPluggable, IRepairPlugin } from '@fluxdown/types';
 
 import { DanglingFootnoteRepairPlugin, PRESET_REPAIR_PLUGINS } from '@fluxdown/core-presets/repair';
-import { memoReturns } from 'functive';
+import { memoReturns } from 'stative';
 
 import type { RepairPluggablesInputs } from './type';
 

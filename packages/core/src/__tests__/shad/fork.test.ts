@@ -10,7 +10,7 @@ import {
   render,
   S,
   useMap,
-} from 'functive';
+} from 'stative';
 
 import type { HastRoot } from '../../typings';
 

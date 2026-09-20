@@ -1,4 +1,4 @@
-import { BatchScheduler, MutableState, ReactiveState, render, S } from 'functive';
+import { BatchScheduler, MutableState, ReactiveState, render, S } from 'stative';
 
 import { BlockLengths } from '..';
 import { createArrayBlock } from '../../../../../__tests__/block';

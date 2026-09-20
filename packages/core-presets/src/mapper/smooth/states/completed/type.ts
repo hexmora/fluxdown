@@ -1,4 +1,4 @@
-import type { IReadableClosure } from 'functive';
+import type { IReadableClosure } from 'stative';
 
 export interface CompletedInputs {
   /**

@@ -29,7 +29,7 @@ changelogs. The dry run builds and checks actual packages without publishing.
 4. Review the workflow summary and packages. **@hexmora must manually approve** the
    `npm-production` environment, even when @hexmora prepared or merged the PR.
 5. The approved packages are published to `latest` and tagged in Git. GitHub
-   Releases are created only for `functive`, `fluxdown`, and `@fluxdown/core`.
+   Releases are created only for `stative`, `fluxdown`, and `@fluxdown/core`.
    A private-only version PR does not publish to npm.
 
 If `main` advances before merge, run **Prepare release** again. Do not use

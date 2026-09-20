@@ -1,6 +1,6 @@
 import { assert } from '@fluxdown/utils';
 import { expectTypeOf } from 'expect-type';
-import { MutableState, ReactiveState, render, S } from 'functive';
+import { MutableState, ReactiveState, render, S } from 'stative';
 
 import type { SmoothTickerClass } from '../../../../..';
 import type { SmoothTick } from '../states';

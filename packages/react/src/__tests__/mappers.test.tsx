@@ -3,6 +3,8 @@ import type { IPluggableConfig } from '@fluxdown/types';
 
 import { Shad, Smooth } from '@fluxdown/core-presets/mapper';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
+import { first, reverse } from 'lodash-es';
+import { createRef, StrictMode } from 'react';
 import {
   type IReadableClosure,
   MutableState,
@@ -12,9 +14,7 @@ import {
   useCombineMap,
   useDefaults,
   useMap,
-} from 'functive';
-import { first, reverse } from 'lodash-es';
-import { createRef, StrictMode } from 'react';
+} from 'stative';
 
 import type { FluxdownRef, IPluginItem } from '../types';
 
