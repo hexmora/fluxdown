@@ -16,7 +16,7 @@ Start with the React component, or use the framework-independent core to build y
 - **Fully reactive.** Text, configuration, and plugins react to state changes, keeping the output up to date without manual refreshes.
 - **Highly customizable.** Bring your own styles and components, from links to code blocks.
 - **Pluggable.** Extend Markdown syntax and rendering with composable plugins.
-- **Framework-independent core.** [`@fluxdown/core`](./packages/core/README.md) is built on the framework-free [`functive`](./packages/functive/README.md) package and can power renderers for different UI frameworks.
+- **Framework-independent core.** [`@fluxdown/core`](./packages/core/README.md) is built on the framework-free [`stative`](./packages/stative/README.md) package and can power renderers for different UI frameworks.
 
 ## Quick start: React
 

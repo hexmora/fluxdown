@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import semver from 'semver';
 
 export const repository = 'hexmora/fluxdown';
-const githubReleasePackages = new Set(['@fluxdown/core', 'fluxdown', 'functive']);
+const githubReleasePackages = new Set(['@fluxdown/core', 'fluxdown', 'stative']);
 const releaseBranch = 'changeset-release/main';
 const preparePath = '.github/workflows/prepare-release.yml';
 const releasePath = '.github/workflows/release.yml';

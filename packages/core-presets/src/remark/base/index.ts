@@ -4,7 +4,7 @@ import type { Root as MdastRoot } from 'mdast';
 import type { Plugin } from 'unified';
 import type { Node } from 'unist';
 
-import { Destructible } from 'functive';
+import { Destructible } from 'stative';
 
 export abstract class BaseRemarkPlugin<
   P = void,

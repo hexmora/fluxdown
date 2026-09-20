@@ -369,9 +369,9 @@ importers:
       '@types/mdast':
         specifier: 'catalog:'
         version: 4.0.4
-      functive:
+      stative:
         specifier: workspace:*
-        version: link:../functive
+        version: link:../stative
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1
@@ -442,9 +442,9 @@ importers:
       '@types/unist':
         specifier: 'catalog:'
         version: 3.0.3
-      functive:
+      stative:
         specifier: workspace:*
-        version: link:../functive
+        version: link:../stative
       hast-util-sanitize:
         specifier: 'catalog:'
         version: 5.0.2
@@ -543,7 +543,7 @@ importers:
         specifier: 'catalog:'
         version: 7.0.2
 
-  packages/functive:
+  packages/stative:
     dependencies:
       lodash-es:
         specifier: 'catalog:'
@@ -650,9 +650,9 @@ importers:
       classnames:
         specifier: 'catalog:'
         version: 2.5.1
-      functive:
+      stative:
         specifier: workspace:*
-        version: link:../functive
+        version: link:../stative
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1
@@ -747,9 +747,9 @@ importers:
       classnames:
         specifier: 'catalog:'
         version: 2.5.1
-      functive:
+      stative:
         specifier: workspace:*
-        version: link:../functive
+        version: link:../stative
       katex:
         specifier: 'catalog:'
         version: 0.17.0
@@ -820,9 +820,9 @@ importers:
       '@types/unist':
         specifier: 'catalog:'
         version: 3.0.3
-      functive:
+      stative:
         specifier: workspace:*
-        version: link:../functive
+        version: link:../stative
       unified:
         specifier: 'catalog:'
         version: 11.0.5

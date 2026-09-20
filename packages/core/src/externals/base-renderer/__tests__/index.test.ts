@@ -6,7 +6,7 @@ import {
   ReactiveState,
   render as renderState,
   S,
-} from 'functive';
+} from 'stative';
 
 import {
   BaseRenderPlugin,

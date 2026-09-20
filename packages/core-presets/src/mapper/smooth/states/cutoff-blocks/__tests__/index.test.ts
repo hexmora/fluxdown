@@ -1,8 +1,8 @@
 import type { IBlockState } from '@fluxdown/types';
-import type { IReactiveState } from 'functive';
+import type { IReactiveState } from 'stative';
 
 import { expectTypeOf } from 'expect-type';
-import { mapClosure, MutableState, render, S, toClosure } from 'functive';
+import { mapClosure, MutableState, render, S, toClosure } from 'stative';
 
 import type { SmoothPosition } from '../../smooth-cursor/states';
 

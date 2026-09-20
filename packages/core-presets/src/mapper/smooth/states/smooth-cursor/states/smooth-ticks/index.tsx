@@ -1,9 +1,9 @@
 /**
- * @jsxImportSource functive
+ * @jsxImportSource stative
  */
 
-import { D, type JSXDescriptor, once, useCombineMap, useSwitchMap } from 'functive';
 import { sum } from 'lodash-es';
+import { D, type JSXDescriptor, once, useCombineMap, useSwitchMap } from 'stative';
 
 import type { SmoothTickerClass } from '../../../../type';
 import type { SmoothTicksInputs } from './type';

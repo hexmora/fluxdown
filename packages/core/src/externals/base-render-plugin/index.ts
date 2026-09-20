@@ -1,6 +1,6 @@
 import type { IBasePluginConfig } from '@fluxdown/types';
 
-import { Destructible } from 'functive';
+import { Destructible } from 'stative';
 
 import { IRenderPlugin, IRenderPluginMatchParams, IRenderPluginRenderParams } from './type';
 

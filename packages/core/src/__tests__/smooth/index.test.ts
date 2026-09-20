@@ -4,7 +4,7 @@ import type {
   SmoothTickerClass,
 } from '@fluxdown/core-presets/mapper';
 import type { IBlockState } from '@fluxdown/types';
-import type { IReactiveState, IReadableClosure } from 'functive';
+import type { IReactiveState, IReadableClosure } from 'stative';
 
 import { expectTypeOf } from 'expect-type';
 

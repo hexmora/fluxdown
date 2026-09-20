@@ -1,5 +1,7 @@
 import type { IBlockState } from '@fluxdown/types';
 
+import { max } from 'lodash-es';
+import { Subscription } from 'rxjs';
 import {
   BatchScheduler,
   D,
@@ -8,9 +10,7 @@ import {
   MutableState,
   render,
   S,
-} from 'functive';
-import { max } from 'lodash-es';
-import { Subscription } from 'rxjs';
+} from 'stative';
 
 import type { SmoothPosition } from '../smooth-cursor/states';
 import type { CutoffBlockEntry } from './type';

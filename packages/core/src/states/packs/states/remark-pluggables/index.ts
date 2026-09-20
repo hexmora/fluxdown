@@ -7,7 +7,7 @@ import {
   SyntaxFootnoteRemarkPlugin,
   SyntaxMathRemarkPlugin,
 } from '@fluxdown/core-presets/remark';
-import { memoReturns } from 'functive';
+import { memoReturns } from 'stative';
 
 import type { RemarkPluggablesInputs } from './type';
 

@@ -102,12 +102,12 @@
     "@mathjax/src": "catalog:",
     "@types/hast": "catalog:",
     "classnames": "catalog:",
-    "functive": "workspace:*",
     "katex": "catalog:",
     "lodash-es": "catalog:",
     "react-error-boundary": "catalog:",
     "shallow-equal": "catalog:",
-    "shiki": "catalog:"
+    "shiki": "catalog:",
+    "stative": "workspace:*"
   },
   "devDependencies": {
     "@rslib/core": "catalog:",

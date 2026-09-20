@@ -19,7 +19,7 @@ const config: StorybookConfig = {
           '@prefix': resolve(import.meta.dirname, '../../react-presets/src/styles/_prefix.scss'),
         },
       },
-      // Workspace packages use functive/jsx-runtime, which has no jsxDEV export.
+      // Workspace packages use stative/jsx-runtime, which has no jsxDEV export.
       oxc: {
         jsx: {
           development: false,

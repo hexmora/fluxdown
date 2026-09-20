@@ -10,7 +10,7 @@ import {
   render,
   S,
   toClosure,
-} from 'functive';
+} from 'stative';
 
 import type { SmoothSchedulerClass } from '../../..';
 import type { SmoothPosition } from '../states';

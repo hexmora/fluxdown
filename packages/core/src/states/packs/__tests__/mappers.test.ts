@@ -4,6 +4,7 @@ import type { ElementContent, Parent, RootContent } from 'hast';
 import { Smooth } from '@fluxdown/core-presets/mapper';
 import { PluginPriority } from '@fluxdown/types';
 import { assert } from '@fluxdown/utils';
+import { first, last, reverse, take } from 'lodash-es';
 import {
   D,
   type IReadableClosure,
@@ -14,8 +15,7 @@ import {
   S,
   useClearable,
   useMap,
-} from 'functive';
-import { first, last, reverse, take } from 'lodash-es';
+} from 'stative';
 
 import type { HastRoot } from '../../../typings';
 import type { MapperInputs, MapperPluggable } from '../../base';

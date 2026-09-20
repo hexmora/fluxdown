@@ -1,8 +1,8 @@
 import type { IBlockState } from '@fluxdown/types';
-import type { IReactiveState } from 'functive';
+import type { IReactiveState } from 'stative';
 
 import { expectTypeOf } from 'expect-type';
-import { BatchScheduler, mapClosure, MutableState, ReactiveState, render, S } from 'functive';
+import { BatchScheduler, mapClosure, MutableState, ReactiveState, render, S } from 'stative';
 
 import { Smooth } from '..';
 import { StepSmoothScheduler } from '../modules/scheduler/__tests__/utils';

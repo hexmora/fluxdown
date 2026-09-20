@@ -4,7 +4,7 @@ import type { IPluggable, IPluggableConfig, IRemarkPlugin } from '@fluxdown/type
 
 import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-presets/remark';
 import { renderHook } from '@testing-library/react';
-import { once } from 'functive';
+import { once } from 'stative';
 
 import type { IPluginItem } from '../../types';
 

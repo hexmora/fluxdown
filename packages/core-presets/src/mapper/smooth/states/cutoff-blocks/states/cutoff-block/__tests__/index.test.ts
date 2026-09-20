@@ -1,8 +1,8 @@
 import type { IBlockState } from '@fluxdown/types';
-import type { IReactiveState } from 'functive';
+import type { IReactiveState } from 'stative';
 
 import { expectTypeOf } from 'expect-type';
-import { D, MutableState, render, S } from 'functive';
+import { D, MutableState, render, S } from 'stative';
 
 import { CutoffBlock } from '..';
 import { createArrayBlock } from '../../../../../__tests__/block';

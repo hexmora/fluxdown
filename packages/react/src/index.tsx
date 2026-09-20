@@ -14,9 +14,9 @@ import { PRESET_RENDER_PLUGINS } from '@fluxdown/react-presets/render';
 import { PRESET_SLOT_PLUGINS } from '@fluxdown/react-presets/slot';
 import { defaultsBy } from '@fluxdown/utils';
 import cn from 'classnames';
-import { D, render, S } from 'functive';
 import { forwardRef, memo, useImperativeHandle } from 'react';
 import { shallowEqual } from 'shallow-equal';
+import { D, render, S } from 'stative';
 
 import type { FluxdownProps, FluxdownRef } from './types';
 

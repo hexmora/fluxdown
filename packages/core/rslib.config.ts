@@ -4,5 +4,5 @@ export default packageConfig({
   entry: {
     index: './src/index.ts',
   },
-  jsxImportSource: 'functive',
+  jsxImportSource: 'stative',
 });

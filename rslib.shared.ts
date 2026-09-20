@@ -44,7 +44,7 @@ export function packageConfig({ entry, react, jsxImportSource }: PackageOptions)
       {
         format: 'esm',
         // Preserve shared declaration modules: bundling each entry duplicates
-        // functive's unique-symbol brands and makes its JSX types incompatible.
+        // stative's unique-symbol brands and makes its JSX types incompatible.
         dts: { autoExtension: true },
         output: { distPath: './dist/esm' },
         plugins: react ? [browserStylesPlugin(Object.keys(entry), 'esm')] : [],

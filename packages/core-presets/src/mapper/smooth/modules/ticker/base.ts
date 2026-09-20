@@ -1,5 +1,5 @@
-import { Destructible } from 'functive';
 import { Subject } from 'rxjs';
+import { Destructible } from 'stative';
 
 import type { ITicker } from './type';
 

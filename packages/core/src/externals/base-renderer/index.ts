@@ -1,7 +1,7 @@
 import type { IBlockState } from '@fluxdown/types';
 
-import { BaseStateClosure } from 'functive';
 import { shallowEqual } from 'shallow-equal';
+import { BaseStateClosure } from 'stative';
 
 import type { BaseRendererInputs } from './type';
 

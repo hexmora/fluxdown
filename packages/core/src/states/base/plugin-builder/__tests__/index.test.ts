@@ -6,9 +6,9 @@ import type {
 } from '@fluxdown/types';
 
 import { PluginPriority } from '@fluxdown/types';
-import { D, type IReactiveState, render, S, toReactiveState } from 'functive';
 import { isArray } from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
+import { D, type IReactiveState, render, S, toReactiveState } from 'stative';
 
 import { buildPluggables, isPluggableEqual, PluginBuilder } from '..';
 

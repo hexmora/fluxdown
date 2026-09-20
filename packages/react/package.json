@@ -81,9 +81,9 @@
     "@fluxdown/utils": "workspace:*",
     "@types/hast": "catalog:",
     "classnames": "catalog:",
-    "functive": "workspace:*",
     "lodash-es": "catalog:",
-    "shallow-equal": "catalog:"
+    "shallow-equal": "catalog:",
+    "stative": "workspace:*"
   },
   "devDependencies": {
     "@rslib/core": "catalog:",

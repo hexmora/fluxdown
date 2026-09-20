@@ -1,11 +1,4 @@
-import {
-  BatchScheduler,
-  combineMapClosure,
-  MutableState,
-  ReactiveState,
-  render,
-  S,
-} from 'functive';
+import { BatchScheduler, combineMapClosure, MutableState, ReactiveState, render, S } from 'stative';
 
 import { Completed } from '..';
 

@@ -1,8 +1,8 @@
 /**
- * @jsxImportSource functive
+ * @jsxImportSource stative
  */
 
-import { type JSXDescriptor, once, useCreate } from 'functive';
+import { type JSXDescriptor, once, useCreate } from 'stative';
 
 import type { SmoothCursorInputs } from './type';
 

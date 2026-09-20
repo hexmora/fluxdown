@@ -1,8 +1,8 @@
 import type { IRangeState } from '@fluxdown/types';
 
 import { compute } from '@fluxdown/utils';
-import { BaseStateClosure } from 'functive';
 import { isUndefined } from 'lodash-es';
+import { BaseStateClosure } from 'stative';
 
 export class Range extends BaseStateClosure<IRangeState | null> {
   protected render() {

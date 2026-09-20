@@ -5,7 +5,7 @@ import type {
   IRehypePlugin,
   IRemarkPlugin,
 } from '@fluxdown/types';
-import type { IReadableClosure } from 'functive';
+import type { IReadableClosure } from 'stative';
 
 import type { HastRoot } from '../../../typings';
 import type { IBlockSection } from '../../base';

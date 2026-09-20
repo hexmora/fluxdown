@@ -7,6 +7,7 @@ import type {
 } from '@fluxdown/types';
 import type { RootContent } from 'hast';
 
+import { isEqual, last, times, uniq } from 'lodash-es';
 import {
   BaseStateClosure,
   type IReactiveState,
@@ -18,8 +19,7 @@ import {
   render,
   S,
   toClosure,
-} from 'functive';
-import { isEqual, last, times, uniq } from 'lodash-es';
+} from 'stative';
 
 import type { HastRoot } from '../../../../typings';
 import type { IBlockSection } from '../../../base';

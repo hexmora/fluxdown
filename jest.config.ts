@@ -26,7 +26,7 @@ const config: Config = {
     'utils',
     'hast',
     'mdast',
-    'functive',
+    'stative',
     'core-presets',
     'core',
     'react-presets',
@@ -49,7 +49,7 @@ const config: Config = {
     moduleNameMapper: { '^(.+\\.svg)\\?react$': '$1' },
     transform: {
       // A project may import another package's sources, so select JSX by source path.
-      '^.+/packages/(?:functive|core|core-presets)/.+\\.[jt]sx?$': swc('functive'),
+      '^.+/packages/(?:stative|core|core-presets)/.+\\.[jt]sx?$': swc('stative'),
       '^.+\\.[cm]?[jt]sx?$': swc('react'),
       '^.+\\.(?:css|scss|sass|less|svg)$': '<rootDir>/scripts/testing/assets-transformer.ts',
     },

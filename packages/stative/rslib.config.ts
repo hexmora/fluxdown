@@ -5,5 +5,5 @@ export default packageConfig({
     index: './src/index.ts',
     'jsx-runtime': './src/jsx-runtime.ts',
   },
-  jsxImportSource: 'functive',
+  jsxImportSource: 'stative',
 });

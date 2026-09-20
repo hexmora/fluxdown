@@ -1,5 +1,5 @@
 import type { IPluggable, IPluginWithConfig } from '@fluxdown/types';
-import type { IReadableClosure } from 'functive';
+import type { IReadableClosure } from 'stative';
 
 import type { MapperPluggable } from '../mapper-composer';
 

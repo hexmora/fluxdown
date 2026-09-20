@@ -1,13 +1,13 @@
 import type { MapperPluggable } from '@fluxdown/core';
 import type { IPluggable, IPluginWithConfig } from '@fluxdown/types';
-import type { FlattenedState } from 'functive';
+import type { FlattenedState } from 'stative';
 
 import { toPluggable } from '@fluxdown/core';
 import { useDeferredUnmount, useStateOf, useStatic } from '@fluxdown/react-presets/base';
-import { flattenClosure } from 'functive';
 import { forEach } from 'lodash-es';
 import { useMemo } from 'react';
 import { shallowEqual } from 'shallow-equal';
+import { flattenClosure } from 'stative';
 
 import type { IPluginItem, PluginConfigs } from '../types';
 

@@ -1,11 +1,11 @@
 /**
- * @jsxImportSource functive
+ * @jsxImportSource stative
  */
 
 import type { IBlockState } from '@fluxdown/types';
 import type { Root as HastRoot } from 'hast';
 
-import { D, type IReactiveState, once, ReactiveState, render, useClearable } from 'functive';
+import { D, type IReactiveState, once, ReactiveState, render, useClearable } from 'stative';
 
 import type { ShadBlockInputs } from './type';
 

@@ -5,9 +5,9 @@ import type {
   IRenderPluginRenderParams,
 } from '@fluxdown/core';
 import type { IPluggable } from '@fluxdown/types';
-import type { IReactiveState } from 'functive';
 import type { Element, ElementContent, Parent } from 'hast';
 import type { ReactNode } from 'react';
+import type { IReactiveState } from 'stative';
 
 export interface ReactRenderExtraParams {
   getProps: (node?: Element) => Record<string, unknown>;

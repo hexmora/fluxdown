@@ -7,5 +7,5 @@ export default packageConfig({
     remark: './src/remark/index.ts',
     repair: './src/repair/index.ts',
   },
-  jsxImportSource: 'functive',
+  jsxImportSource: 'stative',
 });

@@ -1,5 +1,5 @@
 import type { IBlockState } from '@fluxdown/types';
-import type { IReadableClosure, Newable } from 'functive';
+import type { IReadableClosure, Newable } from 'stative';
 
 import type { BaseRenderer } from '.';
 import type { IRenderPlugin } from '../base-render-plugin';

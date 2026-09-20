@@ -1,7 +1,7 @@
 import { act, render, renderHook, screen, waitFor } from '@testing-library/react';
-import { MutableState } from 'functive';
 import { type ReactNode, StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
+import { MutableState } from 'stative';
 
 import { useStateOf, useStateValue } from '..';
 

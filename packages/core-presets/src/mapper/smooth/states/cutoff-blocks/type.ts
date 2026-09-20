@@ -1,5 +1,5 @@
 import type { IBlockState } from '@fluxdown/types';
-import type { IReactiveState, IReadableClosure, MutableState } from 'functive';
+import type { IReactiveState, IReadableClosure, MutableState } from 'stative';
 
 import type { SmoothPosition } from '../smooth-cursor/states';
 

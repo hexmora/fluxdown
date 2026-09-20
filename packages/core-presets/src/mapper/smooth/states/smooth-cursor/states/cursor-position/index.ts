@@ -1,6 +1,6 @@
-import { once, S, useCombine, useCombineMap, useCreate } from 'functive';
 import { sum } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
+import { once, S, useCombine, useCombineMap, useCreate } from 'stative';
 
 import type { IScheduler } from '../../../../modules';
 import type { CursorPositionInputs, SmoothPosition } from './type';

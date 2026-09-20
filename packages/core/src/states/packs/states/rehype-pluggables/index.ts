@@ -1,7 +1,7 @@
 import type { IPluggable, IRehypePlugin } from '@fluxdown/types';
 
 import { HoistFootnoteRehypePlugin, PRESET_REHYPE_PLUGINS } from '@fluxdown/core-presets/rehype';
-import { memoReturns } from 'functive';
+import { memoReturns } from 'stative';
 
 import type { RehypePluggablesInputs } from './type';
 

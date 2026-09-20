@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
-import { combineState, mapClosure } from 'functive';
 import { StrictMode } from 'react';
+import { combineState, mapClosure } from 'stative';
 
 import { usePluginConfig } from '..';
 

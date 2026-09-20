@@ -3,8 +3,8 @@ import type { IBlockMeta, IBlockState } from '@fluxdown/types';
 import type { Element, ElementContent, RootContent, Text } from 'hast';
 
 import { Smooth } from '@fluxdown/core-presets/mapper';
-import { MutableState, render, S } from 'functive';
 import { first, last } from 'lodash-es';
+import { MutableState, render, S } from 'stative';
 
 import type { HastRoot } from '../../typings';
 

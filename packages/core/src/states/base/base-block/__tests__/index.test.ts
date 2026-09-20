@@ -11,7 +11,7 @@ import {
   type StateClosureInputProps,
   useClearable,
   useMap,
-} from 'functive';
+} from 'stative';
 
 import type { BaseBlockItemInputs } from '../type';
 
