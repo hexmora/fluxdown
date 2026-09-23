@@ -1,16 +1,7 @@
 import type { IBlockState } from '@fluxdown/types';
 
-import { max } from 'lodash-es';
 import { Subscription } from 'rxjs';
-import {
-  BatchScheduler,
-  D,
-  type IReactiveState,
-  type IReadableClosure,
-  MutableState,
-  render,
-  S,
-} from 'stative';
+import { D, type IReadableClosure, MutableState, render, S } from 'stative';
 
 import type { SmoothPosition } from '../smooth-cursor/states';
 import type { CutoffBlockEntry } from './type';
@@ -33,20 +24,6 @@ export const clearCutoffBlocks = <T>(entries: Map<IBlockState<T>, CutoffBlockEnt
   entries.clear();
 
   cleanup.unsubscribe();
-};
-
-export const setCutoffBlocksPriority = <T>(
-  state: IReactiveState<IBlockState<T>[]>,
-  entries: Map<IBlockState<T>, CutoffBlockEntry<T>>,
-  inputs: IReactiveState<unknown>[],
-) => {
-  BatchScheduler.setPriority(state, () => {
-    const children = [...entries.values()].flatMap((entry) => entry.dependencies);
-
-    return (
-      (max([...inputs, ...children].map((input) => BatchScheduler.getPriority(input))) ?? 0) + 1
-    );
-  });
 };
 
 export const toCutoffBlocks = <T>(
@@ -75,7 +52,7 @@ export const toCutoffBlocks = <T>(
 
       const closure = render(S([CutoffBlock<T>, { source: D(source), end: range, count }]));
 
-      entry = { end: range, closure, dependencies: [] };
+      entry = { end: range, closure };
 
       entries.set(source, entry);
     } else {
@@ -83,13 +60,7 @@ export const toCutoffBlocks = <T>(
     }
 
     try {
-      const block = entry.closure.value.value;
-
-      if (entry.dependencies.length === 0) {
-        entry.dependencies.push(block, block.meta, block.range);
-      }
-
-      return block;
+      return entry.closure.value.value;
     } catch (error) {
       entries.delete(source);
 

@@ -1,4 +1,4 @@
-import { BatchScheduler } from 'stative';
+import { batch } from 'stative';
 
 import { StepSmoothScheduler } from '../utils/smooth';
 import {
@@ -147,7 +147,7 @@ describe('Smooth ownership', () => {
 
     output.subscribe({ complete });
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       if (scenario.change === 'content') {
         first.source.next(paragraph('abc'));
       } else {
@@ -215,7 +215,7 @@ describe('Smooth ownership', () => {
 
       output.subscribe({ next, complete });
 
-      BatchScheduler.batch(() => {
+      batch(() => {
         block.source.complete();
 
         harness.source.complete();

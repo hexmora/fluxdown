@@ -1,13 +1,6 @@
 import { last, sumBy } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
-import {
-  BatchScheduler,
-  once,
-  ReactiveState,
-  useClearable,
-  useCombineMap,
-  useSwitchMap,
-} from 'stative';
+import { once, ReactiveState, useClearable, useCombineMap, useSwitchMap } from 'stative';
 
 import type { ShadInputs } from '../../type';
 import type { ShadPosition } from './type';
@@ -105,8 +98,6 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
       },
     }),
   );
-
-  BatchScheduler.setPriority(state, () => BatchScheduler.getPriority(input) + 1);
 
   return state;
 });

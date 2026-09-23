@@ -1,4 +1,4 @@
-import { BatchScheduler, once, ReactiveState, useClearable } from 'stative';
+import { once, ReactiveState, useClearable } from 'stative';
 
 import type { CompletedInputs } from './type';
 
@@ -23,8 +23,6 @@ export const Completed = /*#__PURE__*/ once(function Completed({ source }: Compl
         }),
     }),
   );
-
-  BatchScheduler.setPriority(state, () => BatchScheduler.getPriority(input) + 1);
 
   return state;
 });

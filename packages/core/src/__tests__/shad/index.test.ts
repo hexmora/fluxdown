@@ -1,7 +1,7 @@
 import type { IBlockState, IRangeState } from '@fluxdown/types';
 
 import { Shad } from '@fluxdown/core-presets/mapper';
-import { BatchScheduler, MutableState, render, S } from 'stative';
+import { batch, MutableState, render, S } from 'stative';
 
 import type { HastRoot } from '../../typings';
 
@@ -367,7 +367,7 @@ describe('Shad', () => {
 
     expect(fork.meta.value).toEqual(previous.meta.value);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       range.next({ start: 0, end: 4 });
 
       mapped.next(paragraph('ABCD'));
@@ -505,7 +505,7 @@ describe('Shad', () => {
 
     fork.value.subscribe({ complete });
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       block.source.next(paragraph('abcd'));
 
       block.source.complete();

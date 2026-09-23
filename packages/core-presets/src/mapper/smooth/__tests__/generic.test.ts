@@ -2,7 +2,7 @@ import type { IBlockState } from '@fluxdown/types';
 import type { IReactiveState } from 'stative';
 
 import { expectTypeOf } from 'expect-type';
-import { BatchScheduler, mapClosure, MutableState, ReactiveState, render, S } from 'stative';
+import { batch, mapClosure, MutableState, ReactiveState, render, S } from 'stative';
 
 import { Smooth } from '..';
 import { StepSmoothScheduler } from '../modules/scheduler/__tests__/utils';
@@ -99,7 +99,7 @@ describe('Smooth generic blocks', () => {
 
     state.value.subscribe((blocks) => snapshots.push(blocks.map((block) => block.value.value)));
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next([a.block, derived]);
 
       a.source.next([1]);
@@ -143,7 +143,7 @@ describe('Smooth generic blocks', () => {
       const update = () => source.next([replacement.block]);
 
       if (batched) {
-        BatchScheduler.batch(update);
+        batch(update);
       } else {
         update();
       }

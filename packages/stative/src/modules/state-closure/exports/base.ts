@@ -1,4 +1,4 @@
-import { isArray, isPlainObject, mapValues, max, values } from 'lodash-es';
+import { isArray, isPlainObject, mapValues, values } from 'lodash-es';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
@@ -22,7 +22,6 @@ import type {
 } from './render';
 
 import { assert } from '../../../utils';
-import { BatchScheduler } from '../../batch-scheduler';
 import { Destructible } from '../../destructible';
 import { clearByTarget } from '../../destructible/utils';
 import { MutableState } from '../../mutable-state';
@@ -34,6 +33,9 @@ import {
   toReactiveState,
   toState,
 } from '../../reactive-state';
+import { batch } from '../../state-graph/batch';
+import { withStateContext } from '../../state-graph/context';
+import { getStateNode } from '../../state-graph/node';
 import {
   isResolvedClosureSource,
   isResolvedImmediateSource,
@@ -141,7 +143,7 @@ export function switchMapClosure<S, R>(
         };
 
         const handleSchedule = () => {
-          BatchScheduler.schedule(handleUpdate);
+          getStateNode(state).schedule(handleUpdate);
         };
 
         const handleSubscribe = () => {
@@ -194,9 +196,7 @@ export function switchMapClosure<S, R>(
           }
         };
 
-        BatchScheduler.setPriority(handleUpdate, () => BatchScheduler.getPriority(state));
-
-        BatchScheduler.batch(() => {
+        batch(() => {
           handleSubscribe();
 
           subscriptions.add(
@@ -223,11 +223,6 @@ export function switchMapClosure<S, R>(
         };
       },
     });
-
-    BatchScheduler.setPriority(
-      state,
-      () => (max([input, inner].map((value) => BatchScheduler.getPriority(value))) ?? 0) + 1,
-    );
 
     detachWithDescriptorScope(scope, () => state.destroy());
 
@@ -282,7 +277,7 @@ export function mapEachClosure<T, R>(
     const createEntry = (value: T, index: number): ListEntry<T, R> => {
       const item = new MutableState({ initial: value, distinctor: itemDistinctor });
 
-      BatchScheduler.setPriority(item, () => BatchScheduler.getPriority(sourceState) + 1);
+      getStateNode(item).dependOn(getStateNode(sourceState));
 
       const readable = FactoryReadableClosure.create(() => item);
 
@@ -357,7 +352,7 @@ export function mapEachClosure<T, R>(
         };
 
         const scheduleRefresh = () => {
-          BatchScheduler.schedule(refresh, state);
+          getStateNode(state).schedule(refresh);
         };
 
         const connectEntry = (entry: ListEntry<T, R>) => {
@@ -388,7 +383,7 @@ export function mapEachClosure<T, R>(
 
             previousItems = items;
 
-            BatchScheduler.batch(() => {
+            batch(() => {
               entries.forEach((entry, index) => entry.input.next(items[index]));
               created.forEach(connectEntry);
 
@@ -401,7 +396,7 @@ export function mapEachClosure<T, R>(
           }
         };
 
-        BatchScheduler.batch(() => {
+        batch(() => {
           entries.forEach(connectEntry);
 
           subscriptions.add(
@@ -411,7 +406,7 @@ export function mapEachClosure<T, R>(
               complete: () => {
                 completed = true;
 
-                BatchScheduler.batch(() => {
+                batch(() => {
                   entries.forEach((entry) => entry.input.complete());
                   scheduleRefresh();
                 });
@@ -426,14 +421,6 @@ export function mapEachClosure<T, R>(
           subscriptions.unsubscribe();
         };
       },
-    });
-
-    BatchScheduler.setPriority(state, () => {
-      const priorities = [sourceState, ...entries.map((entry) => entry.state)].map((value) =>
-        BatchScheduler.getPriority(value),
-      );
-
-      return (max(priorities) ?? 0) + 1;
     });
 
     detachWithDescriptorScope(scope, () => state.destroy());
@@ -461,10 +448,6 @@ export abstract class BaseStateClosure<T, TInputs = void>
     super();
 
     this.inputs = inputs;
-
-    BatchScheduler.setPriority(this, () =>
-      this._value ? BatchScheduler.getPriority(this._value) : 0,
-    );
 
     const scope = consumeDescriptorScope();
 
@@ -519,13 +502,15 @@ export abstract class BaseStateClosure<T, TInputs = void>
 
         let subscribing = true;
 
-        const subscription = reactiveSource.subscribe({
-          next: (value) => subject.next(subscribing ? reactiveSource.value : value),
+        const subscription = withStateContext(null, () =>
+          reactiveSource.subscribe({
+            next: (value) => subject.next(subscribing ? reactiveSource.value : value),
 
-          error: (error) => subject.error(error),
+            error: (error) => subject.error(error),
 
-          complete: () => subject.complete(),
-        });
+            complete: () => subject.complete(),
+          }),
+        );
 
         subscribing = false;
 
@@ -537,10 +522,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
       this._value = this.clearable(toReactiveState(this.subject));
 
       if (reactiveSource) {
-        BatchScheduler.setPriority(
-          this._value,
-          () => BatchScheduler.getPriority(reactiveSource) + 1,
-        );
+        getStateNode(this._value).dependOn(getStateNode(reactiveSource));
       }
 
       return this._value;

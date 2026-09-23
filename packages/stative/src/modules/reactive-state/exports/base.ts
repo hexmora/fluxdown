@@ -8,8 +8,11 @@ import type {
   StateSubscriber,
 } from '../type';
 
-import { BatchScheduler } from '../../batch-scheduler';
 import { Destructible } from '../../destructible';
+import { canSettle } from '../../state-graph/batch';
+import { getStateContext, withStateContext } from '../../state-graph/context';
+import { getStateNode } from '../../state-graph/node';
+import { bindStateSubscriber } from '../../state-graph/subscriber';
 import { isFinalPendingType } from '../utils';
 
 type PendingType = 'next' | 'complete' | 'error';
@@ -17,6 +20,8 @@ type PendingType = 'next' | 'complete' | 'error';
 type PendingPayload = { value?: unknown; error?: unknown };
 
 export class ReactiveState<T> extends Destructible implements IReactiveState<T> {
+  private readonly node = getStateNode(this);
+
   private readonly subject: BehaviorSubject<T>;
 
   private readonly distinctor: Distinctor<T>;
@@ -91,9 +96,13 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
         try {
           callFinal();
         } finally {
-          this.teardown();
+          this.node.destroy();
 
-          super.destroy();
+          try {
+            this.teardown();
+          } finally {
+            super.destroy();
+          }
         }
       }
     }
@@ -116,7 +125,7 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
     this.pendingType = type;
 
-    BatchScheduler.schedule(this.flushPendingUpdate.bind(this), this);
+    this.node.schedule(this.flushPendingUpdate.bind(this));
   }
 
   private clearPendingValue() {
@@ -138,11 +147,13 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
     const observable = new Observable(this.emitter);
 
-    const subscription = observable.subscribe({
-      next: this._next.bind(this),
-      error: this._error.bind(this),
-      complete: this._complete.bind(this),
-    });
+    const subscription = withStateContext(this.node, () =>
+      observable.subscribe({
+        next: this._next.bind(this),
+        error: this._error.bind(this),
+        complete: this._complete.bind(this),
+      }),
+    );
 
     if (!this.closed && !subscription.closed) {
       this.subscription = subscription;
@@ -168,6 +179,10 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
   get value() {
     this.setup();
 
+    if (canSettle()) {
+      this.node.settle();
+    }
+
     return this.rawValue;
   }
 
@@ -178,9 +193,17 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
   }
 
   subscribe(subscriber: StateSubscriber<T>): Subscription {
+    const context = getStateContext();
+
     this.setup();
 
-    return this.subject.subscribe(subscriber);
+    const disconnect = context?.dependOn(this.node);
+
+    const subscription = this.subject.subscribe(bindStateSubscriber(subscriber, context));
+
+    subscription.add(disconnect);
+
+    return subscription;
   }
 
   protected _next(value: T) {
@@ -232,10 +255,14 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
     this.clearPendingValue();
 
-    this.teardown();
+    this.node.destroy();
 
-    this.subject.complete();
+    try {
+      this.teardown();
+    } finally {
+      this.subject.complete();
 
-    super.destroy();
+      super.destroy();
+    }
   }
 }

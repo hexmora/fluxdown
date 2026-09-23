@@ -8,7 +8,7 @@ import type { FlattenedState, IReadableClosure, JSXDescriptor } from '../../../.
 
 import {
   BaseStateClosure,
-  BatchScheduler,
+  batch,
   MutableState,
   once,
   render,
@@ -143,7 +143,7 @@ describe('useFlatten', () => {
 
     source.next({ count: 2, label: 'second' });
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next({ count: 3, label: 'third' });
 
       source.next({ count: 4, label: 'fourth' });

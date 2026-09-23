@@ -2,7 +2,7 @@ import type { IRawPatchItem } from '@fluxdown/types';
 
 import { expectTypeOf } from 'expect-type';
 import { cloneDeep } from 'lodash-es';
-import { BatchScheduler, type IReactiveState, MutableState, render, S } from 'stative';
+import { batch, type IReactiveState, MutableState, render, S } from 'stative';
 
 import { type IBlockSection, TextChunker } from '../index';
 import { type ChunkedPatch, chunkPatchesByTexts, chunkTextOfMarkdown } from '../utils';
@@ -581,7 +581,7 @@ describe('TextChunker', () => {
     closure.value.subscribe(next);
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       text.next('# Intermediate\n');
       text.next('# Final\nparagraph\n');
       patches.next([{ key: 'paragraph', range: 8 }]);

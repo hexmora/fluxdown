@@ -7,7 +7,7 @@ import { once, useClearable, useMap } from 'stative';
 
 import type { ShadBlockEntry, ShadBlocksInputs } from './type';
 
-import { clearShadBlocks, setShadBlocksPriority, toShadBlocks } from './utils';
+import { clearShadBlocks, toShadBlocks } from './utils';
 
 export const ShadBlocks = /*#__PURE__*/ once(function ShadBlocks({
   source,
@@ -19,13 +19,14 @@ export const ShadBlocks = /*#__PURE__*/ once(function ShadBlocks({
 
   const tail = useMap(source, (blocks) => last(blocks));
 
+  // Start the growth window before an individual block's value is first read.
+  void progress.value;
+
   const blocks = useMap(
     source,
     (items) => toShadBlocks(entries, items, tail, progress),
     shallowEqual,
   );
-
-  setShadBlocksPriority(blocks.value, entries, [source.value, tail.value, progress.value]);
 
   return blocks;
 });

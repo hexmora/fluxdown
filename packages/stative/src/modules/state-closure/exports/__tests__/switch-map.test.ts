@@ -3,7 +3,7 @@ import { shallowEqual } from 'shallow-equal';
 
 import {
   BaseStateClosure,
-  BatchScheduler,
+  batch,
   D,
   type IReadableClosure,
   mapClosure,
@@ -447,7 +447,7 @@ describe('switchMapClosure', () => {
 
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       first.next(3);
 
       source.next(1);
@@ -474,17 +474,13 @@ describe('switchMapClosure', () => {
 
     const output = switchMapClosure(source, (index) => (index === 0 ? D(0) : value));
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next(1);
 
       value.next(3);
 
       expect(output.value.value).toBe(3);
     });
-
-    BatchScheduler.setPriority(value, 20);
-
-    expect(BatchScheduler.getPriority(output.value)).toBeGreaterThan(20);
 
     output.destroy();
 
@@ -524,7 +520,7 @@ describe('switchMapClosure', () => {
 
     expect(output.value.value).toEqual([1]);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next([first, second]);
 
       first.next(3);
@@ -570,7 +566,7 @@ describe('switchMapClosure', () => {
 
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next(true);
 
       value.next(2);
@@ -579,9 +575,11 @@ describe('switchMapClosure', () => {
     expect(next).toHaveBeenCalledTimes(1);
     expect(next).toHaveBeenCalledWith(5);
 
-    BatchScheduler.setPriority(value, 20);
+    value.next(3);
 
-    expect(BatchScheduler.getPriority(output.value)).toBeGreaterThan(20);
+    expect(next).toHaveBeenCalledTimes(2);
+
+    expect(next).toHaveBeenLastCalledWith(7);
 
     output.destroy();
 
@@ -605,7 +603,7 @@ describe('switchMapClosure', () => {
       complete: () => events.push('complete'),
     });
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next(true);
 
       source.complete();
