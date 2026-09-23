@@ -12,10 +12,12 @@ import {
 beforeEach(resetSmoothTests);
 
 describe('Smooth empty blocks', () => {
-  test('omits empty and all-zero-length sources', () => {
+  test('retains zero-length blocks and omits an empty source list', () => {
     const harness = setupSmooth([createBlock('empty', root()).block]);
 
-    expect(harness.state.value.value).toEqual([]);
+    expect(harness.state.value.value.map((block) => block.meta.value.key)).toEqual(['empty']);
+
+    expect(firstBlock(harness.state.value.value).value.value).toEqual(root());
 
     harness.source.next([]);
 
@@ -41,7 +43,7 @@ describe('Smooth empty blocks', () => {
 
     expect(output.map((block) => block.meta.value.key)).toEqual(['empty']);
 
-    expect(firstBlock(output).range.value).toEqual({ start: 0, end: 0 });
+    expect(firstBlock(output).range.value).toBeNull();
 
     expect(firstBlock(output).meta.value.blockCount).toBe(1);
 
@@ -62,7 +64,7 @@ describe('Smooth empty blocks', () => {
     harness.state.destroy();
   });
 
-  test('keeps empty blocks hidden at exact boundaries and removes a trailing empty fork', () => {
+  test('keeps future empty blocks hidden and retains a trailing empty fork', () => {
     const harness = setupSmooth();
 
     expect(harness.state.value.value).toEqual([]);
@@ -117,14 +119,16 @@ describe('Smooth empty blocks', () => {
 
     harness.source.next([a.block, empty.block]);
 
-    expect(harness.state.value.value.map((block) => block.meta.value.key)).toEqual(['a']);
+    expect(harness.state.value.value.map((block) => block.meta.value.key)).toEqual(['a', 'empty']);
 
-    expect(firstBlock(harness.state.value.value).range.value).toEqual({ start: 0, end: 3 });
+    expect(firstBlock(harness.state.value.value).range.value).toBeNull();
 
-    expect(firstBlock(harness.state.value.value).meta.value.blockCount).toBe(1);
+    expect(firstBlock(harness.state.value.value).meta.value.blockCount).toBe(2);
 
-    expect(destroyEmpty).toHaveBeenCalledTimes(1);
+    expect(destroyEmpty).not.toHaveBeenCalled();
 
     harness.state.destroy();
+
+    expect(destroyEmpty).toHaveBeenCalledTimes(1);
   });
 });

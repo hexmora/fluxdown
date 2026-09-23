@@ -52,6 +52,12 @@ export interface IBlockState<T> extends IReadableClosure<T> {
   /** Text length of the base value, unaffected by slicing */
   baseLength: IReactiveState<number>;
 
+  /**
+   * Unchanged output units after a destructive edit, before slicing; Infinity for appends.
+   * Emit on every base-content update, even when this value is unchanged, after updating baseLength.
+   */
+  prevPrefixLength?: IReactiveState<number>;
+
   /** Reactive block context based on the content before slicing */
   meta: IReactiveState<IBlockMeta>;
 

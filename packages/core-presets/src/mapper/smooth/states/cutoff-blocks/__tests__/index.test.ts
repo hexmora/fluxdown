@@ -76,7 +76,7 @@ describe('CutoffBlocks', () => {
 
     expect(state.value.value.map((block) => block.value.value)).toEqual([[]]);
 
-    expect(state.value.value.map((block) => block.range.value)).toEqual([{ start: 0, end: 0 }]);
+    expect(state.value.value.map((block) => block.range.value)).toEqual([null]);
 
     expect(forkHidden).not.toHaveBeenCalled();
 

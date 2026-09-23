@@ -5,8 +5,6 @@ import type { SmoothTicksInputs } from '../smooth-ticks';
 import type { SmoothTick } from '../smooth-ticks/states';
 
 export interface CursorPositionInputs extends SmoothTicksInputs {
-  lengths: IReadableClosure<number[]>;
-
   /**
    * Constructor used to determine visible progress per tick.
    */
@@ -17,7 +15,7 @@ export interface CursorPositionInputs extends SmoothTicksInputs {
 
 export interface SmoothPosition {
   /**
-   * Inclusive index of the last visible block, or -1 when no text units are available.
+   * Inclusive index of the last visible block, or -1 when no blocks are available.
    */
   blockIndex: number;
 

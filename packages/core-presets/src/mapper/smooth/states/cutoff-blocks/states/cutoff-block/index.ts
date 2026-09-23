@@ -1,7 +1,7 @@
 import type { IRangeState } from '@fluxdown/types';
 
 import { isEqual } from 'lodash-es';
-import { D, once, useClearable, useCombineMap, useMap } from 'stative';
+import { D, once, useClearable, useCombineMap } from 'stative';
 
 import type { CutoffBlockInputs } from './type';
 
@@ -18,9 +18,10 @@ export const CutoffBlock = /*#__PURE__*/ once(function CutoffBlock<T>({
     isEqual,
   );
 
-  const range = useMap(
-    end,
-    (offset): IRangeState | null => (offset === null ? null : { start: 0, end: offset }),
+  const range = useCombineMap(
+    [end, source.baseLength],
+    ([offset, length]): IRangeState | null =>
+      offset === null || length === 0 ? null : { start: 0, end: offset },
     isEqual,
   );
 

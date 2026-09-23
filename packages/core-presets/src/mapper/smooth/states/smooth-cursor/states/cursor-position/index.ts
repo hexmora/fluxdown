@@ -1,4 +1,4 @@
-import { sum } from 'lodash-es';
+import { sumBy } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
 import { once, S, useCombine, useCombineMap, useCreate } from 'stative';
 
@@ -6,21 +6,22 @@ import type { IScheduler } from '../../../../modules';
 import type { CursorPositionInputs, SmoothPosition } from './type';
 
 import { Completed } from '../../../completed';
+import { getPreservedIndex } from './utils';
 
 export * from './type';
 
 export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
-  lengths,
+  revisions,
   ticks,
   enabled: _enabled,
   ticker,
   scheduler: _scheduler,
 }: CursorPositionInputs) {
-  const configuration = useCombine(lengths, _enabled, ticker, _scheduler);
+  const configuration = useCombine(revisions, _enabled, ticker, _scheduler);
 
   const completion = useCreate(S([Completed, { source: configuration }]));
 
-  let index = sum(lengths.value.value);
+  let index = sumBy(revisions.value.value, 'length');
 
   let scheduler: IScheduler | null = null;
 
@@ -31,18 +32,27 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
         return previous[1];
       }
 
-      const [[sizes, enabled, , Scheduler], frame, completed] = current;
+      const [[currentRevisions, enabled, , Scheduler], frame, completed] = current;
 
-      const total = sum(sizes);
+      const [[previousRevisions], previousFrame] = previous?.[0] ?? current;
+
+      const total = sumBy(currentRevisions, 'length');
 
       index = enabled ? Math.min(index, total) : total;
+
+      const preserved =
+        enabled && currentRevisions !== previousRevisions
+          ? getPreservedIndex(currentRevisions, previousRevisions, index)
+          : index;
+
+      const reset = preserved < index;
+
+      index = preserved;
 
       if (!enabled) {
         scheduler = null;
       } else if (frame) {
-        const [[previousSizes], previousFrame] = previous?.[0] ?? current;
-
-        const previousTotal = sum(previousSizes);
+        const previousTotal = sumBy(previousRevisions, 'length');
 
         const previousScheduler = scheduler;
 
@@ -50,8 +60,17 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
           scheduler = new Scheduler();
         }
 
-        if (scheduler !== previousScheduler || frame.ticker !== previousFrame?.ticker) {
-          scheduler.start(frame.timestamp, index);
+        const resumed = !frame.ticker.running && index < total;
+
+        const timestamp = resumed ? frame.ticker.start() : frame.timestamp;
+
+        if (
+          scheduler !== previousScheduler ||
+          frame.ticker !== previousFrame?.ticker ||
+          resumed ||
+          reset
+        ) {
+          scheduler.start(timestamp, index);
 
           scheduler.push(total - index);
         } else {
@@ -69,14 +88,25 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
         }
       }
 
+      if (index === total && frame?.ticker.running) {
+        frame.ticker.stop();
+      }
+
       if (completed && index === total) {
         ticks.destroy();
       }
 
       let charIndex = index;
 
+      if (index === total) {
+        return {
+          blockIndex: currentRevisions.length - 1,
+          charIndex: currentRevisions.at(-1)?.length ?? 0,
+        };
+      }
+
       if (total > 0) {
-        for (const [blockIndex, length] of sizes.entries()) {
+        for (const [blockIndex, { length }] of currentRevisions.entries()) {
           if (charIndex <= length) {
             return { blockIndex, charIndex };
           }

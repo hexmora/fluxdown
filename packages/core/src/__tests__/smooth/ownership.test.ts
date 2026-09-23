@@ -65,7 +65,7 @@ describe('Smooth ownership', () => {
 
       harness.state.destroy();
 
-      expect(observerCount(block.block.baseLength)).toBe(0);
+      expect(observerCount(block.block.prevPrefixLength)).toBe(0);
 
       expect(PrimarySmoothTicker.instances.every((ticker) => !ticker.running)).toBe(true);
 
@@ -260,7 +260,7 @@ describe('Smooth ownership', () => {
 
     const destroySource = jest.spyOn(block.block, 'destroy');
 
-    expect(observerCount(block.block.baseLength)).toBeGreaterThan(0);
+    expect(observerCount(block.block.prevPrefixLength)).toBeGreaterThan(0);
 
     harness.source.next([]);
 
@@ -274,7 +274,7 @@ describe('Smooth ownership', () => {
 
     expect(destroySource).not.toHaveBeenCalled();
 
-    expect(observerCount(block.block.baseLength)).toBe(0);
+    expect(observerCount(block.block.prevPrefixLength)).toBe(0);
 
     harness.source.next([createBlock('new', paragraph('new')).block]);
 
@@ -317,7 +317,7 @@ describe('Smooth ownership', () => {
       harness.enabled,
       harness.ticker,
       harness.scheduler,
-      block.block.baseLength,
+      block.block.prevPrefixLength,
     ];
 
     expect(borrowed.every((state) => observerCount(state) > 0)).toBe(true);
@@ -399,6 +399,6 @@ describe('Smooth ownership', () => {
 
     expect(block.source.closed).toBe(false);
 
-    expect(observerCount(block.block.baseLength)).toBe(0);
+    expect(observerCount(block.block.prevPrefixLength)).toBe(0);
   });
 });

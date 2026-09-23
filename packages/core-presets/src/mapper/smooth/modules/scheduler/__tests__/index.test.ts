@@ -245,14 +245,14 @@ describe('SpringSmoothScheduler', () => {
     expect([5, 10, 15, 20, 25].map((time) => scheduler.tick(time))).toEqual([5, 5, 5, 5, 0]);
   });
 
-  test('uses resume speed only after reaching the buffer wall', () => {
+  test('retains resume speed while a short suffix remains buffered', () => {
     const scheduler = new SpringSmoothScheduler([0, 15, 0.1, 1000, 100_000]);
 
     scheduler.start(0, 20);
 
     scheduler.push(1);
 
-    expect([1, 2, 3].map((time) => scheduler.tick(time))).toEqual([0, 0, 0]);
+    expect([1, 2, 3].map((time) => scheduler.tick(time))).toEqual([1, 0, 0]);
   });
 
   test('resumes from the buffer wall at the retained speed', () => {
