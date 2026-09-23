@@ -7,7 +7,7 @@ export const BASE_TOKENS: Omit<ThemeTokens, 'colors' | 'syntax'> = {
 
     fontMono: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
 
-    fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem', lg: '1.125rem', xl: '1.25rem' },
+    fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
 
     lineHeight: { sm: 1.4, md: 1.65, lg: 1.8 },
 

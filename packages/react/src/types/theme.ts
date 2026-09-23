@@ -36,10 +36,6 @@ export interface ThemeTokens {
       sm: string;
 
       md: string;
-
-      lg: string;
-
-      xl: string;
     };
 
     lineHeight: {

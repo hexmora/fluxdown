@@ -1,25 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import {
-  SyntaxHtmlAllowedRemarkPlugin,
-  SyntaxPolicyRemarkPlugin,
-} from '@fluxdown/core-presets/remark';
+import { SanitizerRehypePlugin } from '@fluxdown/core-presets/rehype';
+import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-presets/remark';
 
 import { Fluxdown } from '../../src';
 import { THEME_MARKDOWN } from './consts';
 
 const meta = {
   args: {
-    build: { footnote: true, tex: true },
+    build: { footnote: true, tex: true, indentedCode: true, setextHeading: true },
     plugins: [
       {
         config: {
-          [SyntaxPolicyRemarkPlugin.key]: { indentedCode: true, setextHeading: true },
           [SyntaxHtmlAllowedRemarkPlugin.key]: {
             enabledTags: ['img', 'sub', 'sup', 'kbd', 'mark', 'details', 'summary'],
           },
+          [SanitizerRehypePlugin.key]: { allowedTags: ['mark'] },
         },
-        remarks: [SyntaxPolicyRemarkPlugin, SyntaxHtmlAllowedRemarkPlugin],
+        remarks: [SyntaxHtmlAllowedRemarkPlugin],
+        rehypes: [SanitizerRehypePlugin],
       },
     ],
     style: {
