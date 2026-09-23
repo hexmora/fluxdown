@@ -20,6 +20,8 @@ export interface ToBuildConfigParams {
   base: BaseBuildConfig;
 
   repairEnding: boolean;
+
+  idPrefix?: string;
 }
 
 export const isEnableRAF = () => {
@@ -93,9 +95,13 @@ export const toStreamingConfig = (
   return { repairEnding, smooth, shad };
 };
 
-export const toBuildConfig = ({ base, repairEnding }: ToBuildConfigParams): BlockCompilerConfig => {
+export const toBuildConfig = ({
+  base,
+  repairEnding,
+  idPrefix,
+}: ToBuildConfigParams): BlockCompilerConfig => {
   return {
-    ...defaultsBy(base, { ...DEFAULT_CONFIG, repair: repairEnding }),
+    ...defaultsBy(base, { ...DEFAULT_CONFIG, repair: repairEnding, idPrefix }),
     repairEnding,
   };
 };

@@ -19,6 +19,9 @@ export type IBlockCompilerConfig = {
 
   footnote: boolean;
 
+  /** Stable namespace for generated footnote IDs. React supplies a hydration-safe instance ID. */
+  idPrefix?: string;
+
   tex: boolean;
 };
 

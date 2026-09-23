@@ -25,7 +25,7 @@ const toDataOrAriaName = (name: string) => {
   }
 
   if (name.startsWith('aria') && name.length > 4 && /[A-Z]/.test(name[4] ?? '')) {
-    return `aria-${camelToKebab(name.slice(4)).replace(/^-/, '')}`;
+    return `aria-${name.slice(4).toLowerCase()}`;
   }
 
   return name;
