@@ -5,4 +5,6 @@ export const DEFAULT_CONFIG: BlockCompilerConfig = {
   repair: false,
   repairEnding: false,
   tex: false,
+  indentedCode: false,
+  setextHeading: false,
 };

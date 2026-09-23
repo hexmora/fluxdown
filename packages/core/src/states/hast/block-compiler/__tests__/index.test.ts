@@ -43,6 +43,8 @@ const DEFAULT_CONFIG: BlockCompilerConfig = {
   repairEnding: false,
   footnote: false,
   tex: false,
+  indentedCode: false,
+  setextHeading: false,
 };
 
 const patch = (key: string, range: IRawPatchRange = 0): IRawPatchItem => ({

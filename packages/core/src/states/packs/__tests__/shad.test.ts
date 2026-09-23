@@ -45,7 +45,14 @@ class ManualTicker extends FakeSmoothTicker {
   }
 }
 
-const build = { repair: false, repairEnding: false, footnote: false, tex: false };
+const build = {
+  repair: false,
+  repairEnding: false,
+  footnote: false,
+  tex: false,
+  indentedCode: false,
+  setextHeading: false,
+};
 
 const smooth: BaseSmoothConfig = {
   enabled: true,

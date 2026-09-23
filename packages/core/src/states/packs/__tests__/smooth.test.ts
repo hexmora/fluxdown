@@ -62,7 +62,14 @@ class ObserveCompilation extends BaseRehypePlugin {
   };
 }
 
-const build = { repair: false, repairEnding: false, footnote: false, tex: false };
+const build = {
+  repair: false,
+  repairEnding: false,
+  footnote: false,
+  tex: false,
+  indentedCode: false,
+  setextHeading: false,
+};
 
 const enabled: BaseSmoothConfig = {
   enabled: true,

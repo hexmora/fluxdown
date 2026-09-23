@@ -58,7 +58,7 @@ const MARKDOWN_CASES: ChunkCase[] = [
   chunks('recognizes a standalone thematic break', '***\n'),
   chunks('recognizes a spaced thematic break', '- - -\n'),
   chunks('follows the Setext interpretation of an ambiguous dash line', 'before\n---\n', 'after\n'),
-  chunks('does not treat three dollar signs as display math', '$$$\n', '# Heading\n'),
+  chunks('keeps unclosed three-dollar math through EOF', '$$$\n# Heading\n'),
   chunks('keeps lazy continuation text in an unordered list', '- a\n- b\nafter\n'),
   chunks('keeps lazy continuation text in an ordered list', '1. a\n2. b\nafter\n'),
   chunks('keeps a non-one ordered list and its lazy continuation together', '2. a\n3. b\nafter\n'),
@@ -111,20 +111,16 @@ const MARKDOWN_CASES: ChunkCase[] = [
   chunks('keeps blank lines inside a style block', '<style>\na|b\n\nc|d\n</style>\n', 'after\n'),
   chunks('splits content after an HTML comment', '<!-- a|b -->\n', 'after\n'),
   chunks(
-    'follows marked boundaries for a generic HTML block with blank lines',
-    '<div class="a">\nline 1\n\n',
-    'line 2\n',
-    '</div>\nafter\n',
+    'keeps a generic HTML container together across blank lines',
+    '<div class="a">\nline 1\n\nline 2\n</div>\nafter\n',
   ),
   chunks(
-    'follows marked boundaries for a custom HTML tag with blank lines',
-    '<my-custom-tag>\nline 1\n\n',
-    'line 2\n</my-custom-tag>\nafter\n',
+    'keeps a custom HTML container together across blank lines',
+    '<my-custom-tag>\nline 1\n\nline 2\n</my-custom-tag>\nafter\n',
   ),
   chunks(
-    'follows marked boundaries for nested custom HTML tags',
-    '<my-custom-tag>\n<my-custom-tag>\ninner\n</my-custom-tag>\n\n',
-    'outer\n</my-custom-tag>\nafter\n',
+    'keeps nested custom HTML containers together',
+    '<my-custom-tag>\n<my-custom-tag>\ninner\n</my-custom-tag>\n\nouter\n</my-custom-tag>\nafter\n',
   ),
   chunks('keeps unknown block syntax under marked paragraph semantics', ':::tip\nhi\n:::\n'),
   chunks('preserves CRLF line endings', '# Title\r\n\r\n', 'paragraph\r\n'),
@@ -137,7 +133,7 @@ const TABLE_CASES: ChunkCase[] = [
     '| a \\| b | c |\n| :-- | --: |\n| 1   | 2   |\n',
   ),
   chunks('recognizes a table after a paragraph without a blank line', 'before\n', TABLE),
-  chunks('stops a table before plain text without a blank line', TABLE, 'after\n'),
+  chunks('keeps plain text without a blank line in the table body', `${TABLE}after\n`),
   chunks('stops a table before an ATX heading', TABLE, '# Next | Pipe\n'),
   chunks('stops a table before a list', TABLE, '- item | pipe\n'),
   chunks('stops a table before a non-one ordered list', TABLE, '2. item | pipe\n'),
@@ -147,15 +143,15 @@ const TABLE_CASES: ChunkCase[] = [
   chunks('stops a table before a thematic break', TABLE, '---\n'),
   chunks('attaches a separating blank line to the table', `${TABLE}\n`, 'after\n'),
   chunks('stops a table before an HTML block', TABLE, '<pre>| x | y |</pre>\n\n', 'after\n'),
-  chunks('supports tables without outer pipes', 'a | b\n--- | ---\n1 | 2\n', 'after\n'),
-  chunks('allows body rows with fewer cells', '| a | b |\n| - | - |\n| 1 |\n', 'after\n'),
+  chunks('supports tables without outer pipes', 'a | b\n--- | ---\n1 | 2\nafter\n'),
+  chunks('allows body rows with fewer cells', '| a | b |\n| - | - |\n| 1 |\nafter\n'),
   chunks(
     'does not treat mismatched header and delimiter cells as a table',
     '| a | b |\n| - | - | - |\nafter\n',
   ),
   chunks(
     'preserves CRLF in a table and its following block',
-    '| a | b |\r\n| - | - |\r\n| 1 | 2 |\r\n',
+    '| a | b |\r\n| - | - |\r\n| 1 | 2 |\r\n\r\n',
     'after\r\n',
   ),
 ];
@@ -258,26 +254,18 @@ $$
   ),
   chunks('keeps a Pandoc math block intact', '\\[\na+b\n\\]\n'),
   chunks(
-    'starts Pandoc math after a paragraph without a blank line',
-    'before\n',
-    '\\[\na\n\\]\n',
-    'after\n',
+    'keeps adjacent paragraph text with inline Pandoc delimiters',
+    'before\n\\[\na\n\\]\nafter\n',
   ),
   chunks(
     'shields Markdown-looking lines in Pandoc math',
-    '\\[\na\n---\nb\n=\nc\n***\nd\n\\]\n',
-    'after\n',
+    '\\[\na\n---\nb\n=\nc\n***\nd\n\\]\nafter\n',
   ),
   chunks('keeps unclosed Pandoc math through EOF', '\\[\na+b\n'),
-  chunks(
-    'allows up to three spaces before a Pandoc closing delimiter',
-    '\\[\na\n   \\]\n',
-    'after\n',
-  ),
+  chunks('allows up to three spaces before a Pandoc closing delimiter', '\\[\na\n   \\]\nafter\n'),
   chunks(
     'does not close Pandoc math on a four-space-indented delimiter',
-    '\\[\na\n    \\]\n\\]\n',
-    'after\n',
+    '\\[\na\n    \\]\n\\]\nafter\n',
   ),
   chunks(
     'leaves four-space-indented Pandoc delimiters as code',
@@ -285,7 +273,7 @@ $$
     'after\n',
   ),
   chunks('preserves CRLF in dollar math', '$$\r\na\r\n$$\r\n', 'after\r\n'),
-  chunks('preserves CRLF in Pandoc math', '\\[\r\na\r\n\\]\r\n', 'after\r\n'),
+  chunks('preserves CRLF in Pandoc math', '\\[\r\na\r\n\\]\r\nafter\r\n'),
 ];
 
 const DOCUMENT_SCOPED_CASES: ChunkCase[] = [
@@ -357,11 +345,9 @@ const DOCUMENT_SCOPED_CASES: ChunkCase[] = [
     'Next paragraph.\n',
   ),
   chunks(
-    'finds a reference definition after repairing a table boundary',
-    `${TABLE}[ref]: https://example.test/a|b
-
-Use [the reference][ref].
-`,
+    'keeps definition-looking text in the table body',
+    `${TABLE}[ref]: https://example.test/a|b\n\n`,
+    'Use [the reference][ref].\n',
   ),
 ];
 

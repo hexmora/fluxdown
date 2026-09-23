@@ -159,6 +159,8 @@ const DEFAULT_CONFIG: BlockCompilerConfig = {
   repairEnding: false,
   footnote: false,
   tex: false,
+  indentedCode: false,
+  setextHeading: false,
 };
 
 interface RenderedBlock extends IBlockState<HastRoot> {
