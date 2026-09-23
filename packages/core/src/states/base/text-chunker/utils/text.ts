@@ -1,11 +1,14 @@
 import type { IRawPatchItem } from '@fluxdown/types';
+import type { Marked, Token } from 'marked';
 
 import { keys, last } from 'lodash-es';
-import { Marked, type Token } from 'marked';
 
-import type { IBlockSection } from '../type';
+import type { IBlockSection, TextChunkerConfig } from '../type';
 
+import { trackHtmlContainers } from './html';
+import { DISPLAY_MATH_TOKEN, getMarkdownLexer } from './lexer';
 import { chunkPatchesByTexts } from './patches';
+import { getTableLength } from './table';
 
 export const buildBlockSections = ([currentTexts, currentPatches]: [
   string[],
@@ -17,165 +20,6 @@ export const buildBlockSections = ([currentTexts, currentPatches]: [
     text,
     patches: patchGroups[index] ?? [],
   }));
-};
-
-const DISPLAY_MATH_TOKEN = 'fluxdown_display_math';
-
-// oxlint-disable-next-line unicorn/prefer-set-has -- Fixed lookup tables use arrays by convention.
-const TABLE_INTERRUPT_TOKENS = [
-  DISPLAY_MATH_TOKEN,
-  'blockquote',
-  'code',
-  'def',
-  'heading',
-  'hr',
-  'html',
-  'list',
-];
-
-const isEscaped = (text: string, index: number): boolean => {
-  let backslashes = 0;
-
-  for (let cursor = index - 1; cursor >= 0 && text[cursor] === '\\'; cursor -= 1) {
-    backslashes += 1;
-  }
-
-  return backslashes % 2 === 1;
-};
-
-const findUnescapedDoubleDollar = (text: string): number => {
-  for (let index = 0; index < text.length - 1; index += 1) {
-    if (text[index] !== '$' || text[index + 1] !== '$') {
-      continue;
-    }
-
-    if (!isEscaped(text, index)) {
-      return index;
-    }
-  }
-
-  return -1;
-};
-
-const readDisplayMath = (source: string): string | undefined => {
-  const opening = /^( {0,3})(\$\$(?!\$)|\\\[)([^\n]*)(\n|$)/.exec(source);
-
-  if (!opening) {
-    return undefined;
-  }
-
-  const marker = opening[2];
-  const restOfOpeningLine = opening[3];
-  const openingRaw = opening[0];
-
-  if (marker === '\\[' && restOfOpeningLine.trim() !== '') {
-    return undefined;
-  }
-
-  if (marker === '$$') {
-    const closingIndex = findUnescapedDoubleDollar(restOfOpeningLine);
-
-    if (closingIndex >= 0) {
-      return undefined;
-    }
-  }
-
-  const closingLine = marker === '$$' ? /^ {0,3}\$\$[\t ]*$/ : /^ {0,3}\\\][\t ]*$/;
-  let lineStart = openingRaw.length;
-
-  while (lineStart < source.length) {
-    const newline = source.indexOf('\n', lineStart);
-    const lineEnd = newline < 0 ? source.length : newline;
-    const line = source.slice(lineStart, lineEnd);
-
-    if (closingLine.test(line)) {
-      return source.slice(0, newline < 0 ? lineEnd : newline + 1);
-    }
-
-    if (newline < 0) {
-      break;
-    }
-
-    lineStart = newline + 1;
-  }
-
-  return source;
-};
-
-const markdownLexer = new Marked({
-  gfm: true,
-  extensions: [
-    {
-      name: DISPLAY_MATH_TOKEN,
-      level: 'block',
-      start(source) {
-        const match = /\n {0,3}(?:\$\$(?!\$)|\\\[)/.exec(source);
-
-        if (!match) {
-          return undefined;
-        }
-
-        return match.index + 1;
-      },
-      tokenizer(source) {
-        const raw = readDisplayMath(source);
-
-        if (!raw) {
-          return undefined;
-        }
-
-        return {
-          type: DISPLAY_MATH_TOKEN,
-          raw,
-          text: raw,
-        };
-      },
-    },
-  ],
-});
-
-const hasUnescapedPipe = (line: string): boolean => {
-  for (let index = 0; index < line.length; index += 1) {
-    if (line[index] === '|' && !isEscaped(line, index)) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-/** Narrows marked's permissive table body to explicit row-looking lines. */
-const strictTableRawLength = (raw: string): number => {
-  let lineNumber = 0;
-  let lineStart = 0;
-
-  while (lineStart < raw.length) {
-    const newline = raw.indexOf('\n', lineStart);
-    const lineEnd = newline < 0 ? raw.length : newline;
-    const line = raw.slice(lineStart, lineEnd);
-
-    if (lineNumber >= 2) {
-      if (!hasUnescapedPipe(line)) {
-        return lineStart;
-      }
-
-      const token = markdownLexer.lexer(line)[0];
-
-      if (token && TABLE_INTERRUPT_TOKENS.includes(token.type)) {
-        return lineStart;
-      }
-    }
-
-    lineNumber += 1;
-
-    if (newline < 0) {
-      break;
-    }
-
-    lineStart = newline + 1;
-  }
-
-  return raw.length;
 };
 
 type TokenTree = {
@@ -297,91 +141,158 @@ type RootToken = {
 };
 
 type RootTokenResult = {
-  hasLinks: boolean;
+  hasDocumentSyntax: boolean;
   rootTokens: RootToken[];
 };
 
-const readRootTokens = (markdown: string): RootTokenResult | undefined => {
+const readRootTokens = (
+  markdown: string,
+  markdownLexer: Marked,
+  config: TextChunkerConfig,
+): RootTokenResult | undefined => {
   const rootTokens: RootToken[] = [];
-  let hasLinks = false;
+  let hasDocumentSyntax = false;
+  let cursor = 0;
 
-  const appendSource = (source: string, offset: number): boolean => {
-    const tokens = markdownLexer.lexer(source);
-    let cursor = 0;
+  while (cursor < markdown.length) {
+    const tokens = markdownLexer.lexer(markdown.slice(cursor));
 
-    hasLinks ||= keys(tokens.links).length > 0;
-
-    for (const token of tokens) {
-      if (token.raw.length === 0 || !source.startsWith(token.raw, cursor)) {
-        return false;
-      }
-
-      const tableLength =
-        token.type === 'table' ? strictTableRawLength(token.raw) : token.raw.length;
-
-      if (tableLength <= 0) {
-        return false;
-      }
-
-      if (tableLength < token.raw.length) {
-        const table = token.raw.slice(0, tableLength);
-        const tail = token.raw.slice(tableLength);
-
-        // Re-lex only the text that marked greedily classified as table rows.
-        if (
-          !appendSource(table, offset + cursor) ||
-          !appendSource(tail, offset + cursor + tableLength)
-        ) {
-          return false;
-        }
-      } else {
-        rootTokens.push({
-          token,
-          start: offset + cursor,
-          end: offset + cursor + token.raw.length,
-        });
-      }
-
-      cursor += token.raw.length;
+    if (tokens.length === 0) {
+      return undefined;
     }
 
-    return cursor === source.length;
-  };
+    hasDocumentSyntax ||= keys(tokens.links).length > 0;
 
-  if (!appendSource(markdown, 0)) {
-    return undefined;
+    for (const token of tokens) {
+      if (token.raw.length === 0 || !markdown.startsWith(token.raw, cursor)) {
+        return undefined;
+      }
+
+      const length =
+        token.type === 'table'
+          ? getTableLength(markdown.slice(cursor), markdownLexer, config)
+          : token.raw.length;
+
+      // Preserve marked's ownership of whitespace between blocks.
+      const changed =
+        length !== token.raw.length &&
+        !/^[\t \n]*$/.test(
+          markdown.slice(
+            cursor + Math.min(length, token.raw.length),
+            cursor + Math.max(length, token.raw.length),
+          ),
+        );
+      const raw = changed ? markdown.slice(cursor, cursor + length) : token.raw;
+
+      hasDocumentSyntax ||= changed
+        ? markdownLexer.lexer(raw).some(hasDocumentScopedSyntax)
+        : hasDocumentScopedSyntax(token);
+
+      rootTokens.push({
+        token: changed ? { ...token, raw } : token,
+        start: cursor,
+        end: cursor + raw.length,
+      });
+
+      cursor += raw.length;
+
+      if (changed) {
+        // Resume at the real boundary: a math or list block may extend beyond the
+        // token that marked originally classified as table rows.
+        break;
+      }
+    }
   }
 
-  return { hasLinks, rootTokens };
+  return { hasDocumentSyntax, rootTokens };
+};
+
+const isPandocMath = (token: Token): boolean =>
+  token.type === DISPLAY_MATH_TOKEN && /^ {0,3}\\\[/.test(token.raw);
+
+const needsPreviousContext = (
+  previous: Token | undefined,
+  current: Token,
+  markdownLexer: Marked,
+  separated: boolean,
+): boolean => {
+  // The parser still treats a non-one ordered marker after indented code as text.
+  if (
+    previous?.type === 'code' &&
+    previous.codeBlockStyle === 'indented' &&
+    current.type === 'list' &&
+    current.ordered &&
+    current.start !== 1
+  ) {
+    return true;
+  }
+
+  if (!previous || separated || /\n[\t ]*\n[\t ]*$/.test(previous.raw)) {
+    return false;
+  }
+
+  if (isPandocMath(current)) {
+    return previous.type === 'paragraph' || isPandocMath(previous);
+  }
+
+  // Pandoc delimiters are inline syntax: keep any non-interrupting following content
+  // in the same section rather than turning it into a new standalone block.
+  return (
+    isPandocMath(previous) && (markdownLexer.lexer(`x\n${current.raw}`)[0]?.raw.length ?? 0) > 2
+  );
 };
 
 /**
  * Chunks Markdown at root block boundaries while preserving the source exactly.
  */
-export const chunkTextOfMarkdown = (text: string): string[] => {
+export const chunkTextOfMarkdown = (
+  text: string,
+  config: TextChunkerConfig = { indentedCode: true, setextHeading: true, tex: true },
+): string[] => {
   if (text === '') {
     return [];
   }
 
   const { markdown, originalOffsets } = normalizeLineEndings(text);
-  const result = readRootTokens(markdown);
+  const markdownLexer = getMarkdownLexer(config);
+
+  const result = readRootTokens(markdown, markdownLexer, config);
 
   if (!result) {
     return [text];
   }
 
-  const { hasLinks, rootTokens } = result;
+  const { hasDocumentSyntax, rootTokens } = result;
 
-  if (hasLinks || rootTokens.some(({ token }) => hasDocumentScopedSyntax(token))) {
+  if (hasDocumentSyntax) {
     return [text];
   }
 
   const spans: Array<{ start: number; end: number }> = [];
 
-  for (const { token, start, end } of rootTokens) {
-    if (token.type === 'space') {
-      const previous = last(spans);
+  const containers: string[] = [];
 
+  let previousToken: Token | undefined;
+
+  for (const [index, { token, start, end }] of rootTokens.entries()) {
+    const previous = last(spans);
+
+    const insideContainer = containers.length > 0;
+
+    const needsContext = needsPreviousContext(
+      previousToken,
+      token,
+      markdownLexer,
+      rootTokens[index - 1]?.token.type === 'space',
+    );
+
+    if (token.type !== 'space') {
+      previousToken = token;
+    }
+
+    trackHtmlContainers(token, containers);
+
+    if (token.type === 'space' || (previous && (insideContainer || needsContext))) {
       if (previous) {
         previous.end = end;
       }

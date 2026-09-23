@@ -50,7 +50,14 @@ const TakeFirst = once(function TakeFirst({ source }: MapperInputs): IReadableCl
   return useMap(source, (blocks) => take(blocks, 1));
 });
 
-const build = { repair: false, repairEnding: false, footnote: false, tex: false };
+const build = {
+  repair: false,
+  repairEnding: false,
+  footnote: false,
+  tex: false,
+  indentedCode: false,
+  setextHeading: false,
+};
 
 const enabled: MapperPluggable = [
   Smooth,

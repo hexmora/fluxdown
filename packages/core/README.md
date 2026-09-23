@@ -49,7 +49,14 @@ const core = render(
     {
       Renderer: D(BlocksRenderer),
       text,
-      build: { repair: true, repairEnding: true, footnote: false, tex: false },
+      build: {
+        repair: true,
+        repairEnding: true,
+        footnote: false,
+        tex: false,
+        indentedCode: false,
+        setextHeading: false,
+      },
       patches: [],
       renders: [],
     },
@@ -68,6 +75,8 @@ text.destroy();
 ```
 
 Pass the full Markdown text received so far to `text.next`, appending each new chunk to the previous text. The example keeps repairs enabled for incomplete Markdown throughout the stream.
+
+Set `build.indentedCode` or `build.setextHeading` to `true` to enable those block syntaxes in both the chunker and the default remark syntax policy. Explicit policy plugin settings override parsing options without changing the chunker's build settings.
 
 `D(BlocksRenderer)` passes the renderer class as a static value. `render` creates the core instance, and `core.value.value` gives its current output array. See the [`stative` guide](../stative/README.md) for more on state closures and input values.
 

@@ -6,6 +6,7 @@ import {
   PRESET_REMARK_PLUGINS,
   SyntaxFootnoteRemarkPlugin,
   SyntaxMathRemarkPlugin,
+  SyntaxPolicyRemarkPlugin,
 } from '@fluxdown/core-presets/remark';
 import { memoReturns } from 'stative';
 
@@ -43,6 +44,17 @@ export const RemarkPluggables = /*#__PURE__*/ memoReturns(function RemarkPluggab
     const Plugin = getPluggableClass(pluggable);
 
     const pluginConfig = getPluggableConfig(pluggable);
+
+    if (Plugin === SyntaxPolicyRemarkPlugin) {
+      return [
+        Plugin,
+        {
+          indentedCode: config.indentedCode,
+          setextHeading: config.setextHeading,
+          ...pluginConfig,
+        },
+      ];
+    }
 
     if (Plugin === PatchesRemarkPlugin) {
       return [

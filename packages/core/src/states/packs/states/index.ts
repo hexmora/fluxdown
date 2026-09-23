@@ -1,3 +1,4 @@
+export * from './chunker-config';
 export * from './mapper-pluggables';
 export * from './raw-patches';
 export * from './rehype-pluggables';

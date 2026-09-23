@@ -23,6 +23,12 @@ export type IBlockCompilerConfig = {
   idPrefix?: string;
 
   tex: boolean;
+
+  /** Recognize indented code blocks. */
+  indentedCode: boolean;
+
+  /** Recognize headings underlined with equals signs or dashes. */
+  setextHeading: boolean;
 };
 
 export type BlockCompilerConfig = IBlockCompilerConfig;

@@ -60,6 +60,8 @@ const DEFAULT_CONFIG: BlockCompilerConfig = {
   repairEnding: false,
   footnote: false,
   tex: false,
+  indentedCode: false,
+  setextHeading: false,
 };
 
 const getPluggableClass = <T extends IPluginWithConfig>(pluggable: IPluggable<T, unknown>) => {

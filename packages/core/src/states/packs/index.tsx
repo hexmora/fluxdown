@@ -13,6 +13,7 @@ import type { CoreInputs } from './type';
 import { MapperComposer, PluginBuilder, TextChunker } from '../base';
 import { BlockCompiler } from '../hast';
 import {
+  ChunkerConfig,
   MapperPluggables,
   RawPatchesMapper,
   RehypePluggables,
@@ -58,7 +59,11 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
           source={
             <BlockCompiler
               sections={
-                <TextChunker text={text} patches={<RawPatchesMapper<R> patches={patches} />} />
+                <TextChunker
+                  text={text}
+                  config={<ChunkerConfig config={build} />}
+                  patches={<RawPatchesMapper<R> patches={patches} />}
+                />
               }
               config={build}
               getRemarks={({ config }) => (

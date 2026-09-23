@@ -7,7 +7,17 @@ export interface IBlockSection {
   patches: IRawPatchItem[];
 }
 
+export type TextChunkerConfig = {
+  indentedCode: boolean;
+
+  setextHeading: boolean;
+
+  tex: boolean;
+};
+
 export type TextChunkerInputs = {
+  config?: IReadableClosure<TextChunkerConfig>;
+
   text: IReadableClosure<string>;
 
   patches: IReadableClosure<IRawPatchItem[]>;
