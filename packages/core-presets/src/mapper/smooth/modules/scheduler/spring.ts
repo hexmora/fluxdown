@@ -60,7 +60,7 @@ export class SpringSmoothScheduler extends BaseSmoothScheduler {
 
     this.speed = clamp(
       this.speed + (destination - this.position) * elasticity * elapsed,
-      0,
+      resumeSpeed / 1000,
       maximumSpeed / 1000,
     );
 

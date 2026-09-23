@@ -1,9 +1,10 @@
 import type { IReadableClosure } from 'stative';
 
 import type { SmoothTickerClass } from '../../../../type';
+import type { BlockRevision } from '../block-revisions';
 
 export interface SmoothTicksInputs {
-  lengths: IReadableClosure<number[]>;
+  revisions: IReadableClosure<BlockRevision[]>;
 
   /**
    * Whether newly appended content advances on ticker events.

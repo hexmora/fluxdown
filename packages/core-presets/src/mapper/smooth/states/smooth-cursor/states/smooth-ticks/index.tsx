@@ -2,7 +2,7 @@
  * @jsxImportSource stative
  */
 
-import { sum } from 'lodash-es';
+import { sumBy } from 'lodash-es';
 import { D, type JSXDescriptor, once, useCombineMap, useSwitchMap } from 'stative';
 
 import type { SmoothTickerClass } from '../../../../type';
@@ -15,18 +15,26 @@ export * from './type';
 export const SmoothTicks = /*#__PURE__*/ once(function SmoothTicks({
   enabled: _enabled,
   ticker: _ticker,
-  lengths: _lengths,
+  revisions: _revisions,
 }: SmoothTicksInputs) {
   const active = useCombineMap(
-    [_enabled, _ticker, _lengths],
-    ([enabled, Ticker, lengths], previous): SmoothTickerClass | null => {
+    [_enabled, _ticker, _revisions],
+    ([enabled, Ticker, revisions], previous): SmoothTickerClass | null => {
       if (!previous) {
         return null;
       }
 
-      const [[, , prevLengths], prevTicker] = previous;
+      const [[, , previousRevisions], prevTicker] = previous;
 
-      return enabled && (prevTicker || sum(lengths) > sum(prevLengths)) ? Ticker : null;
+      const replaced = revisions.some(
+        (revision, index) =>
+          revision !== previousRevisions[index] && Number.isFinite(revision.prefixLength),
+      );
+
+      return enabled &&
+        (prevTicker || replaced || sumBy(revisions, 'length') > sumBy(previousRevisions, 'length'))
+        ? Ticker
+        : null;
     },
   );
 

@@ -47,8 +47,8 @@ beforeEach(resetSmoothTests);
 describe('SmoothCursor', () => {
   test.each([
     { values: [], end: { blockIndex: -1, charIndex: 0 } },
-    { values: [[], []], end: { blockIndex: -1, charIndex: 0 } },
-    { values: [[1, 2], []], end: { blockIndex: 0, charIndex: 2 } },
+    { values: [[], []], end: { blockIndex: 1, charIndex: 0 } },
+    { values: [[1, 2], []], end: { blockIndex: 1, charIndex: 0 } },
     { values: [[], [1, 2], [3]], end: { blockIndex: 2, charIndex: 1 } },
   ])('locates initial progress for $values', ({ values, end }) => {
     const blocks = values.map((value) => createArrayBlock(value).block);

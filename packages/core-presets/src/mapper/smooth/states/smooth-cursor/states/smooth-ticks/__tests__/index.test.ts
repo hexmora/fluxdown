@@ -1,6 +1,6 @@
 import { assert } from '@fluxdown/utils';
 import { expectTypeOf } from 'expect-type';
-import { MutableState, ReactiveState, render, S } from 'stative';
+import { mapClosure, MutableState, ReactiveState, render, S } from 'stative';
 
 import type { SmoothTickerClass } from '../../../../..';
 import type { SmoothTick } from '../states';
@@ -18,9 +18,13 @@ const setupTicks = (active = true) => {
 
   const lengths = MutableState.of([3]);
 
+  const revisions = mapClosure(lengths, (sizes) =>
+    sizes.map((length) => ({ length, prefixLength: Infinity })),
+  );
+
   const ticker = MutableState.of<SmoothTickerClass>(PrimarySmoothTicker);
 
-  const ticks = render(S([SmoothTicks, { enabled, lengths, ticker }]));
+  const ticks = render(S([SmoothTicks, { enabled, revisions, ticker }]));
 
   return { enabled, lengths, ticker, ticks };
 };
@@ -188,7 +192,9 @@ describe('SmoothTicks', () => {
         SmoothTicks,
         {
           enabled: ReactiveState.of(true),
-          lengths,
+          revisions: mapClosure(lengths, (sizes) =>
+            sizes.map((length) => ({ length, prefixLength: Infinity })),
+          ),
           ticker: ReactiveState.of(PrimarySmoothTicker),
         },
       ]),

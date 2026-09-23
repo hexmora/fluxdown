@@ -1,26 +1,28 @@
+import type { IBlockState } from '@fluxdown/types';
+
 import { batch, MutableState, ReactiveState, render, S } from 'stative';
 
-import { BlockLengths } from '..';
+import { BlockRevisions } from '..';
 import { createArrayBlock } from '../../../../../__tests__/block';
 import { observerCount } from '../../../../../__tests__/utils';
 
-describe('BlockLengths', () => {
+describe('BlockRevisions', () => {
   test('keeps observing block lengths after the source list completes', () => {
     const block = createArrayBlock([1, 2]);
 
     const source = ReactiveState.of([block.block]);
 
-    const state = render(S([BlockLengths<number[]>, { source }]));
+    const state = render(S([BlockRevisions<number[]>, { source }]));
 
     const complete = jest.fn();
 
     state.value.subscribe({ complete });
 
-    expect(state.value.value).toEqual([2]);
+    expect(state.value.value.map(({ length }) => length)).toEqual([2]);
 
     block.source.next([1, 2, 3]);
 
-    expect(state.value.value).toEqual([3]);
+    expect(state.value.value.map(({ length }) => length)).toEqual([3]);
 
     expect(complete).not.toHaveBeenCalled();
 
@@ -38,7 +40,7 @@ describe('BlockLengths', () => {
 
     const source = MutableState.of([a.block]);
 
-    const state = render(S([BlockLengths<number[]>, { source }]));
+    const state = render(S([BlockRevisions<number[]>, { source }]));
 
     const changed = jest.fn();
 
@@ -46,7 +48,7 @@ describe('BlockLengths', () => {
 
     source.next([b.block]);
 
-    expect(changed).toHaveBeenCalledTimes(1);
+    expect(changed).toHaveBeenCalledTimes(2);
 
     expect(observerCount(a.block.baseLength)).toBe(0);
 
@@ -54,11 +56,11 @@ describe('BlockLengths', () => {
 
     a.source.next([1, 2, 3, 4]);
 
-    expect(changed).toHaveBeenCalledTimes(1);
+    expect(changed).toHaveBeenCalledTimes(2);
 
     b.source.next([3, 4, 5]);
 
-    expect(state.value.value).toEqual([3]);
+    expect(state.value.value.map(({ length }) => length)).toEqual([3]);
 
     state.destroy();
 
@@ -74,11 +76,11 @@ describe('BlockLengths', () => {
 
     const source = MutableState.of([a.block, b.block]);
 
-    const state = render(S([BlockLengths<number[]>, { source }]));
+    const state = render(S([BlockRevisions<number[]>, { source }]));
 
     const frames: number[][] = [];
 
-    state.value.subscribe((lengths) => frames.push(lengths));
+    state.value.subscribe((revisions) => frames.push(revisions.map(({ length }) => length)));
 
     batch(() => {
       a.source.next([1]);
@@ -101,7 +103,7 @@ describe('BlockLengths', () => {
 
     const source = MutableState.of([a.block, b.block]);
 
-    const state = render(S([BlockLengths<number[]>, { source }]));
+    const state = render(S([BlockRevisions<number[]>, { source }]));
 
     const error = jest.fn();
 
@@ -130,43 +132,51 @@ describe('BlockLengths', () => {
 
     const source = MutableState.of([a.block]);
 
-    const state = render(S([BlockLengths<number[]>, { source }]));
+    const state = render(S([BlockRevisions<number[]>, { source }]));
 
     batch(() => {
       source.next([b.block]);
 
-      expect(state.value.value).toEqual([2]);
+      expect(state.value.value.map(({ length }) => length)).toEqual([2]);
     });
 
     expect(observerCount(a.block.baseLength)).toBe(0);
 
     b.source.next([2, 3, 4]);
 
-    expect(state.value.value).toEqual([3]);
+    expect(state.value.value.map(({ length }) => length)).toEqual([3]);
 
     state.destroy();
   });
 
-  test('initializes from a pending base length without replacing it with the committed value', () => {
-    const { block } = createArrayBlock([1]);
+  test('initializes from pending length and prefix without replacing them with committed values', () => {
+    const block: IBlockState<number[]> = createArrayBlock([1]).block;
 
     const length = MutableState.of(1);
 
+    const prefix = MutableState.of(Infinity);
+
     jest.spyOn(block, 'baseLength', 'get').mockReturnValue(length);
+
+    block.prevPrefixLength = prefix;
 
     const source = ReactiveState.of([block]);
 
-    const state = render(S([BlockLengths<number[]>, { source }]));
+    const state = render(S([BlockRevisions<number[]>, { source }]));
 
     batch(() => {
       length.next(3);
 
-      expect(state.value.value).toEqual([3]);
+      prefix.next(0);
+
+      expect(state.value.value).toEqual([{ length: 3, prefixLength: 0 }]);
     });
 
     length.next(4);
 
-    expect(state.value.value).toEqual([4]);
+    prefix.next(Infinity);
+
+    expect(state.value.value).toEqual([{ length: 4, prefixLength: Infinity }]);
 
     state.destroy();
   });
