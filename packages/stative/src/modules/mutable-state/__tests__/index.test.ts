@@ -4,7 +4,7 @@ import { expectTypeOf } from 'expect-type';
 
 import type { ReactiveState } from '../../reactive-state';
 
-import { BatchScheduler } from '../../batch-scheduler';
+import { batch } from '../../..';
 import { MutableState } from '../index';
 
 describe('MutableState', () => {
@@ -130,7 +130,7 @@ describe('MutableState', () => {
     state.subscribe(next);
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       state.next(1);
       state.next(2);
 
@@ -156,7 +156,7 @@ describe('MutableState', () => {
     });
     events.splice(0);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       state.next(1);
       state.complete();
       state.next(2);
@@ -184,7 +184,7 @@ describe('MutableState', () => {
     });
     events.splice(0);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       state.next(1);
       state.error(expectedError);
     });

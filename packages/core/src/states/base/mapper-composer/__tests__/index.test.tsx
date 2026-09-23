@@ -8,7 +8,7 @@ import { PluginPriority } from '@fluxdown/types';
 import { expectTypeOf } from 'expect-type';
 import { reverse, sortBy } from 'lodash-es';
 import {
-  BatchScheduler,
+  batch,
   type IReadableClosure,
   type JSXDescriptor,
   MutableState,
@@ -379,7 +379,7 @@ describe('MapperComposer', () => {
 
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       mappers.next([[Take, { count: 1 }], Reverse]);
 
       source.next([second, first]);

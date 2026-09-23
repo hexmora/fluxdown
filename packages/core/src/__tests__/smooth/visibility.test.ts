@@ -1,5 +1,5 @@
 import { Smooth } from '@fluxdown/core-presets/mapper';
-import { BatchScheduler, ReactiveState, render, S } from 'stative';
+import { batch, ReactiveState, render, S } from 'stative';
 
 import type { HastRoot } from '../../typings';
 
@@ -34,7 +34,7 @@ describe('Smooth visibility', () => {
 
     expect(visibleText(initial)).toEqual(['abcde', 'f']);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       a.source.next(paragraph('a'));
 
       b.source.next(paragraph('bcdef'));

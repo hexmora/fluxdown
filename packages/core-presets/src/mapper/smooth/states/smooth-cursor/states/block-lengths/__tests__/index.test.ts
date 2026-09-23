@@ -1,4 +1,4 @@
-import { BatchScheduler, MutableState, ReactiveState, render, S } from 'stative';
+import { batch, MutableState, ReactiveState, render, S } from 'stative';
 
 import { BlockLengths } from '..';
 import { createArrayBlock } from '../../../../../__tests__/block';
@@ -80,7 +80,7 @@ describe('BlockLengths', () => {
 
     state.value.subscribe((lengths) => frames.push(lengths));
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       a.source.next([1]);
 
       b.source.next([2, 3, 4]);
@@ -132,7 +132,7 @@ describe('BlockLengths', () => {
 
     const state = render(S([BlockLengths<number[]>, { source }]));
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next([b.block]);
 
       expect(state.value.value).toEqual([2]);
@@ -158,7 +158,7 @@ describe('BlockLengths', () => {
 
     const state = render(S([BlockLengths<number[]>, { source }]));
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       length.next(3);
 
       expect(state.value.value).toEqual([3]);

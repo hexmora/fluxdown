@@ -2,8 +2,8 @@ import { BehaviorSubject, Observable, type Observer, Subscription } from 'rxjs';
 
 import type { IReactiveState } from '../../type';
 
+import { batch } from '../../../..';
 import { assert } from '../../../../utils';
-import { BatchScheduler } from '../../../batch-scheduler';
 import { ReactiveState } from '../base';
 import {
   combineMapState,
@@ -327,26 +327,30 @@ describe('combineMapState', () => {
 });
 
 describe('combineState', () => {
-  test('keeps mapped and combined priorities linked to their current sources', () => {
-    const source = ReactiveState.of(1);
+  test('settles mapped inputs before publishing a combined source snapshot', () => {
+    const input = new BehaviorSubject(1);
+
+    const source = toReactiveState(input);
 
     const mapped = mapState(source, (value) => value + 1);
 
     const combined = combineState(source, mapped);
 
-    expect(BatchScheduler.getPriority(mapped)).toBe(1);
+    const next = jest.fn();
 
-    expect(BatchScheduler.getPriority(combined)).toBe(2);
+    combined.subscribe(next);
 
-    BatchScheduler.setPriority(source, 10);
+    expect(next).toHaveBeenCalledTimes(1);
 
-    expect(BatchScheduler.getPriority(mapped)).toBe(11);
+    expect(next).toHaveBeenCalledWith([1, 2]);
 
-    expect(BatchScheduler.getPriority(combined)).toBe(12);
+    next.mockClear();
 
-    BatchScheduler.setPriority(source, NaN);
+    input.next(2);
 
-    expect(BatchScheduler.getPriority(combined)).toBeNaN();
+    expect(next).toHaveBeenCalledTimes(1);
+
+    expect(next).toHaveBeenCalledWith([2, 3]);
 
     combined.destroy();
 
@@ -392,14 +396,6 @@ describe('combineState', () => {
     const combined = combineState(sourceA, sourceB, sourceC);
 
     assertType<IReactiveState<[number, string, boolean]>>(combined);
-  });
-
-  test('preserves a NaN source priority', () => {
-    const source = new ReactiveState({ initial: 1 });
-
-    BatchScheduler.setPriority(source, NaN);
-
-    expect(BatchScheduler.getPriority(combineState(source))).toBeNaN();
   });
 
   test('combines latest values and re-emits on source updates', () => {
@@ -532,7 +528,7 @@ describe('combineState', () => {
 
     combined.subscribe({ error });
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       sourceA.error(firstError);
 
       sourceB.error(new Error('second'));

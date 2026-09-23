@@ -1,4 +1,4 @@
-import { BatchScheduler, combineMapClosure, MutableState, ReactiveState, render, S } from 'stative';
+import { batch, combineMapClosure, MutableState, ReactiveState, render, S } from 'stative';
 
 import { Completed } from '..';
 
@@ -57,7 +57,7 @@ describe('Completed', () => {
 
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next(2);
 
       source.complete();
@@ -76,7 +76,7 @@ describe('Completed', () => {
 
     const completed = render(S([Completed, { source }]));
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next(2);
 
       source.complete();

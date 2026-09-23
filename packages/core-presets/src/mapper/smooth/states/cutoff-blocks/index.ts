@@ -5,7 +5,7 @@ import { once, useClearable, useCombineMap, useMap } from 'stative';
 
 import type { CutoffBlockEntry, CutoffBlocksInputs } from './type';
 
-import { clearCutoffBlocks, setCutoffBlocksPriority, toCutoffBlocks } from './utils';
+import { clearCutoffBlocks, toCutoffBlocks } from './utils';
 
 export * from './type';
 
@@ -30,8 +30,6 @@ export const CutoffBlocks = /*#__PURE__*/ once(function CutoffBlocks<T>({
     ([current, position]) => toCutoffBlocks(entries, current, position, count),
     shallowEqual,
   );
-
-  setCutoffBlocksPriority(blocks.value, entries, [visible.value, end.value, count.value]);
 
   return blocks;
 });

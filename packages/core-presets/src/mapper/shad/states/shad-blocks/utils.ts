@@ -1,9 +1,8 @@
 import type { IBlockState } from '@fluxdown/types';
 import type { Root as HastRoot } from 'hast';
 
-import { max } from 'lodash-es';
 import { Subscription } from 'rxjs';
-import { BatchScheduler, D, type IReactiveState, type IReadableClosure, render, S } from 'stative';
+import { D, type IReadableClosure, render, S } from 'stative';
 
 import type { ShadPosition } from '../shad-progress';
 import type { ShadBlockEntry } from './type';
@@ -18,18 +17,6 @@ export const clearShadBlocks = (entries: Map<IBlockState<HastRoot>, ShadBlockEnt
   entries.clear();
 
   cleanup.unsubscribe();
-};
-
-export const setShadBlocksPriority = (
-  state: IReactiveState<IBlockState<HastRoot>[]>,
-  entries: Map<IBlockState<HastRoot>, ShadBlockEntry>,
-  inputs: IReactiveState<unknown>[],
-) => {
-  BatchScheduler.setPriority(state, () => {
-    const blocks = [...entries.values()].map(({ block }) => block);
-
-    return (max([...inputs, ...blocks].map((input) => BatchScheduler.getPriority(input))) ?? 0) + 1;
-  });
 };
 
 export const toShadBlocks = (

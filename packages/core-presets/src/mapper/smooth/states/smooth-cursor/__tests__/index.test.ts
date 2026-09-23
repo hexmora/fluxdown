@@ -2,7 +2,7 @@ import type { IBlockState } from '@fluxdown/types';
 
 import { expectTypeOf } from 'expect-type';
 import {
-  BatchScheduler,
+  batch,
   type IReadableClosure,
   mapClosure,
   MutableState,
@@ -160,7 +160,7 @@ describe('SmoothCursor', () => {
 
     expect(cursor.value.value).toEqual({ blockIndex: 1, charIndex: 1 });
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       first.source.next([1]);
 
       second.source.next([2, 3, 4, 5, 6]);
@@ -188,7 +188,7 @@ describe('SmoothCursor', () => {
 
     expect(cursor.value.value).toEqual({ blockIndex: 1, charIndex: 1 });
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       first.source.next([1]);
 
       second.source.next([2, 3, 4, 5, 6]);

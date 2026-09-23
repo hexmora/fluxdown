@@ -1,8 +1,8 @@
-import { BatchScheduler } from '../../batch-scheduler';
+import { batch } from '../../..';
 import { MutableState } from '../../mutable-state';
 import { combineMapState, combineState, mapState } from '../exports/operator';
 
-describe('BatchScheduler', () => {
+describe('batch', () => {
   test('publishes one consistent snapshot for multiple source updates', () => {
     const left = MutableState.of(1);
     const right = MutableState.of(2);
@@ -20,7 +20,7 @@ describe('BatchScheduler', () => {
     combinedNext.mockClear();
     rightAtLeftEmission.splice(0);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       left.next(10);
       right.next(20);
 
@@ -35,7 +35,7 @@ describe('BatchScheduler', () => {
 
     combinedNext.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       right.next(30);
       left.next(40);
     });
@@ -73,10 +73,10 @@ describe('BatchScheduler', () => {
     state.subscribe(next);
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       state.next(1);
 
-      BatchScheduler.batch(() => {
+      batch(() => {
         state.next(2);
         state.next(3);
       });
@@ -95,7 +95,7 @@ describe('BatchScheduler', () => {
     state.subscribe(next);
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       state.next(1);
       state.next(0);
     });
@@ -112,7 +112,7 @@ describe('BatchScheduler', () => {
     next.mockClear();
 
     expect(() => {
-      BatchScheduler.batch(() => {
+      batch(() => {
         state.next(1);
         throw new Error('failed');
       });
@@ -137,7 +137,7 @@ describe('BatchScheduler', () => {
     });
     events.splice(0);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       state.next(1);
       state.complete();
       state.next(2);
@@ -165,7 +165,7 @@ describe('BatchScheduler', () => {
     });
     events.splice(0);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       state.complete();
       state.next(1);
     });
@@ -189,7 +189,7 @@ describe('BatchScheduler', () => {
     });
     events.splice(0);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       state.next(1);
       state.error(sourceError);
     });
@@ -208,7 +208,7 @@ describe('BatchScheduler', () => {
 
     combined.subscribe({ complete, error });
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       left.complete();
       right.error(sourceError);
     });
@@ -256,7 +256,7 @@ describe('BatchScheduler', () => {
     state.subscribe({ complete });
 
     expect(() => {
-      BatchScheduler.batch(() => {
+      batch(() => {
         state.next(1);
         state.complete();
       });

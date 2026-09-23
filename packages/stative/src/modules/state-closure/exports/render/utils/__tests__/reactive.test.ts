@@ -3,7 +3,7 @@ import { round } from 'lodash-es';
 
 import {
   BaseStateClosure,
-  BatchScheduler,
+  batch,
   D,
   type IReactiveState,
   type IReadableClosure,
@@ -206,7 +206,7 @@ describe('reactive descriptors', () => {
 
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       quantitySource.next(3);
       TaxRate.source.next(0.2);
 

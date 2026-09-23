@@ -1,4 +1,4 @@
-import { isFunction, isNaN, isObject, isUndefined, max } from 'lodash-es';
+import { isFunction, isObject, isUndefined } from 'lodash-es';
 import { BehaviorSubject, Observable, type Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
@@ -6,7 +6,7 @@ import type { IReadableClosure } from '../../state-closure';
 import type { Distinctor, IReactiveState, StateMapper, StateValue, StateValues } from '../type';
 
 import { compute } from '../../../utils';
-import { BatchScheduler } from '../../batch-scheduler';
+import { getStateNode } from '../../state-graph/node';
 import { ReactiveState } from './base';
 
 type ReactiveStateSource<T> = IReactiveState<T> | BehaviorSubject<T>;
@@ -42,8 +42,6 @@ const createMappedState = <A, B>(
     },
     distinctor,
   });
-
-  BatchScheduler.setPriority(state, () => BatchScheduler.getPriority(source) + 1);
 
   return state;
 };
@@ -227,7 +225,7 @@ export const combineMapState = <const TSources extends [unknown, ...unknown[]], 
       };
 
       const scheduleRefresh = () => {
-        BatchScheduler.schedule(refresh, state);
+        getStateNode(state).schedule(refresh);
       };
 
       const subscriptions: Subscription[] = [];
@@ -279,14 +277,6 @@ export const combineMapState = <const TSources extends [unknown, ...unknown[]], 
       };
     },
     distinctor,
-  });
-
-  BatchScheduler.setPriority(state, () => {
-    const sourcePriorities = states.map((source) => BatchScheduler.getPriority(source));
-
-    const sourcePriority = sourcePriorities.some(isNaN) ? NaN : (max(sourcePriorities) ?? 0);
-
-    return sourcePriority + 1;
   });
 
   return state;

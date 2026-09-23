@@ -1,7 +1,7 @@
 import { BehaviorSubject, type Observer } from 'rxjs';
 
+import { batch } from '../../..';
 import { assert } from '../../../utils';
-import { BatchScheduler } from '../../batch-scheduler';
 import { toReactiveState } from '../exports/operator';
 import { ReactiveState } from '../index';
 
@@ -214,7 +214,7 @@ describe('ReactiveState', () => {
     state.subscribe({ next, complete });
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next(2);
       state.destroy();
     });

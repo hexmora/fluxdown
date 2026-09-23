@@ -3,7 +3,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 
 import type { IReactiveState, StateSubscriber } from '../../reactive-state';
 
-import { BatchScheduler } from '../../batch-scheduler';
+import { batch } from '../../..';
 import { MutableState } from '../../mutable-state';
 import { combineMapState, mapState, ReactiveState, toReactiveState } from '../../reactive-state';
 import { D, render as renderDescriptor, S, type StateClosureResult } from '../exports/render';
@@ -129,7 +129,7 @@ describe('BaseStateClosure runtime', () => {
 
     const closure = create(source);
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next(2);
 
       expect(closure.value.value).toBe(2);
@@ -149,7 +149,7 @@ describe('BaseStateClosure runtime', () => {
 
     const complete = jest.fn();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next(2);
 
       source.complete();
@@ -177,7 +177,7 @@ describe('BaseStateClosure runtime', () => {
 
     const failure = new Error('Failed after the pending value.');
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next(2);
 
       source.error(failure);
@@ -600,37 +600,27 @@ describe('BaseStateClosure runtime', () => {
         return renderDescriptor(S([InputSource, { source }]));
       },
     },
-  ])('exposes $name closure priorities without initializing lazy state flows', ({ create }) => {
+  ])('initializes a $name closure only when its value is accessed', ({ create }) => {
     const build = jest.fn(() => ReactiveState.of(1));
 
     const closure = create(FactoryReadableClosure.create(build));
-
-    expect(BatchScheduler.getPriority(closure)).toBe(0);
 
     expect(build).not.toHaveBeenCalled();
 
     expect(closure.value.value).toBe(1);
 
-    expect(BatchScheduler.getPriority(closure)).toBe(BatchScheduler.getPriority(closure.value));
-
-    expect(BatchScheduler.getPriority(closure)).toBeGreaterThan(0);
-
     expect(build).toHaveBeenCalledTimes(1);
 
     closure.destroy();
-
-    expect(() => BatchScheduler.getPriority(closure)).not.toThrow();
 
     const unopened = create(FactoryReadableClosure.create(build));
 
     unopened.destroy();
 
-    expect(BatchScheduler.getPriority(unopened)).toBe(0);
-
     expect(build).toHaveBeenCalledTimes(1);
   });
 
-  test('follows new dependency depth through a closure priority alias', () => {
+  test('settles new dependency depth through a closure wrapper', () => {
     const source = MutableState.of([0]);
 
     const value = MutableState.of(2);
@@ -643,61 +633,51 @@ describe('BaseStateClosure runtime', () => {
 
     expect(closure.value.value).toEqual([0]);
 
-    const initial = BatchScheduler.getPriority(closure);
+    const next = jest.fn();
 
-    source.next([0, 1]);
+    closure.value.subscribe(next);
 
-    expect(closure.value.value).toEqual([0, 8]);
+    next.mockClear();
 
-    expect(BatchScheduler.getPriority(closure)).toBeGreaterThan(initial);
+    batch(() => {
+      source.next([0, 1]);
 
-    expect(BatchScheduler.getPriority(closure)).toBe(BatchScheduler.getPriority(closure.value));
+      value.next(3);
+    });
 
-    BatchScheduler.setPriority(value, 20);
+    expect(closure.value.value).toEqual([0, 12]);
 
-    expect(BatchScheduler.getPriority(closure)).toBeGreaterThan(20);
+    expect(next).toHaveBeenCalledTimes(1);
+
+    expect(next).toHaveBeenCalledWith([0, 12]);
 
     closure.destroy();
-
-    expect(() => BatchScheduler.getPriority(closure)).not.toThrow();
 
     source.destroy();
 
     value.destroy();
   });
 
-  test('keeps explicit closure priorities when its value is initialized', () => {
-    const source = MutableState.of(1);
-
-    const closure = toClosure(source);
-
-    BatchScheduler.setPriority(closure, 7);
-
-    expect(closure.value.value).toBe(1);
-
-    BatchScheduler.setPriority(source, 20);
-
-    expect(BatchScheduler.getPriority(closure)).toBe(7);
-
-    expect(BatchScheduler.getPriority(closure.value)).toBeGreaterThan(20);
-
-    closure.destroy();
-
-    source.destroy();
-  });
-
-  test('inherits source priority changes through initialized closure wrappers', () => {
+  test('forwards source changes through initialized closure wrappers', () => {
     const source = MutableState.of(1);
 
     const closure = new Source({ source });
 
     const mapped = mapClosure(closure, (value) => value + 1);
 
-    const initial = BatchScheduler.getPriority(mapped.value);
+    const next = jest.fn();
 
-    BatchScheduler.setPriority(source, 10);
+    mapped.value.subscribe(next);
 
-    expect(BatchScheduler.getPriority(mapped.value)).toBe(initial + 10);
+    expect(mapped.value.value).toBe(2);
+
+    next.mockClear();
+
+    source.next(10);
+
+    expect(next).toHaveBeenCalledTimes(1);
+
+    expect(next).toHaveBeenCalledWith(11);
 
     mapped.destroy();
 
@@ -706,7 +686,7 @@ describe('BaseStateClosure runtime', () => {
     source.destroy();
   });
 
-  test('preserves scheduler priority through an unequal diamond dependency', () => {
+  test('settles a wrapped unequal diamond dependency before publishing its join', () => {
     const source = MutableState.of(1);
 
     const short = mapState(source, (value) => value * 10);
@@ -730,10 +710,6 @@ describe('BaseStateClosure runtime', () => {
     joinMapper.mockClear();
 
     next.mockClear();
-
-    expect(BatchScheduler.getPriority(closure.value)).toBe(
-      BatchScheduler.getPriority(longSource) + 2,
-    );
 
     source.next(2);
 

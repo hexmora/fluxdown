@@ -1,4 +1,4 @@
-export * from './batch-scheduler';
+export * from './state-graph';
 export * from './destructible';
 export * from './reactive-state';
 export * from './mutable-state';

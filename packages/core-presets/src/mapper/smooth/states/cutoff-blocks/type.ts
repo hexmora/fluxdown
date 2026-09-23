@@ -1,5 +1,5 @@
 import type { IBlockState } from '@fluxdown/types';
-import type { IReactiveState, IReadableClosure, MutableState } from 'stative';
+import type { IReadableClosure, MutableState } from 'stative';
 
 import type { SmoothPosition } from '../smooth-cursor/states';
 
@@ -19,6 +19,4 @@ export interface CutoffBlockEntry<T> {
   end: MutableState<number | null>;
 
   closure: IReadableClosure<IBlockState<T>>;
-
-  dependencies: (IBlockState<T> | IReactiveState<unknown>)[];
 }

@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import {
   BaseStateClosure,
-  BatchScheduler,
+  batch,
   combineMapClosure,
   D,
   type IReadableClosure,
@@ -23,7 +23,7 @@ import {
 } from '../../../..';
 
 describe('mapEachClosure', () => {
-  test('keeps downstream priorities linked to later entries and their dependencies', () => {
+  test('settles newly added derived entries before notifying downstream consumers', () => {
     const source = MutableState.of([0]);
 
     const value = MutableState.of(2);
@@ -36,17 +36,29 @@ describe('mapEachClosure', () => {
 
     const output = mapClosure(items, (current) => current);
 
-    const initial = BatchScheduler.getPriority(output.value);
+    const next = jest.fn();
 
-    source.next([0, 1]);
+    output.value.subscribe(next);
 
-    expect(output.value.value).toEqual([0, 2]);
+    next.mockClear();
 
-    expect(BatchScheduler.getPriority(output.value)).toBeGreaterThan(initial);
+    batch(() => {
+      source.next([0, 1]);
 
-    BatchScheduler.setPriority(value, 20);
+      value.next(3);
+    });
 
-    expect(BatchScheduler.getPriority(output.value)).toBeGreaterThan(20);
+    expect(output.value.value).toEqual([0, 3]);
+
+    expect(next).toHaveBeenCalledTimes(1);
+
+    expect(next).toHaveBeenCalledWith([0, 3]);
+
+    value.next(4);
+
+    expect(next).toHaveBeenCalledTimes(2);
+
+    expect(next).toHaveBeenLastCalledWith([0, 4]);
 
     output.destroy();
 
@@ -153,7 +165,7 @@ describe('mapEachClosure', () => {
     closure.value.subscribe(next);
     next.mockClear();
 
-    BatchScheduler.batch(() => {
+    batch(() => {
       source.next([2, 3]);
       scale.next(3);
     });
