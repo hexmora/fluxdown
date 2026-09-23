@@ -5,10 +5,10 @@ export const SHAD_DATA_ATTR = 'dataFluxdownShad';
 export const SHAD_HOST_VALUE = 'host';
 
 // oxlint-disable-next-line unicorn/prefer-set-has -- Fixed lookup tables use arrays by convention.
-export const FORBIDDEN_TAG_NAMES = ['a', 'annotation', 'code', 'math', 'pre', 'svg'];
+export const FORBIDDEN_TAG_NAMES = ['annotation', 'code', 'math', 'pre', 'svg'];
 
 // oxlint-disable-next-line unicorn/prefer-set-has -- Fixed lookup tables use arrays by convention.
-export const BOUNDARY_TAG_NAMES = ['tr', 'tbody', 'thead', 'table'];
+export const BOUNDARY_TAG_NAMES = ['a', 'tr', 'tbody', 'thead', 'table'];
 
 // oxlint-disable-next-line unicorn/prefer-set-has -- Fixed lookup tables use arrays by convention.
 export const BLOCK_TAG_NAMES = [

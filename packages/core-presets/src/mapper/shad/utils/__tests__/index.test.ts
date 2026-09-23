@@ -115,7 +115,7 @@ describe('createShadRoot', () => {
     expect(getParts(output)).toEqual(['d', 'ef']);
   });
 
-  test.each(['a', 'annotation', 'code', 'math', 'pre', 'svg'])(
+  test.each(['annotation', 'code', 'math', 'pre', 'svg'])(
     'does not move an effect before a trailing %s subtree',
     (tagName) => {
       const source = root([text('safe'), element(tagName, [text('opaque')])]);

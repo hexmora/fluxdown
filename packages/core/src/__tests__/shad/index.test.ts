@@ -154,7 +154,7 @@ describe('Shad', () => {
   });
 
   test.each(['enabled', 'length'] as const)(
-    'retains the active window when %s disables shading during a shorter continuation',
+    'restarts the active window when growth resumes after %s disables a shorter continuation',
     (config) => {
       const block = createBlock('a', paragraph('abc'));
 
@@ -190,7 +190,7 @@ describe('Shad', () => {
 
       expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
 
-      jest.advanceTimersByTime(99);
+      jest.advanceTimersByTime(199);
 
       expect(readParts(fork.value.value)?.active).toBe('e');
 
@@ -203,7 +203,7 @@ describe('Shad', () => {
   );
 
   test.each(['source', 'length'] as const)(
-    'retains the settled prefix when %s clears within the active window',
+    'clears the settled prefix when %s clears within the active window',
     (reset) => {
       const block = createBlock('a', paragraph('abc'));
 
@@ -232,11 +232,11 @@ describe('Shad', () => {
 
       const fork = firstBlock(harness.state.value.value);
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'xy', active: '' });
+      expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'xy' });
 
       block.source.next(paragraph('xyzw'));
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'z', active: 'w' });
+      expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'zw' });
 
       jest.advanceTimersByTime(200);
 
