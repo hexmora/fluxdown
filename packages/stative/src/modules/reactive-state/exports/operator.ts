@@ -178,7 +178,7 @@ export const combineMapState = <const TSources extends [unknown, ...unknown[]], 
 
       const completed = states.map(() => false);
 
-      let previousValues: TValues | null = null;
+      let previousValues = initialValues;
 
       let closed = false;
 
@@ -205,7 +205,7 @@ export const combineMapState = <const TSources extends [unknown, ...unknown[]], 
 
         const nextValues = [...latestValues] as TValues;
 
-        if (!previousValues || !shallowEqual(nextValues, previousValues)) {
+        if (!shallowEqual(nextValues, previousValues)) {
           previousValues = nextValues;
 
           const nextResult = mapper(nextValues, prev);
