@@ -21,7 +21,7 @@ describe('Fluxdown shad streaming', () => {
   test('leaves initial content unfaded and hides the mask again after appended text settles', async () => {
     jest.useFakeTimers();
 
-    const view = render(<Fluxdown shad text="abc" />);
+    const view = render(<Fluxdown streaming={{ shad: true, smooth: false }} text="abc" />);
 
     expect(view.container.textContent).toBe('abc');
 
@@ -29,7 +29,7 @@ describe('Fluxdown shad streaming', () => {
 
     expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
 
-    view.rerender(<Fluxdown shad text="abcdef" />);
+    view.rerender(<Fluxdown streaming={{ shad: true, smooth: false }} text="abcdef" />);
 
     expect(view.container.textContent).toBe('abcdef');
 
@@ -57,11 +57,23 @@ describe('Fluxdown shad streaming', () => {
 
     expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
 
-    view.rerender(<Fluxdown ref={ref} shad={{ length: 2, maskWidth: 24 }} text="abc" />);
+    view.rerender(
+      <Fluxdown
+        ref={ref}
+        streaming={{ shad: { length: 2, maskWidth: 24 }, smooth: false }}
+        text="abc"
+      />,
+    );
 
     expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('');
 
-    view.rerender(<Fluxdown ref={ref} shad={{ length: 2, maskWidth: 24 }} text="abcdefgh" />);
+    view.rerender(
+      <Fluxdown
+        ref={ref}
+        streaming={{ shad: { length: 2, maskWidth: 24 }, smooth: false }}
+        text="abcdefgh"
+      />,
+    );
 
     expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('gh');
 
@@ -71,7 +83,13 @@ describe('Fluxdown shad streaming', () => {
 
     const active = view.container.querySelector(`.${styles.active}`);
 
-    view.rerender(<Fluxdown ref={ref} shad={{ length: 2, maskWidth: 10 }} text="abcdefgh" />);
+    view.rerender(
+      <Fluxdown
+        ref={ref}
+        streaming={{ shad: { length: 2, maskWidth: 10 }, smooth: false }}
+        text="abcdefgh"
+      />,
+    );
 
     expect(view.container.firstElementChild).toHaveStyle({
       [`--${PREFIX}-shad-mask-width`]: '10px',
@@ -79,7 +97,13 @@ describe('Fluxdown shad streaming', () => {
 
     expect(view.container.querySelector(`.${styles.active}`)).toBe(active);
 
-    view.rerender(<Fluxdown ref={ref} shad={{ length: 4, maskWidth: 0 }} text="abcdefgh" />);
+    view.rerender(
+      <Fluxdown
+        ref={ref}
+        streaming={{ shad: { length: 4, maskWidth: 0 }, smooth: false }}
+        text="abcdefgh"
+      />,
+    );
 
     expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('efgh');
 
@@ -87,13 +111,19 @@ describe('Fluxdown shad streaming', () => {
       [`--${PREFIX}-shad-mask-width`]: '0px',
     });
 
-    view.rerender(<Fluxdown ref={ref} shad={{ enabled: false }} text="abcdefgh" />);
+    view.rerender(
+      <Fluxdown
+        ref={ref}
+        streaming={{ shad: { enabled: false }, smooth: false }}
+        text="abcdefgh"
+      />,
+    );
 
     expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
 
     expect(view.container.textContent).toBe('abcdefgh');
 
-    view.rerender(<Fluxdown ref={ref} shad text="abcdefgh" />);
+    view.rerender(<Fluxdown ref={ref} streaming={{ shad: true, smooth: false }} text="abcdefgh" />);
 
     expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
 
@@ -111,11 +141,11 @@ describe('Fluxdown shad streaming', () => {
       scheduler: createStepScheduler(2),
     };
 
-    const view = render(<Fluxdown shad smooth={smooth} text="first" />);
+    const view = render(<Fluxdown streaming={{ shad: true, smooth }} text="first" />);
 
     const firstParagraph = view.container.querySelector('p');
 
-    view.rerender(<Fluxdown shad smooth={smooth} text={'first\n\n**second**'} />);
+    view.rerender(<Fluxdown streaming={{ shad: true, smooth }} text={'first\n\n**second**'} />);
 
     expect(view.container.textContent).toBe('first');
 
@@ -151,7 +181,7 @@ describe('Fluxdown shad streaming', () => {
 
     const timers = jest.getTimerCount();
 
-    const markup = renderToStaticMarkup(<Fluxdown shad smooth text="Server content" />);
+    const markup = renderToStaticMarkup(<Fluxdown streaming text="Server content" />);
 
     const container = document.createElement('div');
 

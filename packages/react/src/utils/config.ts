@@ -1,4 +1,6 @@
+import type { BlockCompilerConfig } from '@fluxdown/core';
 import type {
+  BaseShadConfig,
   BaseSmoothConfig,
   SchedulerType,
   SmoothConfig,
@@ -7,10 +9,18 @@ import type {
   TickerType,
 } from '@fluxdown/core-presets/mapper';
 
-import { assert } from '@fluxdown/utils';
-import { isBoolean, isFunction, isString } from 'lodash-es';
+import { assert, defaultsBy } from '@fluxdown/utils';
+import { isBoolean, isFinite, isFunction, isString } from 'lodash-es';
 
-import { ALL_SCHEDULERS, ALL_TICKERS } from '../consts';
+import type { BaseBuildConfig, ShadConfig, StreamingConfig } from '../types';
+
+import { ALL_SCHEDULERS, ALL_TICKERS, DEFAULT_CONFIG } from '../consts';
+
+export interface ToBuildConfigParams {
+  base: BaseBuildConfig;
+
+  repairEnding: boolean;
+}
 
 export const isEnableRAF = () => {
   return (
@@ -44,6 +54,15 @@ export const getSchedulerByType = (
   return scheduler;
 };
 
+export const toShadConfig = (config: boolean | ShadConfig): BaseShadConfig => {
+  const { enabled = true, length = 2 } = isBoolean(config) ? { enabled: config } : config;
+
+  return {
+    enabled,
+    length: isFinite(length) ? Math.max(0, Math.floor(length)) : 0,
+  };
+};
+
 export const toSmoothConfig = (config: boolean | SmoothConfig): BaseSmoothConfig => {
   const options: SmoothConfig = isBoolean(config)
     ? {
@@ -59,5 +78,24 @@ export const toSmoothConfig = (config: boolean | SmoothConfig): BaseSmoothConfig
     enabled,
     ticker: getTickerByType(ticker),
     scheduler: getSchedulerByType(scheduler),
+  };
+};
+
+export const toStreamingConfig = (
+  config: boolean | StreamingConfig = false,
+): Required<StreamingConfig> => {
+  if (isBoolean(config)) {
+    return { repairEnding: config, smooth: config, shad: config };
+  }
+
+  const { repairEnding = true, smooth = true, shad = true } = config;
+
+  return { repairEnding, smooth, shad };
+};
+
+export const toBuildConfig = ({ base, repairEnding }: ToBuildConfigParams): BlockCompilerConfig => {
+  return {
+    ...defaultsBy(base, { ...DEFAULT_CONFIG, repair: repairEnding }),
+    repairEnding,
   };
 };

@@ -42,13 +42,13 @@ export default function App() {
 
 ### 流式渲染
 
-每收到一个片段，就将累积的 Markdown 传给 `text`。开启 `smooth` 后，新内容会逐步平滑显示，可搭配任意流式 API。
+每收到一个片段，就将累积的 Markdown 传给 `text`。开启 `streaming` 后，新内容会逐步平滑显示，可搭配任意流式 API。
 
 ```jsx
 import { Fluxdown } from "fluxdown";
 
 export function StreamingMessage({ text }) {
-  return <Fluxdown smooth text={text} build={{ repair: true, repairEnding: true }} />;
+  return <Fluxdown streaming text={text} />;
 }
 ```
 

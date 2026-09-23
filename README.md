@@ -42,13 +42,13 @@ export default function App() {
 
 ### Render a stream
 
-Pass the accumulated Markdown to `text` as chunks arrive. Enable `smooth` to reveal new content gradually, with any streaming API.
+Pass the accumulated Markdown to `text` as chunks arrive. Enable `streaming` to reveal new content gradually, with any streaming API.
 
 ```jsx
 import { Fluxdown } from "fluxdown";
 
 export function StreamingMessage({ text }) {
-  return <Fluxdown smooth text={text} build={{ repair: true, repairEnding: true }} />;
+  return <Fluxdown streaming text={text} />;
 }
 ```
 

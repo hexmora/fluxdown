@@ -13,7 +13,7 @@ A few words arrive quickly, then a longer pause, then a burst of text. The previ
 > Pause the incoming stream to let the preview catch up, then press Play to continue.
 
 \`\`\`tsx
-<Fluxdown smooth text={markdown} />
+<Fluxdown streaming text={markdown} />
 \`\`\`
 
 The stream is complete. Reset it to watch a different sequence of chunks.

@@ -364,7 +364,7 @@ jsx(({ x }: { x: number }) => x, { x: D(42) });
     }
 
     if (specifiers.includes('fluxdown')) {
-      typeSmoke += `\nimport { createElement } from 'react';\nimport { Fluxdown } from 'fluxdown';\ncreateElement(Fluxdown, { text: 'consumer', smooth: true, shad: true });\n`;
+      typeSmoke += `\nimport { createElement } from 'react';\nimport { Fluxdown } from 'fluxdown';\ncreateElement(Fluxdown, { text: 'consumer', streaming: true });\n`;
     }
 
     await writeFile(path.join(consumer, '__tests__', 'smoke.mjs'), esmSmoke);

@@ -12,7 +12,6 @@ import {
 } from '@fluxdown/react-presets/base';
 import { PRESET_RENDER_PLUGINS } from '@fluxdown/react-presets/render';
 import { PRESET_SLOT_PLUGINS } from '@fluxdown/react-presets/slot';
-import { defaultsBy } from '@fluxdown/utils';
 import cn from 'classnames';
 import { forwardRef, memo, useImperativeHandle } from 'react';
 import { shallowEqual } from 'shallow-equal';
@@ -21,12 +20,19 @@ import { D, render, S } from 'stative';
 import type { FluxdownProps, FluxdownRef } from './types';
 
 import { RootReconciler } from './components';
-import { DEFAULT_CONFIG, EL, EO } from './consts';
+import { EL, EO } from './consts';
 import { usePluginConfig, usePlugins, useShadStyles } from './hooks';
 import { ReactRenderer } from './modules';
 import styles from './styles/index.module.scss';
 import { useThemeStyles } from './theme';
-import { isPatchesEqual, isPropsEqual, toShadConfig, toSmoothConfig } from './utils';
+import {
+  isPatchesEqual,
+  isPropsEqual,
+  toBuildConfig,
+  toShadConfig,
+  toSmoothConfig,
+  toStreamingConfig,
+} from './utils';
 
 export * from './types';
 
@@ -38,18 +44,19 @@ export const Fluxdown = /*#__PURE__*/ memo(
       theme = 'light',
       text: _text,
       build: _build = EO,
-      smooth: _smooth = false,
-      shad: _shad = false,
+      streaming = false,
       patches: _patches = EL,
       plugins: _plugins = EL,
     },
     ref,
   ) {
+    const { repairEnding, smooth: _smooth, shad: _shad } = toStreamingConfig(streaming);
+
     const themeStyles = useThemeStyles(theme);
 
     const shadStyles = useShadStyles(_shad);
 
-    const build = useStateOf(defaultsBy(_build, DEFAULT_CONFIG), shallowEqual);
+    const build = useStateOf(toBuildConfig({ base: _build, repairEnding }), shallowEqual);
 
     const smooth = usePluginConfig(toSmoothConfig(_smooth));
 

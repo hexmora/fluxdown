@@ -11,6 +11,8 @@ export const TrackedPreview = ({
   patches,
   text,
 }: TrackedPreviewProps) => {
+  const { repairEnding, ...build } = config;
+
   const renderCount = useRendersCount();
 
   const update = useUpdate();
@@ -32,7 +34,14 @@ export const TrackedPreview = ({
       </div>
 
       <section aria-label={ariaLabel} className="playground-preview-content">
-        {text.length > 0 ? <Fluxdown build={config} patches={patches} text={text} /> : null}
+        {text.length > 0 ? (
+          <Fluxdown
+            build={build}
+            patches={patches}
+            streaming={{ repairEnding, smooth: false, shad: false }}
+            text={text}
+          />
+        ) : null}
       </section>
     </div>
   );

@@ -45,7 +45,7 @@ afterEach(async () => {
 });
 
 describe('Fluxdown mapper plugins', () => {
-  test('overrides mapper tuples with the top-level Smooth and Shad configuration', () => {
+  test('overrides mapper tuples with the streaming Smooth and Shad configuration', () => {
     const ticker = createManualTicker();
 
     const scheduler = createStepScheduler(1);
@@ -229,7 +229,7 @@ describe('Fluxdown mapper plugins', () => {
     const smooth = { enabled: true, ticker: ticker.Ticker, scheduler };
 
     const renderContent = (text: string, mappers: MapperPluggable[] = []) => (
-      <Fluxdown smooth={smooth} text={text} plugins={[{ mappers }]} />
+      <Fluxdown streaming={{ smooth, shad: false }} text={text} plugins={[{ mappers }]} />
     );
 
     const view = render(renderContent('a'));

@@ -101,12 +101,7 @@ describe('comparison utilities', () => {
     };
     const equivalent: FluxdownProps = {
       className: 'markdown',
-      build: {
-        footnote: false,
-        repair: false,
-        repairEnding: false,
-        tex: false,
-      },
+      build: {},
       patches: [{ key: 'inline', range: [0, 2], render: renderPatch }],
       plugins: [
         {
@@ -154,33 +149,63 @@ describe('comparison utilities', () => {
 
     const smooth: FluxdownProps = {
       ...base,
-      smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+      streaming: { smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' } },
     };
 
-    expect(isPropsEqual(base, { ...base, smooth: false })).toBe(true);
+    expect(isPropsEqual(base, { ...base, streaming: false })).toBe(true);
 
-    expect(isPropsEqual(base, { ...base, smooth: true })).toBe(false);
+    expect(isPropsEqual(base, { ...base, streaming: true })).toBe(false);
 
     expect(
       isPropsEqual(smooth, {
         ...base,
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        streaming: { smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' } },
       }),
     ).toBe(true);
 
     expect(
       isPropsEqual(smooth, {
         ...base,
-        smooth: { enabled: false, ticker: 'raf', scheduler: 'spring' },
+        streaming: { smooth: { enabled: false, ticker: 'raf', scheduler: 'spring' } },
       }),
     ).toBe(false);
 
     expect(
       isPropsEqual(smooth, {
         ...base,
-        smooth: { enabled: true, ticker: 'interval', scheduler: 'spring' },
+        streaming: { smooth: { enabled: true, ticker: 'interval', scheduler: 'spring' } },
       }),
     ).toBe(false);
+  });
+
+  test('compares streaming defaults and explicit overrides', () => {
+    const base: FluxdownProps = { text: 'content', streaming: true };
+
+    expect(isPropsEqual(base, { ...base, streaming: {} })).toBe(true);
+
+    expect(
+      isPropsEqual(base, {
+        ...base,
+        streaming: { repairEnding: true, smooth: true, shad: true },
+      }),
+    ).toBe(true);
+
+    expect(isPropsEqual(base, { ...base, build: { repair: true } })).toBe(false);
+
+    expect(isPropsEqual(base, { ...base, build: { repair: false } })).toBe(false);
+
+    expect(isPropsEqual(base, { ...base, streaming: { repairEnding: false } })).toBe(false);
+
+    expect(isPropsEqual(base, { ...base, streaming: { shad: false } })).toBe(false);
+
+    expect(isPropsEqual(base, { ...base, streaming: { shad: { maskWidth: 24 } } })).toBe(false);
+
+    expect(
+      isPropsEqual(
+        { text: 'content' },
+        { text: 'content', streaming: { repairEnding: false, smooth: false, shad: false } },
+      ),
+    ).toBe(true);
   });
 
   test('short-circuits identical props before reading their values', () => {
