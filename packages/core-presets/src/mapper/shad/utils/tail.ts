@@ -33,6 +33,10 @@ const isBlock = (node: RootContent | undefined) => {
   return node?.type === 'element' && BLOCK_TAG_NAMES.includes(node.tagName.toLowerCase());
 };
 
+const isBoundary = (node: HastRoot | RootContent | undefined) => {
+  return node?.type === 'element' && BOUNDARY_TAG_NAMES.includes(node.tagName.toLowerCase());
+};
+
 const getOffset = (
   root: HastRoot | Element,
   path: number[],
@@ -78,11 +82,7 @@ export const getTailRange = (root: HastRoot, length: number) => {
 
       const parent = ancestor?.parent;
 
-      if (
-        frame.hasTarget &&
-        parent?.type === 'element' &&
-        BOUNDARY_TAG_NAMES.includes(parent.tagName.toLowerCase())
-      ) {
+      if (frame.hasTarget && (isBoundary(parent) || isBoundary(frame.parent))) {
         break;
       }
 
@@ -156,7 +156,7 @@ export const getTailRange = (root: HastRoot, length: number) => {
       continue;
     }
 
-    if ((last && isForbidden(node)) || node.tagName.toLowerCase() === 'br') {
+    if ((last && (isForbidden(node) || isBoundary(node))) || node.tagName.toLowerCase() === 'br') {
       break;
     }
 

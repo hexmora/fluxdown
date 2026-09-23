@@ -37,9 +37,9 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
       distinctor: shallowEqual,
 
       emitter: (observer) => {
-        let maximum = input.value.total;
+        let previousTotal = input.value.total;
 
-        let committed = maximum;
+        let committed = previousTotal;
 
         let timeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -70,7 +70,7 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
 
         const subscription = input.subscribe({
           next: ({ total }) => {
-            if (total > maximum) {
+            if (total > previousTotal) {
               clearTimeoutHandle();
 
               timeout = setTimeout(() => {
@@ -80,7 +80,9 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
               }, SHAD_AUTO_HIDE_TIMEOUT);
             }
 
-            maximum = total <= 0 ? 0 : Math.max(maximum, total);
+            committed = Math.min(committed, total);
+
+            previousTotal = total;
 
             publish();
           },
