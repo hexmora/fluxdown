@@ -167,9 +167,13 @@ describe('pack state mappers', () => {
 
       config.next({ ...DEFAULT_CONFIG, footnote: true, repair: true });
 
-      expect(state.value.value).not.toBe(initial);
-
-      expect(next).toHaveBeenCalledTimes(1);
+      if (mapper === 'rehype') {
+        expect(state.value.value).toBe(initial);
+        expect(next).not.toHaveBeenCalled();
+      } else {
+        expect(state.value.value).not.toBe(initial);
+        expect(next).toHaveBeenCalledTimes(1);
+      }
 
       state.destroy();
 
@@ -293,7 +297,7 @@ describe('pack state mappers', () => {
       tex: true,
     });
 
-    expect(rehypes.value.value.map(getPluggableClass)).toContain(HoistFootnoteRehypePlugin);
+    expect(rehypes.value.value.map(getPluggableClass)).not.toContain(HoistFootnoteRehypePlugin);
 
     expect(remarks.value.value.map(getPluggableClass)).toContain(SyntaxMathRemarkPlugin);
 

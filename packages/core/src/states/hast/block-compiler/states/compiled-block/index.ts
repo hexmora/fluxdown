@@ -40,10 +40,17 @@ export const CompiledBlock = /*#__PURE__*/ once(
     // Keep the factory per block so it can accept block-specific inputs in the future.
     const rehypes = getRehypes();
 
+    const idPrefix = useMap(config, (current) => current.idPrefix);
+
     const source = useCombineMap(
-      [section, remarks, rehypes],
-      ([{ text }, currentRemarks, currentRehypes]) =>
-        markdownToHast({ text, remarks: currentRemarks, rehypes: currentRehypes }),
+      [section, remarks, rehypes, idPrefix],
+      ([{ text }, currentRemarks, currentRehypes, currentPrefix]) =>
+        markdownToHast({
+          text,
+          remarks: currentRemarks,
+          rehypes: currentRehypes,
+          idPrefix: currentPrefix,
+        }),
       isEqual,
     );
 

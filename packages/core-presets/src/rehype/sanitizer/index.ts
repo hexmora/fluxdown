@@ -8,7 +8,7 @@ import rehypeSanitize from 'rehype-sanitize';
 import type { SanitizerRehypePluginConfig } from './type';
 
 import { BaseRehypePlugin } from '../base';
-import { createSchema } from './utils';
+import { createSchema, restoreFootnoteLinks } from './utils';
 
 export type { SanitizerRehypePluginConfig } from './type';
 
@@ -36,7 +36,15 @@ export class SanitizerRehypePlugin extends BaseRehypePlugin {
     this.plugin = () => {
       const schema = createSchema(this.innerConfig);
 
-      return rehypeSanitize(schema);
+      const sanitize = rehypeSanitize(schema);
+
+      return (tree) => {
+        const sanitized = sanitize(tree);
+
+        restoreFootnoteLinks(sanitized, schema);
+
+        return sanitized;
+      };
     };
   }
 }

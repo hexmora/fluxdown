@@ -342,7 +342,7 @@ describe('Core', () => {
     expectTypeOf(state).toEqualTypeOf<IReadableClosure<RenderedBlock[]>>();
 
     expect(PRESET_REMARK_PLUGINS).toContain(SyntaxMathRemarkPlugin);
-    expect(PRESET_REHYPE_PLUGINS).toContain(HoistFootnoteRehypePlugin);
+    expect(PRESET_REHYPE_PLUGINS).not.toContain(HoistFootnoteRehypePlugin);
     expect(PRESET_REPAIR_PLUGINS).toContain(DanglingFootnoteRepairPlugin);
 
     state.destroy();

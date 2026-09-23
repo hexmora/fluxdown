@@ -12,7 +12,7 @@ describe('rehype plugin contracts', () => {
   test('exposes unique stable keys for all built-in plugins', () => {
     const keys = PRESET_REHYPE_PLUGINS.map((PluginClass) => PluginClass.key);
 
-    expect(keys).toEqual(['rehype-raw-parser', 'rehype-sanitizer', 'rehype-hoist-footnote']);
+    expect(keys).toEqual(['rehype-raw-parser', 'rehype-sanitizer']);
     expect(uniq(keys)).toHaveLength(keys.length);
   });
 

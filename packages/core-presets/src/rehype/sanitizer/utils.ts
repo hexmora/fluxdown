@@ -1,3 +1,4 @@
+import type { Element, Root } from 'hast';
 import type { Schema as SanitizationSchema } from 'hast-util-sanitize';
 
 import { defaultsBy } from '@fluxdown/utils';
@@ -62,4 +63,58 @@ export const createSchema = ({
   );
 
   return defaultsBy<SanitizationSchema>({ tagNames, attributes, protocols }, initialSchema);
+};
+
+/** Keep generated footnote links aligned with IDs without disabling clobber protection. */
+export const restoreFootnoteLinks = (tree: Root, schema: SanitizationSchema) => {
+  if (!schema.clobber?.includes('id') || !schema.clobberPrefix) {
+    return;
+  }
+
+  if (
+    !tree.children.some(
+      (node) => node.type === 'element' && Object.hasOwn(node.properties, 'dataFootnotes'),
+    )
+  ) {
+    return;
+  }
+
+  const ids: string[] = [];
+
+  const links: Element[] = [];
+
+  const nodes = [...tree.children];
+
+  while (nodes.length > 0) {
+    const node = nodes.pop();
+
+    if (node?.type !== 'element') {
+      continue;
+    }
+
+    if (typeof node.properties.id === 'string') {
+      ids.push(node.properties.id);
+    }
+
+    if (
+      Object.hasOwn(node.properties, 'dataFootnoteRef') ||
+      Object.hasOwn(node.properties, 'dataFootnoteBackref')
+    ) {
+      links.push(node);
+    }
+
+    nodes.push(...node.children);
+  }
+
+  for (const link of links) {
+    const href = link.properties.href;
+
+    if (typeof href === 'string' && href.startsWith('#')) {
+      const target = `${schema.clobberPrefix}${href.slice(1)}`;
+
+      if (ids.includes(target)) {
+        link.properties.href = `#${target}`;
+      }
+    }
+  }
 };

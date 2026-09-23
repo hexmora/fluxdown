@@ -13,7 +13,7 @@ import {
 import { PRESET_RENDER_PLUGINS } from '@fluxdown/react-presets/render';
 import { PRESET_SLOT_PLUGINS } from '@fluxdown/react-presets/slot';
 import cn from 'classnames';
-import { forwardRef, memo, useImperativeHandle } from 'react';
+import { forwardRef, memo, useId, useImperativeHandle } from 'react';
 import { shallowEqual } from 'shallow-equal';
 import { D, render, S } from 'stative';
 
@@ -56,7 +56,9 @@ export const Fluxdown = /*#__PURE__*/ memo(
 
     const shadStyles = useShadStyles(_shad);
 
-    const build = useStateOf(toBuildConfig({ base: _build, repairEnding }), shallowEqual);
+    const idPrefix = useId();
+
+    const build = useStateOf(toBuildConfig({ base: _build, repairEnding, idPrefix }), shallowEqual);
 
     const smooth = usePluginConfig(toSmoothConfig(_smooth));
 
