@@ -1,6 +1,3 @@
-import '@fluxdown/react-presets/render';
-import '@fluxdown/react-presets/slot';
-
 import type { BlockCompilerConfig, IPatchItem, MapperPluggable } from '@fluxdown/core';
 import type { ShadConfig as CoreShadConfig, SmoothConfig } from '@fluxdown/core-presets/mapper';
 import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-presets/base';
@@ -8,14 +5,8 @@ import type { IPluggable, IRehypePlugin, IRemarkPlugin, IRepairPlugin } from '@f
 import type { CSSProperties, ReactNode } from 'react';
 import type { IReadableClosure } from 'stative';
 
+import type { PluginConfigs } from './plugins.js';
 import type { Theme } from './theme';
-
-export type PluginConfigs = MapperConfigs &
-  RemarkConfigs &
-  RehypeConfigs &
-  RepairConfigs &
-  RenderConfigs &
-  SlotConfigs;
 
 export interface IPluginItem {
   config?: PluginConfigs;
@@ -33,7 +24,7 @@ export interface IPluginItem {
   slots?: AnySlotPluggable[];
 }
 
-export type FluxdownConfig = Partial<BlockCompilerConfig>;
+export type BaseBuildConfig = Partial<Omit<BlockCompilerConfig, 'repairEnding'>>;
 
 export interface ShadConfig extends CoreShadConfig {
   /**
@@ -41,6 +32,26 @@ export interface ShadConfig extends CoreShadConfig {
    * @default 15
    */
   maskWidth?: number;
+}
+
+export interface StreamingConfig {
+  /**
+   * Repair incomplete Markdown syntax at the end of the document.
+   * @default true
+   */
+  repairEnding?: boolean;
+
+  /**
+   * Smoothly reveal appended compiled content.
+   * @default true
+   */
+  smooth?: boolean | SmoothConfig;
+
+  /**
+   * Fade the trailing characters of newly revealed content.
+   * @default true
+   */
+  shad?: boolean | ShadConfig;
 }
 
 export interface FluxdownProps {
@@ -65,21 +76,15 @@ export interface FluxdownProps {
   text: string;
 
   /**
-   * Compiler feature configuration.
+   * Static build configuration.
    */
-  build?: FluxdownConfig;
+  build?: BaseBuildConfig;
 
   /**
-   * Smoothly reveal appended compiled content.
+   * Streaming effect configuration.
    * @default false
    */
-  smooth?: boolean | SmoothConfig;
-
-  /**
-   * Fade the trailing characters of newly revealed content.
-   * @default false
-   */
-  shad?: boolean | ShadConfig;
+  streaming?: boolean | StreamingConfig;
 
   /**
    * Inline render patches applied to the Markdown source.

@@ -30,7 +30,7 @@ describe('Fluxdown smooth streaming', () => {
 
     const view = render(
       <StrictMode>
-        <Fluxdown smooth={smooth} text="abc" />
+        <Fluxdown streaming={{ smooth, shad: false }} text="abc" />
       </StrictMode>,
     );
 
@@ -40,7 +40,7 @@ describe('Fluxdown smooth streaming', () => {
 
     view.rerender(
       <StrictMode>
-        <Fluxdown smooth={smooth} text="abcd" />
+        <Fluxdown streaming={{ smooth, shad: false }} text="abcd" />
       </StrictMode>,
     );
 
@@ -71,7 +71,10 @@ describe('Fluxdown smooth streaming', () => {
     expect(view.container).toHaveTextContent('default stream');
 
     view.rerender(
-      <Fluxdown smooth={{ scheduler: 'spring', ticker: 'raf' }} text="object stream" />,
+      <Fluxdown
+        streaming={{ smooth: { scheduler: 'spring', ticker: 'raf' }, shad: false }}
+        text="object stream"
+      />,
     );
 
     expect(view.container).toHaveTextContent('object stream');
@@ -82,11 +85,11 @@ describe('Fluxdown smooth streaming', () => {
   test('shows initial content immediately and reveals an appended suffix across frames', async () => {
     const clock = createRafClock();
 
-    const view = render(<Fluxdown smooth text="abc" />);
+    const view = render(<Fluxdown streaming={{ smooth: true, shad: false }} text="abc" />);
 
     expect(view.container).toHaveTextContent('abc');
 
-    view.rerender(<Fluxdown smooth text="abcdef" />);
+    view.rerender(<Fluxdown streaming={{ smooth: true, shad: false }} text="abcdef" />);
 
     expect(view.container.textContent).toBe('abc');
 
@@ -104,21 +107,23 @@ describe('Fluxdown smooth streaming', () => {
 
     const closure = ref.current;
 
-    view.rerender(<Fluxdown ref={ref} smooth text="abc" />);
+    view.rerender(<Fluxdown ref={ref} streaming={{ smooth: true, shad: false }} text="abc" />);
 
-    view.rerender(<Fluxdown ref={ref} smooth text="abcdef" />);
+    view.rerender(<Fluxdown ref={ref} streaming={{ smooth: true, shad: false }} text="abcdef" />);
 
     expect(view.container.textContent).toBe('abc');
 
-    view.rerender(<Fluxdown ref={ref} smooth={false} text="abcdef" />);
+    view.rerender(<Fluxdown ref={ref} streaming={false} text="abcdef" />);
 
     expect(view.container.textContent).toBe('abcdef');
 
     expect(clock.pending.size).toBe(0);
 
-    view.rerender(<Fluxdown ref={ref} smooth text="abcdef" />);
+    view.rerender(<Fluxdown ref={ref} streaming={{ smooth: true, shad: false }} text="abcdef" />);
 
-    view.rerender(<Fluxdown ref={ref} smooth text="abcdefghi" />);
+    view.rerender(
+      <Fluxdown ref={ref} streaming={{ smooth: true, shad: false }} text="abcdefghi" />,
+    );
 
     expect(view.container.textContent).toBe('abcdef');
 
@@ -130,9 +135,9 @@ describe('Fluxdown smooth streaming', () => {
   test('reveals compiled emphasis without displaying Markdown delimiters', async () => {
     const clock = createRafClock();
 
-    const view = render(<Fluxdown smooth text="" />);
+    const view = render(<Fluxdown streaming={{ smooth: true, shad: false }} text="" />);
 
-    view.rerender(<Fluxdown smooth text="**alphabet**" />);
+    view.rerender(<Fluxdown streaming={{ smooth: true, shad: false }} text="**alphabet**" />);
 
     expect(view.container.textContent).toBe('');
 
@@ -152,11 +157,11 @@ describe('Fluxdown smooth streaming', () => {
   test('keeps completed blocks and the growing paragraph mounted across ticks', async () => {
     const clock = createRafClock();
 
-    const view = render(<Fluxdown smooth text="first" />);
+    const view = render(<Fluxdown streaming={{ smooth: true, shad: false }} text="first" />);
 
     const firstParagraph = view.container.querySelector('p');
 
-    view.rerender(<Fluxdown smooth text={'first\n\nsecond'} />);
+    view.rerender(<Fluxdown streaming={{ smooth: true, shad: false }} text={'first\n\nsecond'} />);
 
     expect(view.container.textContent).toBe('first');
 
@@ -170,7 +175,9 @@ describe('Fluxdown smooth streaming', () => {
 
     expect(view.container.querySelectorAll('p').item(1)).toBe(growingParagraph);
 
-    view.rerender(<Fluxdown smooth text={'first\n\nsecond plus'} />);
+    view.rerender(
+      <Fluxdown streaming={{ smooth: true, shad: false }} text={'first\n\nsecond plus'} />,
+    );
 
     expect(view.container.textContent).toBe('firstsecond');
 
@@ -186,11 +193,19 @@ describe('Fluxdown smooth streaming', () => {
 
     const ref = createRef<FluxdownRef>();
 
-    const view = render(<Fluxdown ref={ref} smooth text="first" />);
+    const view = render(
+      <Fluxdown ref={ref} streaming={{ smooth: true, shad: false }} text="first" />,
+    );
 
     const closure = ref.current;
 
-    view.rerender(<Fluxdown ref={ref} smooth text="first with a pending suffix" />);
+    view.rerender(
+      <Fluxdown
+        ref={ref}
+        streaming={{ smooth: true, shad: false }}
+        text="first with a pending suffix"
+      />,
+    );
 
     expect(clock.pending.size).toBeGreaterThan(0);
 
@@ -216,7 +231,7 @@ describe('Fluxdown smooth streaming', () => {
 
     const view = render(
       <StrictMode>
-        <Fluxdown ref={ref} smooth text="first" />
+        <Fluxdown ref={ref} streaming={{ smooth: true, shad: false }} text="first" />
       </StrictMode>,
     );
 
@@ -224,7 +239,7 @@ describe('Fluxdown smooth streaming', () => {
 
     view.rerender(
       <StrictMode>
-        <Fluxdown ref={ref} smooth text="first second" />
+        <Fluxdown ref={ref} streaming={{ smooth: true, shad: false }} text="first second" />
       </StrictMode>,
     );
 
@@ -246,15 +261,19 @@ describe('Fluxdown smooth streaming', () => {
   test('applies build changes to existing text while smoothing is enabled', async () => {
     const clock = createRafClock();
 
-    const view = render(<Fluxdown build={{ tex: false }} smooth text="$x$" />);
+    const view = render(
+      <Fluxdown build={{ tex: false }} streaming={{ smooth: true, shad: false }} text="$x$" />,
+    );
 
     expect(view.container.textContent).toBe('$x$');
 
-    view.rerender(<Fluxdown build={{ tex: true }} smooth text="$x$" />);
+    view.rerender(
+      <Fluxdown build={{ tex: true }} streaming={{ smooth: true, shad: false }} text="$x$" />,
+    );
 
     await clock.advanceUntil(() => view.container.textContent === 'x');
 
-    view.rerender(<Fluxdown build={{ tex: false }} smooth={false} text="$x$" />);
+    view.rerender(<Fluxdown build={{ tex: false }} streaming={false} text="$x$" />);
 
     expect(view.container.textContent).toBe('$x$');
   });
@@ -272,15 +291,21 @@ describe('Fluxdown smooth streaming', () => {
       scheduler: Scheduler,
     });
 
-    const view = render(<Fluxdown smooth={options(first.Ticker)} text="abc" />);
+    const view = render(
+      <Fluxdown streaming={{ smooth: options(first.Ticker), shad: false }} text="abc" />,
+    );
 
-    view.rerender(<Fluxdown smooth={options(first.Ticker)} text="abcdef" />);
+    view.rerender(
+      <Fluxdown streaming={{ smooth: options(first.Ticker), shad: false }} text="abcdef" />,
+    );
 
     await act(async () => first.current().tick(16));
 
     expect(view.container.textContent).toBe('abcd');
 
-    view.rerender(<Fluxdown smooth={options(second.Ticker)} text="abcdef" />);
+    view.rerender(
+      <Fluxdown streaming={{ smooth: options(second.Ticker), shad: false }} text="abcdef" />,
+    );
 
     expect(view.container.textContent).toBe('abcd');
 
@@ -318,15 +343,21 @@ describe('Fluxdown smooth streaming', () => {
       scheduler,
     });
 
-    const view = render(<Fluxdown smooth={options(SlowScheduler)} text="abc" />);
+    const view = render(
+      <Fluxdown streaming={{ smooth: options(SlowScheduler), shad: false }} text="abc" />,
+    );
 
-    view.rerender(<Fluxdown smooth={options(SlowScheduler)} text="abcdefgh" />);
+    view.rerender(
+      <Fluxdown streaming={{ smooth: options(SlowScheduler), shad: false }} text="abcdefgh" />,
+    );
 
     await act(async () => ticker.current().tick(16));
 
     expect(view.container.textContent).toBe('abcd');
 
-    view.rerender(<Fluxdown smooth={options(FastScheduler)} text="abcdefgh" />);
+    view.rerender(
+      <Fluxdown streaming={{ smooth: options(FastScheduler), shad: false }} text="abcdefgh" />,
+    );
 
     expect(view.container.textContent).toBe('abcd');
 

@@ -1,13 +1,11 @@
-import type { SmoothConfig } from '@fluxdown/core-presets/mapper';
-
 import { isPluggablesEqual, isPluginConfigEqual } from '@fluxdown/core';
-import { defaultsBy } from '@fluxdown/utils';
 import { every, isEqual } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
 
-import type { FluxdownConfig, FluxdownProps, IPluginItem, ShadConfig } from '../types';
+import type { FluxdownProps, IPluginItem } from '../types';
 
-import { DEFAULT_CONFIG, EL, EO } from '../consts';
+import { EL, EO } from '../consts';
+import { toStreamingConfig } from './config';
 import { isPatchesEqual } from './patches';
 
 const isPluginItemEqual = (left: IPluginItem, right: IPluginItem): boolean => {
@@ -38,46 +36,26 @@ const isPluginItemsEqual = (
   );
 };
 
-const isBuildEqual = (
-  left: FluxdownConfig | undefined,
-  right: FluxdownConfig | undefined,
-): boolean => {
-  return (
-    left === right ||
-    shallowEqual(defaultsBy(left ?? EO, DEFAULT_CONFIG), defaultsBy(right ?? EO, DEFAULT_CONFIG))
-  );
-};
-
-export const isSmoothEqual = (
-  left: boolean | SmoothConfig | undefined,
-  right: boolean | SmoothConfig | undefined,
-): boolean => {
-  return left === right || isEqual(left ?? false, right ?? false);
-};
-
-export const isShadEqual = (
-  left: boolean | ShadConfig | undefined,
-  right: boolean | ShadConfig | undefined,
-): boolean => {
-  return left === right || isEqual(left ?? false, right ?? false);
-};
-
 export const isPropsEqual = (
   left: Readonly<FluxdownProps>,
   right: Readonly<FluxdownProps>,
 ): boolean => {
-  return (
-    left === right ||
-    [
-      left.text === right.text,
-      left.className === right.className,
-      shallowEqual(left.style ?? EO, right.style ?? EO),
-      isEqual(left.theme ?? 'light', right.theme ?? 'light'),
-      isBuildEqual(left.build, right.build),
-      isSmoothEqual(left.smooth, right.smooth),
-      isShadEqual(left.shad, right.shad),
-      isPatchesEqual(left.patches ?? EL, right.patches ?? EL),
-      isPluginItemsEqual(left.plugins, right.plugins),
-    ].every((item) => item)
-  );
+  if (left === right) {
+    return true;
+  }
+
+  const leftStreaming = toStreamingConfig(left.streaming);
+
+  const rightStreaming = toStreamingConfig(right.streaming);
+
+  return [
+    left.text === right.text,
+    left.className === right.className,
+    shallowEqual(left.style ?? EO, right.style ?? EO),
+    isEqual(left.theme ?? 'light', right.theme ?? 'light'),
+    shallowEqual(left.build ?? EO, right.build ?? EO),
+    isEqual(leftStreaming, rightStreaming),
+    isPatchesEqual(left.patches ?? EL, right.patches ?? EL),
+    isPluginItemsEqual(left.plugins, right.plugins),
+  ].every((item) => item);
 };
