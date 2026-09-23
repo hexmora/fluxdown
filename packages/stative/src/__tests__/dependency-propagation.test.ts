@@ -1,8 +1,247 @@
 import { BehaviorSubject, type Subscription } from 'rxjs';
 
-import { batch, combineMapState, mapState, MutableState, ReactiveState } from '..';
+import {
+  batch,
+  combineMapState,
+  mapState,
+  MutableState,
+  ReactiveState,
+  switchMapClosure,
+} from '..';
 
 describe('dependency propagation', () => {
+  test('uses the settled source when a batch activates a lazy mapped branch', () => {
+    const selected = MutableState.of(false);
+    const first = MutableState.of(1);
+    const second = MutableState.of(2);
+    const head = mapState(second, (value) => value * 2);
+    const mapper = jest.fn(
+      (value: number, previous: [number, number] | null) => value + (previous?.[1] ?? 0),
+    );
+    const tail = mapState(head, mapper);
+    const output = switchMapClosure(selected, (value) => (value ? tail : first));
+    const next = jest.fn();
+    const outputState = output.value;
+    const subscription = outputState.subscribe(next);
+
+    mapper.mockClear();
+    next.mockClear();
+
+    batch(() => {
+      selected.next(true);
+      first.next(9);
+      second.next(3);
+    });
+
+    expect(mapper).toHaveBeenCalledTimes(1);
+    expect(mapper).toHaveBeenCalledWith(6, [4, 4]);
+    expect(outputState.value).toBe(10);
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledWith(10);
+
+    subscription.unsubscribe();
+    output.destroy();
+    tail.destroy();
+    head.destroy();
+    selected.destroy();
+    first.destroy();
+    second.destroy();
+  });
+
+  describe.each([
+    { terminal: 'complete', error: undefined },
+    { terminal: 'error', error: new Error('source failed') },
+    { terminal: 'error without a reason', error: undefined },
+  ])('$terminal during lazy subscription', ({ terminal, error }) => {
+    test.each(['pending', 'setup', 'reentrant'] as const)(
+      'delivers the final value before a terminal event from %s',
+      (timing) => {
+        const trigger = MutableState.of(false);
+        const source = new MutableState({
+          initial: 0,
+          emitter: (observer) => {
+            if (timing === 'setup') {
+              observer.next(1);
+
+              if (terminal === 'complete') {
+                observer.complete();
+              } else {
+                observer.error(error);
+              }
+            }
+          },
+        });
+        const finish = () => {
+          if (terminal === 'complete') {
+            source.complete();
+          } else {
+            source.error(error);
+          }
+        };
+        const mapped = timing === 'setup' ? source : mapState(source, (value) => value * 2);
+        const events: unknown[] = [];
+        const observer = {
+          next: (value: number) => events.push(['next', value]),
+          complete: () => events.push(['complete']),
+          error: (reason: unknown) => events.push(['error', reason]),
+        };
+        let subscription: Subscription | undefined;
+
+        if (timing === 'reentrant') {
+          source.subscribe({
+            next: (value) => {
+              if (value === 1) {
+                finish();
+              }
+            },
+            error: jest.fn(),
+          });
+        }
+
+        trigger.subscribe((value) => {
+          if (value) {
+            subscription = mapped.subscribe(observer);
+          }
+        });
+
+        batch(() => {
+          trigger.next(true);
+
+          if (timing !== 'setup') {
+            source.next(1);
+          }
+
+          if (timing === 'pending') {
+            finish();
+          }
+        });
+
+        const finalEvent = terminal === 'complete' ? ['complete'] : ['error', error];
+
+        expect(events).toEqual([['next', timing === 'setup' ? 1 : 2], finalEvent]);
+        expect(subscription?.closed).toBe(true);
+
+        events.length = 0;
+        mapped.subscribe(observer);
+
+        expect(events).toEqual([finalEvent]);
+
+        mapped.destroy();
+        source.destroy();
+        trigger.destroy();
+      },
+    );
+  });
+
+  test('forwards reentrant updates and unsubscribes after a lazy subscription settles', () => {
+    const trigger = MutableState.of(false);
+    const source = MutableState.of(0);
+    const mapped = mapState(source, (value) => value * 2);
+    const values: number[] = [];
+    let subscription: Subscription | undefined;
+
+    trigger.subscribe((value) => {
+      if (value) {
+        subscription = mapped.subscribe((current) => {
+          values.push(current);
+
+          if (current === 2) {
+            source.next(2);
+          }
+        });
+      }
+    });
+
+    batch(() => {
+      trigger.next(true);
+      source.next(1);
+    });
+
+    expect(values).toEqual([2, 4]);
+
+    subscription?.unsubscribe();
+    source.next(3);
+
+    expect(values).toEqual([2, 4]);
+
+    mapped.destroy();
+    source.destroy();
+    trigger.destroy();
+  });
+
+  test('preserves final delivery and batch errors when lazy settlement encounters a throwing cleanup', () => {
+    const failure = new Error('cleanup failed');
+    const trigger = MutableState.of(false);
+    const waiting = MutableState.of(0);
+    const source = new MutableState({
+      initial: 0,
+      emitter: () => () => {
+        throw failure;
+      },
+    });
+    const mapped = mapState(source, (value) => value * 2);
+    const next = jest.fn();
+    const complete = jest.fn();
+    const error = jest.fn();
+    const waitingNext = jest.fn();
+    let subscription: Subscription | undefined;
+
+    waiting.subscribe(waitingNext);
+    waitingNext.mockClear();
+    trigger.subscribe((value) => {
+      if (value) {
+        subscription = mapped.subscribe({ next, complete, error });
+      }
+    });
+
+    expect(() => {
+      batch(() => {
+        trigger.next(true);
+        source.next(1);
+        source.complete();
+        waiting.next(1);
+      });
+    }).toThrow('cleanup failed');
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledWith(2);
+    expect(complete).toHaveBeenCalledTimes(1);
+    expect(error).not.toHaveBeenCalled();
+    expect(mapped.value).toBe(2);
+    expect(subscription?.closed).toBe(true);
+    expect(waitingNext).toHaveBeenCalledTimes(1);
+    expect(waitingNext).toHaveBeenCalledWith(1);
+
+    mapped.destroy();
+    source.destroy();
+    trigger.destroy();
+    waiting.destroy();
+  });
+
+  test('keeps an explicit batch pending when it adds a subscriber', () => {
+    const source = MutableState.of(0);
+    const existing = jest.fn();
+    const added = jest.fn();
+    const subscription = source.subscribe(existing);
+
+    existing.mockClear();
+
+    batch(() => {
+      source.next(1);
+      source.subscribe(added);
+
+      expect(existing).not.toHaveBeenCalled();
+      expect(added).toHaveBeenCalledTimes(1);
+      expect(added).toHaveBeenCalledWith(0);
+    });
+
+    expect(existing).toHaveBeenCalledWith(1);
+    expect(added).toHaveBeenNthCalledWith(2, 1);
+
+    subscription.unsubscribe();
+    source.destroy();
+  });
+
   test.each(['destroy', 'complete'] as const)(
     'releases a state when %s encounters a throwing cleanup',
     (operation) => {

@@ -4,31 +4,42 @@ const pending = new Set<StateNode>();
 
 let depth = 0;
 
-let flushing = false;
+let pendingErrors: unknown[] | null = null;
 
-export const canSettle = () => flushing && depth === 0;
+export const canSettle = () => pendingErrors !== null && depth === 0;
+
+/** Keep settlement errors at the batch boundary, outside lazy emitter callbacks. */
+export const settle = (node: StateNode) => {
+  try {
+    node.settle();
+  } catch (error) {
+    if (!pendingErrors) {
+      throw error;
+    }
+
+    pendingErrors.push(error);
+  }
+};
 
 const flush = () => {
-  if (depth > 0 || flushing) {
+  if (depth > 0 || pendingErrors) {
     return;
   }
 
   const errors: unknown[] = [];
 
-  flushing = true;
+  pendingErrors = errors;
 
   try {
     while (pending.size > 0) {
       const node = pending.values().next().value;
 
-      try {
-        node?.settle();
-      } catch (error) {
-        errors.push(error);
+      if (node) {
+        settle(node);
       }
     }
   } finally {
-    flushing = false;
+    pendingErrors = null;
   }
 
   if (errors.length > 0) {

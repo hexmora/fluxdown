@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, Subscription } from 'rxjs';
 
 import type {
   Distinctor,
@@ -9,7 +9,7 @@ import type {
 } from '../type';
 
 import { Destructible } from '../../destructible';
-import { canSettle } from '../../state-graph/batch';
+import { canSettle, settle } from '../../state-graph/batch';
 import { getStateContext, withStateContext } from '../../state-graph/context';
 import { getStateNode } from '../../state-graph/node';
 import { bindStateSubscriber } from '../../state-graph/subscriber';
@@ -192,14 +192,30 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
     return this.rawClosed;
   }
 
+  private getSettledSource() {
+    // Preserve the last value if settling also completes or errors the source.
+    const buffer = new ReplaySubject<T>(1);
+    const subscription = this.subject.subscribe(buffer);
+
+    try {
+      settle(this.node);
+
+      return buffer.isStopped ? buffer : this.subject;
+    } finally {
+      subscription.unsubscribe();
+    }
+  }
+
   subscribe(subscriber: StateSubscriber<T>): Subscription {
     const context = getStateContext();
 
     this.setup();
 
+    const source = canSettle() ? this.getSettledSource() : this.subject;
+
     const disconnect = context?.dependOn(this.node);
 
-    const subscription = this.subject.subscribe(bindStateSubscriber(subscriber, context));
+    const subscription = source.subscribe(bindStateSubscriber(subscriber, context));
 
     subscription.add(disconnect);
 
