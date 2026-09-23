@@ -1,5 +1,15 @@
 # @fluxdown/react-presets
 
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [5d8e870]
+  - stative@2.0.0
+  - @fluxdown/core-presets@0.6.1
+  - @fluxdown/core@0.6.1
+  - @fluxdown/types@0.6.1
+
 ## 0.6.0
 
 ### Minor Changes
