@@ -1,26 +1,12 @@
-import type { IRawPatchItem } from '@fluxdown/types';
 import type { Marked, Token } from 'marked';
 
 import { keys, last, trimEnd } from 'lodash-es';
 
-import type { IBlockSection, TextChunkerConfig } from '../type';
+import type { TextChunkerConfig } from '../type';
 
 import { trackHtmlContainers } from './html';
 import { DISPLAY_MATH_TOKEN, getMarkdownLexer } from './lexer';
-import { chunkPatchesByTexts } from './patches';
 import { getTableLength } from './table';
-
-export const buildBlockSections = ([currentTexts, currentPatches]: [
-  string[],
-  IRawPatchItem[],
-]): IBlockSection[] => {
-  const patchGroups = chunkPatchesByTexts(currentPatches, currentTexts);
-
-  return currentTexts.map((text, index) => ({
-    text,
-    patches: patchGroups[index] ?? [],
-  }));
-};
 
 type TokenTree = {
   type: string;

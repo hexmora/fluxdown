@@ -533,6 +533,173 @@ describe('chunkPatchesByTexts', () => {
 });
 
 describe('TextChunker', () => {
+  test('reuses unchanged sections while keeping empty patch arrays independent', () => {
+    const text = MutableState.of('alpha\n\ntail');
+
+    const patches = MutableState.of<IRawPatchItem[]>([]);
+
+    const closure = render(S([TextChunker, { text, patches }]));
+
+    const initial = closure.value.value;
+
+    text.next('alpha\n\nlonger tail');
+
+    const updated = closure.value.value;
+
+    expect(updated[0]).toBe(initial[0]);
+
+    expect(updated[1]).not.toBe(initial[1]);
+
+    expect(updated[0]?.patches).not.toBe(updated[1]?.patches);
+
+    initial[0]?.patches.push({ key: 'external', range: 0 });
+
+    expect(updated[1]?.patches).toEqual([]);
+
+    patches.next([]);
+
+    const restored = closure.value.value;
+
+    expect(restored[0]).not.toBe(updated[0]);
+
+    expect(restored[0]?.patches).toEqual([]);
+
+    expect(restored[1]).toBe(updated[1]);
+
+    closure.destroy();
+
+    text.destroy();
+
+    patches.destroy();
+  });
+
+  test('projects mutable patch ranges into independent snapshots before comparing sections', () => {
+    const text = MutableState.of('a\n\ndef');
+
+    const range: [number, number] = [4, 5];
+
+    const patches = MutableState.of<IRawPatchItem[]>([{ key: 'patch', range }]);
+
+    const closure = render(S([TextChunker, { text, patches }]));
+
+    const initial = closure.value.value;
+
+    expect(initial[1]?.patches).toEqual([{ key: 'patch', range: [1, 2] }]);
+
+    expect(initial[1]?.patches[0]?.range).not.toBe(range);
+
+    range[0] = 3;
+
+    range[1] = 4;
+
+    patches.next([...patches.value]);
+
+    const updated = closure.value.value;
+
+    expect(updated[0]).toBe(initial[0]);
+
+    expect(updated[1]).not.toBe(initial[1]);
+
+    expect(updated[1]?.patches).toEqual([{ key: 'patch', range: [0, 1] }]);
+
+    expect(initial[1]?.patches).toEqual([{ key: 'patch', range: [1, 2] }]);
+
+    range[0] = 2;
+
+    patches.next([...patches.value]);
+
+    const crossed = closure.value.value;
+
+    expect(crossed[0]).toBe(updated[0]);
+
+    expect(crossed[1]).not.toBe(updated[1]);
+
+    expect(crossed[1]?.patches).toEqual([]);
+
+    expect(updated[1]?.patches).toEqual([{ key: 'patch', range: [0, 1] }]);
+
+    closure.destroy();
+
+    text.destroy();
+
+    patches.destroy();
+  });
+
+  test('retains unchanged sections across appends, replacements, and removals', () => {
+    const text = MutableState.of('# Stable\n\ntail\n');
+
+    const patches = MutableState.of<IRawPatchItem[]>([]);
+
+    const closure = render(S([TextChunker, { text, patches }]));
+
+    const initial = closure.value.value;
+
+    text.next('# Stable\n\nlonger tail\n');
+
+    const updated = closure.value.value;
+
+    expect(updated[0]).toBe(initial[0]);
+
+    expect(updated[1]).not.toBe(initial[1]);
+
+    text.next('# Stable\n\nlonger tail\n\n# Last\n');
+
+    const appended = closure.value.value;
+
+    expect(appended).toHaveLength(3);
+
+    expect(appended[0]).toBe(initial[0]);
+
+    text.next('# Stable\n\nreplacement\n');
+
+    expect(closure.value.value).toEqual([
+      { text: '# Stable\n\n', patches: [] },
+      { text: 'replacement\n', patches: [] },
+    ]);
+
+    expect(closure.value.value[0]).toBe(initial[0]);
+
+    expect(closure.value.value[1]).not.toBe(appended[1]);
+
+    closure.destroy();
+
+    text.destroy();
+
+    patches.destroy();
+  });
+
+  test('reads in-place patch changes when text triggers another projection', () => {
+    const text = MutableState.of('# Stable\n\nbody\n');
+
+    const range: [number, number] = [10, 11];
+
+    const patches = MutableState.of<IRawPatchItem[]>([{ key: 'patch', range }]);
+
+    const closure = render(S([TextChunker, { text, patches }]));
+
+    const initial = closure.value.value;
+
+    range[0] = 11;
+
+    range[1] = 12;
+
+    text.next('# Stable\n\nbody extended\n');
+
+    const updated = closure.value.value;
+
+    expect(updated[0]).toBe(initial[0]);
+
+    expect(updated[1]?.patches).toEqual([{ key: 'patch', range: [1, 2] }]);
+
+    expect(initial[1]?.patches).toEqual([{ key: 'patch', range: [0, 1] }]);
+
+    closure.destroy();
+
+    text.destroy();
+
+    patches.destroy();
+  });
+
   test('exposes reactive sections and follows text and patch changes', () => {
     const text = MutableState.of('# Initial\nparagraph\n');
     const patches = MutableState.of<IRawPatchItem[]>([{ key: 'paragraph', range: 10 }]);
