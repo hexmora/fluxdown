@@ -1,9 +1,31 @@
+import type { HastProjection } from '@fluxdown/hast';
 import type { RootContent } from 'hast';
 
-import { getTextUnits, sizeOfHast, sliceHast } from '@fluxdown/hast';
+import { createHastProjection, getTextUnits, sizeOfHast } from '@fluxdown/hast';
 import { isEqual } from 'lodash-es';
 
 import type { HastRoot } from '../../../typings';
+
+// Compiled roots are immutable revisions; weak keys release their indexes with the roots.
+const projections = /*#__PURE__*/ new WeakMap<HastRoot, HastProjection>();
+
+export const getHastProjection = (root: HastRoot) => {
+  let projection = projections.get(root);
+
+  if (!projection) {
+    projection = createHastProjection(root);
+
+    projections.set(root, projection);
+  }
+
+  return projection;
+};
+
+export const retainHastProjection = (projection: HastProjection) => {
+  projections.set(projection.root, projection);
+
+  return projection.root;
+};
 
 const getUnits = function* (nodes: RootContent[]): Generator<unknown> {
   for (const node of nodes) {
@@ -19,9 +41,9 @@ const getUnits = function* (nodes: RootContent[]): Generator<unknown> {
 
 /** Compare the same visible units that smoothing slices, only after source replacement. */
 export const getCommonPrefixLength = (previous: HastRoot, current: HastRoot) => {
-  const left = getUnits(sliceHast(previous, 0, Infinity)?.children ?? []);
+  const left = getUnits(getHastProjection(previous).full?.root.children ?? []);
 
-  const right = getUnits(sliceHast(current, 0, Infinity)?.children ?? []);
+  const right = getUnits(getHastProjection(current).full?.root.children ?? []);
 
   let length = 0;
 
