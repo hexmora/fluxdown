@@ -65,6 +65,28 @@ const MARKDOWN_CASES: ChunkCase[] = [
   chunks('keeps lazy continuation text in a task list', '- [x] done\nafter\n'),
   chunks('splits a paragraph after a blank line from its list', '- a\n- b\n\n', 'after\n'),
   chunks('splits adjacent lists with different markers', '- a\n- b\n', '1. c\n2. d\n'),
+  chunks('preserves trailing spaces in an EOF list', 'before\n\n', '- first\n- second '),
+  chunks('preserves an unfinished list marker at EOF', 'before\n\n', '- first\n- '),
+  chunks('preserves trailing tabs in an ordered list', 'before\n\n', '1. first\n2. second\t '),
+  chunks('preserves trailing spaces in a nested list', 'before\n\n', '- first\n  - nested  '),
+  chunks(
+    'preserves trailing spaces in lazy list continuation',
+    'before\n\n',
+    '- first\nlazy continuation ',
+  ),
+  chunks('preserves a Setext heading inside an EOF list', 'before\n\n', '- first\n  Title\n  --- '),
+  chunks('preserves indented code inside an EOF list', 'before\n\n', '- first\n\n      code '),
+  chunks(
+    'preserves CRLF and trailing whitespace in an EOF list',
+    'before\r\n\r\n',
+    '- first\r\n- second \t',
+  ),
+  chunks(
+    'keeps whitespace before a following block with its list',
+    'before\n\n',
+    '- first\n- second \n\n',
+    'after\n',
+  ),
   chunks(
     'keeps table-like lines inside their list item',
     '- item\n  | a | b |\n  | - | - |\n  | 1 | 2 |\n  after\n',
@@ -278,6 +300,10 @@ $$
 
 const DOCUMENT_SCOPED_CASES: ChunkCase[] = [
   chunks(
+    'retains document scope when an EOF list needs whitespace alignment',
+    'before\n\n- first[^note] ',
+  ),
+  chunks(
     'falls back to one chunk for a footnote reference',
     'Here is a footnote[^1].\n\nNext paragraph.\n',
   ),
@@ -354,6 +380,17 @@ const DOCUMENT_SCOPED_CASES: ChunkCase[] = [
 describe('chunkTextOfMarkdown', () => {
   test.each(MARKDOWN_CASES)('$name', ({ text, expected }) => {
     expectChunks(text, expected);
+  });
+
+  test('preserves completed blocks while appending to an EOF list', () => {
+    const prefix = ['# Title\n\n', 'before\n\n', TABLE + '\n'];
+    const list = '- first item with **strong** and *emphasis*\n- second item ';
+
+    for (let length = 2; length <= list.length; length += 1) {
+      const tail = list.slice(0, length);
+
+      expectChunks(prefix.join('') + tail, [...prefix, tail]);
+    }
   });
 
   describe('GFM tables', () => {
