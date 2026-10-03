@@ -2,7 +2,7 @@ import type { IBlockState } from '@fluxdown/types';
 import type { IReactiveState } from 'stative';
 
 import { expectTypeOf } from 'expect-type';
-import { mapClosure, MutableState, render, S, toClosure } from 'stative';
+import { batch, mapClosure, MutableState, render, S, toClosure } from 'stative';
 
 import type { SmoothPosition } from '../../smooth-cursor/states';
 
@@ -124,6 +124,61 @@ describe('CutoffBlocks', () => {
     state.destroy();
   });
 
+  test('advances only the boundary entry while the visible block list stays unchanged', () => {
+    const blocks = Array.from({ length: 20 }, (_, index) => createArrayBlock([index, index]));
+
+    const { state, items, end } = setupCutoff(
+      blocks.map(({ block }) => block),
+      { blockIndex: 19, charIndex: 0 },
+    );
+
+    const initial = state.value.value;
+
+    const slice = jest.spyOn(items.value, 'slice');
+
+    const next = jest.spyOn(MutableState.prototype, 'next');
+
+    for (const charIndex of [1, 2, 1]) {
+      end.next({ blockIndex: 19, charIndex });
+
+      expect(state.value.value).toBe(initial);
+    }
+
+    expect(slice).not.toHaveBeenCalled();
+
+    expect(next.mock.calls.filter(([value]) => value === null)).toEqual([]);
+
+    expect(next.mock.calls.filter(([value]) => typeof value === 'number')).toEqual([[1], [2], [1]]);
+
+    next.mockRestore();
+
+    slice.mockRestore();
+
+    state.destroy();
+  });
+
+  test('clears a boundary that moves beyond an unchanged visible list', () => {
+    const { block } = createArrayBlock([1, 2]);
+
+    const { state, end } = setupCutoff([block], { blockIndex: 0, charIndex: 1 });
+
+    const initial = state.value.value;
+
+    end.next({ blockIndex: 1, charIndex: 0 });
+
+    expect(state.value.value).toBe(initial);
+
+    expect(initial[0].range.value).toBeNull();
+
+    expect(initial[0].value.value).toEqual([1, 2]);
+
+    end.next({ blockIndex: 0, charIndex: 1 });
+
+    expect(initial[0].value.value).toEqual([1]);
+
+    state.destroy();
+  });
+
   test('responds to items independently of the endpoint and releases only owned forks', () => {
     const a = createArrayBlock([1, 2], 'a');
 
@@ -232,6 +287,79 @@ describe('CutoffBlocks', () => {
     );
 
     state.destroy();
+  });
+
+  test('publishes consistent forks when source order and the endpoint change together', () => {
+    const a = createArrayBlock([1, 2]);
+
+    const b = createArrayBlock([3, 4]);
+
+    const c = createArrayBlock([5, 6]);
+
+    const { state, items, end } = setupCutoff([a.block, b.block, c.block], {
+      blockIndex: 1,
+      charIndex: 1,
+    });
+
+    const [forkA, forkB] = state.value.value;
+
+    const frames: Array<{ values: number[][]; counts: number[] }> = [];
+
+    state.value.subscribe((blocks) => {
+      frames.push({
+        values: blocks.map((block) => block.value.value),
+        counts: blocks.map((block) => block.meta.value.blockCount),
+      });
+    });
+
+    batch(() => {
+      items.next([b.block, c.block, a.block]);
+
+      end.next({ blockIndex: 2, charIndex: 1 });
+    });
+
+    expect(state.value.value[0]).toBe(forkB);
+
+    expect(state.value.value[2]).toBe(forkA);
+
+    expect(frames).toEqual([
+      { values: [[1, 2], [3]], counts: [2, 2] },
+      { values: [[3, 4], [5, 6], [1]], counts: [3, 3, 3] },
+    ]);
+
+    state.destroy();
+  });
+
+  test('releases every removed fork even when one teardown throws', () => {
+    const a = createArrayBlock([1, 2]);
+
+    const b = createArrayBlock([3, 4]);
+
+    const { state, end } = setupCutoff([a.block, b.block], { blockIndex: 1, charIndex: 1 });
+
+    const [forkA, forkB] = state.value.value;
+
+    const destroyA = forkA.destroy.bind(forkA);
+
+    const first = jest.spyOn(forkA, 'destroy').mockImplementation(() => {
+      destroyA();
+
+      throw new Error('Block cleanup failed.');
+    });
+
+    const second = jest.spyOn(forkB, 'destroy');
+
+    expect(() => end.next({ blockIndex: -1, charIndex: 0 })).toThrow('Block cleanup failed.');
+
+    expect(first).toHaveBeenCalledTimes(1);
+
+    expect(second).toHaveBeenCalledTimes(1);
+
+    state.destroy();
+
+    expect(first).toHaveBeenCalledTimes(1);
+
+    expect(second).toHaveBeenCalledTimes(1);
   });
 
   test('releases every fork even when a block teardown throws', () => {

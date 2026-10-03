@@ -3,7 +3,6 @@ import type { IBlockState } from '@fluxdown/types';
 import { Subscription } from 'rxjs';
 import { D, type IReadableClosure, MutableState, render, S } from 'stative';
 
-import type { SmoothPosition } from '../smooth-cursor/states';
 import type { CutoffBlockEntry } from './type';
 
 import { CutoffBlock } from './states';
@@ -29,34 +28,31 @@ export const clearCutoffBlocks = <T>(entries: Map<IBlockState<T>, CutoffBlockEnt
 export const toCutoffBlocks = <T>(
   entries: Map<IBlockState<T>, CutoffBlockEntry<T>>,
   items: IBlockState<T>[],
-  end: SmoothPosition,
   count: IReadableClosure<number>,
 ): IBlockState<T>[] => {
-  const retained = new Set(items);
+  const cleanup = new Subscription();
 
   for (const [source, entry] of entries) {
-    if (!retained.has(source)) {
+    if (!items.includes(source)) {
       entries.delete(source);
 
-      releaseCutoffBlock(entry);
+      cleanup.add(() => releaseCutoffBlock(entry));
     }
   }
 
-  return items.map((source, blockIndex) => {
-    const boundary = blockIndex === end.blockIndex ? end.charIndex : null;
+  cleanup.unsubscribe();
 
+  return items.map((source) => {
     let entry = entries.get(source);
 
     if (!entry) {
-      const range = MutableState.of(boundary);
+      const range = MutableState.of<number | null>(null);
 
       const closure = render(S([CutoffBlock<T>, { source: D(source), end: range, count }]));
 
       entry = { end: range, closure };
 
       entries.set(source, entry);
-    } else {
-      entry.end.next(boundary);
     }
 
     try {
@@ -69,4 +65,18 @@ export const toCutoffBlocks = <T>(
       throw error;
     }
   });
+};
+
+export const updateCutoffBoundary = <T>(
+  previous: CutoffBlockEntry<T> | undefined,
+  current: CutoffBlockEntry<T> | undefined,
+  end: number,
+): CutoffBlockEntry<T> | undefined => {
+  if (previous && previous !== current && !previous.end.closed) {
+    previous.end.next(null);
+  }
+
+  current?.end.next(end);
+
+  return current;
 };
