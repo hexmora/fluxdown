@@ -83,6 +83,47 @@ describe('CutoffBlocks', () => {
     state.destroy();
   });
 
+  test('reads length only for the boundary and preserves unbounded empty blocks', () => {
+    const first = createArrayBlock([1, 2]);
+
+    const tail = createArrayBlock<number>([]);
+
+    const firstLength = jest.spyOn(first.block, 'baseLength', 'get');
+
+    const tailLength = jest.spyOn(tail.block, 'baseLength', 'get');
+
+    const { state } = setupCutoff([first.block, tail.block], {
+      blockIndex: 1,
+      charIndex: Infinity,
+    });
+
+    const output = state.value.value;
+
+    expect(output.map((block) => block.value.value)).toEqual([[1, 2], []]);
+
+    expect(firstLength).not.toHaveBeenCalled();
+
+    expect(tailLength).toHaveBeenCalled();
+
+    expect(output[1].range.value).toBeNull();
+
+    tail.source.next([3]);
+
+    expect(output[1].range.value).toEqual({ start: 0, end: Infinity });
+
+    expect(output[1].value.value).toEqual([3]);
+
+    tail.source.next([]);
+
+    expect(output[1].range.value).toBeNull();
+
+    expect(output[1].value.value).toBe(tail.source.value);
+
+    expect(firstLength).not.toHaveBeenCalled();
+
+    state.destroy();
+  });
+
   test('responds to items independently of the endpoint and releases only owned forks', () => {
     const a = createArrayBlock([1, 2], 'a');
 

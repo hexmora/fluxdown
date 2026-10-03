@@ -1,3 +1,5 @@
+import { batch } from 'stative';
+
 import { DoubleStepSmoothScheduler, StepSmoothScheduler } from '../utils/smooth';
 import {
   collectText,
@@ -15,6 +17,80 @@ import {
 beforeEach(resetSmoothTests);
 
 describe('Smooth configuration', () => {
+  test.each([false, true])(
+    'smooths additions batched with re-enabling (growth first: %s)',
+    (growthFirst) => {
+      const block = createBlock('a', paragraph('a'));
+
+      const harness = setupSmooth([block.block], false);
+
+      const output = harness.state.value.value;
+
+      const fork = firstBlock(output);
+
+      expect(collectText(fork.value.value)).toBe('a');
+
+      batch(() => {
+        if (growthFirst) {
+          block.source.next(paragraph('abc'));
+        }
+
+        harness.enabled.next(true);
+
+        if (!growthFirst) {
+          block.source.next(paragraph('abc'));
+        }
+      });
+
+      expect(harness.state.value.value).toBe(output);
+
+      expect(collectText(fork.value.value)).toBe('a');
+
+      const ticker = latest(PrimarySmoothTicker.instances);
+
+      ticker.tick(16);
+
+      expect(collectText(fork.value.value)).toBe('ab');
+
+      ticker.tick(32);
+
+      expect(collectText(fork.value.value)).toBe('abc');
+
+      harness.state.destroy();
+    },
+  );
+
+  test('preserves zero-width content when a disabled boundary grows and becomes empty', () => {
+    const empty = {
+      type: 'root' as const,
+      children: [{ type: 'element' as const, tagName: 'table', properties: {}, children: [] }],
+    };
+
+    const block = createBlock('a', empty);
+
+    const harness = setupSmooth([block.block], false);
+
+    const fork = firstBlock(harness.state.value.value);
+
+    expect(fork.range.value).toBeNull();
+
+    expect(fork.value.value).toBe(empty);
+
+    block.source.next(paragraph('a'));
+
+    expect(fork.range.value).toEqual({ start: 0, end: Infinity });
+
+    expect(collectText(fork.value.value)).toBe('a');
+
+    block.source.next(empty);
+
+    expect(fork.range.value).toBeNull();
+
+    expect(fork.value.value).toBe(empty);
+
+    harness.state.destroy();
+  });
+
   test('flushes disabled growth and enables without rewinding visible content', () => {
     const block = createBlock('a', paragraph('abc'));
 
@@ -54,7 +130,7 @@ describe('Smooth configuration', () => {
 
     expect(collectText(fork.value.value)).toBe('abcdefg');
 
-    expect(fork.range.value).toEqual({ start: 0, end: 7 });
+    expect(fork.range.value).toEqual({ start: 0, end: Infinity });
 
     expect(ticker.running).toBe(false);
 
@@ -83,7 +159,7 @@ describe('Smooth configuration', () => {
 
     expect(visibleText(output)).toEqual(['abc', 'def']);
 
-    expect(output.map((block) => block.range.value)).toEqual([null, { start: 0, end: 3 }]);
+    expect(output.map((block) => block.range.value)).toEqual([null, { start: 0, end: Infinity }]);
 
     expect(output.map((block) => block.meta.value.blockCount)).toEqual([2, 2]);
 

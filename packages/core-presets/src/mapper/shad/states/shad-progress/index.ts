@@ -69,8 +69,10 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
         };
 
         const subscription = input.subscribe({
-          next: ({ total }) => {
-            if (total > previousTotal) {
+          next: ({ total, length }) => {
+            if (length <= 0) {
+              clearTimeoutHandle();
+            } else if (total > previousTotal) {
               clearTimeoutHandle();
 
               timeout = setTimeout(() => {

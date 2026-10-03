@@ -30,6 +30,53 @@ const setupSmooth = (initial: IBlockState<number[]>[] = []) => {
 beforeEach(resetSmoothTests);
 
 describe('Smooth generic blocks', () => {
+  test('retains revision lengths while disabled without rewinding on enable', () => {
+    const first = createArrayBlock([1, 2]);
+
+    const tail = createArrayBlock([3, 4]);
+
+    const firstLength = jest.spyOn(first.block, 'baseLength', 'get');
+
+    const tailLength = jest.spyOn(tail.block, 'baseLength', 'get');
+
+    const enabled = MutableState.of(false);
+
+    const source = MutableState.of([first.block, tail.block]);
+
+    const state = render(S([Smooth<number[]>, { source, enabled }]));
+
+    const output = state.value.value;
+
+    expect(output.map((block) => block.value.value)).toEqual([
+      [1, 2],
+      [3, 4],
+    ]);
+
+    tail.source.next([3, 4, 5]);
+
+    expect(output.map((block) => block.value.value)).toEqual([
+      [1, 2],
+      [3, 4, 5],
+    ]);
+
+    expect(firstLength).toHaveBeenCalled();
+
+    expect(tailLength).toHaveBeenCalled();
+
+    enabled.next(true);
+
+    expect(state.value.value).toBe(output);
+
+    expect(output.map((block) => block.value.value)).toEqual([
+      [1, 2],
+      [3, 4, 5],
+    ]);
+
+    expect(tailLength).toHaveBeenCalled();
+
+    state.destroy();
+  });
+
   test('smooths opaque data through the block slicing implementation', () => {
     const { state, source } = setupSmooth();
 
