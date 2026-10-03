@@ -213,7 +213,7 @@ describe('Core shad pipeline', () => {
 
       expect(readParts(firstBlock(view.core.value.value).value.value)).toBeUndefined();
 
-      expect(jest.getTimerCount()).toBe(1);
+      expect(jest.getTimerCount()).toBe(0);
     },
   );
 

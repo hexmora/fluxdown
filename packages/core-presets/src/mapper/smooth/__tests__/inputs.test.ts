@@ -165,11 +165,11 @@ test('SmoothCursor can be constructed lazily and releases only its own resources
 
   source.next([item.block]);
 
-  expect(cursor.value.value).toEqual({ blockIndex: 0, charIndex: 3 });
+  expect(cursor.value.value).toEqual({ blockIndex: 0, charIndex: Infinity });
 
   item.source.next([1, 2, 3, 4]);
 
-  expect(cursor.value.value).toEqual({ blockIndex: 0, charIndex: 4 });
+  expect(cursor.value.value).toEqual({ blockIndex: 0, charIndex: Infinity });
 
   cursor.destroy();
 

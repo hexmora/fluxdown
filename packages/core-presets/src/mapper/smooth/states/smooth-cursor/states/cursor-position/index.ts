@@ -101,7 +101,7 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
       if (index === total) {
         return {
           blockIndex: currentRevisions.length - 1,
-          charIndex: currentRevisions.at(-1)?.length ?? 0,
+          charIndex: enabled ? (currentRevisions.at(-1)?.length ?? 0) : Infinity,
         };
       }
 

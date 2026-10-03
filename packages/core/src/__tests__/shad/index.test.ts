@@ -37,6 +37,93 @@ afterEach(() => {
 });
 
 describe('Shad', () => {
+  test('keeps disabled growth idle and retains its block when toggled', () => {
+    const block = createBlock('a', paragraph('abc'));
+
+    const harness = setup([block.block], false);
+
+    const output = harness.state.value.value;
+
+    const fork = firstBlock(output);
+
+    expect(collectText(fork.value.value)).toBe('abc');
+
+    block.source.next(paragraph('abcd'));
+
+    expect(collectText(fork.value.value)).toBe('abcd');
+
+    expect(jest.getTimerCount()).toBe(0);
+
+    harness.enabled.next(true);
+
+    expect(harness.state.value.value).toBe(output);
+
+    expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+
+    block.source.next(paragraph('abcde'));
+
+    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+
+    expect(jest.getTimerCount()).toBe(1);
+
+    harness.enabled.next(false);
+
+    expect(jest.getTimerCount()).toBe(0);
+
+    block.source.next(paragraph('abcdef'));
+
+    expect(collectText(fork.value.value)).toBe('abcdef');
+
+    expect(jest.getTimerCount()).toBe(0);
+
+    harness.enabled.next(true);
+
+    expect(firstBlock(harness.state.value.value)).toBe(fork);
+
+    expect(readParts(fork.value.value)).toEqual({ leading: 'ef', active: '' });
+
+    block.source.next(paragraph('abcdefg'));
+
+    expect(readParts(fork.value.value)).toEqual({ leading: 'f', active: 'g' });
+  });
+
+  test.each([false, true])(
+    'shades additions batched with re-enabling (growth first: %s)',
+    (growthFirst) => {
+      const block = createBlock('a', paragraph('a'));
+
+      const harness = setup([block.block], false);
+
+      const output = harness.state.value.value;
+
+      const fork = firstBlock(output);
+
+      expect(collectText(fork.value.value)).toBe('a');
+
+      batch(() => {
+        if (growthFirst) {
+          block.source.next(paragraph('abc'));
+        }
+
+        harness.enabled.next(true);
+
+        if (!growthFirst) {
+          block.source.next(paragraph('abc'));
+        }
+      });
+
+      expect(harness.state.value.value).toBe(output);
+
+      expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'bc' });
+
+      expect(jest.getTimerCount()).toBe(1);
+
+      jest.advanceTimersByTime(200);
+
+      expect(readParts(fork.value.value)).toEqual({ leading: 'bc', active: '' });
+    },
+  );
+
   test('keeps the initial tail idle and shades only new text until growth stops', () => {
     const block = createBlock('a', paragraph('abcd'));
 
@@ -174,7 +261,7 @@ describe('Shad', () => {
 
       expect(readParts(fork.value.value)).toBeUndefined();
 
-      expect(jest.getTimerCount()).toBe(1);
+      expect(jest.getTimerCount()).toBe(0);
 
       jest.advanceTimersByTime(100);
 
@@ -267,7 +354,7 @@ describe('Shad', () => {
 
     expect(readParts(fork.value.value)).toBeUndefined();
 
-    expect(jest.getTimerCount()).toBe(1);
+    expect(jest.getTimerCount()).toBe(0);
 
     block.source.next(paragraph('abcdef'));
 

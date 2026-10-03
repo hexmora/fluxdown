@@ -27,19 +27,21 @@ const setupCursor = (
 ) => {
   const source = MutableState.of(initial);
 
+  const enabled = MutableState.of(active);
+
   const cursor = render(
     S([
       SmoothCursor<number[]>,
       {
         source: toClosure(source),
-        enabled: toClosure(active),
+        enabled: toClosure(enabled),
         ticker: toClosure(ReactiveState.of(PrimarySmoothTicker)),
         scheduler: toClosure(ReactiveState.of(Scheduler)),
       },
     ]),
   );
 
-  return { cursor, source };
+  return { cursor, source, enabled };
 };
 
 beforeEach(resetSmoothTests);
@@ -130,7 +132,7 @@ describe('SmoothCursor', () => {
 
     const next = createArrayBlock([3, 4]);
 
-    const { cursor, source } = setupCursor([first.block], false);
+    const { cursor, source, enabled } = setupCursor([first.block], false);
 
     const changed = jest.fn();
 
@@ -143,6 +145,12 @@ describe('SmoothCursor', () => {
     expect(changed).toHaveBeenCalledTimes(1);
 
     next.source.next([3, 4, 5]);
+
+    expect(cursor.value.value).toEqual({ blockIndex: 0, charIndex: Infinity });
+
+    expect(changed).toHaveBeenCalledTimes(1);
+
+    enabled.next(true);
 
     expect(cursor.value.value).toEqual({ blockIndex: 0, charIndex: 3 });
 
