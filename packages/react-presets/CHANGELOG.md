@@ -1,5 +1,21 @@
 # @fluxdown/react-presets
 
+## 0.6.1
+
+### Patch Changes
+
+- cc66511: Render footnote bodies by default and keep references, backlinks, and labels aligned with sanitized IDs. React instances use hydration-safe footnote namespaces; headless consumers can set `build.idPrefix`. Correct the spelling of multiword ARIA attributes.
+- Updated dependencies [cc66511]
+- Updated dependencies [cc66511]
+- Updated dependencies [cc66511]
+- Updated dependencies [cc66511]
+- Updated dependencies [cc66511]
+- Updated dependencies [cc66511]
+  - @fluxdown/core@0.7.0
+  - @fluxdown/core-presets@0.6.1
+  - stative@1.1.0
+  - @fluxdown/types@0.6.1
+
 ## 0.6.0
 
 ### Minor Changes
