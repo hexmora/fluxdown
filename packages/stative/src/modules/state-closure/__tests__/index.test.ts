@@ -223,6 +223,148 @@ describe('BaseStateClosure runtime', () => {
     closure.destroy();
   });
 
+  test.each([false, true])(
+    'replays the final subscription-time value within a batch (completed: %s)',
+    (completed) => {
+      let current = 1;
+
+      const source: IReactiveState<number> = {
+        get value() {
+          return current;
+        },
+
+        closed: false,
+        subscribe: (subscriber) => {
+          current = 2;
+
+          emitToSubscriber(subscriber, current);
+
+          if (completed && !isFunction(subscriber)) {
+            subscriber.complete?.();
+          }
+
+          return new Subscription();
+        },
+      };
+
+      const closure = toClosure(source);
+
+      const next = jest.fn();
+
+      const complete = jest.fn();
+
+      batch(() => {
+        closure.value.subscribe({ next, complete });
+
+        expect(next.mock.calls).toEqual([[2]]);
+
+        expect(complete).not.toHaveBeenCalled();
+      });
+
+      expect(next.mock.calls).toEqual([[2]]);
+
+      expect(complete).toHaveBeenCalledTimes(completed ? 1 : 0);
+
+      closure.destroy();
+    },
+  );
+
+  test.each([
+    { batched: false, failure: new Error('Failed during subscription.') },
+    { batched: true, failure: new Error('Failed during subscription.') },
+    { batched: false, failure: undefined },
+    { batched: true, failure: undefined },
+  ])(
+    'surfaces synchronous source errors during first access (batched: $batched, failure: $failure)',
+    ({ batched, failure }) => {
+      const source: IReactiveState<number> = {
+        value: 1,
+        closed: false,
+        subscribe: (subscriber) => {
+          if (!isFunction(subscriber)) {
+            subscriber.error?.(failure);
+          }
+
+          return new Subscription();
+        },
+      };
+
+      const closure = toClosure(source);
+
+      const read = () => {
+        let caught = false;
+
+        try {
+          void closure.value;
+        } catch (error) {
+          caught = true;
+
+          expect(error).toBe(failure);
+        }
+
+        expect(caught).toBe(true);
+
+        expect(() => closure.value).toThrow('Cannot set up a destroyed state closure.');
+      };
+
+      if (batched) {
+        batch(read);
+      } else {
+        read();
+      }
+    },
+  );
+
+  test('ignores an invalid synchronous source error after completion', () => {
+    const source: IReactiveState<number> = {
+      value: 1,
+      closed: false,
+      subscribe: (subscriber) => {
+        if (!isFunction(subscriber)) {
+          subscriber.complete?.();
+
+          subscriber.error?.(new Error('Already completed.'));
+        }
+
+        return new Subscription();
+      },
+    };
+
+    const closure = toClosure(source);
+
+    batch(() => {
+      expect(closure.value.value).toBe(1);
+    });
+
+    expect(closure.value.closed).toBe(true);
+
+    closure.destroy();
+  });
+
+  test('filters identical derived values even when the source distinctor allows them', () => {
+    const source = MutableState.of(0);
+
+    const value = { label: 'stable' };
+
+    const closure = mapClosure(
+      source,
+      () => value,
+      () => false,
+    );
+
+    const next = jest.fn();
+
+    closure.value.subscribe(next);
+
+    source.next(1);
+
+    expect(next.mock.calls).toEqual([[value]]);
+
+    closure.destroy();
+
+    source.destroy();
+  });
+
   test('preserves later event payloads when a source advances reentrantly', () => {
     const source = new BehaviorSubject(0);
 
@@ -399,6 +541,59 @@ describe('BaseStateClosure runtime', () => {
     expect(closure.value.value).toBe(2);
 
     expect(source.subscribe).toHaveBeenCalledTimes(1);
+  });
+
+  test.each(['destroy', 'complete'] as const)(
+    'preserves the latest unread output before %s',
+    (terminal) => {
+      const source = MutableState.of(1);
+
+      const closure = toClosure(source);
+
+      const value = closure.value;
+
+      source.next(2);
+
+      if (terminal === 'destroy') {
+        closure.destroy();
+      } else {
+        source.complete();
+      }
+
+      expect(value.closed).toBe(true);
+
+      expect(value.value).toBe(2);
+
+      if (terminal === 'destroy') {
+        expect(source.closed).toBe(false);
+
+        source.next(3);
+
+        expect(source.value).toBe(3);
+
+        expect(value.value).toBe(2);
+      }
+
+      closure.destroy();
+
+      source.destroy();
+    },
+  );
+
+  test('subscribes when the closure value is obtained before it is read', () => {
+    const source = createTrackedReactiveSource(1);
+
+    const closure = toClosure(source.source);
+
+    const value = closure.value;
+
+    expect(source.subscribe).toHaveBeenCalledTimes(1);
+
+    source.emit(2);
+
+    expect(value.value).toBe(2);
+
+    closure.destroy();
   });
 
   test('cannot initialize after being destroyed while still lazy', () => {
@@ -728,6 +923,34 @@ describe('BaseStateClosure runtime', () => {
     longSource.destroy();
 
     longHead.destroy();
+
+    source.destroy();
+  });
+
+  test('closes its output without closing a borrowed mutable state', () => {
+    const source = MutableState.of(1);
+
+    const closure = toClosure(source);
+
+    const value = closure.value;
+
+    const complete = jest.fn();
+
+    value.subscribe({ complete });
+
+    closure.destroy();
+
+    source.next(2);
+
+    expect(complete).toHaveBeenCalledTimes(1);
+
+    expect(value.closed).toBe(true);
+
+    expect(value.value).toBe(1);
+
+    expect(source.closed).toBe(false);
+
+    expect(source.value).toBe(2);
 
     source.destroy();
   });

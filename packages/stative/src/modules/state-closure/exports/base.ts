@@ -1,5 +1,5 @@
 import { isArray, isPlainObject, mapValues, values } from 'lodash-es';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
 import type { DestructibleTarget } from '../../destructible';
@@ -30,7 +30,6 @@ import {
   isReactiveStateLike,
   mapState,
   ReactiveState,
-  toReactiveState,
   toState,
 } from '../../reactive-state';
 import { batch } from '../../state-graph/batch';
@@ -438,9 +437,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
   extends Destructible
   implements IReadableClosure<T>
 {
-  private subject: BehaviorSubject<T> | null = null;
-
-  private _value: IReactiveState<T> | null = null;
+  private _value: MutableState<T> | null = null;
 
   readonly inputs: TInputs;
 
@@ -474,6 +471,79 @@ export abstract class BaseStateClosure<T, TInputs = void>
     }
   }
 
+  private createState(source: IReactiveState<T> | null, initial: T): MutableState<T> {
+    if (!source) {
+      return this.clearable(MutableState.of(initial));
+    }
+
+    let state: MutableState<T> | null = null;
+
+    let pending: { value: T; terminal?: 'complete' | { error: unknown } } | null = {
+      value: initial,
+    };
+
+    const subscription = withStateContext(null, () =>
+      source.subscribe({
+        next: (value) => {
+          if (state) {
+            state.next(value);
+
+            return;
+          }
+
+          if (pending && !pending.terminal) {
+            pending.value = source.value;
+          }
+        },
+
+        error: (error) => {
+          if (state) {
+            state.error(error);
+
+            return;
+          }
+
+          if (pending && !pending.terminal) {
+            pending.terminal = { error };
+          }
+        },
+
+        complete: () => {
+          if (state) {
+            state.complete();
+
+            return;
+          }
+
+          if (pending && !pending.terminal) {
+            pending.terminal = 'complete';
+          }
+        },
+      }),
+    );
+
+    detachWithDescriptorScope(getReadableClosureScope(this), () => subscription.unsubscribe());
+
+    // Capture subscription-time events without retaining their buffer after setup.
+    const { value, terminal } = pending;
+
+    pending = null;
+
+    if (terminal && terminal !== 'complete') {
+      throw terminal.error;
+    }
+
+    state = this.clearable(MutableState.of(value));
+
+    if (terminal === 'complete') {
+      state.complete();
+    }
+
+    getStateNode(state).dependOn(getStateNode(source));
+
+    return state;
+  }
+
   private setup() {
     if (this._value !== null) {
       return this._value;
@@ -495,37 +565,11 @@ export abstract class BaseStateClosure<T, TInputs = void>
 
       const initial = reactiveSource ? reactiveSource.value : (directSource as T);
 
-      this.subject = new BehaviorSubject(initial);
+      const state = this.createState(reactiveSource, initial);
 
-      if (reactiveSource) {
-        const subject = this.subject;
+      this._value = state;
 
-        let subscribing = true;
-
-        const subscription = withStateContext(null, () =>
-          reactiveSource.subscribe({
-            next: (value) => subject.next(subscribing ? reactiveSource.value : value),
-
-            error: (error) => subject.error(error),
-
-            complete: () => subject.complete(),
-          }),
-        );
-
-        subscribing = false;
-
-        detachWithDescriptorScope(getReadableClosureScope(this), () => subscription.unsubscribe());
-      }
-
-      this.clearable(this.subject);
-
-      this._value = this.clearable(toReactiveState(this.subject));
-
-      if (reactiveSource) {
-        getStateNode(this._value).dependOn(getStateNode(reactiveSource));
-      }
-
-      return this._value;
+      return state;
     } catch (error) {
       this.destroy();
 
@@ -638,11 +682,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
   }
 
   protected next(newValue: T) {
-    this.setup();
-
-    assert(this.subject);
-
-    this.subject.next(newValue);
+    this.setup().next(newValue);
   }
 
   protected abstract render(): StateClosureResult<T>;
