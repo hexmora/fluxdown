@@ -7,6 +7,94 @@ import { createArrayBlock } from '../../../../../__tests__/block';
 import { observerCount } from '../../../../../__tests__/utils';
 
 describe('BlockRevisions', () => {
+  test('keeps retained block subscriptions across append, reorder, and removal', () => {
+    const a = createArrayBlock([1]);
+
+    const b = createArrayBlock([2, 3]);
+
+    const c = createArrayBlock([4, 5, 6]);
+
+    const subscribeA = jest.spyOn(a.block.baseLength, 'subscribe');
+
+    const subscribeB = jest.spyOn(b.block.baseLength, 'subscribe');
+
+    const source = MutableState.of([a.block, b.block]);
+
+    const state = render(S([BlockRevisions<number[]>, { source }]));
+
+    expect(state.value.value.map(({ length }) => length)).toEqual([1, 2]);
+
+    subscribeA.mockClear();
+
+    subscribeB.mockClear();
+
+    source.next([a.block, b.block, c.block]);
+
+    source.next([c.block, a.block, b.block]);
+
+    expect(state.value.value.map(({ length }) => length)).toEqual([3, 1, 2]);
+
+    source.next([b.block, a.block]);
+
+    expect(state.value.value.map(({ length }) => length)).toEqual([2, 1]);
+
+    expect(subscribeA).not.toHaveBeenCalled();
+
+    expect(subscribeB).not.toHaveBeenCalled();
+
+    expect(observerCount(c.block.baseLength)).toBe(0);
+
+    a.source.next([1, 2, 3, 4]);
+
+    expect(state.value.value.map(({ length }) => length)).toEqual([2, 4]);
+
+    source.next([a.block]);
+
+    expect(observerCount(b.block.baseLength)).toBe(0);
+
+    b.source.next([5, 6, 7]);
+
+    source.next([a.block, b.block]);
+
+    expect(subscribeA).not.toHaveBeenCalled();
+
+    expect(subscribeB).toHaveBeenCalledTimes(1);
+
+    expect(state.value.value.map(({ length }) => length)).toEqual([4, 3]);
+
+    state.destroy();
+
+    expect(observerCount(a.block.baseLength)).toBe(0);
+
+    expect(observerCount(b.block.baseLength)).toBe(0);
+  });
+
+  test('shares one revision subscription when a block occurs twice', () => {
+    const a = createArrayBlock([1]);
+
+    const subscribe = jest.spyOn(a.block.baseLength, 'subscribe');
+
+    const source = MutableState.of([a.block, a.block]);
+
+    const state = render(S([BlockRevisions<number[]>, { source }]));
+
+    expect(state.value.value.map(({ length }) => length)).toEqual([1, 1]);
+
+    expect(subscribe).toHaveBeenCalledTimes(1);
+
+    source.next([a.block]);
+
+    a.source.next([1, 2]);
+
+    expect(state.value.value.map(({ length }) => length)).toEqual([2]);
+
+    expect(subscribe).toHaveBeenCalledTimes(1);
+
+    state.destroy();
+
+    expect(observerCount(a.block.baseLength)).toBe(0);
+  });
+
   test('keeps observing block lengths after the source list completes', () => {
     const block = createArrayBlock([1, 2]);
 
