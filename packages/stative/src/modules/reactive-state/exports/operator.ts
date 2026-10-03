@@ -203,9 +203,9 @@ export const combineMapState = <const TSources extends [unknown, ...unknown[]], 
           latestValues[index] = states[index].value;
         }
 
-        const nextValues = [...latestValues] as TValues;
+        if (!shallowEqual(latestValues, previousValues)) {
+          const nextValues = [...latestValues] as TValues;
 
-        if (!shallowEqual(nextValues, previousValues)) {
           previousValues = nextValues;
 
           const nextResult = mapper(nextValues, prev);
