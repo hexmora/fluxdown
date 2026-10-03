@@ -36,6 +36,8 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
   private pendingPayload: PendingPayload | null = null;
 
+  private readonly publishPending: () => void;
+
   static of<T>(value: T): ReactiveState<T> {
     return new ReactiveState({
       initial: value,
@@ -48,6 +50,8 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
     this.distinctor = distinctor;
 
     this.subject = new BehaviorSubject(initial);
+
+    this.publishPending = this.flushPendingUpdate.bind(this);
 
     if (emitter) {
       this.emitter = emitter;
@@ -125,7 +129,7 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
     this.pendingType = type;
 
-    this.node.schedule(this.flushPendingUpdate.bind(this));
+    this.node.schedule(this.publishPending);
   }
 
   private clearPendingValue() {
