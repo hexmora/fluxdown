@@ -1,12 +1,20 @@
+import type { IBlockRawMeta } from '@fluxdown/types';
 import type { IReadableClosure } from 'stative';
 
-import type { BlockCompilerInputs, BlockCompilerItem } from '../../type';
+import type { IBlockSection } from '../../../../base';
+import type { BlockCompilerInputs } from '../../type';
 
 export type CompiledBlockInputs = Pick<
   BlockCompilerInputs,
   'config' | 'getRemarks' | 'getRehypes'
 > & {
-  item: IReadableClosure<BlockCompilerItem>;
+  section: IReadableClosure<IBlockSection>;
+
+  meta: IReadableClosure<IBlockRawMeta>;
+
+  isLast: IReadableClosure<boolean>;
+
+  count: IReadableClosure<number>;
 
   key: string;
 };

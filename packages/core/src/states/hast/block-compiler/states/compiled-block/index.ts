@@ -10,29 +10,44 @@ import { markdownToHast } from '../../utils';
 export * from './type';
 
 export const CompiledBlock = /*#__PURE__*/ once(
-  ({ item, key, config, getRemarks, getRehypes }: CompiledBlockInputs) => {
-    const section = useMap(item, (currentItem) => currentItem.section, isEqual);
-
-    const meta = useMap(
-      item,
-      (currentItem) => ({ ...currentItem.meta, key, sourceText: currentItem.section.text }),
+  ({
+    section,
+    meta: rawMeta,
+    isLast,
+    count,
+    key,
+    config,
+    getRemarks,
+    getRehypes,
+  }: CompiledBlockInputs) => {
+    const meta = useCombineMap(
+      [rawMeta, section, count],
+      ([currentMeta, { text }, blockCount]) => ({
+        ...currentMeta,
+        blockCount,
+        key,
+        sourceText: text,
+      }),
       isEqual,
     );
 
-    const remarksContext = useMap(
-      item,
-      ({ section: { patches }, meta: { currentIndex, blockCount } }) => ({
+    const remarksContext = useCombineMap(
+      [section, isLast],
+      ([{ patches }, currentIsLast]) => ({
         patches,
-        isLast: currentIndex === blockCount - 1,
+        isLast: currentIsLast,
       }),
       isEqual,
     );
 
     const remarksConfig = useCombineMap(
       [config, remarksContext],
-      ([{ repairEnding, ...restConfig }, { patches, isLast }]): BlockRemarksConfig => ({
+      ([
+        { repairEnding, ...restConfig },
+        { patches, isLast: currentIsLast },
+      ]): BlockRemarksConfig => ({
         ...restConfig,
-        repairEnding: repairEnding && isLast,
+        repairEnding: repairEnding && currentIsLast,
         patches,
       }),
       isEqual,
