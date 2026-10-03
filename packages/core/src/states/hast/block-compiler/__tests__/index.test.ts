@@ -396,6 +396,71 @@ describe('BlockCompiler', () => {
     expect(harness.remarkConfigs[3]?.closed).toBe(true);
   });
 
+  test('only reads compilation config when patches or ending context change', () => {
+    const harness = setupCompiler({
+      sections: [section('a'), section('b'), section('c')],
+    });
+
+    const readRepairEnding = jest.fn(() => true);
+
+    harness.config.next({
+      ...DEFAULT_CONFIG,
+      get repairEnding() {
+        return readRepairEnding();
+      },
+    });
+
+    const blocks = harness.closure.value.value;
+
+    expect(readRepairEnding).toHaveBeenCalledTimes(3);
+
+    readRepairEnding.mockClear();
+
+    harness.sections.next([section('a'), section('b'), section('c'), section('d')]);
+
+    expect(readRepairEnding).toHaveBeenCalledTimes(2);
+
+    expect(blocks.map((block) => block.meta.value.blockCount)).toEqual([4, 4, 4]);
+
+    expect(harness.remarkConfigs.map((state) => state.value.repairEnding)).toEqual([
+      false,
+      false,
+      false,
+      true,
+    ]);
+
+    readRepairEnding.mockClear();
+
+    harness.sections.next([section('longer a'), section('b'), section('c'), section('d')]);
+
+    expect(readRepairEnding).not.toHaveBeenCalled();
+
+    expect(blocks[1]?.meta.value.charStart).toBe(8);
+
+    harness.sections.next([
+      section('longer a'),
+      section('b', [patch('changed')]),
+      section('c'),
+      section('d'),
+    ]);
+
+    expect(readRepairEnding).toHaveBeenCalledTimes(1);
+
+    expect(harness.remarkConfigs[1]?.value.patches).toEqual([patch('changed')]);
+
+    readRepairEnding.mockClear();
+
+    harness.sections.next([section('longer a'), section('b', [patch('changed')])]);
+
+    expect(readRepairEnding).toHaveBeenCalledTimes(1);
+
+    expect(harness.remarkConfigs[1]?.value.repairEnding).toBe(true);
+
+    expect(harness.closure.value.value.map((block) => block.meta.value.blockCount)).toEqual([2, 2]);
+
+    harness.closure.destroy();
+  });
+
   test('publishes one final HAST and one consistent metadata snapshot for a text and patch update', () => {
     const patched = createRemarkAppender('|patched').plugin;
     const harness = setupCompiler({
