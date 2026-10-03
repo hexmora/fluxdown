@@ -134,6 +134,16 @@ describe('CutoffBlocks', () => {
 
     const initial = state.value.value;
 
+    const ranges = initial.map((block) => {
+      const subscriber = jest.fn();
+
+      block.range.subscribe(subscriber);
+
+      subscriber.mockClear();
+
+      return subscriber;
+    });
+
     const slice = jest.spyOn(items.value, 'slice');
 
     const next = jest.spyOn(MutableState.prototype, 'next');
@@ -148,7 +158,15 @@ describe('CutoffBlocks', () => {
 
     expect(next.mock.calls.filter(([value]) => value === null)).toEqual([]);
 
-    expect(next.mock.calls.filter(([value]) => typeof value === 'number')).toEqual([[1], [2], [1]]);
+    for (const subscriber of ranges.slice(0, -1)) {
+      expect(subscriber).not.toHaveBeenCalled();
+    }
+
+    expect(ranges.at(-1)?.mock.calls).toEqual([
+      [{ start: 0, end: 1 }],
+      [{ start: 0, end: 2 }],
+      [{ start: 0, end: 1 }],
+    ]);
 
     next.mockRestore();
 
