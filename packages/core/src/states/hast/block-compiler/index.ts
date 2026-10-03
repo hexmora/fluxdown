@@ -3,7 +3,9 @@ import { mapClosure, once, S, useMap, useMapEach } from 'stative';
 
 import type { BlockCompilerInputs, BlockCompilerItem, IBlockCompiler } from './type';
 
+import { isSectionEqual } from '../../base/text-chunker/utils';
 import { CompiledBlock } from './states';
+import { isItemEqual } from './utils';
 
 export * from './states';
 export * from './type';
@@ -14,19 +16,25 @@ export const BlockCompiler = /*#__PURE__*/ once(
 
     const count = useMap(sections, (current) => current.length);
 
-    const items = useMap(sections, (currentSections) => {
-      let charStart = 0;
+    const items = useMap(sections, (current, previous): BlockCompilerItem[] => {
+      let charEnd = 0;
 
-      return currentSections.map((section, currentIndex): BlockCompilerItem => {
-        const charEnd = charStart + section.text.length;
+      return current.map((section, currentIndex) => {
+        const charStart = charEnd;
 
-        const item = {
+        charEnd += section.text.length;
+
+        const item: BlockCompilerItem = {
           section,
           meta: { charStart, charEnd, currentIndex },
-          isLast: currentIndex === currentSections.length - 1,
+          isLast: currentIndex === current.length - 1,
         };
 
-        charStart = charEnd;
+        const previousItem = previous?.[1][currentIndex];
+
+        if (previousItem && isItemEqual(previousItem, item)) {
+          return previousItem;
+        }
 
         return item;
       });
@@ -38,7 +46,7 @@ export const BlockCompiler = /*#__PURE__*/ once(
         S([
           CompiledBlock,
           {
-            section: mapClosure(item, (current) => current.section, isEqual),
+            section: mapClosure(item, (current) => current.section, isSectionEqual),
             meta: mapClosure(item, (current) => current.meta, isEqual),
             isLast: mapClosure(item, (current) => current.isLast),
             count,
@@ -48,7 +56,7 @@ export const BlockCompiler = /*#__PURE__*/ once(
             getRehypes,
           },
         ]),
-      isEqual,
+      isItemEqual,
     );
   },
 );
