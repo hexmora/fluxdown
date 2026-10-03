@@ -5,7 +5,7 @@ import { once, useClearable, useCombineMap, useMap } from 'stative';
 
 import type { CutoffBlockEntry, CutoffBlocksInputs } from './type';
 
-import { clearCutoffBlocks, toCutoffBlocks } from './utils';
+import { clearCutoffBlocks, toCutoffBlocks, updateCutoffBoundary } from './utils';
 
 export * from './type';
 
@@ -15,21 +15,41 @@ export const CutoffBlocks = /*#__PURE__*/ once(function CutoffBlocks<T>({
 }: CutoffBlocksInputs<T>) {
   const entries = new Map<IBlockState<T>, CutoffBlockEntry<T>>();
 
+  let previous: IBlockState<T>[] | undefined;
+
+  let blocks: IBlockState<T>[] = [];
+
+  let boundary: CutoffBlockEntry<T> | undefined;
+
   useClearable(() => clearCutoffBlocks(entries));
 
+  const blockIndex = useMap(end, (position) => position.blockIndex);
+
   const visible = useCombineMap(
-    [items, end],
-    ([current, position]) => current.slice(0, Math.max(0, position.blockIndex + 1)),
+    [items, blockIndex],
+    ([current, index]) => current.slice(0, Math.max(0, index + 1)),
     shallowEqual,
   );
 
   const count = useMap(visible, (current) => current.length);
 
-  const blocks = useCombineMap(
+  return useCombineMap(
     [visible, end, count],
-    ([current, position]) => toCutoffBlocks(entries, current, position, count),
+    ([current, position]) => {
+      if (current !== previous) {
+        blocks = toCutoffBlocks(entries, current, count);
+
+        previous = current;
+      }
+
+      boundary = updateCutoffBoundary(
+        boundary,
+        entries.get(current[position.blockIndex]),
+        position.charIndex,
+      );
+
+      return blocks;
+    },
     shallowEqual,
   );
-
-  return blocks;
 });
