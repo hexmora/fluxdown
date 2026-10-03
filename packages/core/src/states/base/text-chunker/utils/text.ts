@@ -1,7 +1,7 @@
 import type { IRawPatchItem } from '@fluxdown/types';
 import type { Marked, Token } from 'marked';
 
-import { keys, last } from 'lodash-es';
+import { keys, last, trimEnd } from 'lodash-es';
 
 import type { IBlockSection, TextChunkerConfig } from '../type';
 
@@ -145,6 +145,34 @@ type RootTokenResult = {
   rootTokens: RootToken[];
 };
 
+const alignRootToken = (
+  token: Token,
+  markdown: string,
+  cursor: number,
+  isLast: boolean,
+): Token | undefined => {
+  if (token.raw.length === 0) {
+    return undefined;
+  }
+
+  if (markdown.startsWith(token.raw, cursor)) {
+    return token;
+  }
+
+  if (token.type !== 'list' || !isLast) {
+    return undefined;
+  }
+
+  const raw = markdown.slice(cursor);
+
+  if (trimEnd(token.raw) !== trimEnd(raw)) {
+    return undefined;
+  }
+
+  // Marked may replace trailing list whitespace with a newline at EOF.
+  return { ...token, raw };
+};
+
 const readRootTokens = (
   markdown: string,
   markdownLexer: Marked,
@@ -163,8 +191,10 @@ const readRootTokens = (
 
     hasDocumentSyntax ||= keys(tokens.links).length > 0;
 
-    for (const token of tokens) {
-      if (token.raw.length === 0 || !markdown.startsWith(token.raw, cursor)) {
+    for (const currentToken of tokens) {
+      const token = alignRootToken(currentToken, markdown, cursor, currentToken === last(tokens));
+
+      if (!token) {
         return undefined;
       }
 
