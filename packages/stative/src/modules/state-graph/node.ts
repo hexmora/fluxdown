@@ -63,19 +63,23 @@ export class StateNode {
   }
 
   private invalidate() {
+    if (this.dirty || this.disposed) {
+      return;
+    }
+
+    this.dirty = true;
+
     const pending: StateNode[] = [this];
 
     for (let index = 0; index < pending.length; index++) {
-      const node = pending[index];
+      for (const node of pending[index].dependents) {
+        if (node.dirty || node.disposed) {
+          continue;
+        }
 
-      if (node.dirty || node.disposed) {
-        continue;
-      }
+        node.dirty = true;
 
-      node.dirty = true;
-
-      for (const dependent of node.dependents) {
-        pending.push(dependent);
+        pending.push(node);
       }
     }
   }
