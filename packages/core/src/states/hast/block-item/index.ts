@@ -1,6 +1,5 @@
 import type { IReactiveState, IReadableClosure } from 'stative';
 
-import { sizeOfHast, sliceHast } from '@fluxdown/hast';
 import { stubFalse } from 'lodash-es';
 import { mapState } from 'stative';
 
@@ -8,7 +7,7 @@ import type { HastRoot } from '../../../typings';
 import type { BaseBlockItemInputs } from '../../base/base-block/type';
 
 import { BaseBlockItem } from '../../base';
-import { getCommonPrefixLength } from './utils';
+import { getCommonPrefixLength, getHastProjection, retainHastProjection } from './utils';
 
 export class BlockItem extends BaseBlockItem<HastRoot> {
   private readonly revisionSource: IReadableClosure<{ prefixLength: number }>;
@@ -49,10 +48,12 @@ export class BlockItem extends BaseBlockItem<HastRoot> {
   }
 
   protected slice(value: HastRoot, start: number, end: number): HastRoot {
-    const sliced = sliceHast(value, start, end);
+    const projection = getHastProjection(value);
+    const fullRange = start === 0 && end === Infinity;
+    const sliced = fullRange ? projection.full : projection.slice(start, end);
 
     if (sliced) {
-      return sliced;
+      return retainHastProjection(sliced);
     }
 
     return {
@@ -62,6 +63,6 @@ export class BlockItem extends BaseBlockItem<HastRoot> {
   }
 
   protected lengthOf(value: HastRoot) {
-    return sizeOfHast(value);
+    return getHastProjection(value).length;
   }
 }

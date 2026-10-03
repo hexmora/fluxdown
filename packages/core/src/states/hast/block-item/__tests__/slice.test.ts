@@ -26,6 +26,10 @@ class BlockStateSliceHarness extends BlockItem {
   applySlice(value: Root, start: number, end: number) {
     return this.slice(value, start, end);
   }
+
+  measure(value: Root) {
+    return this.lengthOf(value);
+  }
 }
 
 describe('BlockItem slicing', () => {
@@ -54,5 +58,50 @@ describe('BlockItem slicing', () => {
     expect(second).toEqual(first);
     expect(first).not.toBe(second);
     expect(first.children).not.toBe(second.children);
+  });
+
+  test('shares revision indexes across independent block views and their slices', () => {
+    const source = root([element('p', [text('A👨‍👩‍👧‍👦🇨🇳👍🏽e\u0301Z')])]);
+    const other = create(BlockStateSliceHarness.prototype) as BlockStateSliceHarness;
+    const segment = jest.spyOn(Intl.Segmenter.prototype, 'segment');
+
+    try {
+      expect(closure.measure(source)).toBe(6);
+      expect(other.measure(source)).toBe(6);
+
+      const slice = closure.applySlice(source, 1, 5);
+      const nested = other.applySlice(slice, 1, 3);
+
+      expect(other.measure(slice)).toBe(4);
+      expect(closure.measure(nested)).toBe(2);
+      expect(segment).toHaveBeenCalledTimes(1);
+    } finally {
+      segment.mockRestore();
+    }
+  });
+
+  test.each([
+    { name: 'hidden-only', source: root([element('script', [text('hidden')])]) },
+    { name: 'empty table', source: root([element('table')]) },
+    { name: 'comment-only', source: root([{ type: 'comment', value: 'hidden' }]) },
+  ])('filters $name content for an explicit complete range', ({ source }) => {
+    expect(closure.applySlice(source, 0, Infinity)).toEqual({ ...source, children: [] });
+    expect(closure.measure(source)).toBe(0);
+  });
+
+  test('reuses the normalized full view without segmenting its text', () => {
+    const source = root([element('p', [text('visible')]), element('script', [text('hidden')])]);
+    const segment = jest.spyOn(Intl.Segmenter.prototype, 'segment');
+
+    try {
+      const first = closure.applySlice(source, 0, Infinity);
+      const second = closure.applySlice(source, 0, Infinity);
+
+      expect(first).toEqual(root([element('p', [text('visible')])]));
+      expect(second).toBe(first);
+      expect(segment).not.toHaveBeenCalled();
+    } finally {
+      segment.mockRestore();
+    }
   });
 });
