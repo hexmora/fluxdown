@@ -19,17 +19,20 @@ export const CompiledBlock = /*#__PURE__*/ once(
       isEqual,
     );
 
+    const remarksContext = useMap(
+      item,
+      ({ section: { patches }, meta: { currentIndex, blockCount } }) => ({
+        patches,
+        isLast: currentIndex === blockCount - 1,
+      }),
+      isEqual,
+    );
+
     const remarksConfig = useCombineMap(
-      [config, item],
-      ([
-        { repairEnding, ...restConfig },
-        {
-          section: { patches },
-          meta: { currentIndex, blockCount },
-        },
-      ]): BlockRemarksConfig => ({
+      [config, remarksContext],
+      ([{ repairEnding, ...restConfig }, { patches, isLast }]): BlockRemarksConfig => ({
         ...restConfig,
-        repairEnding: repairEnding && currentIndex === blockCount - 1,
+        repairEnding: repairEnding && isLast,
         patches,
       }),
       isEqual,
