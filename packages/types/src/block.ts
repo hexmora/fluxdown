@@ -3,6 +3,9 @@ import type { IReactiveState, IReadableClosure } from 'stative';
 import type { IRangeState } from './range';
 
 export interface IBlockMeta extends IBlockRawMeta {
+  /** Length of the list containing the block */
+  blockCount: number;
+
   /** Unique block identifier */
   key: string;
 
@@ -19,9 +22,6 @@ export interface IBlockRawMeta {
 
   /** Index of the block in the full list */
   currentIndex: number;
-
-  /** Length of the list containing the block */
-  blockCount: number;
 }
 
 interface IBlockStateMapper<T> {

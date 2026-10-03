@@ -53,4 +53,6 @@ export type BlockCompilerItem = {
   meta: IBlockRawMeta;
 
   section: IBlockSection;
+
+  isLast: boolean;
 };

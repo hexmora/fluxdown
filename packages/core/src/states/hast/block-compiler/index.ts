@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash-es';
-import { once, S, useMap, useMapEach } from 'stative';
+import { mapClosure, once, S, useMap, useMapEach } from 'stative';
 
 import type { BlockCompilerInputs, BlockCompilerItem, IBlockCompiler } from './type';
 
@@ -12,6 +12,8 @@ export const BlockCompiler = /*#__PURE__*/ once(
   ({ sections, config, getRemarks, getRehypes }: BlockCompilerInputs): IBlockCompiler => {
     let nextKey = 0;
 
+    const count = useMap(sections, (current) => current.length);
+
     const items = useMap(sections, (currentSections) => {
       let charStart = 0;
 
@@ -20,7 +22,8 @@ export const BlockCompiler = /*#__PURE__*/ once(
 
         const item = {
           section,
-          meta: { charStart, charEnd, currentIndex, blockCount: currentSections.length },
+          meta: { charStart, charEnd, currentIndex },
+          isLast: currentIndex === currentSections.length - 1,
         };
 
         charStart = charEnd;
@@ -32,7 +35,19 @@ export const BlockCompiler = /*#__PURE__*/ once(
     return useMapEach(
       items,
       (item) =>
-        S([CompiledBlock, { item, key: String(++nextKey), config, getRemarks, getRehypes }]),
+        S([
+          CompiledBlock,
+          {
+            section: mapClosure(item, (current) => current.section, isEqual),
+            meta: mapClosure(item, (current) => current.meta, isEqual),
+            isLast: mapClosure(item, (current) => current.isLast),
+            count,
+            key: String(++nextKey),
+            config,
+            getRemarks,
+            getRehypes,
+          },
+        ]),
       isEqual,
     );
   },

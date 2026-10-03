@@ -10,6 +10,7 @@ import type { RootContent } from 'hast';
 import { isEqual, last, times, uniq } from 'lodash-es';
 import {
   BaseStateClosure,
+  batch,
   type IReactiveState,
   type IReadableClosure,
   mapState,
@@ -460,6 +461,144 @@ describe('BlockCompiler', () => {
 
     harness.closure.destroy();
   });
+
+  test('updates the document count without revisiting stable block compilation inputs', () => {
+    const patches: IRawPatchItem[] = [];
+
+    const readPatches = jest.fn(() => patches);
+
+    const firstSection: IBlockSection = {
+      text: 'first',
+      get patches() {
+        return readPatches();
+      },
+    };
+
+    const secondSection = section('second');
+
+    const thirdSection = section('third');
+
+    const harness = setupCompiler({
+      sections: [firstSection, secondSection, thirdSection],
+      config: { repairEnding: true },
+    });
+
+    const initial = harness.closure.value.value;
+
+    const firstMeta = jest.fn();
+
+    initial[0]?.meta.subscribe(firstMeta);
+    firstMeta.mockClear();
+    readPatches.mockClear();
+
+    harness.sections.next([firstSection, secondSection, thirdSection, section('fourth')]);
+
+    const appended = harness.closure.value.value;
+
+    expect(appended.slice(0, 3)).toEqual(initial);
+    expect(appended.map((block) => block.meta.value.blockCount)).toEqual([4, 4, 4, 4]);
+    expect(firstMeta).toHaveBeenCalledTimes(1);
+    expect(readPatches).not.toHaveBeenCalled();
+
+    firstMeta.mockClear();
+
+    harness.sections.next([firstSection, secondSection, thirdSection, section('longer fourth')]);
+
+    expect(harness.closure.value.value).toBe(appended);
+    expect(firstMeta).not.toHaveBeenCalled();
+    expect(readPatches).not.toHaveBeenCalled();
+
+    harness.sections.next([firstSection, secondSection]);
+
+    expect(harness.closure.value.value.map((block) => block.meta.value.blockCount)).toEqual([2, 2]);
+    expect(firstMeta).toHaveBeenCalledTimes(1);
+    expect(readPatches).not.toHaveBeenCalled();
+    expect(harness.remarkConfigs[1]?.value.repairEnding).toBe(true);
+
+    harness.closure.destroy();
+  });
+
+  test.each([false, true])(
+    'keeps block contents and metadata consistent during batched edits (config first: %s)',
+    (configFirst) => {
+      const enabled = createRemarkAppender('|enabled').plugin;
+
+      const ending = createRemarkAppender('|ending').plugin;
+
+      const compile = createRehypeAppender('');
+
+      const harness = setupCompiler({
+        sections: [section('alpha'), section('beta')],
+        config: { repairEnding: true },
+        getRemarks: (config) =>
+          mapState(
+            config,
+            ({ footnote, repairEnding }) => [
+              ...(footnote ? [enabled] : []),
+              ...(repairEnding ? [ending] : []),
+            ],
+            isEqual,
+          ),
+        getRehypes: () => [compile.plugin],
+      });
+
+      const first = harness.closure.value.value[0];
+
+      expect(first).toBeDefined();
+
+      const snapshots = jest.fn();
+
+      first?.value.subscribe((root) => snapshots(collectText(root), first.meta.value));
+      snapshots.mockClear();
+      compile.run.mockClear();
+
+      const update = (sections: IBlockSection[], config: BlockCompilerConfig) => {
+        batch(() => {
+          if (configFirst) {
+            harness.config.next(config);
+            harness.sections.next(sections);
+          } else {
+            harness.sections.next(sections);
+            harness.config.next(config);
+          }
+        });
+      };
+
+      update([section('omega'), section('two'), section('three')], {
+        ...DEFAULT_CONFIG,
+        footnote: true,
+      });
+
+      expect(snapshots).toHaveBeenCalledTimes(1);
+      expect(snapshots).toHaveBeenCalledWith('omega|enabled', {
+        key: '1',
+        sourceText: 'omega',
+        charStart: 0,
+        charEnd: 5,
+        currentIndex: 0,
+        blockCount: 3,
+      });
+      expect(compile.run).toHaveBeenCalledTimes(3);
+
+      snapshots.mockClear();
+      compile.run.mockClear();
+
+      update([section('reset')], { ...DEFAULT_CONFIG, repairEnding: true });
+
+      expect(snapshots).toHaveBeenCalledTimes(1);
+      expect(snapshots).toHaveBeenCalledWith('reset|ending', {
+        key: '1',
+        sourceText: 'reset',
+        charStart: 0,
+        charEnd: 5,
+        currentIndex: 0,
+        blockCount: 1,
+      });
+      expect(compile.run).toHaveBeenCalledTimes(1);
+
+      harness.closure.destroy();
+    },
+  );
 
   test('publishes one final HAST and one consistent metadata snapshot for a text and patch update', () => {
     const patched = createRemarkAppender('|patched').plugin;
