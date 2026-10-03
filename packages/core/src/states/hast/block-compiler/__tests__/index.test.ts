@@ -23,8 +23,8 @@ import {
 } from 'stative';
 
 import type { HastRoot } from '../../../../typings';
-import type { IBlockSection } from '../../../base';
 
+import { type IBlockSection, TextChunker } from '../../../base';
 import { BlockCompiler, type BlockCompilerConfig, type BlockRemarksConfig } from '../index';
 
 type SourceInputs<T> = {
@@ -212,6 +212,56 @@ const getObserverCount = (state: IReactiveState<unknown>) => {
 };
 
 describe('BlockCompiler', () => {
+  test('preserves replacement revisions when the chunker shares unchanged sections', () => {
+    const text = MutableState.of('# Stable\n\nabcdef\n');
+
+    const patches = MutableState.of<IRawPatchItem[]>([]);
+
+    const config = MutableState.of(DEFAULT_CONFIG);
+
+    const sections = render(S([TextChunker, { text, patches }]));
+
+    const closure = render(
+      S([
+        BlockCompiler,
+        {
+          sections,
+          config,
+          getRemarks: () => MutableState.of<IRemarkPlugin[]>([]),
+          getRehypes: () => MutableState.of<IRehypePlugin[]>([]),
+        },
+      ]),
+    );
+
+    const initial = closure.value.value;
+
+    const tail = initial[1]!;
+
+    expect(tail.baseLength.value).toBe(6);
+
+    expect(tail.prevPrefixLength?.value).toBe(Infinity);
+
+    text.next('# Stable\n\nabXYZ!\n');
+
+    expect(closure.value.value).toEqual(initial);
+
+    expect(collectText(tail.value.value)).toBe('abXYZ!');
+
+    expect(tail.baseLength.value).toBe(6);
+
+    expect(tail.prevPrefixLength?.value).toBe(2);
+
+    expect(tail.meta.value.sourceText).toBe('abXYZ!\n');
+
+    closure.destroy();
+
+    text.destroy();
+
+    patches.destroy();
+
+    config.destroy();
+  });
+
   test('lazily builds blocks from the latest sections and config', () => {
     const harness = setupCompiler({ sections: [section('stale')] });
 
