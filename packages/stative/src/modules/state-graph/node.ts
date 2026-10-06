@@ -2,21 +2,20 @@ import { noop } from 'lodash-es';
 
 import { dequeue, enqueue } from './batch';
 import { withStateContext } from './context';
+import { StateLinks } from './links';
 
 type StateUpdate = () => void;
 
 type DependencyFrame = {
   node: StateNode;
-  dependencies: MapIterator<StateNode>;
+  dependencies: MapIterator<StateLinks<StateNode>>;
 };
 
 const nodes = /*#__PURE__*/ new WeakMap<object, StateNode>();
 
 /** Dependencies describe notification order; dirty nodes are pulled before publication. */
 export class StateNode {
-  private readonly dependencies = new Map<StateNode, number>();
-
-  private readonly dependents = new Set<StateNode>();
+  private readonly links: StateLinks<StateNode> = new StateLinks(this);
 
   private dirty = false;
 
@@ -26,16 +25,14 @@ export class StateNode {
 
   private update: StateUpdate | null = null;
 
-  dependOn(source: StateNode): () => void {
+  dependOn(source: StateNode, { ordering = false }: { ordering?: boolean } = {}): () => void {
     if (source === this || source.disposed || this.disposed) {
       return noop;
     }
 
-    this.dependencies.set(source, (this.dependencies.get(source) ?? 0) + 1);
+    this.links.connect(source.links, ordering);
 
-    source.dependents.add(this);
-
-    if (source.dirty) {
+    if (!ordering && source.dirty) {
       this.invalidate();
     }
 
@@ -48,17 +45,7 @@ export class StateNode {
 
       connected = false;
 
-      const count = this.dependencies.get(source) ?? 0;
-
-      if (count > 1) {
-        this.dependencies.set(source, count - 1);
-
-        return;
-      }
-
-      this.dependencies.delete(source);
-
-      source.dependents.delete(this);
+      this.links.disconnect(source.links, ordering);
     };
   }
 
@@ -72,8 +59,10 @@ export class StateNode {
     const pending: StateNode[] = [this];
 
     for (let index = 0; index < pending.length; index++) {
-      for (const node of pending[index].dependents) {
-        if (node.dirty || node.disposed) {
+      for (const [links, dependency] of pending[index].links.targets) {
+        const { node } = links;
+
+        if (dependency.normal === 0 || node.dirty || node.disposed) {
           continue;
         }
 
@@ -97,18 +86,34 @@ export class StateNode {
   }
 
   private needsSettle() {
-    return this.dirty && !this.settling && !this.disposed;
+    if (this.settling || this.disposed) {
+      return false;
+    }
+
+    if (this.dirty) {
+      return true;
+    }
+
+    if (this.links.barriers) {
+      for (const { node } of this.links.barriers) {
+        if (node.dirty && !node.settling && !node.disposed) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   private enter(): DependencyFrame {
     this.settling = true;
 
-    return { node: this, dependencies: this.dependencies.keys() };
+    return { node: this, dependencies: this.links.sources.keys() };
   }
 
   private hasDirtyDependency() {
-    for (const source of this.dependencies.keys()) {
-      if (source.needsSettle()) {
+    for (const source of this.links.sources.keys()) {
+      if (source.node.needsSettle()) {
         return true;
       }
     }
@@ -148,8 +153,8 @@ export class StateNode {
         const source = frame.dependencies.next();
 
         if (!source.done) {
-          if (source.value.needsSettle()) {
-            stack.push(source.value.enter());
+          if (source.value.node.needsSettle()) {
+            stack.push(source.value.node.enter());
           }
 
           continue;
@@ -159,7 +164,7 @@ export class StateNode {
 
         // An upstream callback may have written a dependency already visited by this frame.
         if (node.hasDirtyDependency()) {
-          frame.dependencies = node.dependencies.keys();
+          frame.dependencies = node.links.sources.keys();
 
           continue;
         }
@@ -167,7 +172,7 @@ export class StateNode {
         node.publish();
 
         if (node.dirty) {
-          frame.dependencies = node.dependencies.keys();
+          frame.dependencies = node.links.sources.keys();
 
           continue;
         }
@@ -192,17 +197,7 @@ export class StateNode {
 
     dequeue(this);
 
-    for (const source of this.dependencies.keys()) {
-      source.dependents.delete(this);
-    }
-
-    for (const target of this.dependents) {
-      target.dependencies.delete(this);
-    }
-
-    this.dependencies.clear();
-
-    this.dependents.clear();
+    this.links.destroy();
   }
 }
 
