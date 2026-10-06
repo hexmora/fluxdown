@@ -1,5 +1,16 @@
 # @fluxdown/core-presets
 
+## 0.6.3
+
+### Patch Changes
+
+- cb73ca0: Reduce propagation allocations by reusing pending publication callbacks, copying combined input snapshots only when their values change, and forwarding closure values through one owned mutable state instead of an extra BehaviorSubject relay. Preserve synchronous initialization errors, batching, output equality, and ownership boundaries. Closure outputs obtained before their first read now retain the latest received value after completion or destruction.
+- Updated dependencies [a4457b5]
+- Updated dependencies [cb73ca0]
+- Updated dependencies [8eb9b3f]
+  - stative@1.1.1
+  - @fluxdown/types@0.7.0
+
 ## 0.6.2
 
 ### Patch Changes

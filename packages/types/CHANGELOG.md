@@ -1,5 +1,17 @@
 # @fluxdown/types
 
+## 0.7.0
+
+### Minor Changes
+
+- 8eb9b3f: Keep the document block count separate from per-block compilation inputs so adding a block does not revisit stable compilation contexts. Public block metadata continues to report the current count through IBlockMeta; IBlockRawMeta now contains only character offsets and the block index. Advanced compiler integrations must pass section, meta, isLast, and count closures directly to CompiledBlock instead of an item closure. BlockCompilerItem.meta matches IBlockRawMeta exactly and uses an explicit isLast flag instead of meta.blockCount.
+
+### Patch Changes
+
+- Updated dependencies [a4457b5]
+- Updated dependencies [cb73ca0]
+  - stative@1.1.1
+
 ## 0.6.1
 
 ### Patch Changes
