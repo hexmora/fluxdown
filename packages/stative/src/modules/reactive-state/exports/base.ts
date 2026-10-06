@@ -201,7 +201,7 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
     this.setup();
 
-    const disconnect = context?.dependOn(this.node);
+    const disconnect = this.actualClosed ? undefined : context?.dependOn(this.node);
 
     const subscription = this.subject.subscribe(bindStateSubscriber(subscriber, context));
 
