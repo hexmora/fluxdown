@@ -1,5 +1,5 @@
 import { isFunction, isObject, isUndefined } from 'lodash-es';
-import { BehaviorSubject, Observable, type Subscription } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
 import type { IReadableClosure } from '../../state-closure';
@@ -15,6 +15,7 @@ import type {
 import { compute } from '../../../utils';
 import { getStateContext, withStateContext } from '../../state-graph/context';
 import { getStateNode } from '../../state-graph/node';
+import { observeState, type StateSubscription } from '../observe';
 import { ReactiveState } from './base';
 
 type ReactiveStateSource<T> = IReactiveState<T> | BehaviorSubject<T>;
@@ -47,11 +48,11 @@ const createMappedState = <A, B>(
         complete: () => observer.complete(),
       };
 
-      const subscription = ordering
-        ? withStateContext(getStateContext(), () => source.subscribe(subscriber), {
-            ordering: true,
-          })
-        : source.subscribe(subscriber);
+      const subscription = observeState(
+        source,
+        subscriber,
+        ordering ? { ordering: true } : undefined,
+      );
 
       return () => {
         subscription.unsubscribe();
@@ -259,14 +260,14 @@ export const combineMapState = <const TSources extends [unknown, ...unknown[]], 
         getStateNode(state).schedule(refresh);
       };
 
-      const subscriptions: Subscription[] = [];
+      const subscriptions: StateSubscription[] = [];
 
       for (let index = 0; index < states.length; index++) {
         if (closed) {
           break;
         }
 
-        const subscription = states[index].subscribe({
+        const subscription = observeState(states[index], {
           next: () => {
             if (closed) {
               return;

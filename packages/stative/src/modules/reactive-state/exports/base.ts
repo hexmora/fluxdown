@@ -1,5 +1,12 @@
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { isFunction, noop } from 'lodash-es';
+import { Observable, type Observer, type Subscription, type TeardownLogic } from 'rxjs';
 
+import type {
+  NativeStateAccess,
+  ObserveStateOptions,
+  PublishedState,
+  StateSubscription,
+} from '../observe';
 import type {
   Distinctor,
   EmitterFunction,
@@ -15,96 +22,151 @@ import {
   getStateContextOptions,
   withStateContext,
 } from '../../state-graph/context';
-import { getStateNode } from '../../state-graph/node';
-import { bindStateSubscriber } from '../../state-graph/subscriber';
+import { getStateNode, peekStateNode, type StateNode } from '../../state-graph/node';
+import { hasNativeAccessors, nativeState } from '../observe';
+import { reportStateError, StateObservers } from '../observers';
 import { isFinalPendingType } from '../utils';
 
 type PendingType = 'next' | 'complete' | 'error';
 
-type PendingPayload = { value?: unknown; error?: unknown };
+class StateEmitter<T> implements Observer<T> {
+  constructor(private state: ReactiveState<T> | null) {}
+
+  private emit(type: PendingType, value?: unknown) {
+    const { state } = this;
+
+    if (!state) {
+      return;
+    }
+
+    if (type !== 'next') {
+      this.state = null;
+    }
+
+    try {
+      state.receive(type, value);
+    } catch (error) {
+      reportStateError(error);
+    }
+  }
+
+  next(value: T) {
+    this.emit('next', value);
+  }
+
+  error(error: unknown) {
+    this.emit('error', error);
+  }
+
+  complete() {
+    this.emit('complete');
+  }
+
+  unsubscribe() {
+    this.state = null;
+  }
+}
 
 export class ReactiveState<T> extends Destructible implements IReactiveState<T> {
-  private readonly node = getStateNode(this);
+  private stateNode: StateNode | null = null;
 
-  private readonly subject: BehaviorSubject<T>;
+  private observers: StateObservers<T> | null = null;
+
+  private current: T;
+
+  private stopped: boolean;
+
+  private failed = false;
+
+  private failure: unknown;
 
   private readonly distinctor: Distinctor<T>;
 
-  private subscription: Subscription | null = null;
+  private emitter?: EmitterFunction<T>;
 
-  private readonly emitter?: EmitterFunction<T>;
+  private emitterObserver: StateEmitter<T> | null = null;
 
-  private isSetup = false;
+  private emitterTeardown: TeardownLogic = undefined;
+
+  private isSetup: boolean;
 
   private pendingType: PendingType | null = null;
 
-  private pendingPayload: PendingPayload | null = null;
+  private hasPendingValue = false;
 
-  private readonly publishPending: () => void;
+  private pendingValue?: T;
+
+  private pendingError: unknown;
+
+  private publishPending?: () => void;
 
   static of<T>(value: T): ReactiveState<T> {
-    return new ReactiveState({
-      initial: value,
-    });
+    return new ReactiveState({ initial: value });
   }
 
   constructor({ initial, emitter, distinctor = Object.is, lazy = true }: ReactiveStateParams<T>) {
     super();
 
+    this.current = initial;
+
     this.distinctor = distinctor;
 
-    this.subject = new BehaviorSubject(initial);
+    this.stopped = !emitter;
 
-    this.publishPending = this.flushPendingUpdate.bind(this);
+    this.isSetup = !emitter || emitter === noop;
 
-    if (emitter) {
-      this.emitter = emitter;
+    this.emitter = emitter === noop ? undefined : emitter;
 
-      if (!lazy) {
-        this.setup();
-      }
-    } else {
-      this.subject.complete();
+    if (!lazy) {
+      this.setup();
     }
+  }
+
+  get [nativeState](): NativeStateAccess<T> | null {
+    return hasNativeAccessors(this, ReactiveState.prototype) ? this : null;
+  }
+
+  private get node() {
+    return (this.stateNode ??= getStateNode(this));
+  }
+
+  private get existingNode() {
+    return (this.stateNode ??= peekStateNode(this) ?? null);
   }
 
   private flushPendingUpdate() {
     const type = this.pendingType;
 
-    const payload = this.pendingPayload;
+    const hasValue = this.hasPendingValue;
+
+    const value = this.pendingValue as T;
+
+    const error = this.pendingError;
 
     this.clearPendingValue();
 
-    if (!type || this.actualClosed) {
+    if (!type || this.stopped) {
       return;
     }
 
-    const callNext = () => {
-      if (payload && 'value' in payload) {
-        const value = payload.value as T;
-
-        if (!this.distinctor(this.subject.value, value)) {
-          this.subject.next(value);
-        }
-      }
-    };
-
-    const callFinal = () => {
-      if (type === 'error') {
-        this.subject.error(payload?.error);
-      } else {
-        this.subject.complete();
-      }
-    };
-
     try {
-      callNext();
+      if (hasValue && !this.distinctor(this.current, value)) {
+        this.current = value;
+
+        this.observers?.notify('next', value);
+      }
     } finally {
       if (isFinalPendingType(type)) {
+        this.stopped = true;
+
+        this.failed = type === 'error';
+
+        this.failure = error;
+
         try {
-          callFinal();
+          this.observers?.notify(type, error);
         } finally {
-          this.node.destroy();
+          this.existingNode?.destroy();
 
           try {
             this.teardown();
@@ -117,21 +179,21 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
   }
 
   private setPendingValue(type: PendingType, payload?: unknown) {
-    if (this.pendingType && isFinalPendingType(this.pendingType)) {
+    if (isFinalPendingType(this.pendingType)) {
       return;
     }
 
-    this.pendingPayload ??= {};
-
     if (type === 'next') {
-      this.pendingPayload.value = payload;
-    }
+      this.hasPendingValue = true;
 
-    if (type === 'error') {
-      this.pendingPayload.error = payload;
+      this.pendingValue = payload as T;
+    } else if (type === 'error') {
+      this.pendingError = payload;
     }
 
     this.pendingType = type;
+
+    this.publishPending ??= this.flushPendingUpdate.bind(this);
 
     this.node.schedule(this.publishPending);
   }
@@ -139,7 +201,11 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
   private clearPendingValue() {
     this.pendingType = null;
 
-    this.pendingPayload = null;
+    this.hasPendingValue = false;
+
+    this.pendingValue = undefined;
+
+    this.pendingError = undefined;
   }
 
   private setup() {
@@ -149,46 +215,54 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
     this.isSetup = true;
 
-    if (!this.emitter || this.subject.closed || this.subject.isStopped) {
+    const { emitter } = this;
+
+    this.emitter = undefined;
+
+    if (!emitter || this.stopped) {
       return;
     }
 
-    const observable = new Observable(this.emitter);
+    const observer = new StateEmitter(this);
 
-    const subscription = withStateContext(this.node, () =>
-      observable.subscribe({
-        next: this._next.bind(this),
-        error: this._error.bind(this),
-        complete: this._complete.bind(this),
-      }),
-    );
+    this.emitterObserver = observer;
 
-    if (!this.closed && !subscription.closed) {
-      this.subscription = subscription;
+    let teardown: TeardownLogic = undefined;
+
+    try {
+      teardown = withStateContext(this.node, () => emitter(observer));
+    } catch (error) {
+      observer.error(error);
     }
-  }
 
-  private get actualClosed() {
-    return this.subject.closed || this.subject.isStopped;
+    if (this.stopped) {
+      this.disposeEmitter(teardown);
+    } else {
+      this.emitterTeardown = teardown;
+    }
   }
 
   private get rawClosed() {
-    return isFinalPendingType(this.pendingType) || this.actualClosed;
+    return isFinalPendingType(this.pendingType) || this.stopped;
   }
 
   private get rawValue() {
-    if (this.pendingPayload && 'value' in this.pendingPayload) {
-      return this.pendingPayload.value as T;
+    if (this.hasPendingValue) {
+      return this.pendingValue as T;
     }
 
-    return this.subject.value;
+    if (this.failed) {
+      throw this.failure;
+    }
+
+    return this.current;
   }
 
   get value() {
     this.setup();
 
     if (canSettle()) {
-      this.node.settle();
+      this.existingNode?.settle();
     }
 
     return this.rawValue;
@@ -200,30 +274,58 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
     return this.rawClosed;
   }
 
-  subscribe(subscriber: StateSubscriber<T>): Subscription {
-    const context = getStateContext();
+  getPublishedState(): PublishedState<T> {
+    return {
+      value: this.current,
+      closed: this.stopped,
+      failed: this.failed,
+      error: this.failure,
+    };
+  }
 
-    const options = getStateContextOptions();
+  observe(subscriber: StateSubscriber<T>, options?: ObserveStateOptions): StateSubscription {
+    const context = getStateContext();
 
     this.setup();
 
-    const disconnect = this.actualClosed ? undefined : context?.dependOn(this.node, options);
+    const disconnect = this.stopped
+      ? undefined
+      : context?.dependOn(this.node, options ?? getStateContextOptions());
 
-    const subscription = this.subject.subscribe(bindStateSubscriber(subscriber, context));
+    this.observers ??= new StateObservers();
 
-    subscription.add(disconnect);
+    const observer = this.observers.add(subscriber, context, disconnect);
 
-    return subscription;
+    if (this.failed) {
+      observer.notify('error', this.failure);
+    } else if (this.stopped) {
+      observer.notify('complete');
+    } else {
+      observer.notify('next', this.current);
+    }
+
+    return observer;
+  }
+
+  subscribe(subscriber: StateSubscriber<T>): Subscription {
+    return new Observable<T>((observer) => this.observe(observer)).subscribe(subscriber);
+  }
+
+  /** Shared emitter entry keeps per-state bound observer callbacks out of the graph. */
+  receive(type: PendingType, value?: unknown) {
+    if (type === 'next') {
+      this._next(value as T);
+    } else if (type === 'error') {
+      this._error(value);
+    } else {
+      this._complete();
+    }
   }
 
   protected _next(value: T) {
     this.setup();
 
-    if (this.rawClosed) {
-      return;
-    }
-
-    if (this.distinctor(this.rawValue, value)) {
+    if (this.rawClosed || this.distinctor(this.rawValue, value)) {
       return;
     }
 
@@ -233,29 +335,37 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
   protected _error(error: unknown) {
     this.setup();
 
-    if (this.rawClosed) {
-      return;
+    if (!this.rawClosed) {
+      this.setPendingValue('error', error);
     }
-
-    this.setPendingValue('error', error);
   }
 
   protected _complete() {
     this.setup();
 
-    if (this.rawClosed) {
-      return;
+    if (!this.rawClosed) {
+      this.setPendingValue('complete');
     }
+  }
 
-    this.setPendingValue('complete');
+  private disposeEmitter(teardown: TeardownLogic) {
+    if (isFunction(teardown)) {
+      teardown();
+    } else {
+      teardown?.unsubscribe();
+    }
   }
 
   private teardown() {
-    if (this.subscription && !this.subscription.closed) {
-      this.subscription.unsubscribe();
-    }
+    this.emitterObserver?.unsubscribe();
 
-    this.subscription = null;
+    this.emitterObserver = null;
+
+    const teardown = this.emitterTeardown;
+
+    this.emitterTeardown = undefined;
+
+    this.disposeEmitter(teardown);
   }
 
   override destroy() {
@@ -265,12 +375,14 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
     this.clearPendingValue();
 
-    this.node.destroy();
+    this.existingNode?.destroy();
+
+    this.stopped = true;
 
     try {
       this.teardown();
     } finally {
-      this.subject.complete();
+      this.observers?.notify('complete');
 
       super.destroy();
     }

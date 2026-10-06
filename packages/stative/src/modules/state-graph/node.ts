@@ -111,14 +111,25 @@ export class StateNode {
     return { node: this, dependencies: this.links.sources.keys() };
   }
 
-  private hasDirtyDependency() {
+  private getDependencyStatus(stack: DependencyFrame[]): 'ready' | 'pending' | 'blocked' {
     for (const source of this.links.sources.keys()) {
-      if (source.node.needsSettle()) {
-        return true;
+      const dependency = source.node;
+
+      // A reentrant read cannot publish past an upstream callback still delivering a value.
+      if (
+        dependency.dirty &&
+        dependency.settling &&
+        !stack.some((frame) => frame.node === dependency)
+      ) {
+        return 'blocked';
+      }
+
+      if (dependency.needsSettle()) {
+        return 'pending';
       }
     }
 
-    return false;
+    return 'ready';
   }
 
   private publish() {
@@ -159,7 +170,13 @@ export class StateNode {
         const node = frame.node;
 
         // An upstream callback may have written a dependency already visited by this frame.
-        if (node.hasDirtyDependency()) {
+        const status = node.getDependencyStatus(stack);
+
+        if (status === 'blocked') {
+          return;
+        }
+
+        if (status === 'pending') {
           frame.dependencies = node.links.sources.keys();
 
           continue;
@@ -207,4 +224,11 @@ export const getStateNode = (state: object): StateNode => {
   }
 
   return node;
+};
+
+export const peekStateNode = (state: object): StateNode | undefined => nodes.get(state);
+
+/** Transparent lifetime views share their source's publication order. */
+export const aliasStateNode = (state: object, source: object) => {
+  nodes.set(state, getStateNode(source));
 };
