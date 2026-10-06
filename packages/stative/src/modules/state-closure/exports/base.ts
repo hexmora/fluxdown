@@ -11,6 +11,7 @@ import type {
   StateValue,
   StateValues,
 } from '../../reactive-state';
+import type { StateSubscription } from '../../reactive-state/observe';
 import type { FlattenedState, IReadableClosure, ListEntry, StateClosureSource } from '../type';
 import type {
   BuiltClosure,
@@ -27,12 +28,14 @@ import { clearByTarget } from '../../destructible/utils';
 import { MutableState } from '../../mutable-state';
 import {
   combineMapState,
+  computedState,
   isReactiveStateLike,
   mapState,
   ReactiveState,
   selectState,
   toState,
 } from '../../reactive-state';
+import { isNativeState, observeState, readPublishedState } from '../../reactive-state/observe';
 import { batch } from '../../state-graph/batch';
 import { withStateContext } from '../../state-graph/context';
 import { getStateNode } from '../../state-graph/node';
@@ -44,6 +47,8 @@ import {
 } from '../utils';
 import { withStateClosureHookRuntime } from './hooks/runtime/utils';
 import { mapKeyedClosure } from './keyed';
+import { OwnedStateView } from './owned-state-view';
+import { OwnedValueState } from './owned-value-state';
 import { isImmediateDescriptor, isStateClosureDescriptor, render } from './render';
 import {
   bindRootDescriptorScope,
@@ -55,6 +60,15 @@ import {
   releaseReadableClosure,
 } from './render/utils/context';
 import { isReadableClosure } from './render/utils/resolve';
+
+type OwnedReactiveState<T> = IReactiveState<T> & { destroy(): void };
+
+type CollectionEntry<T, R> = Omit<ListEntry<T, R>, 'subscription'> & {
+  value: R;
+  native: boolean;
+  completed: boolean;
+  subscription?: StateSubscription;
+};
 
 export const toClosure = <T>(source: StateClosureSource<T>): IReadableClosure<T> => {
   return isReadableClosure<T>(source) ? source : new SourceReadableClosure({ source });
@@ -166,7 +180,7 @@ export function switchMapClosure<S, R>(
       emitter: (observer) => {
         const subscriptions = new Subscription();
 
-        let subscription: Subscription | null = null;
+        let subscription: StateSubscription | null = null;
 
         let stopped = false;
 
@@ -185,7 +199,7 @@ export function switchMapClosure<S, R>(
         };
 
         const handleSubscribe = () => {
-          subscription = inner.subscribe({
+          subscription = observeState(inner, {
             next: handleSchedule,
 
             error: handleError,
@@ -238,7 +252,7 @@ export function switchMapClosure<S, R>(
           handleSubscribe();
 
           subscriptions.add(
-            input.subscribe({
+            observeState(input, {
               next: handleSchedule,
 
               error: handleError,
@@ -264,10 +278,8 @@ export function switchMapClosure<S, R>(
       },
     });
 
-    detachWithDescriptorScope(scope, () => state.destroy());
-
     return state;
-  });
+  }, true);
 
   const scope = getReadableClosureScope(closure);
 
@@ -287,6 +299,21 @@ export const combineMapClosure = <const TSources extends [unknown, ...unknown[]]
     combineMapState(
       sources,
       (value, prev) => withStateClosureHookRuntime(null, () => mapper(value, prev)),
+      distinctor,
+    ),
+  );
+};
+
+/** Pure projections stay unsubscribed until observed and compute synchronous reads on demand. */
+export const computedClosure = <const TSources extends [unknown, ...unknown[]], R>(
+  sources: [...TSources],
+  mapper: (values: StateValues<TSources>) => R,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R> => {
+  return new DerivedReadableClosure(sources, () =>
+    computedState(
+      sources,
+      (currentValues) => withStateClosureHookRuntime(null, () => mapper(currentValues)),
       distinctor,
     ),
   );
@@ -314,7 +341,7 @@ export function mapEachClosure<T, R>(
   const closure = FactoryReadableClosure.create(() => {
     const sourceState = input.value;
 
-    const createEntry = (value: T, index: number): ListEntry<T, R> => {
+    const createEntry = (value: T, index: number): CollectionEntry<T, R> => {
       const item = new MutableState({ initial: value, distinctor: itemDistinctor });
 
       getStateNode(item).dependOn(getStateNode(sourceState), { ordering: true });
@@ -329,7 +356,16 @@ export function mapEachClosure<T, R>(
       ownReadableClosure(scope, child);
 
       try {
-        return { input: item, closure: child, state: child.value };
+        const state = child.value;
+
+        return {
+          input: item,
+          closure: child,
+          state,
+          value: state.value,
+          native: isNativeState(state),
+          completed: state.closed,
+        };
       } catch (error) {
         releaseReadableClosure(scope, child);
 
@@ -337,7 +373,7 @@ export function mapEachClosure<T, R>(
       }
     };
 
-    const releaseEntries = (items: ListEntry<T, R>[]) => {
+    const releaseEntries = (items: CollectionEntry<T, R>[]) => {
       const cleanup = new Subscription();
 
       for (const entry of items) {
@@ -352,16 +388,18 @@ export function mapEachClosure<T, R>(
     };
 
     let previousItems = sourceState.value;
-    let entries = previousItems.map(createEntry);
+    const entries = previousItems.map(createEntry);
 
     const state: ReactiveState<R[]> = new ReactiveState({
-      initial: entries.map((entry) => entry.state.value),
+      initial: entries.map((entry) => entry.value),
       distinctor: shallowEqual,
       emitter: (observer) => {
         const subscriptions = new Subscription();
 
         let stopped = false;
         let completed = false;
+
+        let valuesChanged = false;
 
         const fail = (error: unknown) => {
           if (stopped) {
@@ -379,9 +417,18 @@ export function mapEachClosure<T, R>(
           }
 
           try {
-            observer.next(entries.map((entry) => entry.state.value));
+            if (valuesChanged) {
+              valuesChanged = false;
 
-            if (completed && entries.every((entry) => entry.state.closed)) {
+              observer.next(
+                entries.map((entry) => (entry.native ? entry.value : entry.state.value)),
+              );
+            }
+
+            if (
+              completed &&
+              entries.every((entry) => (entry.native ? entry.completed : entry.state.closed))
+            ) {
               stopped = true;
 
               observer.complete();
@@ -395,12 +442,32 @@ export function mapEachClosure<T, R>(
           getStateNode(state).schedule(refresh);
         };
 
-        const connectEntry = (entry: ListEntry<T, R>) => {
-          entry.subscription = entry.state.subscribe({
-            next: scheduleRefresh,
+        const connectEntry = (entry: CollectionEntry<T, R>) => {
+          let connecting = true;
+
+          entry.subscription = observeState(entry.state, {
+            next: (value) => {
+              const current = connecting ? entry.state.value : value;
+
+              if (!entry.native || !Object.is(entry.value, current)) {
+                entry.value = current;
+
+                valuesChanged = true;
+
+                scheduleRefresh();
+              }
+            },
             error: fail,
-            complete: scheduleRefresh,
+            complete: () => {
+              entry.completed = true;
+
+              if (completed) {
+                scheduleRefresh();
+              }
+            },
           });
+
+          connecting = false;
 
           subscriptions.add(entry.subscription);
         };
@@ -410,25 +477,47 @@ export function mapEachClosure<T, R>(
             return;
           }
 
-          const created: ListEntry<T, R>[] = [];
+          const created: CollectionEntry<T, R>[] = [];
 
           try {
             for (let index = entries.length; index < items.length; index++) {
               created.push(createEntry(items[index], index));
             }
 
-            const removed = entries.slice(items.length);
+            const retainedLength = Math.min(entries.length, items.length);
+            const previous = previousItems;
+            const removed = items.length < entries.length ? entries.splice(items.length) : [];
 
-            entries = [...entries.slice(0, items.length), ...created];
+            for (const entry of created) {
+              entries.push(entry);
+            }
 
             previousItems = items;
 
+            if (removed.length > 0 || created.length > 0) {
+              valuesChanged = true;
+            }
+
             batch(() => {
-              entries.forEach((entry, index) => entry.input.next(items[index]));
+              for (let index = 0; index < retainedLength; index++) {
+                if (itemDistinctor || !Object.is(previous[index], items[index])) {
+                  entries[index].input.next(items[index]);
+                }
+              }
+
+              if (itemDistinctor) {
+                for (let index = retainedLength; index < entries.length; index++) {
+                  entries[index].input.next(items[index]);
+                }
+              }
+
               created.forEach(connectEntry);
 
               releaseEntries(removed);
-              scheduleRefresh();
+
+              if (valuesChanged) {
+                scheduleRefresh();
+              }
             });
           } catch (error) {
             releaseEntries(created);
@@ -440,7 +529,7 @@ export function mapEachClosure<T, R>(
           entries.forEach(connectEntry);
 
           subscriptions.add(
-            sourceState.subscribe({
+            observeState(sourceState, {
               next: update,
               error: fail,
               complete: () => {
@@ -463,10 +552,8 @@ export function mapEachClosure<T, R>(
       },
     });
 
-    detachWithDescriptorScope(scope, () => state.destroy());
-
     return state;
-  });
+  }, true);
 
   const scope = getReadableClosureScope(closure);
   const input = ownReadableClosure(scope, toClosure(source));
@@ -478,7 +565,12 @@ export abstract class BaseStateClosure<T, TInputs = void>
   extends Destructible
   implements IReadableClosure<T>
 {
-  private _value: MutableState<T> | null = null;
+  private _value: IReactiveState<T> | null = null;
+
+  /** Custom writable closures retain a mutable output; internal graphs can own or borrow it. */
+  protected get outputMode(): 'mutable' | 'view' | 'owned' {
+    return 'mutable';
+  }
 
   readonly inputs: TInputs;
 
@@ -493,7 +585,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
       bindRootDescriptorScope(scope, this);
     }
 
-    clearWithDescriptorScope(getReadableClosureScope(this), () => super.destroy());
+    getReadableClosureScope(this);
 
     // Descriptor inputs are already owned; rescanning would also capture D-wrapped values.
     if (scope) {
@@ -512,10 +604,40 @@ export abstract class BaseStateClosure<T, TInputs = void>
     }
   }
 
-  private createState(source: IReactiveState<T> | null, initial: T): MutableState<T> {
-    if (!source) {
-      return this.clearable(MutableState.of(initial));
+  private createState(source: IReactiveState<T> | null, initial: T): IReactiveState<T> {
+    if (source && this.outputMode === 'owned') {
+      detachWithDescriptorScope(getReadableClosureScope(this), () => {
+        (source as OwnedReactiveState<T>).destroy();
+      });
+
+      return source;
     }
+
+    if (source && this.outputMode === 'view' && isNativeState(source)) {
+      // Reading the native publication does not set up a ReactiveState. A terminal
+      // source is already an immutable handle and needs no extra lifetime boundary.
+      if (source instanceof ReactiveState && readPublishedState(source).closed) {
+        return source;
+      }
+
+      const state = new OwnedStateView(source);
+
+      detachWithDescriptorScope(getReadableClosureScope(this), () => state.destroy());
+
+      return state;
+    }
+
+    if (!source) {
+      return this.clearable(
+        this.outputMode === 'mutable' ? MutableState.of(initial) : new OwnedValueState(initial),
+      );
+    }
+
+    return this.createForwardedState(source);
+  }
+
+  private createForwardedState(source: IReactiveState<T>): MutableState<T> {
+    const initial = source.value;
 
     let state: MutableState<T> | null = null;
 
@@ -524,7 +646,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
     };
 
     const subscription = withStateContext(null, () =>
-      source.subscribe({
+      observeState(source, {
         next: (value) => {
           if (state) {
             state.next(value);
@@ -604,9 +726,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
           ? directSource
           : null;
 
-      const initial = reactiveSource ? reactiveSource.value : (directSource as T);
-
-      const state = this.createState(reactiveSource, initial);
+      const state = this.createState(reactiveSource, directSource as T);
 
       this._value = state;
 
@@ -746,13 +866,21 @@ export abstract class BaseStateClosure<T, TInputs = void>
   }
 
   protected next(newValue: T) {
-    this.setup().next(newValue);
+    const state = this.setup();
+
+    assert(state instanceof MutableState, 'This closure has no writable output.');
+
+    state.next(newValue);
   }
 
   protected abstract render(): StateClosureResult<T>;
 }
 
 class SourceReadableClosure<T> extends BaseStateClosure<T, { source: StateClosureSource<T> }> {
+  protected override get outputMode() {
+    return 'view' as const;
+  }
+
   protected render(): StateClosureResult<T> {
     const { source } = this.inputs;
 
@@ -772,9 +900,13 @@ class SourceReadableClosure<T> extends BaseStateClosure<T, { source: StateClosur
 
 class DerivedReadableClosure<T, S> extends BaseStateClosure<
   T,
-  { source: S; factory: () => ReactiveState<T> }
+  { source: S; factory: () => OwnedReactiveState<T> }
 > {
-  constructor(source: S, factory: () => ReactiveState<T>) {
+  protected override get outputMode() {
+    return 'owned' as const;
+  }
+
+  constructor(source: S, factory: () => OwnedReactiveState<T>) {
     super({ source, factory });
 
     if (isArray(source)) {
@@ -789,20 +921,22 @@ class DerivedReadableClosure<T, S> extends BaseStateClosure<
   protected render() {
     const { factory } = this.inputs;
 
-    const state = factory();
-
-    detachWithDescriptorScope(getReadableClosureScope(this), () => state.destroy());
-
-    return state;
+    return factory();
   }
 }
 
 export class FactoryReadableClosure<T> extends BaseStateClosure<
   T,
-  { factory: () => StateClosureResult<T> }
+  { factory: () => StateClosureResult<T>; owned?: boolean }
 > {
-  static create<T>(factory: () => StateClosureResult<T>): FactoryReadableClosure<T> {
-    return new FactoryReadableClosure({ factory });
+  static create<T>(factory: () => OwnedReactiveState<T>, owned: true): FactoryReadableClosure<T>;
+  static create<T>(factory: () => StateClosureResult<T>, owned?: false): FactoryReadableClosure<T>;
+  static create<T>(factory: () => StateClosureResult<T>, owned = false): FactoryReadableClosure<T> {
+    return new FactoryReadableClosure({ factory, owned });
+  }
+
+  protected override get outputMode() {
+    return this.inputs.owned ? ('owned' as const) : ('view' as const);
   }
 
   protected render() {

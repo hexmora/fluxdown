@@ -341,7 +341,7 @@ describe('BaseStateClosure runtime', () => {
     closure.destroy();
   });
 
-  test('filters identical derived values even when the source distinctor allows them', () => {
+  test('honors the derived distinctor without an additional closure equality boundary', () => {
     const source = MutableState.of(0);
 
     const value = { label: 'stable' };
@@ -358,7 +358,7 @@ describe('BaseStateClosure runtime', () => {
 
     source.next(1);
 
-    expect(next.mock.calls).toEqual([[value]]);
+    expect(next.mock.calls).toEqual([[value], [value]]);
 
     closure.destroy();
 

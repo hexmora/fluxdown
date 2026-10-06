@@ -23,6 +23,7 @@ import type { StateClosureRef } from './type';
 
 import {
   combineMapClosure,
+  computedClosure,
   flattenClosure,
   mapClosure,
   mapEachClosure,
@@ -150,6 +151,20 @@ export const useCombineMap = <const TSources extends [unknown, ...unknown[]], R>
   return ownReadableClosure(
     getReadableClosureScope(owner),
     combineMapClosure(sources, mapper, distinctor),
+  );
+};
+
+/** Create a pure projection without installing input subscriptions until it is observed. */
+export const useComputed = <const TSources extends [unknown, ...unknown[]], R>(
+  sources: [...TSources],
+  mapper: (values: StateValues<TSources>) => R,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R> => {
+  const { owner } = getCurrentStateClosureHookRuntime('useComputed', 'once');
+
+  return ownReadableClosure(
+    getReadableClosureScope(owner),
+    computedClosure(sources, mapper, distinctor),
   );
 };
 

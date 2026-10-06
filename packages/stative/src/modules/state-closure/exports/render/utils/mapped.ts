@@ -8,11 +8,7 @@ import { combineMapState, ReactiveState } from '../../../../reactive-state';
 import { FactoryReadableClosure } from '../../base';
 import { StateClosureHookRuntime } from '../../hooks/runtime';
 import { getMapperComparers } from '../../memo';
-import {
-  clearWithDescriptorScope,
-  detachWithDescriptorScope,
-  getReadableClosureScope,
-} from './context';
+import { clearWithDescriptorScope, getReadableClosureScope } from './context';
 
 /** Builds functional closures lazily and keeps mapper hooks local to each instance. */
 export const createMappedStateClosure = <T>(
@@ -22,11 +18,7 @@ export const createMappedStateClosure = <T>(
   kind: 'mapper' | 'once',
   distinctor?: Distinctor<T>,
 ): IReadableClosure<T> => {
-  const closure: IReadableClosure<T> = FactoryReadableClosure.create<T>(() => {
-    if (kind === 'once') {
-      return hooks.render(() => mapper(readInputs())) as StateClosureResult<T>;
-    }
-
+  const createOutput = () => {
     const comparers = getMapperComparers(mapper);
 
     let previous: { inputs: unknown; result: T } | null = null;
@@ -55,10 +47,15 @@ export const createMappedStateClosure = <T>(
         )
       : ReactiveState.of(read());
 
-    detachWithDescriptorScope(getReadableClosureScope(closure), () => state.destroy());
-
     return state;
-  });
+  };
+
+  const closure: IReadableClosure<T> =
+    kind === 'once'
+      ? FactoryReadableClosure.create<T>(
+          () => hooks.render(() => mapper(readInputs())) as StateClosureResult<T>,
+        )
+      : FactoryReadableClosure.create<T>(createOutput, true);
 
   const hooks = new StateClosureHookRuntime(kind, closure);
 

@@ -6,12 +6,12 @@ import type { IReadableClosure, StateClosureSource } from '../type';
 import type { MarkedStateClosureDescriptor } from './render';
 
 import { ReactiveState } from '../../reactive-state';
+import { isNativeState, observeState, type StateSubscription } from '../../reactive-state/observe';
 import { batch } from '../../state-graph/batch';
 import { getStateNode } from '../../state-graph/node';
 import { FactoryReadableClosure, toClosure } from './base';
 import {
   clearWithDescriptorScope,
-  detachWithDescriptorScope,
   getReadableClosureScope,
   ownReadableClosure,
   releaseReadableClosure,
@@ -20,7 +20,10 @@ import {
 type KeyedEntry<T> = {
   closure: IReadableClosure<T>;
   state: IReactiveState<T>;
-  subscription?: Subscription;
+  value: T;
+  native: boolean;
+  completed: boolean;
+  subscription?: StateSubscription;
 };
 
 /**
@@ -60,7 +63,15 @@ export function mapKeyedClosure<T, R>(
       ownReadableClosure(scope, child);
 
       try {
-        return { closure: child, state: child.value };
+        const state = child.value;
+
+        return {
+          closure: child,
+          state,
+          value: state.value,
+          native: isNativeState(state),
+          completed: state.closed,
+        };
       } catch (error) {
         releaseReadableClosure(scope, child);
 
@@ -101,7 +112,7 @@ export function mapKeyedClosure<T, R>(
     });
 
     const state: ReactiveState<R[]> = new ReactiveState({
-      initial: slots.map((entry) => entry.state.value),
+      initial: slots.map((entry) => entry.value),
       distinctor: shallowEqual,
       emitter: (observer) => {
         const subscriptions = new Subscription();
@@ -111,6 +122,8 @@ export function mapKeyedClosure<T, R>(
         let sourceCompleted = false;
 
         let completed = false;
+
+        let valuesChanged = false;
 
         const fail = (error: unknown) => {
           if (!stopped) {
@@ -126,9 +139,16 @@ export function mapKeyedClosure<T, R>(
           }
 
           try {
-            observer.next(slots.map((entry) => entry.state.value));
+            if (valuesChanged) {
+              valuesChanged = false;
 
-            if (sourceCompleted && slots.every((entry) => entry.state.closed)) {
+              observer.next(slots.map((entry) => (entry.native ? entry.value : entry.state.value)));
+            }
+
+            if (
+              sourceCompleted &&
+              slots.every((entry) => (entry.native ? entry.completed : entry.state.closed))
+            ) {
               stopped = true;
 
               completed = true;
@@ -143,11 +163,31 @@ export function mapKeyedClosure<T, R>(
         const scheduleRefresh = () => getStateNode(state).schedule(refresh);
 
         const connectEntry = (entry: KeyedEntry<R>) => {
-          entry.subscription = entry.state.subscribe({
-            next: scheduleRefresh,
+          let connecting = true;
+
+          entry.subscription = observeState(entry.state, {
+            next: (value) => {
+              const current = connecting ? entry.state.value : value;
+
+              if (!entry.native || !Object.is(entry.value, current)) {
+                entry.value = current;
+
+                valuesChanged = true;
+
+                scheduleRefresh();
+              }
+            },
             error: fail,
-            complete: scheduleRefresh,
+            complete: () => {
+              entry.completed = true;
+
+              if (sourceCompleted) {
+                scheduleRefresh();
+              }
+            },
           });
+
+          connecting = false;
 
           subscriptions.add(entry.subscription);
         };
@@ -157,11 +197,51 @@ export function mapKeyedClosure<T, R>(
             return;
           }
 
-          const next = new Map<T, KeyedEntry<R>>();
-
           const created: KeyedEntry<R>[] = [];
 
           try {
+            let prefix = 0;
+
+            while (
+              prefix < previousItems.length &&
+              prefix < items.length &&
+              Object.is(previousItems[prefix], items[prefix])
+            ) {
+              prefix += 1;
+            }
+
+            if (prefix === previousItems.length && items.length >= prefix) {
+              for (let index = prefix; index < items.length; index++) {
+                const item = items[index];
+                let entry = entries.get(item);
+
+                if (!entry) {
+                  entry = createEntry(item);
+
+                  entries.set(item, entry);
+
+                  created.push(entry);
+                }
+
+                slots.push(entry);
+              }
+
+              valuesChanged ||= items.length !== previousItems.length;
+
+              previousItems = items;
+
+              batch(() => {
+                created.forEach(connectEntry);
+
+                if (valuesChanged) {
+                  scheduleRefresh();
+                }
+              });
+
+              return;
+            }
+
+            const next = new Map<T, KeyedEntry<R>>();
             const nextSlots = items.map((item) => {
               let entry = next.get(item) ?? entries.get(item);
 
@@ -186,6 +266,10 @@ export function mapKeyedClosure<T, R>(
 
             entries = next;
 
+            valuesChanged ||=
+              slots.length !== nextSlots.length ||
+              slots.some((entry, index) => entry !== nextSlots[index]);
+
             slots = nextSlots;
 
             previousItems = items;
@@ -195,7 +279,9 @@ export function mapKeyedClosure<T, R>(
 
               releaseEntries(removed);
 
-              scheduleRefresh();
+              if (valuesChanged) {
+                scheduleRefresh();
+              }
             });
           } catch (error) {
             try {
@@ -210,7 +296,7 @@ export function mapKeyedClosure<T, R>(
           entries.forEach(connectEntry);
 
           subscriptions.add(
-            sourceState.subscribe({
+            observeState(sourceState, {
               next: update,
               error: fail,
               complete: () => {
@@ -242,10 +328,8 @@ export function mapKeyedClosure<T, R>(
       },
     });
 
-    detachWithDescriptorScope(scope, () => state.destroy());
-
     return state;
-  });
+  }, true);
 
   const scope = getReadableClosureScope(closure);
 

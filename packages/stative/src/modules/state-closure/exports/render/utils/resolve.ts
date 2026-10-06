@@ -244,19 +244,23 @@ const buildSlottedStateClosure = (
       isMarkedStateClosureDescriptor(descriptor),
     );
 
-    return createMappedStateClosure(Factory, () => inputs, [], 'once');
+    return withDescriptorScope(scope, () =>
+      createMappedStateClosure(Factory, () => inputs, [], 'once'),
+    );
   }
 
   const dependencies: IReadableClosure<unknown>[] = [];
 
   const node = resolveMappingNode(params, scope, dependencies);
 
-  return createMappedStateClosure(
-    Factory,
-    () => readMappingNode(node),
-    dependencies,
-    'mapper',
-    distinctor,
+  return withDescriptorScope(scope, () =>
+    createMappedStateClosure(
+      Factory,
+      () => readMappingNode(node),
+      dependencies,
+      'mapper',
+      distinctor,
+    ),
   );
 };
 
@@ -286,7 +290,7 @@ export const buildStateClosure = (
       isImmediateDescriptor(descriptor) ||
       isReactiveStateLike(descriptor)
     ) {
-      closure = toClosure(descriptor);
+      closure = withDescriptorScope(closureScope, () => toClosure(descriptor));
     } else if (isSlottedDescriptor(descriptor)) {
       closure = buildSlottedStateClosure(descriptor, closureScope);
     } else if (isClass(descriptor)) {
@@ -298,11 +302,8 @@ export const buildStateClosure = (
 
       const node = resolveMappingNode(descriptor, closureScope, dependencies);
 
-      closure = createMappedStateClosure(
-        identity,
-        () => readMappingNode(node),
-        dependencies,
-        'mapper',
+      closure = withDescriptorScope(closureScope, () =>
+        createMappedStateClosure(identity, () => readMappingNode(node), dependencies, 'mapper'),
       );
     }
 

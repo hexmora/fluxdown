@@ -1,19 +1,18 @@
-import { reverse } from 'lodash-es';
-import { Subscription } from 'rxjs';
+import { UnsubscriptionError } from 'rxjs';
 
 import type { IReadableClosure } from '../../../type';
 
 export type DescriptorScope = {
   detached: boolean;
   destroyed: boolean;
-  closures: Set<IReadableClosure<unknown>>;
-  detachers: Array<() => void>;
-  resources: Array<() => void>;
+  closures: Set<IReadableClosure<unknown>> | null;
+  detachers: Array<() => void> | null;
+  resources: Array<() => void> | null;
 };
 
 type ClosureContext = {
   scope: DescriptorScope | null;
-  owners: Set<DescriptorScope>;
+  owners: Set<DescriptorScope> | null;
 };
 
 const closureContext = /*#__PURE__*/ Symbol('closureContext');
@@ -29,7 +28,7 @@ const getClosureContext = (
     return existing;
   }
 
-  const context: ClosureContext = { scope: null, owners: new Set() };
+  const context: ClosureContext = { scope: null, owners: null };
 
   Object.defineProperty(closure, closureContext, { value: context });
 
@@ -59,9 +58,9 @@ export const consumeDescriptorScope = (): DescriptorScope | null => {
 export const createDescriptorScope = (): DescriptorScope => ({
   detached: false,
   destroyed: false,
-  closures: new Set(),
-  detachers: [],
-  resources: [],
+  closures: null,
+  detachers: null,
+  resources: null,
 });
 
 export const assertDescriptorScope = (scope: DescriptorScope) => {
@@ -71,26 +70,26 @@ export const assertDescriptorScope = (scope: DescriptorScope) => {
 };
 
 export const clearWithDescriptorScope = (scope: DescriptorScope, cleanup: () => void) => {
-  scope.resources.push(cleanup);
+  (scope.resources ??= []).push(cleanup);
 };
 
 export const detachWithDescriptorScope = (scope: DescriptorScope, detach: () => void) => {
-  scope.detachers.push(detach);
+  (scope.detachers ??= []).push(detach);
 };
 
 export const ownReadableClosure = <T extends IReadableClosure<unknown>>(
   scope: DescriptorScope,
   closure: T,
 ): T => {
-  if (scope.closures.has(closure)) {
+  if (scope.closures?.has(closure)) {
     return closure;
   }
 
-  const { owners } = getClosureContext(closure);
+  const context = getClosureContext(closure);
 
-  owners.add(scope);
+  (context.owners ??= new Set()).add(scope);
 
-  scope.closures.add(closure);
+  (scope.closures ??= new Set()).add(closure);
 
   return closure;
 };
@@ -99,17 +98,29 @@ export const releaseReadableClosure = (
   scope: DescriptorScope,
   closure: IReadableClosure<unknown>,
 ) => {
-  if (!scope.closures.delete(closure)) {
+  if (!scope.closures?.delete(closure)) {
     return;
   }
 
   const { owners } = getClosureContext(closure);
 
-  owners.delete(scope);
+  owners?.delete(scope);
 
-  if (owners.size === 0) {
+  if (!owners?.size) {
     closure.destroy();
   }
+};
+
+const appendCleanupError = (errors: unknown[] | undefined, error: unknown): unknown[] => {
+  const result = errors ?? [];
+
+  if (error instanceof UnsubscriptionError) {
+    result.push(...error.errors);
+  } else {
+    result.push(error);
+  }
+
+  return result;
 };
 
 const detachDescriptorScope = (scope: DescriptorScope) => {
@@ -119,23 +130,53 @@ const detachDescriptorScope = (scope: DescriptorScope) => {
 
   scope.detached = true;
 
-  const teardown = new Subscription();
+  let errors: unknown[] | undefined;
 
-  for (const detach of reverse(scope.detachers.splice(0))) {
-    teardown.add(detach);
-  }
+  const detachers = scope.detachers;
 
-  for (const closure of scope.closures) {
-    teardown.add(() => {
-      const { scope: childScope, owners } = getClosureContext(closure);
+  scope.detachers = null;
 
-      if (childScope && [...owners].every((owner) => owner.detached)) {
-        detachDescriptorScope(childScope);
+  if (detachers) {
+    for (let index = detachers.length - 1; index >= 0; index--) {
+      try {
+        detachers[index]();
+      } catch (error) {
+        errors = appendCleanupError(errors, error);
       }
-    });
+    }
   }
 
-  teardown.unsubscribe();
+  if (scope.closures) {
+    for (const closure of scope.closures) {
+      try {
+        const { scope: childScope, owners } = getClosureContext(closure);
+
+        if (childScope) {
+          let allDetached = true;
+
+          if (owners) {
+            for (const owner of owners) {
+              if (!owner.detached) {
+                allDetached = false;
+
+                break;
+              }
+            }
+          }
+
+          if (allDetached) {
+            detachDescriptorScope(childScope);
+          }
+        }
+      } catch (error) {
+        errors = appendCleanupError(errors, error);
+      }
+    }
+  }
+
+  if (errors) {
+    throw new UnsubscriptionError(errors);
+  }
 };
 
 export const destroyDescriptorScope = (scope: DescriptorScope, destroy?: () => void) => {
@@ -145,19 +186,51 @@ export const destroyDescriptorScope = (scope: DescriptorScope, destroy?: () => v
 
   scope.destroyed = true;
 
-  const teardown = new Subscription(() => detachDescriptorScope(scope));
+  let errors: unknown[] | undefined;
 
-  for (const closure of reverse([...scope.closures])) {
-    teardown.add(() => releaseReadableClosure(scope, closure));
+  try {
+    detachDescriptorScope(scope);
+  } catch (error) {
+    errors = appendCleanupError(errors, error);
   }
 
-  teardown.add(destroy);
+  if (scope.closures) {
+    const closures = [...scope.closures];
 
-  for (const cleanup of scope.resources.splice(0)) {
-    teardown.add(cleanup);
+    for (let index = closures.length - 1; index >= 0; index--) {
+      try {
+        releaseReadableClosure(scope, closures[index]);
+      } catch (error) {
+        errors = appendCleanupError(errors, error);
+      }
+    }
+
+    scope.closures = null;
   }
 
-  teardown.unsubscribe();
+  try {
+    destroy?.();
+  } catch (error) {
+    errors = appendCleanupError(errors, error);
+  }
+
+  const resources = scope.resources;
+
+  scope.resources = null;
+
+  if (resources) {
+    for (const cleanup of resources) {
+      try {
+        cleanup();
+      } catch (error) {
+        errors = appendCleanupError(errors, error);
+      }
+    }
+  }
+
+  if (errors) {
+    throw new UnsubscriptionError(errors);
+  }
 };
 
 export const bindRootDescriptorScope = <T extends IReadableClosure<unknown>>(
@@ -173,14 +246,24 @@ export const bindRootDescriptorScope = <T extends IReadableClosure<unknown>>(
   }
 
   if (previous) {
-    scope.resources.push(...previous.resources.splice(0));
+    if (previous.resources) {
+      (scope.resources ??= []).push(...previous.resources);
 
-    scope.detachers.push(...previous.detachers.splice(0));
+      previous.resources = null;
+    }
 
-    for (const child of previous.closures) {
-      ownReadableClosure(scope, child);
+    if (previous.detachers) {
+      (scope.detachers ??= []).push(...previous.detachers);
 
-      releaseReadableClosure(previous, child);
+      previous.detachers = null;
+    }
+
+    if (previous.closures) {
+      for (const child of previous.closures) {
+        ownReadableClosure(scope, child);
+
+        releaseReadableClosure(previous, child);
+      }
     }
   } else {
     const destroy = closure.destroy.bind(closure);
