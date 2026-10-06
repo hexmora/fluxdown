@@ -12,52 +12,52 @@ import {
   useSelect,
 } from '..';
 
+const collectMappingEvents = (select: typeof mapState) => {
+  const input = MutableState.of([1]);
+
+  const events: unknown[] = [];
+
+  const output = select<typeof input, { count: number }>(
+    input,
+    (values, previous) => {
+      events.push(['map', [...values], previous?.[0], previous?.[1]]);
+
+      return { count: values.length };
+    },
+    (previous, current) => previous.count === current.count,
+  );
+
+  output.subscribe({
+    next: (value) => events.push(['next', value]),
+    complete: () => events.push(['complete']),
+  });
+
+  input.next([2]);
+
+  batch(() => {
+    input.next([2, 3]);
+
+    input.next([2, 3, 4]);
+  });
+
+  batch(() => {
+    input.next([5]);
+
+    input.complete();
+  });
+
+  events.push(['final', output.value, output.closed]);
+
+  output.destroy();
+
+  input.destroy();
+
+  return events;
+};
+
 describe('shared selections', () => {
   test('keeps mapping, comparison, and terminal notifications equivalent to mapping', () => {
-    const run = (select: typeof mapState) => {
-      const input = MutableState.of([1]);
-
-      const events: unknown[] = [];
-
-      const output = select<typeof input, { count: number }>(
-        input,
-        (values, previous) => {
-          events.push(['map', [...values], previous?.[0], previous?.[1]]);
-
-          return { count: values.length };
-        },
-        (previous, current) => previous.count === current.count,
-      );
-
-      output.subscribe({
-        next: (value) => events.push(['next', value]),
-        complete: () => events.push(['complete']),
-      });
-
-      input.next([2]);
-
-      batch(() => {
-        input.next([2, 3]);
-
-        input.next([2, 3, 4]);
-      });
-
-      batch(() => {
-        input.next([5]);
-
-        input.complete();
-      });
-
-      events.push(['final', output.value, output.closed]);
-
-      output.destroy();
-
-      input.destroy();
-
-      return events;
-    };
-
-    expect(run(selectState)).toEqual(run(mapState));
+    expect(collectMappingEvents(selectState)).toEqual(collectMappingEvents(mapState));
   });
 
   test.each([false, true])(

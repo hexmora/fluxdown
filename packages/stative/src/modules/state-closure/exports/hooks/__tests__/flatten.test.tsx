@@ -6,15 +6,7 @@ import { expectTypeOf } from 'expect-type';
 
 import type { FlattenedState, IReadableClosure, JSXDescriptor } from '../../../../..';
 
-import {
-  BaseStateClosure,
-  batch,
-  MutableState,
-  once,
-  render,
-  S,
-  useFlatten,
-} from '../../../../..';
+import { BaseStateClosure, batch, MutableState, once, render, S, useFlatten } from '../../../../..';
 
 type Config = {
   count: number;

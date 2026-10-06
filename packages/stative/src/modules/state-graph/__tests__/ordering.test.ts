@@ -121,55 +121,56 @@ describe('ordering dependencies', () => {
     source.destroy();
   });
 
-  test.each(
-    [0, 1, 3].flatMap((depth) => [false, true].map((ordering) => ({ depth, ordering }))),
-  )('settles prerequisites attached during publication: %j', ({ depth, ordering }) => {
-    const source = new StateNode();
+  test.each([0, 1, 3].flatMap((depth) => [false, true].map((ordering) => ({ depth, ordering }))))(
+    'settles prerequisites attached during publication: %j',
+    ({ depth, ordering }) => {
+      const source = new StateNode();
 
-    const target = new StateNode();
+      const target = new StateNode();
 
-    const middle: StateNode[] = [];
+      const middle: StateNode[] = [];
 
-    let prerequisite = source;
+      let prerequisite = source;
 
-    for (let index = 0; index < depth; index++) {
-      const node = new StateNode();
+      for (let index = 0; index < depth; index++) {
+        const node = new StateNode();
 
-      node.dependOn(prerequisite, { ordering: true });
+        node.dependOn(prerequisite, { ordering: true });
 
-      middle.push(node);
+        middle.push(node);
 
-      prerequisite = node;
-    }
+        prerequisite = node;
+      }
 
-    const failure = new Error('New prerequisite failed.');
+      const failure = new Error('New prerequisite failed.');
 
-    let localError: unknown;
+      let localError: unknown;
 
-    batch(() => {
-      target.schedule(() => target.dependOn(prerequisite, { ordering }));
+      batch(() => {
+        target.schedule(() => target.dependOn(prerequisite, { ordering }));
 
-      source.schedule(() => {
-        throw failure;
+        source.schedule(() => {
+          throw failure;
+        });
+
+        try {
+          target.settle();
+        } catch (error) {
+          localError = error;
+        }
       });
 
-      try {
-        target.settle();
-      } catch (error) {
-        localError = error;
+      expect(localError).toBe(failure);
+
+      target.destroy();
+
+      for (const node of middle) {
+        node.destroy();
       }
-    });
 
-    expect(localError).toBe(failure);
-
-    target.destroy();
-
-    for (const node of middle) {
-      node.destroy();
-    }
-
-    source.destroy();
-  });
+      source.destroy();
+    },
+  );
 
   test('uses iterative propagation and reads for deeply nested prerequisites', () => {
     const source = new StateNode();
