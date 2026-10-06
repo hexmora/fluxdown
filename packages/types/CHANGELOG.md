@@ -1,5 +1,16 @@
 # @fluxdown/types
 
+## 0.7.1
+
+### Patch Changes
+
+- aa2a08f: Allow compatible internal dependency updates through caret version ranges instead
+  of exact version pins. Future updates within those ranges can be installed without
+  releasing unchanged dependent packages. Existing consumer lockfiles must still be
+  updated to resolve newer dependency versions.
+- Updated dependencies [aa2a08f]
+  - @fluxdown/mdast@0.6.1
+
 ## 0.7.0
 
 ### Minor Changes

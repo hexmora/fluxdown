@@ -1,5 +1,19 @@
 # fluxdown
 
+## 0.7.3
+
+### Patch Changes
+
+- aa2a08f: Allow compatible internal dependency updates through caret version ranges instead
+  of exact version pins. Future updates within those ranges can be installed without
+  releasing unchanged dependent packages. Existing consumer lockfiles must still be
+  updated to resolve newer dependency versions.
+- Updated dependencies [aa2a08f]
+  - @fluxdown/core@0.8.1
+  - @fluxdown/core-presets@0.6.4
+  - @fluxdown/react-presets@0.6.4
+  - @fluxdown/types@0.7.1
+
 ## 0.7.2
 
 ### Patch Changes
