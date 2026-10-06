@@ -2,26 +2,23 @@
  * @jsxImportSource stative
  */
 
-import type { IRehypePlugin, IRemarkPlugin, IRepairPlugin } from '@fluxdown/types';
 import type { ElementContent, Parent } from 'hast';
 
-import { type JSXDescriptor, once, useDefaults } from 'stative';
+import { type JSXDescriptor, once, S, useCreate, useDefaults } from 'stative';
 
 import type { IRenderPlugin } from '../../externals';
 import type { CoreInputs } from './type';
 
 import { MapperComposer, PluginBuilder, TextChunker } from '../base';
-import { BlockCompiler } from '../hast';
 import {
   ChunkerConfig,
   MapperPluggables,
   RawPatchesMapper,
-  RehypePluggables,
-  RemarkPluggables,
   RenderPatchesMapper,
   RenderPluggables,
-  RepairPluggables,
 } from './states';
+import { BlockCompiler, type BlockCompilerInputs } from '../hast';
+import { DocumentPlugins } from './states/document-plugins';
 
 export * from './states';
 export * from './type';
@@ -45,6 +42,23 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
 
   const mapperSources = useDefaults(mappers, {});
 
+  const plugins = useCreate(
+    S([
+      DocumentPlugins,
+      {
+        config: build,
+        remarks: remarkSources,
+        rehypes: rehypeSources,
+        repairs: repairSources,
+      },
+    ]),
+  );
+
+  const getRemarks: BlockCompilerInputs['getRemarks'] = ({ config }) =>
+    plugins.createRemarkScope(config);
+
+  const getRehypes = () => plugins.createRehypeScope();
+
   return (
     <Renderer
       patches={<RenderPatchesMapper<R> patches={patches} />}
@@ -66,26 +80,8 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
                 />
               }
               config={build}
-              getRemarks={({ config }) => (
-                <PluginBuilder<IRemarkPlugin>
-                  plugins={
-                    <RemarkPluggables
-                      config={config}
-                      extras={remarkSources}
-                      repairs={
-                        <PluginBuilder<IRepairPlugin>
-                          plugins={<RepairPluggables config={config} extras={repairSources} />}
-                        />
-                      }
-                    />
-                  }
-                />
-              )}
-              getRehypes={() => (
-                <PluginBuilder<IRehypePlugin>
-                  plugins={<RehypePluggables config={build} extras={rehypeSources} />}
-                />
-              )}
+              getRemarks={getRemarks}
+              getRehypes={getRehypes}
             />
           }
         />
