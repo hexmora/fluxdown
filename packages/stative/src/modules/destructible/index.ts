@@ -5,11 +5,13 @@ import { clearByTarget } from './utils';
 export * from './type';
 
 export class Destructible implements IDestructible {
-  private readonly targets: DestructibleTarget[] = [];
+  private targets: DestructibleTarget[] | null = null;
 
   protected destroyed = false;
 
   protected clearable<T extends DestructibleTarget>(value: T): T {
+    this.targets ??= [];
+
     this.targets.push(value);
 
     return value;
@@ -22,10 +24,16 @@ export class Destructible implements IDestructible {
 
     this.destroyed = true;
 
-    for (const target of this.targets) {
+    const { targets } = this;
+
+    if (!targets) {
+      return;
+    }
+
+    for (const target of targets) {
       clearByTarget(target);
     }
 
-    this.targets.splice(0);
+    this.targets = null;
   }
 }
