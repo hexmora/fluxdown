@@ -876,13 +876,27 @@ export abstract class BaseStateClosure<T, TInputs = void>
   protected abstract render(): StateClosureResult<T>;
 }
 
-class SourceReadableClosure<T> extends BaseStateClosure<T, { source: StateClosureSource<T> }> {
+class SourceReadableClosure<T> extends BaseStateClosure<T> {
+  private source: StateClosureSource<T> | undefined;
+
+  constructor({ source }: { source: StateClosureSource<T> }) {
+    super(undefined);
+
+    this.source = source;
+
+    if (isReadableClosure(source)) {
+      this.own(source);
+    }
+  }
+
   protected override get outputMode() {
     return 'view' as const;
   }
 
   protected render(): StateClosureResult<T> {
-    const { source } = this.inputs;
+    const source = this.source as StateClosureSource<T>;
+
+    this.source = undefined;
 
     const resolved = resolveSource(source);
 
@@ -896,18 +910,25 @@ class SourceReadableClosure<T> extends BaseStateClosure<T, { source: StateClosur
 
     return this.clearable(ReactiveState.of(resolved.source as T));
   }
+
+  override destroy() {
+    this.source = undefined;
+
+    super.destroy();
+  }
 }
 
-class DerivedReadableClosure<T, S> extends BaseStateClosure<
-  T,
-  { source: S; factory: () => OwnedReactiveState<T> }
-> {
+class DerivedReadableClosure<T, S> extends BaseStateClosure<T> {
+  private factory: (() => OwnedReactiveState<T>) | null;
+
   protected override get outputMode() {
     return 'owned' as const;
   }
 
   constructor(source: S, factory: () => OwnedReactiveState<T>) {
-    super({ source, factory });
+    super(undefined);
+
+    this.factory = factory;
 
     if (isArray(source)) {
       for (const item of source) {
@@ -915,13 +936,23 @@ class DerivedReadableClosure<T, S> extends BaseStateClosure<
           this.own(item);
         }
       }
+    } else if (isReadableClosure(source)) {
+      this.own(source);
     }
   }
 
   protected render() {
-    const { factory } = this.inputs;
+    const factory = this.factory!;
+
+    this.factory = null;
 
     return factory();
+  }
+
+  override destroy() {
+    this.factory = null;
+
+    super.destroy();
   }
 }
 

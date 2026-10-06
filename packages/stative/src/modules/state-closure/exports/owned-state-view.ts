@@ -16,7 +16,7 @@ import {
   getStateContextOptions,
   withStateContext,
 } from '../../state-graph/context';
-import { aliasStateNode, getStateNode } from '../../state-graph/node';
+import { aliasStateNode, clearStateNodeAlias, getStateNode } from '../../state-graph/node';
 import { fixedStateValue, hasFixedStateValue } from './owned-value-state';
 
 /**
@@ -160,6 +160,8 @@ export class OwnedStateView<T> implements IReactiveState<T>, NativeStateAccess<T
     this.source = null;
 
     this.access = null;
+
+    clearStateNodeAlias(this);
 
     try {
       this.connection?.unsubscribe();

@@ -266,3 +266,8 @@ export const peekStateNode = (state: object): StateNode | undefined => nodes.get
 export const aliasStateNode = (state: object, source: object) => {
   nodes.set(state, getStateNode(source));
 };
+
+/** Frozen borrowed views must not retain their source's live dependency graph. */
+export const clearStateNodeAlias = (state: object) => {
+  nodes.delete(state);
+};
