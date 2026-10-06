@@ -74,16 +74,16 @@
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },
   "dependencies": {
-    "@fluxdown/core": "workspace:*",
-    "@fluxdown/core-presets": "workspace:*",
-    "@fluxdown/react-presets": "workspace:*",
-    "@fluxdown/types": "workspace:*",
-    "@fluxdown/utils": "workspace:*",
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-presets": "workspace:^",
+    "@fluxdown/react-presets": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
     "@types/hast": "catalog:",
     "classnames": "catalog:",
     "lodash-es": "catalog:",
     "shallow-equal": "catalog:",
-    "stative": "workspace:*"
+    "stative": "workspace:^"
   },
   "devDependencies": {
     "@rslib/core": "catalog:",

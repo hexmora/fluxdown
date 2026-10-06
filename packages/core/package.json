@@ -59,10 +59,10 @@
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },
   "dependencies": {
-    "@fluxdown/core-presets": "workspace:*",
-    "@fluxdown/hast": "workspace:*",
-    "@fluxdown/types": "workspace:*",
-    "@fluxdown/utils": "workspace:*",
+    "@fluxdown/core-presets": "workspace:^",
+    "@fluxdown/hast": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
     "@types/hast": "catalog:",
     "@types/mdast": "catalog:",
     "lodash-es": "catalog:",
@@ -71,7 +71,7 @@
     "remark-rehype": "catalog:",
     "rxjs": "catalog:",
     "shallow-equal": "catalog:",
-    "stative": "workspace:*",
+    "stative": "workspace:^",
     "unified": "catalog:"
   },
   "devDependencies": {

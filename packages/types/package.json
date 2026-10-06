@@ -56,12 +56,12 @@
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },
   "dependencies": {
-    "@fluxdown/mdast": "workspace:*",
-    "@fluxdown/utils": "workspace:*",
+    "@fluxdown/mdast": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
     "@types/hast": "catalog:",
     "@types/mdast": "catalog:",
     "@types/unist": "catalog:",
-    "stative": "workspace:*",
+    "stative": "workspace:^",
     "unified": "catalog:"
   },
   "devDependencies": {
