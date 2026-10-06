@@ -197,9 +197,7 @@ describe('collection reading', () => {
 
     collection.value.subscribe({ error: jest.fn() });
 
-    const switched = switchMapClosure(selected, (value) =>
-      value ? child!.value : independent,
-    );
+    const switched = switchMapClosure(selected, (value) => (value ? child!.value : independent));
 
     const external = mapState(switched, (value) => value + 1);
 

@@ -48,7 +48,9 @@ const createMappedState = <A, B>(
       };
 
       const subscription = ordering
-        ? withStateContext(getStateContext(), () => source.subscribe(subscriber), { ordering: true })
+        ? withStateContext(getStateContext(), () => source.subscribe(subscriber), {
+            ordering: true,
+          })
         : source.subscribe(subscriber);
 
       return () => {
