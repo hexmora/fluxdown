@@ -121,6 +121,56 @@ describe('ordering dependencies', () => {
     source.destroy();
   });
 
+  test.each(
+    [0, 1, 3].flatMap((depth) => [false, true].map((ordering) => ({ depth, ordering }))),
+  )('settles prerequisites attached during publication: %j', ({ depth, ordering }) => {
+    const source = new StateNode();
+
+    const target = new StateNode();
+
+    const middle: StateNode[] = [];
+
+    let prerequisite = source;
+
+    for (let index = 0; index < depth; index++) {
+      const node = new StateNode();
+
+      node.dependOn(prerequisite, { ordering: true });
+
+      middle.push(node);
+
+      prerequisite = node;
+    }
+
+    const failure = new Error('New prerequisite failed.');
+
+    let localError: unknown;
+
+    batch(() => {
+      target.schedule(() => target.dependOn(prerequisite, { ordering }));
+
+      source.schedule(() => {
+        throw failure;
+      });
+
+      try {
+        target.settle();
+      } catch (error) {
+        localError = error;
+      }
+    });
+
+    expect(localError).toBe(failure);
+
+    target.destroy();
+
+    for (const node of middle) {
+      node.destroy();
+    }
+
+    source.destroy();
+  });
+
   test('uses iterative propagation and reads for deeply nested prerequisites', () => {
     const source = new StateNode();
 
