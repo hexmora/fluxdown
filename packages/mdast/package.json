@@ -57,7 +57,7 @@
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },
   "dependencies": {
-    "@fluxdown/utils": "workspace:*",
+    "@fluxdown/utils": "workspace:^",
     "@types/mdast": "catalog:",
     "lodash-es": "catalog:"
   },

@@ -86,10 +86,10 @@
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },
   "dependencies": {
-    "@fluxdown/hast": "workspace:*",
-    "@fluxdown/mdast": "workspace:*",
-    "@fluxdown/types": "workspace:*",
-    "@fluxdown/utils": "workspace:*",
+    "@fluxdown/hast": "workspace:^",
+    "@fluxdown/mdast": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
     "@types/hast": "catalog:",
     "@types/mdast": "catalog:",
     "@types/unist": "catalog:",
@@ -116,7 +116,7 @@
     "remark-breaks": "catalog:",
     "rxjs": "catalog:",
     "shallow-equal": "catalog:",
-    "stative": "workspace:*",
+    "stative": "workspace:^",
     "unified": "catalog:"
   },
   "devDependencies": {

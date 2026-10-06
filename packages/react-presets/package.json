@@ -94,10 +94,10 @@
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },
   "dependencies": {
-    "@fluxdown/core": "workspace:*",
-    "@fluxdown/core-presets": "workspace:*",
-    "@fluxdown/types": "workspace:*",
-    "@fluxdown/utils": "workspace:*",
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-presets": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
     "@mathjax/mathjax-tex-font": "catalog:",
     "@mathjax/src": "catalog:",
     "@types/hast": "catalog:",
@@ -107,7 +107,7 @@
     "react-error-boundary": "catalog:",
     "shallow-equal": "catalog:",
     "shiki": "catalog:",
-    "stative": "workspace:*"
+    "stative": "workspace:^"
   },
   "devDependencies": {
     "@rslib/core": "catalog:",

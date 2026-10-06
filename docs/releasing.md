@@ -18,6 +18,11 @@ pnpm publish:dry-run
 Commit the Changeset with the code. Do not manually bump versions or edit release
 changelogs. The dry run builds and checks actual packages without publishing.
 
+Use `workspace:^` for internal runtime dependencies and keep updates compatible
+within the published range. In-range updates do not require Changesets for
+unchanged dependents. If a dependent must require a newer dependency version,
+add a Changeset for it; stable preparation raises its minimum dependency version.
+
 ## Stable releases
 
 1. Open **Actions → Prepare release → Run workflow** and choose `main` to create
