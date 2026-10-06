@@ -44,7 +44,7 @@ import {
 } from '../utils';
 import { withStateClosureHookRuntime } from './hooks/runtime/utils';
 import { mapKeyedClosure } from './keyed';
-import { isStateClosureDescriptor, render } from './render';
+import { isImmediateDescriptor, isStateClosureDescriptor, render } from './render';
 import {
   bindRootDescriptorScope,
   clearWithDescriptorScope,
@@ -101,6 +101,7 @@ export const flattenClosure = <T extends object>(
 
 /**
  * Follows the latest mapped child and releases the previous child graph on replacement.
+ * Consecutive returns of the same raw state reuse its child closure and subscription.
  * Completed flows retain the final child graph until the closure is destroyed.
  */
 export function switchMapClosure<S, R>(
@@ -121,12 +122,34 @@ export function switchMapClosure<S, R>(
   const closure = FactoryReadableClosure.create(() => {
     const input = toState(source);
 
+    let cached: [IReactiveState<R>, IReadableClosure<R>] | null = null;
+
+    clearWithDescriptorScope(scope, () => {
+      cached = null;
+    });
+
     const handleCreate = (value: StateValue<S>) =>
       ownReadableClosure(
         scope,
-        FactoryReadableClosure.create(() =>
-          render<R>(withStateClosureHookRuntime(null, () => mapper(value))),
-        ),
+        FactoryReadableClosure.create(() => {
+          const result = withStateClosureHookRuntime(null, () => mapper(value));
+
+          if (!isImmediateDescriptor(result) && isReactiveStateLike<R>(result)) {
+            if (cached && cached[0] === result) {
+              return cached[1];
+            }
+
+            const child = render<R>(result);
+
+            cached = [result, child];
+
+            return child;
+          }
+
+          cached = null;
+
+          return render<R>(result);
+        }),
       );
 
     let previous = input.value;
@@ -227,6 +250,8 @@ export function switchMapClosure<S, R>(
 
         return () => {
           stopped = true;
+
+          cached = null;
 
           subscriptions.unsubscribe();
 

@@ -320,6 +320,208 @@ describe('switchMapClosure', () => {
     value.destroy();
   });
 
+  test.each(['native', 'custom'] as const)(
+    'reuses the current %s state subscription while running the mapper on outer changes',
+    (kind) => {
+      const source = MutableState.of(0);
+
+      const value = MutableState.of(1);
+
+      const child =
+        kind === 'native'
+          ? value
+          : {
+              get value() {
+                return value.value;
+              },
+              get closed() {
+                return value.closed;
+              },
+              subscribe: value.subscribe.bind(value),
+            };
+
+      const subscribe = jest.spyOn(child, 'subscribe');
+
+      const mapper = jest.fn(() => child);
+
+      const output = switchMapClosure(source, mapper);
+
+      expect(subscribe).not.toHaveBeenCalled();
+
+      expect(output.value.value).toBe(1);
+
+      source.next(1);
+
+      source.next(2);
+
+      value.next(3);
+
+      expect(output.value.value).toBe(3);
+
+      expect(mapper.mock.calls).toEqual([[0], [1], [2]]);
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
+
+      const subscription = subscribe.mock.results[0].value;
+
+      expect(subscription.closed).toBe(false);
+
+      output.destroy();
+
+      expect(subscription.closed).toBe(true);
+
+      expect(value.closed).toBe(false);
+
+      source.destroy();
+
+      value.destroy();
+    },
+  );
+
+  test.each(['state', 'immediate'] as const)(
+    'reacquires a raw state after switching away to a %s result',
+    (replacement) => {
+      const source = MutableState.of(0);
+
+      const first = MutableState.of(1);
+
+      const second = MutableState.of(2);
+
+      const subscribe = jest.spyOn(first, 'subscribe');
+
+      const output = switchMapClosure(source, (index) =>
+        index === 1 ? (replacement === 'state' ? second : D(first)) : first,
+      );
+
+      expect(output.value.value).toBe(1);
+
+      const subscription = subscribe.mock.results[0].value;
+
+      source.next(1);
+
+      expect(output.value.value).toBe(replacement === 'state' ? 2 : first);
+
+      expect(subscription.closed).toBe(true);
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
+
+      first.next(3);
+
+      expect(output.value.value).toBe(replacement === 'state' ? 2 : first);
+
+      source.next(2);
+
+      expect(output.value.value).toBe(3);
+
+      expect(subscribe).toHaveBeenCalledTimes(2);
+
+      output.destroy();
+
+      expect(first.closed).toBe(false);
+
+      expect(second.closed).toBe(false);
+
+      source.destroy();
+
+      first.destroy();
+
+      second.destroy();
+    },
+  );
+
+  test('publishes and completes a reused raw state in an atomic source change', () => {
+    const source = MutableState.of(0);
+
+    const value = MutableState.of(1);
+
+    const subscribe = jest.spyOn(value, 'subscribe');
+
+    const mapper = jest.fn(() => value);
+
+    const output = switchMapClosure(source, mapper);
+
+    const events: Array<number | 'complete'> = [];
+
+    output.value.subscribe({
+      next: (current) => events.push(current),
+
+      complete: () => events.push('complete'),
+    });
+
+    batch(() => {
+      source.next(1);
+
+      source.complete();
+
+      value.next(2);
+
+      value.complete();
+    });
+
+    expect(events).toEqual([1, 2, 'complete']);
+
+    expect(mapper.mock.calls).toEqual([[0], [1]]);
+
+    expect(subscribe).toHaveBeenCalledTimes(1);
+
+    output.destroy();
+  });
+
+  test.each(['mapper', 'inner'] as const)(
+    'releases a reused raw state subscription after an %s error',
+    (target) => {
+      const source = MutableState.of(0);
+
+      const value = MutableState.of(1);
+
+      const subscribe = jest.spyOn(value, 'subscribe');
+
+      const mapper = jest.fn(() => value);
+
+      const output = switchMapClosure(source, mapper);
+
+      const error = jest.fn();
+
+      output.value.subscribe({ error });
+
+      source.next(1);
+
+      const failure = new Error('Reused child failed.');
+
+      if (target === 'mapper') {
+        mapper.mockImplementationOnce(() => {
+          throw failure;
+        });
+
+        source.next(2);
+      } else {
+        value.error(failure);
+      }
+
+      expect(error).toHaveBeenCalledTimes(1);
+
+      expect(error).toHaveBeenCalledWith(failure);
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
+
+      expect(subscribe.mock.results[0].value.closed).toBe(true);
+
+      mapper.mockClear();
+
+      source.next(3);
+
+      expect(mapper).not.toHaveBeenCalled();
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
+
+      output.destroy();
+
+      source.destroy();
+
+      value.destroy();
+    },
+  );
+
   test('waits for the current inner after the outer source completes', () => {
     const source = MutableState.of(1);
 
