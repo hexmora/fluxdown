@@ -38,27 +38,21 @@ export const isNativeState = <T>(state: IReactiveState<T>): state is NativeState
 
 /** Respect custom getters and subscription adapters instead of bypassing their behavior. */
 export const hasNativeAccessors = (state: object, prototype: object): boolean => {
-  for (const key of ['value', 'closed', 'subscribe']) {
-    const expected = Object.getOwnPropertyDescriptor(prototype, key);
+  let current: object | null = state;
 
-    let current: object | null = state;
-
-    while (current) {
-      const descriptor = Object.getOwnPropertyDescriptor(current, key);
-
-      if (descriptor) {
-        if (descriptor.get !== expected?.get || descriptor.value !== expected?.value) {
-          return false;
-        }
-
-        break;
-      }
-
-      current = Object.getPrototypeOf(current);
+  while (current && current !== prototype) {
+    if (
+      Object.hasOwn(current, 'value') ||
+      Object.hasOwn(current, 'closed') ||
+      Object.hasOwn(current, 'subscribe')
+    ) {
+      return false;
     }
+
+    current = Object.getPrototypeOf(current);
   }
 
-  return true;
+  return current === prototype;
 };
 
 export const readPublishedState = <T>(state: NativeState<T>): PublishedState<T> => {
@@ -71,8 +65,10 @@ export const observeState = <T>(
   subscriber: StateSubscriber<T>,
   options?: ObserveStateOptions,
 ): StateSubscription => {
-  if (isNativeState(state)) {
-    return state[nativeState].observe(subscriber, options);
+  const access = nativeState in state ? (state as NativeState<T>)[nativeState] : null;
+
+  if (access) {
+    return access.observe(subscriber, options);
   }
 
   return options
