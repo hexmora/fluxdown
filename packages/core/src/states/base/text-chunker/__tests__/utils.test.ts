@@ -5,7 +5,8 @@ import { cloneDeep } from 'lodash-es';
 import { batch, type IReactiveState, MutableState, render, S } from 'stative';
 
 import { type IBlockSection, TextChunker } from '../index';
-import { type ChunkedPatch, chunkPatchesByTexts, chunkTextOfMarkdown } from '../utils';
+import { type ChunkedPatch, chunkPatchesByTexts } from '../utils';
+import { LexerChunker } from '../utils/chunker';
 
 type ChunkCase = {
   name: string;
@@ -20,7 +21,7 @@ const chunks = (name: string, ...expected: string[]): ChunkCase => ({
 });
 
 const expectChunks = (text: string, expected: string[]) => {
-  const result = chunkTextOfMarkdown(text);
+  const result = new LexerChunker().chunk(text);
 
   expect(result).toEqual(expected);
   expect(result.join('')).toBe(text);
@@ -377,7 +378,7 @@ const DOCUMENT_SCOPED_CASES: ChunkCase[] = [
   ),
 ];
 
-describe('chunkTextOfMarkdown', () => {
+describe('LexerChunker', () => {
   test.each(MARKDOWN_CASES)('$name', ({ text, expected }) => {
     expectChunks(text, expected);
   });
