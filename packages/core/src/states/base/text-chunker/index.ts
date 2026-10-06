@@ -3,7 +3,8 @@ import { once, useCombineMap, useDefaults } from 'stative';
 
 import type { IBlockSection, TextChunkerInputs } from './type';
 
-import { chunkPatchesByTexts, chunkTextOfMarkdown, isSectionEqual } from './utils';
+import { chunkPatchesByTexts, isSectionEqual } from './utils';
+import { LexerChunker } from './utils/chunker';
 
 export * from './type';
 
@@ -14,8 +15,10 @@ export const TextChunker = /*#__PURE__*/ once(function TextChunker({
 }: TextChunkerInputs) {
   const config = useDefaults(_config, { indentedCode: true, setextHeading: true, tex: true });
 
+  const chunker = new LexerChunker();
+
   const texts = useCombineMap([text, config], ([currentText, currentConfig]) =>
-    chunkTextOfMarkdown(currentText, currentConfig),
+    chunker.chunk(currentText, currentConfig),
   );
 
   return useCombineMap(
