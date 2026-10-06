@@ -27,11 +27,11 @@ catalog:
   micromark-extension-gfm-autolink-literal: ^2.1.0
   micromark-extension-gfm-footnote: ^2.1.0
   micromark-extension-gfm-strikethrough: ^2.1.0
-  micromark-extension-gfm-table: ^2.1.1
+  micromark-extension-gfm-table: ^2.1.2
   micromark-extension-gfm-task-list-item: ^2.1.0
   micromark-extension-math: ^3.1.0
   micromark-util-character: ^2.1.1
-  micromark-util-types: ^2.0.2
+  micromark-util-types: ^2.0.3
   react-error-boundary: ^6.1.2
   react-use: ^17.6.1
   rehype-raw: ^7.0.0
