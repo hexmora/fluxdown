@@ -1,12 +1,11 @@
 import { isEqual } from 'lodash-es';
 import { once, S, useCombineMap, useComputed, useCreate, useMap } from 'stative';
 
-import type { BlockRemarksConfig } from '../../type';
 import type { CompiledBlockContentInputs } from './type';
 
 import { BlockItem } from '../../../block-item';
 import { markdownToHast } from '../../utils';
-import { isMetaEqual } from './utils';
+import { getRemarksConfig, isMetaEqual } from './utils';
 
 export const CompiledBlockContent = /*#__PURE__*/ once(
   ({ item, idPrefix, count, key, config, getRemarks, getRehypes }: CompiledBlockContentInputs) => {
@@ -27,27 +26,7 @@ export const CompiledBlockContent = /*#__PURE__*/ once(
       isMetaEqual,
     );
 
-    const remarksContext = useMap(
-      item,
-      ({ section: { patches }, isLast: currentIsLast }) => ({
-        patches,
-        isLast: currentIsLast,
-      }),
-      isEqual,
-    );
-
-    const remarksConfig = useCombineMap(
-      [config, remarksContext],
-      ([
-        { repairEnding, ...restConfig },
-        { patches, isLast: currentIsLast },
-      ]): BlockRemarksConfig => ({
-        ...restConfig,
-        repairEnding: repairEnding && currentIsLast,
-        patches,
-      }),
-      isEqual,
-    );
+    const remarksConfig = useCombineMap([config, item], getRemarksConfig, isEqual);
 
     const remarks = getRemarks({ config: remarksConfig });
 
