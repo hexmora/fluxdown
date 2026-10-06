@@ -5,6 +5,8 @@ import { D, once, useClearable, useCombineMap, useMap, useSwitchMap } from 'stat
 
 import type { CutoffBlockInputs } from './type';
 
+import { isMetaEqual } from './utils';
+
 export * from './type';
 
 export const CutoffBlock = /*#__PURE__*/ once(function CutoffBlock<T>({
@@ -15,7 +17,7 @@ export const CutoffBlock = /*#__PURE__*/ once(function CutoffBlock<T>({
   const meta = useCombineMap(
     [source.meta, count],
     ([current, blockCount]) => ({ ...current, blockCount }),
-    isEqual,
+    isMetaEqual,
   );
 
   const boundary = useMap(end, (offset) => offset !== null);

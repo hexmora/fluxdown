@@ -6,6 +6,7 @@ import type { CompiledBlockInputs } from './type';
 
 import { BlockItem } from '../../../block-item';
 import { markdownToHast } from '../../utils';
+import { isMetaEqual } from './utils';
 
 export * from './type';
 
@@ -28,7 +29,7 @@ export const CompiledBlock = /*#__PURE__*/ once(
         key,
         sourceText: text,
       }),
-      isEqual,
+      isMetaEqual,
     );
 
     const remarksContext = useCombineMap(
