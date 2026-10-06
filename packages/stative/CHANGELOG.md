@@ -1,5 +1,12 @@
 # stative
 
+## 1.1.1
+
+### Patch Changes
+
+- a4457b5: Mark dependent states before adding them to the invalidation worklist, avoiding duplicate entries and allocations for already-dirty roots while preserving dependency ordering and error isolation.
+- cb73ca0: Reduce propagation allocations by reusing pending publication callbacks, copying combined input snapshots only when their values change, and forwarding closure values through one owned mutable state instead of an extra BehaviorSubject relay. Preserve synchronous initialization errors, batching, output equality, and ownership boundaries. Closure outputs obtained before their first read now retain the latest received value after completion or destruction.
+
 ## 1.1.0
 
 ### Minor Changes
