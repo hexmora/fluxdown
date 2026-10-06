@@ -30,7 +30,7 @@ const setupSmooth = (initial: IBlockState<number[]>[] = []) => {
 beforeEach(resetSmoothTests);
 
 describe('Smooth generic blocks', () => {
-  test('retains revision lengths while disabled without rewinding on enable', () => {
+  test('starts from currently visible content when enabling a disabled mapper', () => {
     const first = createArrayBlock([1, 2]);
 
     const tail = createArrayBlock([3, 4]);
@@ -59,13 +59,15 @@ describe('Smooth generic blocks', () => {
       [3, 4, 5],
     ]);
 
-    expect(firstLength).toHaveBeenCalled();
+    expect(firstLength).not.toHaveBeenCalled();
 
-    expect(tailLength).toHaveBeenCalled();
+    expect(tailLength).not.toHaveBeenCalled();
+
+    expect(output).toBe(source.value);
 
     enabled.next(true);
 
-    expect(state.value.value).toBe(output);
+    expect(state.value.value).not.toBe(output);
 
     expect(output.map((block) => block.value.value)).toEqual([
       [1, 2],

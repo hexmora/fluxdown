@@ -6,6 +6,7 @@ import type { IScheduler, ITicker } from './modules';
 export interface SmoothBaseInputs {
   /**
    * Whether newly appended content advances on ticker events.
+   * Enabling starts from the currently visible content; disabling returns the source blocks.
    */
   enabled?: IReadableClosure<boolean>;
 

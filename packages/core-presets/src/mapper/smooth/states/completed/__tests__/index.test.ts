@@ -71,22 +71,32 @@ describe('Completed', () => {
     output.destroy();
   });
 
-  test('observes completion when first initialized inside a pending batch', () => {
+  test('reads pending closure but delivers completion only after the batch publishes', () => {
     const source = MutableState.of(1);
 
     const completed = render(S([Completed, { source }]));
+
+    const complete = jest.fn();
 
     batch(() => {
       source.next(2);
 
       source.complete();
 
-      expect(completed.value.value).toBe(false);
+      expect(completed.value.value).toBe(true);
+
+      completed.value.subscribe({ complete });
+
+      expect(source.getPublishedState().closed).toBe(false);
+
+      expect(complete).not.toHaveBeenCalled();
     });
 
     expect(completed.value.value).toBe(true);
 
     expect(completed.value.closed).toBe(true);
+
+    expect(complete).toHaveBeenCalledTimes(1);
 
     completed.destroy();
   });

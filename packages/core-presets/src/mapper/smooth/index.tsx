@@ -4,7 +4,7 @@
 
 import type { IBlockState, IPluggableConfig } from '@fluxdown/types';
 
-import { D, type JSXDescriptor, once, useDefaults } from 'stative';
+import { D, type IReadableClosure, once, useDefaults, useSwitchMap } from 'stative';
 
 import type { SmoothBaseInputs, SmoothInputs } from './type';
 
@@ -24,13 +24,13 @@ declare global {
 
 export const Smooth = /*#__PURE__*/ withKey(
   'smooth',
-  /*#__PURE__*/ once<<T>(inputs: SmoothInputs<T>) => JSXDescriptor<IBlockState<T>[]>>(
+  /*#__PURE__*/ once<<T>(inputs: SmoothInputs<T>) => IReadableClosure<IBlockState<T>[]>>(
     function Smooth<T>({
       source,
       enabled: _enabled,
       ticker: _ticker,
       scheduler: _scheduler,
-    }: SmoothInputs<T>): JSXDescriptor<IBlockState<T>[]> {
+    }: SmoothInputs<T>): IReadableClosure<IBlockState<T>[]> {
       const enabled = useDefaults(_enabled, false);
 
       const ticker = useDefaults(
@@ -40,18 +40,22 @@ export const Smooth = /*#__PURE__*/ withKey(
 
       const scheduler = useDefaults(_scheduler, D(SpringSmoothScheduler));
 
-      return (
-        <CutoffBlocks<T>
-          items={source}
-          end={
-            <SmoothCursor<T>
-              source={source}
-              enabled={enabled}
-              ticker={ticker}
-              scheduler={scheduler}
-            />
-          }
-        />
+      return useSwitchMap(enabled, (active) =>
+        active ? (
+          <CutoffBlocks<T>
+            items={source}
+            end={
+              <SmoothCursor<T>
+                source={source}
+                enabled={enabled}
+                ticker={ticker}
+                scheduler={scheduler}
+              />
+            }
+          />
+        ) : (
+          source
+        ),
       );
     },
   ),

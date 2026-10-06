@@ -32,8 +32,10 @@ export const toCutoffBlocks = <T>(
 ): IBlockState<T>[] => {
   const cleanup = new Subscription();
 
+  const retained = new Set(items);
+
   for (const [source, entry] of entries) {
-    if (!items.includes(source)) {
+    if (!retained.has(source)) {
       entries.delete(source);
 
       cleanup.add(() => releaseCutoffBlock(entry));
