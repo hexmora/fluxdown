@@ -3,9 +3,17 @@ import { BehaviorSubject, Observable, type Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
 import type { IReadableClosure } from '../../state-closure';
-import type { Distinctor, IReactiveState, StateMapper, StateValue, StateValues } from '../type';
+import type {
+  Distinctor,
+  IReactiveState,
+  StateMapper,
+  StateSubscriber,
+  StateValue,
+  StateValues,
+} from '../type';
 
 import { compute } from '../../../utils';
+import { getStateContext, withStateContext } from '../../state-graph/context';
 import { getStateNode } from '../../state-graph/node';
 import { ReactiveState } from './base';
 
@@ -16,6 +24,7 @@ const createMappedState = <A, B>(
   initialSource: A,
   mapper: StateMapper<A, B>,
   distinctor?: Distinctor<B>,
+  ordering = false,
 ): ReactiveState<B> => {
   const initial = mapper(initialSource, null);
 
@@ -24,9 +33,11 @@ const createMappedState = <A, B>(
   const state = new ReactiveState({
     initial,
     emitter: (observer) => {
-      const subscription = source.subscribe({
+      const subscriber: StateSubscriber<A> = {
         next: (value) => {
-          const nextResult = mapper(value, prev);
+          const nextResult = ordering
+            ? withStateContext(getStateContext(), () => mapper(value, prev))
+            : mapper(value, prev);
 
           observer.next(nextResult);
 
@@ -34,7 +45,11 @@ const createMappedState = <A, B>(
         },
         error: (error) => observer.error(error),
         complete: () => observer.complete(),
-      });
+      };
+
+      const subscription = ordering
+        ? withStateContext(getStateContext(), () => source.subscribe(subscriber), { ordering: true })
+        : source.subscribe(subscriber);
 
       return () => {
         subscription.unsubscribe();
@@ -136,10 +151,11 @@ export function toReactiveState<T>(
   });
 }
 
-export const mapState = <S, B>(
+const deriveState = <S, B>(
   source: S,
   mapper: StateMapper<StateValue<S>, B>,
   distinctor?: Distinctor<B>,
+  ordering = false,
 ): ReactiveState<B> => {
   if (!isStateSourceLike(source)) {
     return ReactiveState.of(mapper(source as StateValue<S>, null));
@@ -147,8 +163,21 @@ export const mapState = <S, B>(
 
   const state = toState(source);
 
-  return createMappedState(state, state.value, mapper, distinctor);
+  return createMappedState(state, state.value, mapper, distinctor, ordering);
 };
+
+export const mapState = <S, B>(
+  source: S,
+  mapper: StateMapper<StateValue<S>, B>,
+  distinctor?: Distinctor<B>,
+): ReactiveState<B> => deriveState(source, mapper, distinctor);
+
+/** Keep shared derived values behind an equality boundary while preserving synchronous reads. */
+export const selectState = <S, B>(
+  source: S,
+  mapper: StateMapper<StateValue<S>, B>,
+  distinctor?: Distinctor<B>,
+): ReactiveState<B> => deriveState(source, mapper, distinctor, true);
 
 export const combineMapState = <const TSources extends [unknown, ...unknown[]], T>(
   sources: [...TSources],

@@ -10,7 +10,11 @@ import type {
 
 import { Destructible } from '../../destructible';
 import { canSettle } from '../../state-graph/batch';
-import { getStateContext, withStateContext } from '../../state-graph/context';
+import {
+  getStateContext,
+  getStateContextOptions,
+  withStateContext,
+} from '../../state-graph/context';
 import { getStateNode } from '../../state-graph/node';
 import { bindStateSubscriber } from '../../state-graph/subscriber';
 import { isFinalPendingType } from '../utils';
@@ -199,9 +203,11 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
   subscribe(subscriber: StateSubscriber<T>): Subscription {
     const context = getStateContext();
 
+    const options = getStateContextOptions();
+
     this.setup();
 
-    const disconnect = this.actualClosed ? undefined : context?.dependOn(this.node);
+    const disconnect = this.actualClosed ? undefined : context?.dependOn(this.node, options);
 
     const subscription = this.subject.subscribe(bindStateSubscriber(subscriber, context));
 

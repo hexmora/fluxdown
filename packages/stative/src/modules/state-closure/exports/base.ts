@@ -30,6 +30,7 @@ import {
   isReactiveStateLike,
   mapState,
   ReactiveState,
+  selectState,
   toState,
 } from '../../reactive-state';
 import { batch } from '../../state-graph/batch';
@@ -65,6 +66,20 @@ export const mapClosure = <S, R>(
 ): IReadableClosure<R> => {
   return new DerivedReadableClosure(source, () =>
     mapState(
+      source,
+      (value, prev) => withStateClosureHookRuntime(null, () => mapper(value, prev)),
+      distinctor,
+    ),
+  );
+};
+
+export const selectClosure = <S, R>(
+  source: S,
+  mapper: StateMapper<StateValue<S>, R>,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R> => {
+  return new DerivedReadableClosure(source, () =>
+    selectState(
       source,
       (value, prev) => withStateClosureHookRuntime(null, () => mapper(value, prev)),
       distinctor,
@@ -597,6 +612,14 @@ export abstract class BaseStateClosure<T, TInputs = void>
     distinctor?: Distinctor<R>,
   ): IReadableClosure<R> {
     return this.own(mapClosure(source, mapper, distinctor));
+  }
+
+  protected select<S, R>(
+    source: S,
+    mapper: StateMapper<StateValue<S>, R>,
+    distinctor?: Distinctor<R>,
+  ): IReadableClosure<R> {
+    return this.own(selectClosure(source, mapper, distinctor));
   }
 
   protected switchMap<S, R>(

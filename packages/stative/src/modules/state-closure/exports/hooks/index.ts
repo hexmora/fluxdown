@@ -26,6 +26,7 @@ import {
   flattenClosure,
   mapClosure,
   mapEachClosure,
+  selectClosure,
   switchMapClosure,
   toClosure,
 } from '../base';
@@ -43,6 +44,19 @@ export const useMap = <S, R>(
   const { owner } = getCurrentStateClosureHookRuntime('useMap', 'once');
 
   return ownReadableClosure(getReadableClosureScope(owner), mapClosure(source, mapper, distinctor));
+};
+
+export const useSelect = <S, R>(
+  source: S,
+  mapper: StateMapper<StateValue<S>, R>,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R> => {
+  const { owner } = getCurrentStateClosureHookRuntime('useSelect', 'once');
+
+  return ownReadableClosure(
+    getReadableClosureScope(owner),
+    selectClosure(source, mapper, distinctor),
+  );
 };
 
 export function useSwitchMap<S, R>(
