@@ -137,10 +137,6 @@ export class StateNode {
 
   settle() {
     if (!this.needsSettle()) {
-      if (!this.settling) {
-        dequeue(this);
-      }
-
       return;
     }
 

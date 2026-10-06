@@ -23,6 +23,10 @@ const flush = () => {
 
       try {
         node?.settle();
+
+        if (node) {
+          pending.delete(node);
+        }
       } catch (error) {
         errors.push(error);
       }
