@@ -19,12 +19,10 @@ const flush = () => {
 
   try {
     while (pending.size > 0) {
-      const node = pending.values().next().value;
-
       try {
-        node?.settle();
+        for (const node of pending) {
+          node.settle();
 
-        if (node) {
           pending.delete(node);
         }
       } catch (error) {
