@@ -30,6 +30,7 @@ import {
   switchMapClosure,
   toClosure,
 } from '../base';
+import { mapKeyedClosure } from '../keyed';
 import { isStateClosureDescriptor, render } from '../render';
 import { getReadableClosureScope, ownReadableClosure } from '../render/utils/context';
 import { getCurrentStateClosureHookRuntime } from './runtime/utils';
@@ -120,6 +121,23 @@ export function useMapEach<T, R>(
     getReadableClosureScope(owner),
     mapEachClosure(source, mapper, itemDistinctor),
   );
+}
+
+export function useMapKeyed<T, R>(
+  source: StateSource<readonly T[]>,
+  mapper: (item: T) => MarkedStateClosureDescriptor<R>,
+): IReadableClosure<R[]>;
+export function useMapKeyed<T, R>(
+  source: StateSource<readonly T[]>,
+  mapper: (item: T) => StateClosureSource<R>,
+): IReadableClosure<R[]>;
+export function useMapKeyed<T, R>(
+  source: StateSource<readonly T[]>,
+  mapper: (item: T) => StateClosureSource<R>,
+): IReadableClosure<R[]> {
+  const { owner } = getCurrentStateClosureHookRuntime('useMapKeyed', 'once');
+
+  return ownReadableClosure(getReadableClosureScope(owner), mapKeyedClosure(source, mapper));
 }
 
 export const useCombineMap = <const TSources extends [unknown, ...unknown[]], R>(

@@ -43,6 +43,7 @@ import {
   resolveSource,
 } from '../utils';
 import { withStateClosureHookRuntime } from './hooks/runtime/utils';
+import { mapKeyedClosure } from './keyed';
 import { isStateClosureDescriptor, render } from './render';
 import {
   bindRootDescriptorScope,
@@ -656,6 +657,21 @@ export abstract class BaseStateClosure<T, TInputs = void>
     itemDistinctor?: Distinctor<A>,
   ): IReadableClosure<R[]> {
     return this.own(mapEachClosure(source, mapper, itemDistinctor));
+  }
+
+  protected mapKeyed<A, R>(
+    source: StateSource<readonly A[]>,
+    mapper: (item: A) => MarkedStateClosureDescriptor<R>,
+  ): IReadableClosure<R[]>;
+  protected mapKeyed<A, R>(
+    source: StateSource<readonly A[]>,
+    mapper: (item: A) => StateClosureSource<R>,
+  ): IReadableClosure<R[]>;
+  protected mapKeyed<A, R>(
+    source: StateSource<readonly A[]>,
+    mapper: (item: A) => StateClosureSource<R>,
+  ): IReadableClosure<R[]> {
+    return this.own(mapKeyedClosure(source, mapper));
   }
 
   protected create<const D extends StateClosureDescriptor<unknown>>(source: D): BuiltClosure<D>;
