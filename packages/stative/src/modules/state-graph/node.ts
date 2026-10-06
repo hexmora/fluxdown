@@ -2,13 +2,17 @@ import { noop } from 'lodash-es';
 
 import { dequeue, enqueue } from './batch';
 import { withStateContext } from './context';
-import { StateLinks } from './links';
+import { type StateDependency, StateLinks } from './links';
 
 type StateUpdate = () => void;
 
 type DependencyFrame = {
   node: StateNode;
-  dependencies: MapIterator<StateLinks<StateNode>>;
+  next: StateDependency<StateNode> | null;
+
+  version: number;
+
+  order: number;
 };
 
 const nodes = /*#__PURE__*/ new WeakMap<object, StateNode>();
@@ -30,7 +34,7 @@ export class StateNode {
       return noop;
     }
 
-    this.links.connect(source.links, ordering);
+    const dependency = this.links.connect(source.links, ordering);
 
     if (source.dirty || source.needsSettle()) {
       this.invalidate();
@@ -45,7 +49,7 @@ export class StateNode {
 
       connected = false;
 
-      this.links.disconnect(source.links, ordering);
+      this.links.disconnectEdge(dependency, ordering);
     };
   }
 
@@ -59,10 +63,10 @@ export class StateNode {
     const pending: StateNode[] = [this];
 
     for (let index = 0; index < pending.length; index++) {
-      for (const [links, dependency] of pending[index].links.targets) {
-        const { node } = links;
+      for (let edge = pending[index].links.firstTarget; edge; edge = edge.nextTarget) {
+        const { node } = edge.target!;
 
-        if (dependency.normal === 0 || node.dirty || node.disposed) {
+        if (edge.normal === 0 || node.dirty || node.disposed) {
           continue;
         }
 
@@ -108,12 +112,17 @@ export class StateNode {
   private enter(): DependencyFrame {
     this.settling = true;
 
-    return { node: this, dependencies: this.links.sources.keys() };
+    return {
+      node: this,
+      next: this.links.firstSource,
+      version: this.links.sourceVersion,
+      order: 0,
+    };
   }
 
   private getDependencyStatus(stack: DependencyFrame[]): 'ready' | 'pending' | 'blocked' {
-    for (const source of this.links.sources.keys()) {
-      const dependency = source.node;
+    for (let edge = this.links.firstSource; edge; edge = edge.nextSource) {
+      const dependency = edge.source!.node;
 
       // A reentrant read cannot publish past an upstream callback still delivering a value.
       if (
@@ -157,17 +166,34 @@ export class StateNode {
       while (stack.length > 0) {
         const frame = stack[stack.length - 1];
 
-        const source = frame.dependencies.next();
+        const { node } = frame;
 
-        if (!source.done) {
-          if (source.value.node.needsSettle()) {
-            stack.push(source.value.node.enter());
+        if (frame.version !== node.links.sourceVersion) {
+          frame.next = node.links.firstSource;
+
+          frame.version = node.links.sourceVersion;
+
+          // Preserve insertion order when callbacks remove or append dependencies.
+          while (frame.next && frame.next.order <= frame.order) {
+            frame.next = frame.next.nextSource;
+          }
+        }
+
+        const edge = frame.next;
+
+        if (edge) {
+          frame.next = edge.nextSource;
+
+          frame.order = edge.order;
+
+          const source = edge.source!.node;
+
+          if (source.needsSettle()) {
+            stack.push(source.enter());
           }
 
           continue;
         }
-
-        const node = frame.node;
 
         // An upstream callback may have written a dependency already visited by this frame.
         const status = node.getDependencyStatus(stack);
@@ -177,7 +203,11 @@ export class StateNode {
         }
 
         if (status === 'pending') {
-          frame.dependencies = node.links.sources.keys();
+          frame.next = node.links.firstSource;
+
+          frame.version = node.links.sourceVersion;
+
+          frame.order = 0;
 
           continue;
         }
@@ -185,7 +215,11 @@ export class StateNode {
         node.publish();
 
         if (node.dirty) {
-          frame.dependencies = node.links.sources.keys();
+          frame.next = node.links.firstSource;
+
+          frame.version = node.links.sourceVersion;
+
+          frame.order = 0;
 
           continue;
         }

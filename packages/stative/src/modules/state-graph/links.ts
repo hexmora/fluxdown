@@ -1,13 +1,42 @@
-type Dependency = {
-  normal: number;
-  ordering: number;
-};
+/** One shared edge holds both subscription counts and both adjacency links. */
+export class StateDependency<T> {
+  normal = 0;
+
+  ordering = 0;
+
+  previousSource: StateDependency<T> | null = null;
+
+  nextSource: StateDependency<T> | null = null;
+
+  previousTarget: StateDependency<T> | null = null;
+
+  nextTarget: StateDependency<T> | null = null;
+
+  constructor(
+    public source: StateLinks<T> | null,
+    public target: StateLinks<T> | null,
+    readonly order: number,
+  ) {}
+}
+
+const indexThreshold = 16;
 
 /** Track ordering prerequisites without spreading value invalidation through them. */
 export class StateLinks<T> {
-  readonly sources = new Map<StateLinks<T>, Dependency>();
+  firstSource: StateDependency<T> | null = null;
 
-  readonly targets = new Map<StateLinks<T>, Dependency>();
+  private lastSource: StateDependency<T> | null = null;
+
+  firstTarget: StateDependency<T> | null = null;
+
+  private lastTarget: StateDependency<T> | null = null;
+
+  private sourceCount = 0;
+
+  /** Settling frames restart only when a callback changes this adjacency list. */
+  sourceVersion = 0;
+
+  private sourceIndex: Map<StateLinks<T>, StateDependency<T>> | null = null;
 
   /** One supporting path per root; null marks a direct ordering prerequisite. */
   private roots: Map<StateLinks<T>, StateLinks<T> | null> | null = null;
@@ -16,6 +45,114 @@ export class StateLinks<T> {
 
   get barriers(): ReadonlyMap<StateLinks<T>, StateLinks<T> | null> | null {
     return this.roots;
+  }
+
+  getSource(source: StateLinks<T>): StateDependency<T> | undefined {
+    if (this.sourceIndex) {
+      return this.sourceIndex.get(source);
+    }
+
+    for (let edge = this.firstSource; edge; edge = edge.nextSource) {
+      if (edge.source === source) {
+        return edge;
+      }
+    }
+
+    return undefined;
+  }
+
+  private append(source: StateLinks<T>): StateDependency<T> {
+    const edge = new StateDependency(source, this, this.sourceVersion + 1);
+
+    edge.previousSource = this.lastSource;
+
+    if (this.lastSource) {
+      this.lastSource.nextSource = edge;
+    } else {
+      this.firstSource = edge;
+    }
+
+    this.lastSource = edge;
+
+    edge.previousTarget = source.lastTarget;
+
+    if (source.lastTarget) {
+      source.lastTarget.nextTarget = edge;
+    } else {
+      source.firstTarget = edge;
+    }
+
+    source.lastTarget = edge;
+
+    this.sourceCount += 1;
+
+    this.sourceVersion += 1;
+
+    if (this.sourceIndex) {
+      this.sourceIndex.set(source, edge);
+    } else if (this.sourceCount === indexThreshold) {
+      this.sourceIndex = new Map();
+
+      for (let current = this.firstSource; current; current = current.nextSource) {
+        this.sourceIndex.set(current.source!, current);
+      }
+    }
+
+    return edge;
+  }
+
+  private remove(edge: StateDependency<T>) {
+    const { source, target, previousSource, nextSource, previousTarget, nextTarget } = edge;
+
+    if (!source || !target) {
+      return;
+    }
+
+    if (previousSource) {
+      previousSource.nextSource = nextSource;
+    } else {
+      target.firstSource = nextSource;
+    }
+
+    if (nextSource) {
+      nextSource.previousSource = previousSource;
+    } else {
+      target.lastSource = previousSource;
+    }
+
+    if (previousTarget) {
+      previousTarget.nextTarget = nextTarget;
+    } else {
+      source.firstTarget = nextTarget;
+    }
+
+    if (nextTarget) {
+      nextTarget.previousTarget = previousTarget;
+    } else {
+      source.lastTarget = previousTarget;
+    }
+
+    target.sourceCount -= 1;
+
+    target.sourceVersion += 1;
+
+    target.sourceIndex?.delete(source);
+
+    if (target.sourceCount <= indexThreshold / 2) {
+      target.sourceIndex = null;
+    }
+
+    edge.source = null;
+
+    edge.target = null;
+
+    edge.previousSource = null;
+
+    edge.nextSource = null;
+
+    edge.previousTarget = null;
+
+    edge.nextTarget = null;
   }
 
   private addBarrier(root: StateLinks<T>, support: StateLinks<T> | null) {
@@ -36,7 +173,9 @@ export class StateLinks<T> {
     for (let index = 0; index < pending.length; index++) {
       const links = pending[index];
 
-      for (const target of links.targets.keys()) {
+      for (let edge = links.firstTarget; edge; edge = edge.nextTarget) {
+        const target = edge.target!;
+
         if (target.roots?.has(root)) {
           continue;
         }
@@ -50,18 +189,12 @@ export class StateLinks<T> {
     }
   }
 
-  connect(source: StateLinks<T>, ordering: boolean) {
-    let dependency = this.sources.get(source);
+  connect(source: StateLinks<T>, ordering: boolean): StateDependency<T> {
+    let dependency = this.getSource(source);
 
     const connected = dependency !== undefined;
 
-    if (!dependency) {
-      dependency = { normal: 0, ordering: 0 };
-
-      this.sources.set(source, dependency);
-
-      source.targets.set(this, dependency);
-    }
+    dependency ??= this.append(source);
 
     if (ordering) {
       dependency.ordering += 1;
@@ -80,12 +213,22 @@ export class StateLinks<T> {
         this.addBarrier(root, source);
       }
     }
+
+    return dependency;
   }
 
   disconnect(source: StateLinks<T>, ordering: boolean) {
-    const dependency = this.sources.get(source);
+    const dependency = this.getSource(source);
 
-    if (!dependency) {
+    if (dependency) {
+      this.disconnectEdge(dependency, ordering);
+    }
+  }
+
+  disconnectEdge(dependency: StateDependency<T>, ordering: boolean) {
+    const source = dependency.source;
+
+    if (!source || dependency.target !== this) {
       return;
     }
 
@@ -96,9 +239,7 @@ export class StateLinks<T> {
     }
 
     if (dependency.normal === 0 && dependency.ordering === 0) {
-      this.sources.delete(source);
-
-      source.targets.delete(this);
+      this.remove(dependency);
 
       if (!ordering && !source.roots) {
         return;
@@ -128,10 +269,10 @@ export class StateLinks<T> {
       const support = current.roots?.get(root);
 
       if (support === null) {
-        return (current.sources.get(root)?.ordering ?? 0) > 0;
+        return (current.getSource(root)?.ordering ?? 0) > 0;
       }
 
-      if (!support || !current.sources.has(support)) {
+      if (!support || !current.getSource(support)) {
         return false;
       }
 
@@ -151,7 +292,7 @@ export class StateLinks<T> {
         continue;
       }
 
-      if ((this.sources.get(root)?.ordering ?? 0) > 0) {
+      if ((this.getSource(root)?.ordering ?? 0) > 0) {
         this.roots.set(root, null);
 
         continue;
@@ -159,7 +300,9 @@ export class StateLinks<T> {
 
       let replacement: StateLinks<T> | undefined;
 
-      for (const source of this.sources.keys()) {
+      for (let edge = this.firstSource; edge; edge = edge.nextSource) {
+        const source = edge.source!;
+
         if (StateLinks.reachesBarrier(source, root, this)) {
           replacement = source;
 
@@ -181,8 +324,8 @@ export class StateLinks<T> {
     const affected = new Set(initial);
 
     for (const links of affected) {
-      for (const target of links.targets.keys()) {
-        affected.add(target);
+      for (let edge = links.firstTarget; edge; edge = edge.nextTarget) {
+        affected.add(edge.target!);
       }
     }
 
@@ -192,8 +335,10 @@ export class StateLinks<T> {
     }
 
     for (const links of affected) {
-      for (const [source, dependency] of links.sources) {
-        if (dependency.ordering > 0) {
+      for (let edge = links.firstSource; edge; edge = edge.nextSource) {
+        const source = edge.source!;
+
+        if (edge.ordering > 0) {
           links.addBarrier(source, null);
         }
 
@@ -211,21 +356,21 @@ export class StateLinks<T> {
   }
 
   destroy() {
-    const targets = [...this.targets.keys()];
+    const targets: StateLinks<T>[] = [];
 
-    for (const source of this.sources.keys()) {
-      source.targets.delete(this);
+    for (let edge = this.firstTarget; edge; edge = edge.nextTarget) {
+      targets.push(edge.target!);
     }
 
-    for (const target of targets) {
-      target.sources.delete(this);
+    while (this.firstSource) {
+      this.remove(this.firstSource);
+    }
+
+    while (this.firstTarget) {
+      this.remove(this.firstTarget);
     }
 
     const hadBarriers = this.roots !== null;
-
-    this.sources.clear();
-
-    this.targets.clear();
 
     this.roots = null;
 

@@ -52,7 +52,7 @@ describe('ordering prerequisites', () => {
 
     expect(target.barriers).toBeNull();
 
-    expect(target.sources.has(source)).toBe(true);
+    expect(target.getSource(source)).toBeDefined();
 
     target.connect(source, true);
 
@@ -62,9 +62,9 @@ describe('ordering prerequisites', () => {
 
     target.disconnect(source, true);
 
-    expect(target.sources.size).toBe(0);
+    expect(target.firstSource).toBeNull();
 
-    expect(source.targets.size).toBe(0);
+    expect(source.firstTarget).toBeNull();
 
     expect(target.barriers).toBeNull();
   });
@@ -217,7 +217,13 @@ describe('ordering prerequisites', () => {
         const expected = new Set<number>();
 
         for (const current of pending) {
-          for (const [source, dependency] of current.sources) {
+          for (
+            let dependency = current.firstSource;
+            dependency;
+            dependency = dependency.nextSource
+          ) {
+            const source = dependency.source!;
+
             pending.add(source);
 
             if (dependency.ordering > 0) {
