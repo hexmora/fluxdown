@@ -1,8 +1,7 @@
-import { isFunction, isObject, isUndefined } from 'lodash-es';
+import { isFunction, isUndefined } from 'lodash-es';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
-import type { IReadableClosure } from '../../state-closure';
 import type {
   Distinctor,
   IReactiveState,
@@ -17,6 +16,9 @@ import { getStateContext, withStateContext } from '../../state-graph/context';
 import { getStateNode } from '../../state-graph/node';
 import { observeState, type StateSubscription } from '../observe';
 import { ReactiveState } from './base';
+import { isReactiveStateLike, isStateClosureLike, isStateSourceLike } from './utils';
+
+export { isReactiveStateLike } from './utils';
 
 type ReactiveStateSource<T> = IReactiveState<T> | BehaviorSubject<T>;
 
@@ -62,26 +64,6 @@ const createMappedState = <A, B>(
   });
 
   return state;
-};
-
-export const isReactiveStateLike = <T = unknown>(value: unknown): value is IReactiveState<T> =>
-  isObject(value) &&
-  'value' in value &&
-  'closed' in value &&
-  isFunction((value as Partial<IReactiveState<T>>).subscribe);
-
-const isStateClosureLike = <T = unknown>(value: unknown): value is IReadableClosure<T> => {
-  return (
-    isObject(value) &&
-    'value' in value &&
-    'destroy' in value &&
-    !isReactiveStateLike(value) &&
-    isFunction(value.destroy)
-  );
-};
-
-const isStateSourceLike = (value: unknown) => {
-  return isReactiveStateLike(value) || isStateClosureLike(value);
 };
 
 export const toState = <S>(source: S): IReactiveState<StateValue<S>> => {

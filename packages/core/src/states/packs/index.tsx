@@ -17,7 +17,7 @@ import {
   RenderPatchesMapper,
   RenderPluggables,
 } from './states';
-import { BlockCompiler, type BlockCompilerInputs } from '../hast';
+import { DocumentCompiler } from './states/document-compiler';
 import { DocumentPlugins } from './states/document-plugins';
 
 export * from './states';
@@ -54,11 +54,6 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
     ]),
   );
 
-  const getRemarks: BlockCompilerInputs['getRemarks'] = ({ config }) =>
-    plugins.createRemarkScope(config);
-
-  const getRehypes = () => plugins.createRehypeScope();
-
   return (
     <Renderer
       patches={<RenderPatchesMapper<R> patches={patches} />}
@@ -71,7 +66,7 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
         <MapperComposer
           mappers={<MapperPluggables extras={mapperSources} />}
           source={
-            <BlockCompiler
+            <DocumentCompiler
               sections={
                 <TextChunker
                   text={text}
@@ -80,8 +75,7 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
                 />
               }
               config={build}
-              getRemarks={getRemarks}
-              getRehypes={getRehypes}
+              plugins={plugins}
             />
           }
         />

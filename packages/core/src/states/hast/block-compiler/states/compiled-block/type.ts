@@ -27,3 +27,5 @@ export type CompiledBlockContentInputs = Omit<
 
   idPrefix: IReadableClosure<string | undefined>;
 };
+
+export type BlockContentInputs = Omit<CompiledBlockContentInputs, 'getRemarks' | 'getRehypes'>;
