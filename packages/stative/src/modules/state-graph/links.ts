@@ -9,29 +9,42 @@ export class StateLinks<T> {
 
   readonly targets = new Map<StateLinks<T>, Dependency>();
 
-  private roots: Set<StateLinks<T>> | null = null;
+  /** One supporting path per root; null marks a direct ordering prerequisite. */
+  private roots: Map<StateLinks<T>, StateLinks<T> | null> | null = null;
 
   constructor(readonly node: T) {}
 
-  get barriers(): ReadonlySet<StateLinks<T>> | null {
+  get barriers(): ReadonlyMap<StateLinks<T>, StateLinks<T> | null> | null {
     return this.roots;
   }
 
-  private addBarrier(root: StateLinks<T>) {
+  private addBarrier(root: StateLinks<T>, support: StateLinks<T> | null) {
+    if (this.roots?.has(root)) {
+      if (support === null) {
+        this.roots.set(root, null);
+      }
+
+      return;
+    }
+
+    this.roots ??= new Map();
+
+    this.roots.set(root, support);
+
     const pending: StateLinks<T>[] = [this];
 
     for (let index = 0; index < pending.length; index++) {
       const links = pending[index];
 
-      if (links.roots?.has(root)) {
-        continue;
-      }
-
-      links.roots ??= new Set();
-
-      links.roots.add(root);
-
       for (const target of links.targets.keys()) {
+        if (target.roots?.has(root)) {
+          continue;
+        }
+
+        target.roots ??= new Map();
+
+        target.roots.set(root, links);
+
         pending.push(target);
       }
     }
@@ -54,7 +67,7 @@ export class StateLinks<T> {
       dependency.ordering += 1;
 
       if (dependency.ordering === 1) {
-        this.addBarrier(source);
+        this.addBarrier(source, null);
       }
     } else {
       dependency.normal += 1;
@@ -63,8 +76,8 @@ export class StateLinks<T> {
     const { roots } = source;
 
     if (!connected && roots) {
-      for (const root of roots) {
-        this.addBarrier(root);
+      for (const root of roots.keys()) {
+        this.addBarrier(root, source);
       }
     }
   }
@@ -94,9 +107,74 @@ export class StateLinks<T> {
       return;
     }
 
-    if (this.roots) {
+    if (!this.repair(source)) {
       this.rebuild([this]);
     }
+  }
+
+  private static reachesBarrier<TNode>(
+    source: StateLinks<TNode>,
+    root: StateLinks<TNode>,
+    excluded: StateLinks<TNode>,
+  ) {
+    // A path that returns through the dependent cannot replace its removed support.
+    const visited = new Set([excluded]);
+
+    let current = source;
+
+    while (!visited.has(current)) {
+      visited.add(current);
+
+      const support = current.roots?.get(root);
+
+      if (support === null) {
+        return (current.sources.get(root)?.ordering ?? 0) > 0;
+      }
+
+      if (!support || !current.sources.has(support)) {
+        return false;
+      }
+
+      current = support;
+    }
+
+    return false;
+  }
+
+  private repair(removed: StateLinks<T>) {
+    if (!this.roots) {
+      return true;
+    }
+
+    for (const [root, support] of this.roots) {
+      if (support !== removed && !(support === null && root === removed)) {
+        continue;
+      }
+
+      if ((this.sources.get(root)?.ordering ?? 0) > 0) {
+        this.roots.set(root, null);
+
+        continue;
+      }
+
+      let replacement: StateLinks<T> | undefined;
+
+      for (const source of this.sources.keys()) {
+        if (StateLinks.reachesBarrier(source, root, this)) {
+          replacement = source;
+
+          break;
+        }
+      }
+
+      if (!replacement) {
+        return false;
+      }
+
+      this.roots.set(root, replacement);
+    }
+
+    return true;
   }
 
   private rebuild(initial: StateLinks<T>[]) {
@@ -116,7 +194,7 @@ export class StateLinks<T> {
     for (const links of affected) {
       for (const [source, dependency] of links.sources) {
         if (dependency.ordering > 0) {
-          links.addBarrier(source);
+          links.addBarrier(source, null);
         }
 
         const { roots } = source;
@@ -125,8 +203,8 @@ export class StateLinks<T> {
           continue;
         }
 
-        for (const root of roots) {
-          links.addBarrier(root);
+        for (const root of roots.keys()) {
+          links.addBarrier(root, source);
         }
       }
     }
@@ -152,7 +230,7 @@ export class StateLinks<T> {
     this.roots = null;
 
     if (hadBarriers || targets.some((target) => target.roots?.has(this))) {
-      this.rebuild(targets);
+      this.rebuild(targets.filter((target) => !target.repair(this)));
     }
   }
 }

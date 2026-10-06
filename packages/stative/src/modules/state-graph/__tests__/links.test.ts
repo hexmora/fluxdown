@@ -1,3 +1,5 @@
+import { sortBy } from 'lodash-es';
+
 import { StateLinks } from '../links';
 
 describe('ordering prerequisites', () => {
@@ -18,13 +20,13 @@ describe('ordering prerequisites', () => {
 
     second.connect(source, true);
 
-    expect([...output.barriers!]).toEqual([source]);
+    expect([...output.barriers!.keys()]).toEqual([source]);
 
     first.disconnect(source, true);
 
     expect(first.barriers).toBeNull();
 
-    expect([...output.barriers!]).toEqual([source]);
+    expect([...output.barriers!.keys()]).toEqual([source]);
 
     second.disconnect(source, true);
 
@@ -44,7 +46,7 @@ describe('ordering prerequisites', () => {
 
     target.disconnect(source, true);
 
-    expect([...target.barriers!]).toEqual([source]);
+    expect([...target.barriers!.keys()]).toEqual([source]);
 
     target.disconnect(source, true);
 
@@ -56,7 +58,7 @@ describe('ordering prerequisites', () => {
 
     target.disconnect(source, false);
 
-    expect([...target.barriers!]).toEqual([source]);
+    expect([...target.barriers!.keys()]).toEqual([source]);
 
     target.disconnect(source, true);
 
@@ -93,7 +95,7 @@ describe('ordering prerequisites', () => {
     first.disconnect(detached, true);
 
     for (const links of [first, second, output]) {
-      expect([...links.barriers!]).toEqual([retained]);
+      expect([...links.barriers!.keys()]).toEqual([retained]);
     }
 
     retained.destroy();
@@ -126,7 +128,7 @@ describe('ordering prerequisites', () => {
 
     expect(item.barriers).toBeNull();
 
-    expect([...output.barriers!]).toEqual([outer]);
+    expect([...output.barriers!.keys()]).toEqual([outer]);
 
     outer.destroy();
 
@@ -148,12 +150,86 @@ describe('ordering prerequisites', () => {
 
     output.connect(middle, false);
 
-    expect([...output.barriers!]).toEqual([source]);
+    expect([...output.barriers!.keys()]).toEqual([source]);
 
     middle.disconnect(item, false);
 
     expect(middle.barriers).toBeNull();
 
     expect(output.barriers).toBeNull();
+  });
+
+  test('matches reachable ordering prerequisites through repeated graph changes', () => {
+    let seed = 817;
+
+    const random = (limit: number) => {
+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+
+      return seed % limit;
+    };
+
+    let identity = 12;
+
+    const nodes = Array.from({ length: identity }, (_, index) => new StateLinks(index));
+
+    let connections: Array<{
+      source: StateLinks<number>;
+      target: StateLinks<number>;
+      ordering: boolean;
+    }> = [];
+
+    for (let iteration = 0; iteration < 600; iteration++) {
+      const operation = random(5);
+
+      if (operation < 3) {
+        const source = nodes[random(nodes.length)];
+
+        const target = nodes[random(nodes.length)];
+
+        const ordering = random(3) === 0;
+
+        if (source !== target) {
+          target.connect(source, ordering);
+
+          connections.push({ source, target, ordering });
+        }
+      } else if (operation === 3 && connections.length > 0) {
+        const [connection] = connections.splice(random(connections.length), 1);
+
+        connection.target.disconnect(connection.source, connection.ordering);
+      } else {
+        const index = random(nodes.length);
+
+        const removed = nodes[index];
+
+        removed.destroy();
+
+        connections = connections.filter(
+          ({ source, target }) => source !== removed && target !== removed,
+        );
+
+        nodes[index] = new StateLinks(identity++);
+      }
+
+      for (const node of nodes) {
+        const pending = new Set([node]);
+
+        const expected = new Set<number>();
+
+        for (const current of pending) {
+          for (const [source, dependency] of current.sources) {
+            pending.add(source);
+
+            if (dependency.ordering > 0) {
+              expected.add(source.node);
+            }
+          }
+        }
+
+        const actual = [...(node.barriers?.keys() ?? [])].map((root) => root.node);
+
+        expect(sortBy(actual)).toEqual(sortBy([...expected]));
+      }
+    }
   });
 });

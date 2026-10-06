@@ -95,7 +95,7 @@ export class StateNode {
     }
 
     if (this.links.barriers) {
-      for (const { node } of this.links.barriers) {
+      for (const { node } of this.links.barriers.keys()) {
         if (node.dirty && !node.settling && !node.disposed) {
           return true;
         }
