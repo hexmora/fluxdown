@@ -4,6 +4,7 @@ import type { PhrasingContent } from 'mdast';
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last } from 'lodash-es';
 
+import { tailRepairRunner } from '../../utils/repair-scope';
 import { BaseRepairPlugin } from '../base';
 
 export type IncompleteImageRepairPluginConfig = {
@@ -28,7 +29,7 @@ export class IncompleteImageRepairPlugin extends BaseRepairPlugin {
 
   private readonly innerConfig: IncompleteImageRepairPluginInnerConfig;
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
+  runner: RepairPluginRunner = tailRepairRunner(({ node, parents }) => {
     if (node.type !== 'paragraph') {
       return;
     }
@@ -110,7 +111,7 @@ export class IncompleteImageRepairPlugin extends BaseRepairPlugin {
     }
 
     node.children.splice(node.children.length - 1, 1, ...replacement);
-  };
+  });
 
   constructor(config: IncompleteImageRepairPluginConfig = {}) {
     super();

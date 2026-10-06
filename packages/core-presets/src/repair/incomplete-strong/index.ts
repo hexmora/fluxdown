@@ -5,6 +5,7 @@ import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { first, last, nth } from 'lodash-es';
 
 import { isRepairNodeType } from '../../utils';
+import { tailRepairRunner } from '../../utils/repair-scope';
 import { BaseRepairPlugin } from '../base';
 
 declare global {
@@ -21,7 +22,7 @@ export class IncompleteStrongRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parent, parents, index }) => {
+  runner: RepairPluginRunner = tailRepairRunner(({ node, parent, parents, index }) => {
     let branch = node;
 
     for (const ancestor of parents) {
@@ -152,5 +153,5 @@ export class IncompleteStrongRepairPlugin extends BaseRepairPlugin {
 
       return;
     }
-  };
+  });
 }

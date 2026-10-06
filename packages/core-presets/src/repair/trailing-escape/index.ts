@@ -5,6 +5,7 @@ import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last, nth } from 'lodash-es';
 
 import { isRepairNodeType } from '../../utils';
+import { tailRepairRunner } from '../../utils/repair-scope';
 import { BaseRepairPlugin } from '../base';
 
 declare global {
@@ -21,7 +22,7 @@ export class TrailingEscapeRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
+  runner: RepairPluginRunner = tailRepairRunner(({ node, parents }) => {
     if (!isRepairNodeType(node, 'text') || !this.isStructuralTail(node, parents)) {
       return;
     }
@@ -39,7 +40,7 @@ export class TrailingEscapeRepairPlugin extends BaseRepairPlugin {
     if (trailingEscapes % 2 === 1) {
       node.value = node.value.slice(0, -1);
     }
-  };
+  });
 
   private isStructuralTail(node: unknown, parents: Parent[]): boolean {
     let child = node;

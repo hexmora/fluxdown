@@ -10,6 +10,8 @@ import {
 import { PluginPriority } from '@fluxdown/types';
 import { isFunction } from 'lodash-es';
 
+import { isTailRepairRunner } from './repair-scope';
+
 type RepairProcessOptions<T extends Parent | RootContent> = OmitWithType<
   ProcessMdastParams<T>,
   'node' | 'runner'
@@ -43,15 +45,22 @@ export const runRepairPlugin = <T extends Parent | RootContent>({
   safe = true,
   ...processOptions
 }: RunRepairPluginParams<T>) => {
-  const runners = isFunction(plugin.runner)
-    ? [plugin.runner.bind(plugin)]
-    : plugin.runner.map((item) => item.bind(plugin));
+  const runners = isFunction(plugin.runner) ? [plugin.runner] : [...plugin.runner];
   const { ending: _ending, priority: _priority, ...pluginOptions } = plugin.config;
+
+  const options = { ...processOptions, ...pluginOptions };
 
   plugin.before(node);
 
-  for (const runner of runners) {
+  for (const original of runners) {
     plugin.beforeEach(node);
+
+    const runner = original.bind(plugin);
+
+    const tailOnly =
+      isTailRepairRunner(original) &&
+      (!options.order || options.order === 'pre') &&
+      !options.rightFirst;
 
     const handleRunner = (params: ProcessMdastRunnerParams<T>) => {
       runner({
@@ -71,8 +80,8 @@ export const runRepairPlugin = <T extends Parent | RootContent>({
       processMdast({
         node,
         runner: handleRunner,
-        ...processOptions,
-        ...pluginOptions,
+        scope: tailOnly ? 'tail' : 'tree',
+        ...options,
       });
     } catch (error) {
       if (!safe) {

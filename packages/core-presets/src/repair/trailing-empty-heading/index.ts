@@ -5,6 +5,7 @@ import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last } from 'lodash-es';
 
 import { isRepairNodeType } from '../../utils';
+import { tailRepairRunner } from '../../utils/repair-scope';
 import { BaseRepairPlugin } from '../base';
 
 declare global {
@@ -21,7 +22,7 @@ export class TrailingEmptyHeadingRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parent, parents, insertNext }) => {
+  runner: RepairPluginRunner = tailRepairRunner(({ node, parent, parents, insertNext }) => {
     if (!isRepairNodeType(node, 'heading') || !parent || !this.isStructuralTail(node, parents)) {
       return;
     }
@@ -31,7 +32,7 @@ export class TrailingEmptyHeadingRepairPlugin extends BaseRepairPlugin {
     }
 
     insertNext([], true);
-  };
+  });
 
   private isEmpty(heading: Heading): boolean {
     return heading.children.every(

@@ -32,6 +32,13 @@ export interface ProcessMdastParams<T extends RootContent | Parent = Parent> {
    * @default false
    */
   rightFirst?: boolean;
+
+  /**
+   * Visit the whole tree, or follow only the last child of each parent.
+   * Children are still captured before the runner mutates the current node.
+   * @default 'tree'
+   */
+  scope?: 'tree' | 'tail';
 }
 
 export type ProcessMdastRunnerParams<T extends RootContent | Parent = Parent> = {
@@ -101,6 +108,7 @@ export const processMdast = <T extends RootContent | Parent>({
   runner,
   order = 'pre',
   rightFirst = false,
+  scope = 'tree',
 }: ProcessMdastParams<T>) => {
   let stopped = false;
 
@@ -127,7 +135,7 @@ export const processMdast = <T extends RootContent | Parent>({
     }
 
     /** Snapshot children before runner callbacks can mutate the tree. */
-    const children = owner.children.slice();
+    const children = scope === 'tail' ? owner.children.slice(-1) : owner.children.slice();
     const ordered = rightFirst
       ? children
       : /** The stack is LIFO, so left-first traversal pushes children in reverse order. */

@@ -4,6 +4,7 @@ import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last } from 'lodash-es';
 
 import { isRepairNodeType } from '../../utils';
+import { tailRepairRunner } from '../../utils/repair-scope';
 import { BaseRepairPlugin } from '../base';
 
 declare global {
@@ -20,7 +21,7 @@ export class IncompleteCodeFenceRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
+  runner: RepairPluginRunner = tailRepairRunner(({ node, parents }) => {
     if (!isRepairNodeType(node, 'code') && !isRepairNodeType(node, 'text')) {
       return;
     }
@@ -44,5 +45,5 @@ export class IncompleteCodeFenceRepairPlugin extends BaseRepairPlugin {
     if (isRepairNodeType(node, 'text')) {
       node.value = node.value.replace(/(^|(?:\r\n|\r|\n))`{1,2}$/, '$1');
     }
-  };
+  });
 }

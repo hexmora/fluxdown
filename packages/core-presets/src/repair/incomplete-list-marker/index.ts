@@ -3,6 +3,7 @@ import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/typ
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last } from 'lodash-es';
 
+import { tailRepairRunner } from '../../utils/repair-scope';
 import { BaseRepairPlugin } from '../base';
 
 declare global {
@@ -19,7 +20,7 @@ export class IncompleteListMarkerRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
+  runner: RepairPluginRunner = tailRepairRunner(({ node, parents }) => {
     if (node.type !== 'paragraph') {
       return;
     }
@@ -53,5 +54,5 @@ export class IncompleteListMarkerRepairPlugin extends BaseRepairPlugin {
     }
 
     tail.value = value;
-  };
+  });
 }

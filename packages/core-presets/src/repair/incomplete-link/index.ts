@@ -4,6 +4,7 @@ import type { PhrasingContent } from 'mdast';
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last, max } from 'lodash-es';
 
+import { tailRepairRunner } from '../../utils/repair-scope';
 import { BaseRepairPlugin } from '../base';
 
 declare global {
@@ -20,7 +21,7 @@ export class IncompleteLinkRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
+  runner: RepairPluginRunner = tailRepairRunner(({ node, parents }) => {
     if (node.type !== 'paragraph') {
       return;
     }
@@ -110,5 +111,5 @@ export class IncompleteLinkRepairPlugin extends BaseRepairPlugin {
     }
 
     node.children.splice(node.children.length - 1, 1, ...replacement);
-  };
+  });
 }
