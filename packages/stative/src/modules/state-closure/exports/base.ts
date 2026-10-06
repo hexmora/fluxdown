@@ -276,7 +276,7 @@ export function mapEachClosure<T, R>(
     const createEntry = (value: T, index: number): ListEntry<T, R> => {
       const item = new MutableState({ initial: value, distinctor: itemDistinctor });
 
-      getStateNode(item).dependOn(getStateNode(sourceState));
+      getStateNode(item).dependOn(getStateNode(sourceState), { ordering: true });
 
       const readable = FactoryReadableClosure.create(() => item);
 
