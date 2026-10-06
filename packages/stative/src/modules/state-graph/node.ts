@@ -32,7 +32,7 @@ export class StateNode {
 
     this.links.connect(source.links, ordering);
 
-    if (!ordering && source.dirty) {
+    if (source.dirty || source.needsSettle()) {
       this.invalidate();
     }
 
