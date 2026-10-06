@@ -32,6 +32,8 @@ class ComputedState<TValues extends [unknown, ...unknown[]], T>
 
   private snapshot: PublishedState<T> | null = null;
 
+  private destroying = false;
+
   private values: TValues | null = null;
 
   private current?: T;
@@ -75,22 +77,55 @@ class ComputedState<TValues extends [unknown, ...unknown[]], T>
       return this.active.value;
     }
 
-    return this.evaluate(this.sources!.map((source) => source.value) as TValues);
+    let values: TValues;
+
+    try {
+      values = this.sources!.map((source) => source.value) as TValues;
+    } catch (error) {
+      if (!this.snapshot) {
+        throw error;
+      }
+
+      return this.value;
+    }
+
+    // Reading an input may synchronously observe or destroy this computed state.
+    return this.active || this.snapshot ? this.value : this.evaluate(values);
   }
 
   get closed(): boolean {
-    return (
-      !!this.snapshot || (this.active?.closed ?? this.sources!.every((source) => source.closed))
-    );
-  }
-
-  getPublishedState(): PublishedState<T> {
     if (this.snapshot) {
-      return this.snapshot;
+      return true;
     }
 
     if (this.active) {
-      return this.active.getPublishedState();
+      return this.active.closed;
+    }
+
+    let closed: boolean;
+
+    try {
+      closed = this.sources!.every((source) => source.closed);
+    } catch (error) {
+      if (!this.snapshot) {
+        throw error;
+      }
+
+      return true;
+    }
+
+    return this.active || this.snapshot ? this.closed : closed;
+  }
+
+  private get storedPublishedState(): PublishedState<T> | null {
+    return this.snapshot ?? this.active?.getPublishedState() ?? null;
+  }
+
+  getPublishedState(): PublishedState<T> {
+    const stored = this.storedPublishedState;
+
+    if (stored) {
+      return stored;
     }
 
     try {
@@ -101,6 +136,12 @@ class ComputedState<TValues extends [unknown, ...unknown[]], T>
 
         return { value: source.value, closed: source.closed, failed: false, error: undefined };
       });
+
+      const current = this.storedPublishedState;
+
+      if (current) {
+        return current;
+      }
 
       const failure = sources.find((source) => source.failed);
 
@@ -115,27 +156,54 @@ class ComputedState<TValues extends [unknown, ...unknown[]], T>
         error: undefined,
       };
     } catch (error) {
-      return { value: this.current as T, closed: true, failed: true, error };
+      return (
+        this.storedPublishedState ?? {
+          value: this.current as T,
+          closed: true,
+          failed: true,
+          error,
+        }
+      );
     }
   }
 
-  private activate(): ReactiveState<T> {
+  private activate(): ReactiveState<T> | null {
     if (!this.active) {
-      const state = combineMapState(
-        this.sources!,
-        (values) => this.evaluate(values as TValues),
-        this.distinctor,
-      );
+      let state: ReactiveState<T>;
 
-      aliasStateNode(state, this);
+      try {
+        state = combineMapState(
+          this.sources!,
+          (values) => (this.snapshot ? this.value : this.evaluate(values as TValues)),
+          this.distinctor,
+        );
+      } catch (error) {
+        if (!this.snapshot) {
+          throw error;
+        }
 
-      this.active = state;
+        return null;
+      }
+
+      // Input setup can reenter observe() or destroy() before construction returns.
+      // Keep the state established by that inner call instead of orphaning its observers.
+      if (this.active || this.snapshot) {
+        state.destroy();
+      } else {
+        aliasStateNode(state, this);
+
+        this.active = state;
+      }
     }
 
     return this.active;
   }
 
   observe(subscriber: StateSubscriber<T>, options?: ObserveStateOptions): StateSubscription {
+    if (!this.snapshot) {
+      this.activate();
+    }
+
     if (this.snapshot) {
       const state = ReactiveState.of(this.snapshot.value);
 
@@ -148,7 +216,7 @@ class ComputedState<TValues extends [unknown, ...unknown[]], T>
       return observeState(state, subscriber, options);
     }
 
-    return observeState(this.activate(), subscriber, options);
+    return observeState(this.active!, subscriber, options);
   }
 
   subscribe(subscriber: StateSubscriber<T>): Subscription {
@@ -156,9 +224,11 @@ class ComputedState<TValues extends [unknown, ...unknown[]], T>
   }
 
   destroy() {
-    if (this.snapshot) {
+    if (this.snapshot || this.destroying) {
       return;
     }
+
+    this.destroying = true;
 
     this.snapshot = { ...this.getPublishedState(), closed: true };
 
@@ -176,6 +246,8 @@ class ComputedState<TValues extends [unknown, ...unknown[]], T>
       this.sources = null;
 
       this.mapper = null;
+
+      this.destroying = false;
     }
   }
 }
