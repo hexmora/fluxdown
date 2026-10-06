@@ -205,11 +205,11 @@ export const combineMapState = <const TSources extends [unknown, ...unknown[]], 
   const state = new ReactiveState({
     initial,
     emitter: (observer) => {
-      const latestValues = [...initialValues] as TValues;
+      const latestValues = [...prev[0]] as TValues;
 
       const completed = states.map(() => false);
 
-      let previousValues = initialValues;
+      let previousValues = prev[0];
 
       let closed = false;
 
