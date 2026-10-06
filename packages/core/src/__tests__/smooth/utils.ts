@@ -8,6 +8,7 @@ import { MutableState, render, S } from 'stative';
 
 import type { HastRoot } from '../../typings';
 
+import { countStateObservers } from '../../../../../scripts/testing/state';
 import { BlockItem } from '../../states';
 import { DoubleStepSmoothScheduler, FakeSmoothTicker, StepSmoothScheduler } from '../utils/smooth';
 
@@ -83,9 +84,7 @@ export const createBlock = (key: string, value: HastRoot, currentIndex = 0, bloc
   return { block, source, meta };
 };
 
-export const observerCount = (state: object) => {
-  return (state as { subject: { observers: unknown[] } }).subject.observers.length;
-};
+export const observerCount = countStateObservers;
 
 export const latest = <T>(instances: T[]): T => {
   const instance = last(instances);

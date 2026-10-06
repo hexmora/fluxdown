@@ -37,26 +37,26 @@ afterEach(() => {
 });
 
 describe('Shad', () => {
-  test('keeps disabled growth idle and retains its block when toggled', () => {
+  test('keeps disabled growth idle and rebuilds its animation scope when toggled', () => {
     const block = createBlock('a', paragraph('abc'));
 
     const harness = setup([block.block], false);
 
     const output = harness.state.value.value;
 
-    const fork = firstBlock(output);
-
-    expect(collectText(fork.value.value)).toBe('abc');
+    expect(Object.is(firstBlock(output), block.block)).toBe(true);
 
     block.source.next(paragraph('abcd'));
 
-    expect(collectText(fork.value.value)).toBe('abcd');
+    expect(collectText(firstBlock(output).value.value)).toBe('abcd');
 
     expect(jest.getTimerCount()).toBe(0);
 
     harness.enabled.next(true);
 
-    expect(harness.state.value.value).toBe(output);
+    let fork = firstBlock(harness.state.value.value);
+
+    expect(Object.is(harness.state.value.value, output)).toBe(false);
 
     expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
 
@@ -68,17 +68,23 @@ describe('Shad', () => {
 
     harness.enabled.next(false);
 
+    expect(fork.value.closed).toBe(true);
+
     expect(jest.getTimerCount()).toBe(0);
 
     block.source.next(paragraph('abcdef'));
 
-    expect(collectText(fork.value.value)).toBe('abcdef');
+    expect(collectText(firstBlock(harness.state.value.value).value.value)).toBe('abcdef');
 
     expect(jest.getTimerCount()).toBe(0);
 
     harness.enabled.next(true);
 
-    expect(firstBlock(harness.state.value.value)).toBe(fork);
+    const previous = fork;
+
+    fork = firstBlock(harness.state.value.value);
+
+    expect(Object.is(fork, previous)).toBe(false);
 
     expect(readParts(fork.value.value)).toEqual({ leading: 'ef', active: '' });
 
@@ -88,7 +94,7 @@ describe('Shad', () => {
   });
 
   test.each([false, true])(
-    'shades additions batched with re-enabling (growth first: %s)',
+    'starts from settled content when growth and enabling share a batch (growth first: %s)',
     (growthFirst) => {
       const block = createBlock('a', paragraph('a'));
 
@@ -96,9 +102,7 @@ describe('Shad', () => {
 
       const output = harness.state.value.value;
 
-      const fork = firstBlock(output);
-
-      expect(collectText(fork.value.value)).toBe('a');
+      expect(collectText(firstBlock(output).value.value)).toBe('a');
 
       batch(() => {
         if (growthFirst) {
@@ -112,15 +116,23 @@ describe('Shad', () => {
         }
       });
 
-      expect(harness.state.value.value).toBe(output);
+      const fork = firstBlock(harness.state.value.value);
 
-      expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'bc' });
+      expect(Object.is(harness.state.value.value, output)).toBe(false);
+
+      expect(readParts(fork.value.value)).toEqual({ leading: 'bc', active: '' });
+
+      expect(jest.getTimerCount()).toBe(0);
+
+      block.source.next(paragraph('abcd'));
+
+      expect(readParts(fork.value.value)).toEqual({ leading: 'c', active: 'd' });
 
       expect(jest.getTimerCount()).toBe(1);
 
       jest.advanceTimersByTime(200);
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'bc', active: '' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
     },
   );
 
@@ -247,7 +259,7 @@ describe('Shad', () => {
 
       const harness = setup([block.block]);
 
-      const fork = firstBlock(harness.state.value.value);
+      let fork = firstBlock(harness.state.value.value);
 
       block.source.next(paragraph('abcdef'));
 
@@ -258,6 +270,8 @@ describe('Shad', () => {
       }
 
       block.source.next(paragraph('abcd'));
+
+      fork = firstBlock(harness.state.value.value);
 
       expect(readParts(fork.value.value)).toBeUndefined();
 
@@ -270,6 +284,8 @@ describe('Shad', () => {
       } else {
         harness.length.next(2);
       }
+
+      fork = firstBlock(harness.state.value.value);
 
       expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
 
@@ -335,12 +351,12 @@ describe('Shad', () => {
     },
   );
 
-  test('resizes the tail and commits growth while disabled without replacing the block', () => {
+  test('resizes the active tail and rebuilds from growth committed while disabled', () => {
     const block = createBlock('a', paragraph('abcd'));
 
     const harness = setup([block.block]);
 
-    const fork = firstBlock(harness.state.value.value);
+    let fork = firstBlock(harness.state.value.value);
 
     expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
 
@@ -352,6 +368,8 @@ describe('Shad', () => {
 
     harness.enabled.next(false);
 
+    fork = firstBlock(harness.state.value.value);
+
     expect(readParts(fork.value.value)).toBeUndefined();
 
     expect(jest.getTimerCount()).toBe(0);
@@ -359,6 +377,8 @@ describe('Shad', () => {
     block.source.next(paragraph('abcdef'));
 
     harness.enabled.next(true);
+
+    fork = firstBlock(harness.state.value.value);
 
     expect(readParts(fork.value.value)).toEqual({ leading: 'cdef', active: '' });
 

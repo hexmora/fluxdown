@@ -24,6 +24,7 @@ import {
 
 import type { HastRoot } from '../../../../typings';
 
+import { countStateObservers } from '../../../../../../../scripts/testing/state';
 import { type IBlockSection, TextChunker } from '../../../base';
 import { BlockCompiler, type BlockCompilerConfig, type BlockRemarksConfig } from '../index';
 
@@ -203,13 +204,7 @@ const setupCompiler = ({
   };
 };
 
-const getObserverCount = (state: IReactiveState<unknown>) => {
-  return (
-    state as unknown as {
-      subject: { observers: unknown[] };
-    }
-  ).subject.observers.length;
-};
+const getObserverCount = countStateObservers;
 
 describe('BlockCompiler', () => {
   test('preserves replacement revisions when the chunker shares unchanged sections', () => {
@@ -469,7 +464,7 @@ describe('BlockCompiler', () => {
 
     harness.sections.next([section('a'), section('b'), section('c'), section('d')]);
 
-    expect(readRepairEnding).toHaveBeenCalledTimes(2);
+    expect(readRepairEnding).toHaveBeenCalledTimes(1);
 
     expect(blocks.map((block) => block.meta.value.blockCount)).toEqual([4, 4, 4]);
 

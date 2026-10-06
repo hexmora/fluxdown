@@ -15,6 +15,7 @@ import {
 
 import type { BaseBlockItemInputs } from '../type';
 
+import { countStateObservers } from '../../../../../../../scripts/testing/state';
 import { BaseBlockItem } from '../index';
 
 class TextBlock extends BaseBlockItem<string> {
@@ -41,9 +42,7 @@ const createMeta = () =>
     blockCount: 1,
   });
 
-const getObserverCount = (state: object) => {
-  return (state as { subject: { observers: unknown[] } }).subject.observers.length;
-};
+const getObserverCount = countStateObservers;
 
 describe('BaseBlockItem', () => {
   test('keeps input subscriptions lazy until the corresponding values are read', () => {
@@ -112,12 +111,17 @@ describe('BaseBlockItem', () => {
     const block = renderTextBlock({ source, meta, mapper: D(() => mapped) });
 
     expect(block.value.value).toBe('mapped');
+    expect(getObserverCount(mapped)).toBe(0);
+
+    const subscription = block.value.subscribe(() => {});
+
     expect(getObserverCount(mapped)).toBe(1);
 
     block.destroy();
 
     expect(mapped.closed).toBe(false);
     expect(getObserverCount(mapped)).toBe(0);
+    expect(subscription.closed).toBe(true);
   });
 
   test('owns mapper-returned closures independently for each block and fork', () => {

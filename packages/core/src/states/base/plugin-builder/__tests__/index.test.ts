@@ -8,9 +8,10 @@ import type {
 import { PluginPriority } from '@fluxdown/types';
 import { isArray } from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
-import { D, type IReactiveState, render, S, toReactiveState } from 'stative';
+import { D, render, S, toReactiveState } from 'stative';
 
 import { buildPluggables, isPluggableEqual, PluginBuilder } from '..';
+import { countStateObservers } from '../../../../../../../scripts/testing/state';
 
 interface TestPluginConfig extends IBasePluginConfig {
   label?: string;
@@ -62,13 +63,7 @@ const findPlugin = (plugins: TestPlugin[], key: string) => {
   return plugins.find((plugin) => plugin.key === key);
 };
 
-const getObserverCount = (state: IReactiveState<unknown>) => {
-  return (
-    state as unknown as {
-      subject: { observers: unknown[] };
-    }
-  ).subject.observers.length;
-};
+const getObserverCount = countStateObservers;
 
 describe('PluginBuilder', () => {
   test('compares plugin classes by reference and tuple options deeply', () => {

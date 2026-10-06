@@ -47,6 +47,7 @@ import type { HastRoot } from '../../../typings';
 import type { BlockCompilerConfig } from '../../hast';
 
 import { Core, type IPatchItem } from '..';
+import { countStateObservers } from '../../../../../../scripts/testing/state';
 import {
   BaseRenderer,
   BaseRenderPlugin,
@@ -274,13 +275,7 @@ const getFirstBlockTree = (state: {
   return getBlockTree(first(state.value.value));
 };
 
-const getObserverCount = (state: IReactiveState<unknown>): number => {
-  return (
-    state as unknown as {
-      subject: { observers: unknown[] };
-    }
-  ).subject.observers.length;
-};
+const getObserverCount = countStateObservers;
 
 const setupCore = (initialText = 'base') => {
   const text = MutableState.of(initialText);

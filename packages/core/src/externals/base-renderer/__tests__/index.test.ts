@@ -8,6 +8,7 @@ import {
   S,
 } from 'stative';
 
+import { countStateObservers } from '../../../../../../scripts/testing/state';
 import {
   BaseRenderPlugin,
   type IRenderPlugin,
@@ -108,13 +109,7 @@ const setupRenderer = (blocks: IBlockState<string>[]) => {
   return { initialPlugin, patches, plugins, renderer, source };
 };
 
-const getObserverCount = (state: IReactiveState<unknown>) => {
-  return (
-    state as unknown as {
-      subject: { observers: unknown[] };
-    }
-  ).subject.observers.length;
-};
+const getObserverCount = countStateObservers;
 
 describe('BaseRenderer', () => {
   test('lazily renders new block instances and reuses cached results in source order', () => {

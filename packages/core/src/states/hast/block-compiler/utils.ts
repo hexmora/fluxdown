@@ -1,24 +1,11 @@
 import type { IRehypePlugin, IRemarkPlugin } from '@fluxdown/types';
 
-import { isEqual } from 'lodash-es';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { Processor, unified } from 'unified';
 
-import type { BlockCompilerItem } from './type';
-
 import { HastRoot, MdastRoot } from '../../../typings';
-import { isSectionEqual } from '../../base/text-chunker/utils';
 import { getFootnotePrefix, namespaceFootnoteLabel } from './footnote';
-
-export const isItemEqual = (item: BlockCompilerItem, other: BlockCompilerItem): boolean => {
-  return (
-    item === other ||
-    (item.isLast === other.isLast &&
-      isEqual(item.meta, other.meta) &&
-      isSectionEqual(item.section, other.section))
-  );
-};
 
 type AstProcessor = Processor<MdastRoot, undefined, undefined, undefined, undefined>;
 

@@ -1,11 +1,9 @@
-import { isEqual } from 'lodash-es';
-import { mapClosure, once, S, useMap, useMapEach, useSelect } from 'stative';
+import { once, S, useMap, useMapEach, useSelect } from 'stative';
 
 import type { BlockCompilerInputs, BlockCompilerItem, IBlockCompiler } from './type';
 
 import { isSectionEqual } from '../../base/text-chunker/utils';
-import { CompiledBlock } from './states';
-import { isItemEqual } from './utils';
+import { CompiledBlockContent } from './states/compiled-block/content';
 
 export * from './states';
 export * from './type';
@@ -16,6 +14,8 @@ export const BlockCompiler = /*#__PURE__*/ once(
 
     const count = useSelect(sections, (current) => current.length);
 
+    const idPrefix = useMap(config, (current) => current.idPrefix);
+
     const items = useMap(sections, (current, previous): BlockCompilerItem[] => {
       let charEnd = 0;
 
@@ -24,39 +24,43 @@ export const BlockCompiler = /*#__PURE__*/ once(
 
         charEnd += section.text.length;
 
-        const item: BlockCompilerItem = {
-          section,
-          meta: { charStart, charEnd, currentIndex },
-          isLast: currentIndex === current.length - 1,
-        };
+        const isLast = currentIndex === current.length - 1;
 
         const previousItem = previous?.[1][currentIndex];
 
-        if (previousItem && isItemEqual(previousItem, item)) {
+        const sameSection = previousItem && isSectionEqual(previousItem.section, section);
+
+        if (
+          previousItem &&
+          previousItem.isLast === isLast &&
+          previousItem.meta.charStart === charStart &&
+          previousItem.meta.charEnd === charEnd &&
+          sameSection
+        ) {
           return previousItem;
         }
 
-        return item;
+        return {
+          section: sameSection ? previousItem.section : section,
+          meta: { charStart, charEnd, currentIndex },
+          isLast,
+        };
       });
     });
 
-    return useMapEach(
-      items,
-      (item) =>
-        S([
-          CompiledBlock,
-          {
-            section: mapClosure(item, (current) => current.section, isSectionEqual),
-            meta: mapClosure(item, (current) => current.meta, isEqual),
-            isLast: mapClosure(item, (current) => current.isLast),
-            count,
-            key: String(++nextKey),
-            config,
-            getRemarks,
-            getRehypes,
-          },
-        ]),
-      isItemEqual,
+    return useMapEach(items, (item) =>
+      S([
+        CompiledBlockContent,
+        {
+          item,
+          idPrefix,
+          count,
+          key: String(++nextKey),
+          config,
+          getRemarks,
+          getRehypes,
+        },
+      ]),
     );
   },
 );

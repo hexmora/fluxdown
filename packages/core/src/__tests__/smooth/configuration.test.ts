@@ -18,7 +18,7 @@ beforeEach(resetSmoothTests);
 
 describe('Smooth configuration', () => {
   test.each([false, true])(
-    'smooths additions batched with re-enabling (growth first: %s)',
+    'starts from settled content when growth and enabling share a batch (growth first: %s)',
     (growthFirst) => {
       const block = createBlock('a', paragraph('a'));
 
@@ -26,7 +26,7 @@ describe('Smooth configuration', () => {
 
       const output = harness.state.value.value;
 
-      const fork = firstBlock(output);
+      let fork = firstBlock(output);
 
       expect(collectText(fork.value.value)).toBe('a');
 
@@ -42,19 +42,23 @@ describe('Smooth configuration', () => {
         }
       });
 
-      expect(harness.state.value.value).toBe(output);
+      expect(Object.is(harness.state.value.value, output)).toBe(false);
 
-      expect(collectText(fork.value.value)).toBe('a');
+      fork = firstBlock(harness.state.value.value);
+
+      expect(collectText(fork.value.value)).toBe('abc');
+
+      block.source.next(paragraph('abcde'));
 
       const ticker = latest(PrimarySmoothTicker.instances);
 
       ticker.tick(16);
 
-      expect(collectText(fork.value.value)).toBe('ab');
+      expect(collectText(fork.value.value)).toBe('abcd');
 
       ticker.tick(32);
 
-      expect(collectText(fork.value.value)).toBe('abc');
+      expect(collectText(fork.value.value)).toBe('abcde');
 
       harness.state.destroy();
     },
@@ -78,7 +82,7 @@ describe('Smooth configuration', () => {
 
     block.source.next(paragraph('a'));
 
-    expect(fork.range.value).toEqual({ start: 0, end: Infinity });
+    expect(fork.range.value).toBeNull();
 
     expect(collectText(fork.value.value)).toBe('a');
 
@@ -96,7 +100,7 @@ describe('Smooth configuration', () => {
 
     const harness = setupSmooth([block.block], false);
 
-    const fork = firstBlock(harness.state.value.value);
+    let fork = firstBlock(harness.state.value.value);
 
     expect(collectText(fork.value.value)).toBe('abc');
 
@@ -109,6 +113,8 @@ describe('Smooth configuration', () => {
     expect(collectText(fork.value.value)).toBe('abcde');
 
     harness.enabled.next(true);
+
+    fork = firstBlock(harness.state.value.value);
 
     expect(collectText(fork.value.value)).toBe('abcde');
 
@@ -128,9 +134,13 @@ describe('Smooth configuration', () => {
 
     harness.enabled.next(false);
 
+    expect(fork.value.closed).toBe(true);
+
+    fork = firstBlock(harness.state.value.value);
+
     expect(collectText(fork.value.value)).toBe('abcdefg');
 
-    expect(fork.range.value).toEqual({ start: 0, end: Infinity });
+    expect(fork.range.value).toBeNull();
 
     expect(ticker.running).toBe(false);
 
@@ -159,7 +169,7 @@ describe('Smooth configuration', () => {
 
     expect(visibleText(output)).toEqual(['abc', 'def']);
 
-    expect(output.map((block) => block.range.value)).toEqual([null, { start: 0, end: Infinity }]);
+    expect(output.map((block) => block.range.value)).toEqual([null, null]);
 
     expect(output.map((block) => block.meta.value.blockCount)).toEqual([2, 2]);
 
@@ -243,13 +253,15 @@ describe('Smooth configuration', () => {
 
     const harness = setupSmooth([block.block]);
 
-    const fork = firstBlock(harness.state.value.value);
+    let fork = firstBlock(harness.state.value.value);
 
     block.source.next(paragraph('ab'));
 
     const primary = latest(PrimarySmoothTicker.instances);
 
     harness.enabled.next(false);
+
+    fork = firstBlock(harness.state.value.value);
 
     harness.ticker.next(SecondarySmoothTicker);
 
@@ -264,6 +276,8 @@ describe('Smooth configuration', () => {
     expect(SecondarySmoothTicker.instances).toHaveLength(0);
 
     harness.enabled.next(true);
+
+    fork = firstBlock(harness.state.value.value);
 
     block.source.next(paragraph('abcdef'));
 

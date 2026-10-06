@@ -11,7 +11,7 @@ export abstract class BaseBlockItem<T>
 {
   private readonly rangeSource: IReadableClosure<IRangeState | null>;
 
-  private readonly baseLengthSource: IReadableClosure<number>;
+  private baseLengthSource: IReadableClosure<number> | null = null;
 
   private lengthSource: IReadableClosure<number> | null = null;
 
@@ -21,8 +21,10 @@ export abstract class BaseBlockItem<T>
     const { range } = this.inputs;
 
     this.rangeSource = this.defaults(range, null);
+  }
 
-    this.baseLengthSource = this.getBaseLengthState();
+  protected override get outputMode(): 'mutable' | 'view' | 'owned' {
+    return 'view';
   }
 
   get meta(): IReactiveState<IBlockMeta> {
@@ -40,7 +42,7 @@ export abstract class BaseBlockItem<T>
   }
 
   get baseLength(): IReactiveState<number> {
-    return this.baseLengthSource.value;
+    return (this.baseLengthSource ??= this.getBaseLengthState()).value;
   }
 
   protected abstract slice(value: T, start: number, end: number): T;
@@ -48,7 +50,11 @@ export abstract class BaseBlockItem<T>
   protected abstract lengthOf(value: T): number;
 
   protected render() {
-    const { mapper, source } = this.inputs;
+    const { mapper, source, range } = this.inputs;
+
+    if (!range && !mapper) {
+      return source;
+    }
 
     const rawValue = this.combineMap([source, this.rangeSource], ([currentValue, currentRange]) => {
       if (!currentRange) {
