@@ -11,7 +11,7 @@ import { D, type IReadableClosure, once, useMap, useSwitchMap } from 'stative';
 import type { HastRoot } from '../../../typings';
 import type { Mapper, MapperComposerInputs } from './type';
 
-import { isPluggableEqual, isPluggablesEqual } from '../plugin-builder';
+import { isPluggableEnabled, isPluggableEqual, isPluggablesEqual } from '../plugin-builder';
 import { MapperItem } from './states';
 
 export * from './type';
@@ -23,7 +23,7 @@ export const MapperComposer = /*#__PURE__*/ once(function MapperComposer({
   const mappers = useMap(
     _mappers,
     (items) =>
-      sortBy(items, (item) =>
+      sortBy(items.filter(isPluggableEnabled), (item) =>
         isArray(item) ? (item[1].priority ?? PluginPriority.Default) : PluginPriority.Default,
       ),
     isPluggablesEqual,

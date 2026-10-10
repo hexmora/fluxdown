@@ -78,6 +78,36 @@ const TakeJSX = once(
 );
 
 describe('MapperComposer', () => {
+  test('skips disabled mappers and cleans up their state when toggled off', () => {
+    const construct = jest.fn();
+    const cleanup = jest.fn();
+    const Optional = once(({ source }: MapperInputs) => {
+      construct();
+
+      useClearable(cleanup);
+
+      return useMap(source, (blocks) => reverse([...blocks]));
+    });
+    const { closure, mappers, first, second, destroy } = setup([[Optional, { disabled: true }]]);
+
+    expect(closure.value.value).toEqual([first, second]);
+    expect(construct).not.toHaveBeenCalled();
+
+    mappers.next([[Optional, { disabled: false }]]);
+
+    expect(closure.value.value).toEqual([second, first]);
+    expect(construct).toHaveBeenCalledTimes(1);
+
+    mappers.next([[Optional, { disabled: true }]]);
+
+    expect(closure.value.value).toEqual([first, second]);
+    expect(cleanup).toHaveBeenCalledTimes(1);
+
+    destroy();
+
+    expect(cleanup).toHaveBeenCalledTimes(1);
+  });
+
   test('composes bare and configured mappers in order and follows source updates', () => {
     const { closure, source, first, second, destroy } = setup([Reverse, [Take, { count: 1 }]]);
 

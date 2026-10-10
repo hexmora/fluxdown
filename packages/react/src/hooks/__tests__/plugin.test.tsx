@@ -81,6 +81,15 @@ describe('usePlugins', () => {
     expect(result.current[1]).toBe(tuple);
   });
 
+  test('omits explicitly disabled defaults while retaining exclusion through later merges', () => {
+    const tuple: RemarkItem = [SyntaxPolicyRemarkPlugin, { disabled: true }];
+    const packs: IPluginItem[] = [{ remarks: [tuple] }];
+    const { result } = renderHook(() => usePlugins(packs, 'remarks', [SyntaxPolicyRemarkPlugin]));
+
+    expect(result.current).toEqual([tuple]);
+    expect(result.current[0]).toBe(tuple);
+  });
+
   test('reflects pack and default order changes', () => {
     const presetA = asRemark('preset-a');
 

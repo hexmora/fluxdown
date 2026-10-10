@@ -2,9 +2,9 @@ import type { MapperPluggable } from '@fluxdown/core';
 import type { IPluggable, IPluginWithConfig } from '@fluxdown/types';
 import type { FlattenedState } from 'stative';
 
-import { toPluggable } from '@fluxdown/core';
+import { isPluggableEnabled, toPluggable } from '@fluxdown/core';
 import { useDeferredUnmount, useStateOf, useStatic } from '@fluxdown/react-presets/base';
-import { forEach } from 'lodash-es';
+import { forEach, isArray } from 'lodash-es';
 import { useMemo } from 'react';
 import { shallowEqual } from 'shallow-equal';
 import { flattenClosure } from 'stative';
@@ -40,13 +40,20 @@ export function usePlugins(
   type: PluginChannel,
   defaults: readonly PackPluggable[] = EL,
 ): PackPluggable[] {
-  return useMemo(
-    () => [
-      ...defaults,
-      ...items.flatMap((item) =>
-        toPluggable<PackPluggable, PluginConfigs>([item[type] ?? EL, item.config ?? EO]),
-      ),
-    ],
-    [defaults, items, type],
-  );
+  return useMemo(() => {
+    const plugins = items.flatMap((item) =>
+      toPluggable<PackPluggable, PluginConfigs>([item[type] ?? EL, item.config ?? EO]),
+    );
+
+    const disabled = new Set(
+      plugins
+        .filter((plugin) => !isPluggableEnabled(plugin))
+        .map((plugin) => (isArray(plugin) ? plugin[0] : plugin)),
+    );
+
+    return [
+      ...defaults.filter((plugin) => !disabled.has(isArray(plugin) ? plugin[0] : plugin)),
+      ...plugins,
+    ];
+  }, [defaults, items, type]);
 }
