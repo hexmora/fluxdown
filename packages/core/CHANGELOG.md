@@ -1,5 +1,28 @@
 # @fluxdown/core
 
+## 0.8.2
+
+### Patch Changes
+
+- 470fb5b: Reuse sealed Markdown block prefixes during streaming appends and lex only the mutable tail. Preserve document-scoped definitions, syntax policies, source offsets, destructive replacements, and block-local patches.
+- a37ab59: Compare block metadata with a fast path for changed block counts.
+- ad93451: Add shared selection states and closures that preserve synchronous dependency order while avoiding downstream invalidation when their result stays equal. Use a shared selection for the document block count.
+- Updated dependencies [d595ca8]
+- Updated dependencies [1f8bb14]
+- Updated dependencies [6bf8f8a]
+- Updated dependencies [5b391b4]
+- Updated dependencies [559a259]
+- Updated dependencies [f72e624]
+- Updated dependencies [a37ab59]
+- Updated dependencies [8e65595]
+- Updated dependencies [0161ebf]
+- Updated dependencies [468a453]
+- Updated dependencies [dad697b]
+- Updated dependencies [f627b35]
+- Updated dependencies [ad93451]
+  - stative@1.2.0
+  - @fluxdown/core-presets@0.6.5
+
 ## 0.8.1
 
 ### Patch Changes
