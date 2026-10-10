@@ -101,7 +101,7 @@ export const toBuildConfig = ({
   idPrefix,
 }: ToBuildConfigParams): BlockCompilerConfig => {
   return {
-    ...defaultsBy(base, { ...DEFAULT_CONFIG, repair: repairEnding, idPrefix }),
+    ...defaultsBy(base, { ...DEFAULT_CONFIG, idPrefix }),
     repairEnding,
   };
 };
