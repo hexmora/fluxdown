@@ -30,6 +30,8 @@ export interface ThemeTokens {
 
     fontMono: string;
 
+    fontSmoothing: string;
+
     fontSize: {
       xs: string;
 
@@ -47,11 +49,11 @@ export interface ThemeTokens {
     };
 
     fontWeight: {
-      normal: number;
+      normal: number | string;
 
-      medium: number;
+      medium: number | string;
 
-      bold: number;
+      bold: number | string;
     };
   };
 
@@ -76,6 +78,59 @@ export interface ThemeTokens {
     fontSize: string;
 
     lineHeight: number | string;
+  };
+
+  /**
+   * Presentation of inline code outside preformatted blocks.
+   */
+  inlineCode: {
+    paddingBlock: string;
+
+    paddingInline: string;
+
+    border: string;
+
+    borderRadius: string;
+
+    background: string;
+
+    fontFamily: string;
+
+    fontSize: string;
+
+    whiteSpace: string;
+  };
+
+  /**
+   * Dimensions, spacing, and borders of thematic breaks.
+   */
+  divider: {
+    height: string;
+
+    marginBlock: string;
+
+    marginInline: string;
+
+    border: string;
+
+    borderBlockEnd: string;
+
+    background: string;
+  };
+
+  /**
+   * Spacing, border, and typography of the footnotes section.
+   */
+  footnotes: {
+    marginTop: string;
+
+    paddingTop: string;
+
+    borderTop: string;
+
+    color: string;
+
+    fontSize: string;
   };
 
   /**
