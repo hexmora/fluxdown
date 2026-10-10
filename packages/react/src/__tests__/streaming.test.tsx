@@ -1,3 +1,6 @@
+import type { IRemarkPlugin } from '@fluxdown/types';
+
+import { BaseRemarkPlugin } from '@fluxdown/core-presets/remark';
 import { act, cleanup, render } from '@testing-library/react';
 import { createRef } from 'react';
 
@@ -88,27 +91,80 @@ describe('Fluxdown streaming options', () => {
     expect(ref.current).toBe(core);
   });
 
-  test('honors an explicit repair override and restores streaming defaults when it is removed', () => {
+  test('keeps ordinary repairs and recompiles only the final block when streaming ends', () => {
+    const compiled: string[] = [];
+
+    class CompileCounterRemarkPlugin extends BaseRemarkPlugin {
+      static readonly key = 'remark-compile-counter';
+
+      plugin: IRemarkPlugin['plugin'] = () => (_tree, file) => {
+        compiled.push(String(file));
+      };
+    }
+
+    const plugins = [{ remarks: [CompileCounterRemarkPlugin] }];
     const streaming = { smooth: false, shad: false };
+    const text = 'first<img\n\nsecond\n\n**ending';
 
-    const view = render(<Fluxdown streaming={streaming} text="**ending" />);
+    const view = render(<Fluxdown plugins={plugins} streaming={streaming} text={text} />);
 
-    expect(view.container.querySelector('strong')).toHaveTextContent('ending');
-
-    view.rerender(<Fluxdown build={{ repair: false }} streaming={streaming} text="**ending" />);
-
-    expect(view.container.textContent).toBe('**ending');
-
-    expect(view.container.querySelector('strong')).toBeNull();
-
-    view.rerender(<Fluxdown streaming={streaming} text="**ending" />);
+    expect(view.container.querySelector('p')?.textContent).toBe('first');
 
     expect(view.container.querySelector('strong')).toHaveTextContent('ending');
 
-    view.rerender(<Fluxdown build={{ repair: true }} streaming={false} text="**ending" />);
+    expect(compiled).toHaveLength(3);
 
-    expect(view.container.textContent).toBe('**ending');
+    compiled.length = 0;
+
+    view.rerender(<Fluxdown plugins={plugins} streaming={false} text={text} />);
+
+    expect(view.container.querySelector('p')?.textContent).toBe('first');
 
     expect(view.container.querySelector('strong')).toBeNull();
+
+    expect(view.container.textContent).toContain('**ending');
+
+    expect(compiled).toEqual(['**ending']);
+
+    view.rerender(
+      <Fluxdown
+        plugins={plugins}
+        streaming={streaming}
+        text={'updated<img\n\nsecond\n\n**continued'}
+      />,
+    );
+
+    expect(view.container.querySelector('p')?.textContent).toBe('updated');
+
+    expect(view.container.querySelector('strong')).toHaveTextContent('continued');
   });
+
+  test.each<{ streaming: FluxdownProps['streaming']; repairedEnding: boolean }>([
+    { streaming: false, repairedEnding: false },
+    { streaming: { smooth: false, shad: false }, repairedEnding: true },
+  ])(
+    'honors and removes an explicit repair override with streaming=$streaming',
+    ({ streaming, repairedEnding }) => {
+      const text = 'prefix<img\n\n**ending';
+      const view = render(<Fluxdown streaming={streaming} text={text} />);
+
+      expect(view.container.querySelector('p')?.textContent).toBe('prefix');
+
+      expect(view.container.querySelector('strong') !== null).toBe(repairedEnding);
+
+      view.rerender(<Fluxdown build={{ repair: false }} streaming={streaming} text={text} />);
+
+      expect(view.container.querySelector('p')?.textContent).toBe('prefix<img');
+
+      expect(view.container.querySelector('strong')).toBeNull();
+
+      expect(view.container.textContent).toContain('**ending');
+
+      view.rerender(<Fluxdown streaming={streaming} text={text} />);
+
+      expect(view.container.querySelector('p')?.textContent).toBe('prefix');
+
+      expect(view.container.querySelector('strong') !== null).toBe(repairedEnding);
+    },
+  );
 });
