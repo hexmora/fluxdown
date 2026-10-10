@@ -74,6 +74,9 @@ export type IPluggableConfig<C = unknown> = (unknown extends C
    * Overrides the plugin priority. Lower values run first; equal values keep declaration order.
    */
   priority?: PluginPriority | number;
+
+  /** Excludes this plugin from the configured list without constructing it. */
+  disabled?: boolean;
 };
 
 export type IPluggable<T extends IPluginWithConfig, O = void, P = O> =

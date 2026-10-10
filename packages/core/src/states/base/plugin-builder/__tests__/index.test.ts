@@ -163,6 +163,41 @@ describe('PluginBuilder', () => {
     expect(pluginB?.config).toEqual({});
   });
 
+  test('skips disabled plugins and retires instances when toggled off', () => {
+    const construct = jest.fn();
+    const Plugin = createPluginClass('optional', construct);
+    const { closure, plugins, pluginsSubject } = setupBuilder([[Plugin, { disabled: true }]]);
+
+    expect(closure.value.value).toEqual([]);
+    expect(construct).not.toHaveBeenCalled();
+
+    pluginsSubject.next([[Plugin, { disabled: false }]]);
+
+    const [instance] = closure.value.value;
+
+    expect(construct).toHaveBeenCalledTimes(1);
+
+    pluginsSubject.next([[Plugin, { disabled: true }]]);
+
+    expect(closure.value.value).toEqual([]);
+    expect(instance?.destroy).toHaveBeenCalledTimes(1);
+
+    pluginsSubject.next([Plugin]);
+
+    const [replacement] = closure.value.value;
+
+    expect(replacement).not.toBe(instance);
+    expect(construct).toHaveBeenCalledTimes(2);
+
+    closure.destroy();
+
+    expect(instance?.destroy).toHaveBeenCalledTimes(1);
+    expect(replacement?.destroy).toHaveBeenCalledTimes(1);
+
+    plugins.destroy();
+    pluginsSubject.complete();
+  });
+
   test('destroys already constructed plugins when a later constructor fails', () => {
     const destroy = jest.fn();
     const failure = new Error('Failed to construct the next plugin.');

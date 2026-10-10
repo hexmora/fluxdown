@@ -1,6 +1,9 @@
 import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-presets/base';
 import type { IPluggable, IPluggableConfig, IRemarkPlugin } from '@fluxdown/types';
 
+import { SyntaxSoftEndlineRemarkPlugin } from '@fluxdown/core-presets/remark';
+import { ParagraphRenderPlugin } from '@fluxdown/react-presets/render';
+import { ParagraphSlotPlugin } from '@fluxdown/react-presets/slot';
 import { PluginPriority } from '@fluxdown/types';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { type ComponentType, createRef, type ReactNode, StrictMode } from 'react';
@@ -59,6 +62,48 @@ const IsolatedSlotB = ({ children }: ParagraphSlotProps) => (
 );
 
 describe('Fluxdown', () => {
+  test('disables individual parser and render presets without reintroducing defaults', () => {
+    const { container, rerender } = render(
+      <Fluxdown
+        plugins={[
+          {
+            remarks: [[SyntaxSoftEndlineRemarkPlugin, { disabled: true }]],
+            renders: [[ParagraphRenderPlugin, { disabled: true }]],
+          },
+        ]}
+        text={'first\nsecond'}
+      />,
+    );
+
+    expect(container.querySelector('br')).toBeNull();
+    expect(container.querySelector('p')?.textContent).toBe('first\nsecond');
+    expect(container.querySelector('p')?.className).toBe('');
+
+    rerender(<Fluxdown text={'first\nsecond'} />);
+
+    expect(container.querySelector('br')).toBeInTheDocument();
+    expect(container.querySelector('p')?.className).not.toBe('');
+  });
+
+  test('omits disabled slots from the Raw composition chain', () => {
+    const capture = jest.fn();
+    const CustomParagraph = createParagraphSlotPlugin('custom-paragraph', ({ Raw, children }) => {
+      capture(Raw);
+
+      return <p>{children}</p>;
+    });
+
+    render(
+      <Fluxdown
+        plugins={[{ slots: [[ParagraphSlotPlugin, { disabled: true }], CustomParagraph] }]}
+        text="custom paragraph"
+      />,
+    );
+
+    expect(screen.getByText('custom paragraph')).toBeInTheDocument();
+    expect(capture).toHaveBeenCalledWith(null);
+  });
+
   test('renders Markdown synchronously during server rendering', () => {
     const markup = renderToStaticMarkup(<Fluxdown text="# Server heading" />);
 

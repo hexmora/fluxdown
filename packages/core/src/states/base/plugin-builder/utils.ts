@@ -52,6 +52,9 @@ export const isPluggableEqual = <T>(left: T | [T, unknown], right: T | [T, unkno
   );
 };
 
+export const isPluggableEnabled = (pluggable: AnyPluggable): boolean =>
+  !isArray(pluggable) || pluggable[1].disabled !== true;
+
 export const isPluggablesEqual = <T>(
   left: readonly T[] = [],
   right: readonly T[] = [],

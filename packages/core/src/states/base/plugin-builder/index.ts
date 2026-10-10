@@ -6,7 +6,12 @@ import { once, useClearable, useMap } from 'stative';
 
 import type { PluginBuilderInputs, PluginEntry } from './type';
 
-import { buildPluggables, isPluggableEqual, sortPluginInstances } from './utils';
+import {
+  buildPluggables,
+  isPluggableEnabled,
+  isPluggableEqual,
+  sortPluginInstances,
+} from './utils';
 
 export * from './type';
 export * from './utils';
@@ -27,7 +32,7 @@ export const PluginBuilder = /*#__PURE__*/ once(function PluginBuilder<
   return useMap(plugins, (currentPluggables) => {
     entries = cacheDiffMap({
       prev: entries.map((entry) => [entry.pluggable, entry]),
-      current: currentPluggables,
+      current: currentPluggables.filter(isPluggableEnabled),
       mapper: (pluggable) => ({
         instance: buildPluggables(pluggable),
         pluggable,
