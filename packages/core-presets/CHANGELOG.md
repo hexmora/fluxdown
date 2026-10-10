@@ -1,5 +1,25 @@
 # @fluxdown/core-presets
 
+## 0.6.5
+
+### Patch Changes
+
+- a37ab59: Compare block metadata with a fast path for changed block counts.
+- 8e65595: Keep retained block revision subscriptions connected while streaming instead of rebuilding the complete aggregate whenever block membership changes.
+- dad697b: Reuse the current raw state subscription in switchMap, removing ShadProgress's local tail cache while preserving child ownership and lifecycle handling.
+- Updated dependencies [d595ca8]
+- Updated dependencies [1f8bb14]
+- Updated dependencies [6bf8f8a]
+- Updated dependencies [5b391b4]
+- Updated dependencies [559a259]
+- Updated dependencies [f72e624]
+- Updated dependencies [0161ebf]
+- Updated dependencies [468a453]
+- Updated dependencies [dad697b]
+- Updated dependencies [f627b35]
+- Updated dependencies [ad93451]
+  - stative@1.2.0
+
 ## 0.6.4
 
 ### Patch Changes

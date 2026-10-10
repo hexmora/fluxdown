@@ -1,5 +1,28 @@
 # fluxdown
 
+## 0.7.4
+
+### Patch Changes
+
+- 3222507: Keep ordinary Markdown repairs enabled when streaming ends and only disable ending repairs. Explicit `build.repair` settings still take precedence.
+- Updated dependencies [d595ca8]
+- Updated dependencies [1f8bb14]
+- Updated dependencies [470fb5b]
+- Updated dependencies [6bf8f8a]
+- Updated dependencies [5b391b4]
+- Updated dependencies [559a259]
+- Updated dependencies [f72e624]
+- Updated dependencies [a37ab59]
+- Updated dependencies [8e65595]
+- Updated dependencies [0161ebf]
+- Updated dependencies [468a453]
+- Updated dependencies [dad697b]
+- Updated dependencies [f627b35]
+- Updated dependencies [ad93451]
+  - stative@1.2.0
+  - @fluxdown/core@0.8.2
+  - @fluxdown/core-presets@0.6.5
+
 ## 0.7.3
 
 ### Patch Changes
