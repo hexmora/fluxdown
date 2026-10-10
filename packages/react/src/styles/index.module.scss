@@ -10,7 +10,7 @@
   font-weight: var(--#{$prefix}-typography-font-weight-normal);
   line-height: var(--#{$prefix}-typography-line-height-md);
   overflow-wrap: anywhere;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: var(--#{$prefix}-typography-font-smoothing);
 
   &,
   & * {
@@ -18,24 +18,27 @@
   }
 
   :not(pre) > code {
-    padding: 0.15em 0.35em;
+    padding-block: var(--#{$prefix}-inline-code-padding-block);
+    padding-inline: var(--#{$prefix}-inline-code-padding-inline);
 
-    border: 1px solid var(--#{$prefix}-colors-border);
-    border-radius: var(--#{$prefix}-radius-sm);
-    background: var(--#{$prefix}-colors-surface-muted);
+    border: var(--#{$prefix}-inline-code-border);
+    border-radius: var(--#{$prefix}-inline-code-border-radius);
+    background: var(--#{$prefix}-inline-code-background);
 
-    font-family: var(--#{$prefix}-typography-font-mono);
-    font-size: 0.875em;
-    white-space: break-spaces;
+    font-family: var(--#{$prefix}-inline-code-font-family);
+    font-size: var(--#{$prefix}-inline-code-font-size);
+    white-space: var(--#{$prefix}-inline-code-white-space);
   }
 
   hr {
-    height: 1px;
+    height: var(--#{$prefix}-divider-height);
 
-    margin: var(--#{$prefix}-spacing-xl) 0;
+    margin-block: var(--#{$prefix}-divider-margin-block);
+    margin-inline: var(--#{$prefix}-divider-margin-inline);
 
-    border: 0;
-    background: var(--#{$prefix}-colors-border);
+    border: var(--#{$prefix}-divider-border);
+    border-block-end: var(--#{$prefix}-divider-border-block-end);
+    background: var(--#{$prefix}-divider-background);
   }
 
   del {
@@ -49,12 +52,12 @@
   }
 
   :global(.footnotes) {
-    margin-top: var(--#{$prefix}-spacing-xl);
-    padding-top: var(--#{$prefix}-spacing-lg);
+    margin-top: var(--#{$prefix}-footnotes-margin-top);
+    padding-top: var(--#{$prefix}-footnotes-padding-top);
 
-    border-top: 1px solid var(--#{$prefix}-colors-border);
+    border-top: var(--#{$prefix}-footnotes-border-top);
 
-    color: var(--#{$prefix}-colors-fg-muted);
-    font-size: var(--#{$prefix}-typography-font-size-sm);
+    color: var(--#{$prefix}-footnotes-color);
+    font-size: var(--#{$prefix}-footnotes-font-size);
   }
 }
