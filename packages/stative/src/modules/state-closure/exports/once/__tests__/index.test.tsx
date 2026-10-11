@@ -6,7 +6,6 @@ import {
   BaseStateClosure,
   D,
   type IReadableClosure,
-  isOnceFunction,
   MutableState,
   once,
   ReactiveState,
@@ -15,6 +14,7 @@ import {
   useCombineMap,
   useMap,
 } from '../../../../..';
+import { isOnceFunction } from '../utils';
 
 const Double = ({ value }: { value: number }) => value * 2;
 

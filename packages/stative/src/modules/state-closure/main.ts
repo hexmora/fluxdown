@@ -1,8 +1,7 @@
 import { isArray, isPlainObject, mapValues, values } from 'lodash-es';
-import { Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
-import type { DestructibleTarget } from '../../destructible';
+import type { DestructibleTarget } from '../destructible';
 import type {
   Distinctor,
   IReactiveState,
@@ -10,8 +9,7 @@ import type {
   StateSource,
   StateValue,
   StateValues,
-} from '../../reactive-state';
-import type { FlattenedState, IReadableClosure, ListEntry, StateClosureSource } from '../type';
+} from '../reactive-state';
 import type {
   BuiltClosure,
   MarkedStateClosureDescriptor,
@@ -19,12 +17,13 @@ import type {
   StateClosureResult,
   StateClosureResultNode,
   StateClosureResultValue,
-} from './render';
+} from './exports/render';
+import type { FlattenedState, IReadableClosure, StateClosureSource } from './type';
 
-import { assert } from '../../../utils';
-import { Destructible } from '../../destructible';
-import { clearByTarget } from '../../destructible/utils';
-import { MutableState } from '../../mutable-state';
+import { assert } from '../../utils';
+import { Destructible } from '../destructible';
+import { clearByTarget } from '../destructible/utils';
+import { MutableState } from '../mutable-state';
 import {
   combineMapState,
   isReactiveStateLike,
@@ -32,29 +31,29 @@ import {
   ReactiveState,
   selectState,
   toState,
-} from '../../reactive-state';
-import { batch } from '../../state-graph/batch';
-import { withStateContext } from '../../state-graph/context';
-import { getStateNode } from '../../state-graph/node';
+} from '../reactive-state';
+import { StateContext } from '../state-graph/utils/context';
+import { StateNode } from '../state-graph/utils/node';
+import { StateClosureHookRuntime } from './exports/hooks/utils/runtime';
+import { mapKeyedClosure } from './exports/keyed';
+import { mapEachClosure, switchMapClosure } from './exports/operator';
+import { render } from './exports/render';
+import {
+  bindRootDescriptorScope,
+  clearWithDescriptorScope,
+  DescriptorContext,
+  detachWithDescriptorScope,
+  getReadableClosureScope,
+  ownReadableClosure,
+  releaseReadableClosure,
+} from './exports/render/utils/context';
+import { isReadableClosure, isStateClosureDescriptor } from './exports/render/utils/predicates';
 import {
   isResolvedClosureSource,
   isResolvedImmediateSource,
   resolveResult,
   resolveSource,
-} from '../utils';
-import { withStateClosureHookRuntime } from './hooks/runtime/utils';
-import { mapKeyedClosure } from './keyed';
-import { isImmediateDescriptor, isStateClosureDescriptor, render } from './render';
-import {
-  bindRootDescriptorScope,
-  clearWithDescriptorScope,
-  consumeDescriptorScope,
-  detachWithDescriptorScope,
-  getReadableClosureScope,
-  ownReadableClosure,
-  releaseReadableClosure,
-} from './render/utils/context';
-import { isReadableClosure } from './render/utils/resolve';
+} from './utils/source';
 
 export const toClosure = <T>(source: StateClosureSource<T>): IReadableClosure<T> => {
   return isReadableClosure<T>(source) ? source : new SourceReadableClosure({ source });
@@ -68,7 +67,7 @@ export const mapClosure = <S, R>(
   return new DerivedReadableClosure(source, () =>
     mapState(
       source,
-      (value, prev) => withStateClosureHookRuntime(null, () => mapper(value, prev)),
+      (value, prev) => StateClosureHookRuntime.run(null, () => mapper(value, prev)),
       distinctor,
     ),
   );
@@ -82,7 +81,7 @@ export const selectClosure = <S, R>(
   return new DerivedReadableClosure(source, () =>
     selectState(
       source,
-      (value, prev) => withStateClosureHookRuntime(null, () => mapper(value, prev)),
+      (value, prev) => StateClosureHookRuntime.run(null, () => mapper(value, prev)),
       distinctor,
     ),
   );
@@ -99,185 +98,6 @@ export const flattenClosure = <T extends object>(
   ) as FlattenedState<T>;
 };
 
-/**
- * Follows the latest mapped child and releases the previous child graph on replacement.
- * Consecutive returns of the same raw state reuse its child closure and subscription.
- * Completed flows retain the final child graph until the closure is destroyed.
- */
-export function switchMapClosure<S, R>(
-  source: S,
-  mapper: (value: StateValue<S>) => R & StateClosureResultNode,
-  distinctor?: Distinctor<StateClosureResultValue<R>>,
-): IReadableClosure<StateClosureResultValue<R>>;
-export function switchMapClosure<S, R>(
-  source: S,
-  mapper: (value: StateValue<S>) => StateClosureResult<R>,
-  distinctor?: Distinctor<R>,
-): IReadableClosure<R>;
-export function switchMapClosure<S, R>(
-  source: S,
-  mapper: (value: StateValue<S>) => StateClosureResult<R>,
-  distinctor?: Distinctor<R>,
-): IReadableClosure<R> {
-  const closure = FactoryReadableClosure.create(() => {
-    const input = toState(source);
-
-    let cached: [IReactiveState<R>, IReadableClosure<R>] | null = null;
-
-    clearWithDescriptorScope(scope, () => {
-      cached = null;
-    });
-
-    const handleCreate = (value: StateValue<S>) =>
-      ownReadableClosure(
-        scope,
-        FactoryReadableClosure.create(() => {
-          const result = withStateClosureHookRuntime(null, () => mapper(value));
-
-          if (!isImmediateDescriptor(result) && isReactiveStateLike<R>(result)) {
-            if (cached && cached[0] === result) {
-              return cached[1];
-            }
-
-            const child = render<R>(result);
-
-            cached = [result, child];
-
-            return child;
-          }
-
-          cached = null;
-
-          return render<R>(result);
-        }),
-      );
-
-    let previous = input.value;
-
-    let current = handleCreate(previous);
-
-    let inner = current.value;
-
-    const state: ReactiveState<R> = new ReactiveState({
-      initial: inner.value,
-
-      distinctor,
-
-      emitter: (observer) => {
-        const subscriptions = new Subscription();
-
-        let subscription: Subscription | null = null;
-
-        let stopped = false;
-
-        let completed = false;
-
-        const handleError = (error: unknown) => {
-          if (!stopped) {
-            stopped = true;
-
-            observer.error(error);
-          }
-        };
-
-        const handleSchedule = () => {
-          getStateNode(state).schedule(handleUpdate);
-        };
-
-        const handleSubscribe = () => {
-          subscription = inner.subscribe({
-            next: handleSchedule,
-
-            error: handleError,
-
-            complete: handleSchedule,
-          });
-        };
-
-        const handleUpdate = () => {
-          if (stopped) {
-            return;
-          }
-
-          try {
-            const value = input.value;
-
-            if (!Object.is(value, previous)) {
-              const next = handleCreate(value);
-
-              const nextState = next.value;
-
-              subscription?.unsubscribe();
-
-              releaseReadableClosure(scope, current);
-
-              previous = value;
-
-              current = next;
-
-              inner = nextState;
-
-              handleSubscribe();
-            }
-
-            observer.next(inner.value);
-
-            if (input.closed && inner.closed) {
-              stopped = true;
-
-              completed = true;
-
-              observer.complete();
-            }
-          } catch (error) {
-            handleError(error);
-          }
-        };
-
-        batch(() => {
-          handleSubscribe();
-
-          subscriptions.add(
-            input.subscribe({
-              next: handleSchedule,
-
-              error: handleError,
-
-              complete: handleSchedule,
-            }),
-          );
-        });
-
-        return () => {
-          stopped = true;
-
-          cached = null;
-
-          subscriptions.unsubscribe();
-
-          subscription?.unsubscribe();
-
-          if (!completed) {
-            releaseReadableClosure(scope, current);
-          }
-        };
-      },
-    });
-
-    detachWithDescriptorScope(scope, () => state.destroy());
-
-    return state;
-  });
-
-  const scope = getReadableClosureScope(closure);
-
-  if (isReadableClosure(source)) {
-    ownReadableClosure(scope, source);
-  }
-
-  return closure;
-}
-
 export const combineMapClosure = <const TSources extends [unknown, ...unknown[]], R>(
   sources: [...TSources],
   mapper: StateMapper<StateValues<TSources>, R>,
@@ -286,193 +106,11 @@ export const combineMapClosure = <const TSources extends [unknown, ...unknown[]]
   return new DerivedReadableClosure(sources, () =>
     combineMapState(
       sources,
-      (value, prev) => withStateClosureHookRuntime(null, () => mapper(value, prev)),
+      (value, prev) => StateClosureHookRuntime.run(null, () => mapper(value, prev)),
       distinctor,
     ),
   );
 };
-
-/**
- * Keeps one owned state flow per list position and follows its current value.
- * Branded descriptors infer their resolved value before inspecting tuple factories.
- */
-export function mapEachClosure<T, R>(
-  source: StateSource<readonly T[]>,
-  mapper: (item: IReadableClosure<T>, index: number) => MarkedStateClosureDescriptor<R>,
-  itemDistinctor?: Distinctor<T>,
-): IReadableClosure<R[]>;
-export function mapEachClosure<T, R>(
-  source: StateSource<readonly T[]>,
-  mapper: (item: IReadableClosure<T>, index: number) => StateClosureSource<R>,
-  itemDistinctor?: Distinctor<T>,
-): IReadableClosure<R[]>;
-export function mapEachClosure<T, R>(
-  source: StateSource<readonly T[]>,
-  mapper: (item: IReadableClosure<T>, index: number) => StateClosureSource<R>,
-  itemDistinctor?: Distinctor<T>,
-): IReadableClosure<R[]> {
-  const closure = FactoryReadableClosure.create(() => {
-    const sourceState = input.value;
-
-    const createEntry = (value: T, index: number): ListEntry<T, R> => {
-      const item = new MutableState({ initial: value, distinctor: itemDistinctor });
-
-      getStateNode(item).dependOn(getStateNode(sourceState), { ordering: true });
-
-      const readable = FactoryReadableClosure.create(() => item);
-
-      clearWithDescriptorScope(getReadableClosureScope(readable), () => item.destroy());
-
-      const child = FactoryReadableClosure.create(() => toClosure(mapper(readable, index)));
-
-      ownReadableClosure(getReadableClosureScope(child), readable);
-      ownReadableClosure(scope, child);
-
-      try {
-        return { input: item, closure: child, state: child.value };
-      } catch (error) {
-        releaseReadableClosure(scope, child);
-
-        throw error;
-      }
-    };
-
-    const releaseEntries = (items: ListEntry<T, R>[]) => {
-      const cleanup = new Subscription();
-
-      for (const entry of items) {
-        cleanup.add(() => {
-          entry.subscription?.unsubscribe();
-
-          releaseReadableClosure(scope, entry.closure);
-        });
-      }
-
-      cleanup.unsubscribe();
-    };
-
-    let previousItems = sourceState.value;
-    let entries = previousItems.map(createEntry);
-
-    const state: ReactiveState<R[]> = new ReactiveState({
-      initial: entries.map((entry) => entry.state.value),
-      distinctor: shallowEqual,
-      emitter: (observer) => {
-        const subscriptions = new Subscription();
-
-        let stopped = false;
-        let completed = false;
-
-        const fail = (error: unknown) => {
-          if (stopped) {
-            return;
-          }
-
-          stopped = true;
-
-          observer.error(error);
-        };
-
-        const refresh = () => {
-          if (stopped) {
-            return;
-          }
-
-          try {
-            observer.next(entries.map((entry) => entry.state.value));
-
-            if (completed && entries.every((entry) => entry.state.closed)) {
-              stopped = true;
-
-              observer.complete();
-            }
-          } catch (error) {
-            fail(error);
-          }
-        };
-
-        const scheduleRefresh = () => {
-          getStateNode(state).schedule(refresh);
-        };
-
-        const connectEntry = (entry: ListEntry<T, R>) => {
-          entry.subscription = entry.state.subscribe({
-            next: scheduleRefresh,
-            error: fail,
-            complete: scheduleRefresh,
-          });
-
-          subscriptions.add(entry.subscription);
-        };
-
-        const update = (items: readonly T[]) => {
-          if (stopped || items === previousItems) {
-            return;
-          }
-
-          const created: ListEntry<T, R>[] = [];
-
-          try {
-            for (let index = entries.length; index < items.length; index++) {
-              created.push(createEntry(items[index], index));
-            }
-
-            const removed = entries.slice(items.length);
-
-            entries = [...entries.slice(0, items.length), ...created];
-
-            previousItems = items;
-
-            batch(() => {
-              entries.forEach((entry, index) => entry.input.next(items[index]));
-              created.forEach(connectEntry);
-
-              releaseEntries(removed);
-              scheduleRefresh();
-            });
-          } catch (error) {
-            releaseEntries(created);
-            fail(error);
-          }
-        };
-
-        batch(() => {
-          entries.forEach(connectEntry);
-
-          subscriptions.add(
-            sourceState.subscribe({
-              next: update,
-              error: fail,
-              complete: () => {
-                completed = true;
-
-                batch(() => {
-                  entries.forEach((entry) => entry.input.complete());
-                  scheduleRefresh();
-                });
-              },
-            }),
-          );
-        });
-
-        return () => {
-          stopped = true;
-
-          subscriptions.unsubscribe();
-        };
-      },
-    });
-
-    detachWithDescriptorScope(scope, () => state.destroy());
-
-    return state;
-  });
-
-  const scope = getReadableClosureScope(closure);
-  const input = ownReadableClosure(scope, toClosure(source));
-
-  return closure;
-}
 
 export abstract class BaseStateClosure<T, TInputs = void>
   extends Destructible
@@ -487,7 +125,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
 
     this.inputs = inputs;
 
-    const scope = consumeDescriptorScope();
+    const scope = DescriptorContext.consume();
 
     if (scope) {
       bindRootDescriptorScope(scope, this);
@@ -523,7 +161,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
       value: initial,
     };
 
-    const subscription = withStateContext(null, () =>
+    const subscription = StateContext.run(null, () =>
       source.subscribe({
         next: (value) => {
           if (state) {
@@ -580,7 +218,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
       state.complete();
     }
 
-    getStateNode(state).dependOn(getStateNode(source));
+    StateNode.get(state).dependOn(StateNode.get(source));
 
     return state;
   }
@@ -593,7 +231,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
     assert(!this.destroyed, 'Cannot set up a destroyed state closure.');
 
     try {
-      const resolvedSource = resolveResult(withStateClosureHookRuntime(null, () => this.render()));
+      const resolvedSource = resolveResult(StateClosureHookRuntime.run(null, () => this.render()));
 
       const directSource = isResolvedClosureSource(resolvedSource)
         ? this.own(resolvedSource.source).value

@@ -1,12 +1,12 @@
 // oxlint-disable typescript/no-explicit-any
 import type { BehaviorSubject } from 'rxjs';
 
-import type { Newable } from '../../../../../typings';
-import type { Distinctor, IReactiveState } from '../../../../reactive-state';
-import type { IReadableClosure } from '../../../type';
-import type { AnyOnceFunction, OnceFunctionMetadata } from '../../once';
+import type { Newable } from '../../../../typings';
+import type { Distinctor, IReactiveState } from '../../../reactive-state';
+import type { IReadableClosure } from '../../type';
+import type { AnyOnceFunction, OnceFunctionMetadata } from '../once';
 
-import { immediateDescriptor } from './consts';
+import { immediateDescriptor } from './utils/consts';
 
 declare const jsxDescriptor: unique symbol;
 

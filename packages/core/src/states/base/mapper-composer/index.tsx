@@ -5,32 +5,16 @@
 import type { IBlockState } from '@fluxdown/types';
 
 import { PluginPriority } from '@fluxdown/types';
-import { first, isArray, sortBy, tail } from 'lodash-es';
-import { D, type IReadableClosure, type JSXDescriptor, once, useMap, useSwitchMap } from 'stative';
+import { first, isArray, sortBy } from 'lodash-es';
+import { D, type IReadableClosure, once, useMap, useSwitchMap } from 'stative';
 
 import type { HastRoot } from '../../../typings';
-import type { Mapper, MapperComposerInputs, MapperPluggable } from './type';
+import type { Mapper, MapperComposerInputs } from './type';
 
 import { isPluggableEqual, isPluggablesEqual } from '../plugin-builder';
+import { MapperItem } from './states';
 
 export * from './type';
-
-const MapperItem = /*#__PURE__*/ once(function MapperItem({
-  mapper,
-  mappers,
-  source,
-}: MapperComposerInputs & { mapper: [Mapper, object | undefined] }): JSXDescriptor<
-  IBlockState<HastRoot>[]
-> {
-  const [Mapper, config] = mapper;
-
-  // Freeze the old suffix while its mapper is being replaced.
-  const rest = useMap(mappers, (items, previous): MapperPluggable[] =>
-    isPluggableEqual(first(items), mapper) ? tail(items) : (previous?.[1] ?? []),
-  );
-
-  return <MapperComposer mappers={rest} source={Mapper({ ...config, source })} />;
-});
 
 export const MapperComposer = /*#__PURE__*/ once(function MapperComposer({
   mappers: _mappers,

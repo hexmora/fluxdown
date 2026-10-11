@@ -6,25 +6,21 @@ import type {
   IReactiveState,
   ReactiveStateParams,
   StateSubscriber,
-} from '../type';
+} from './type';
 
-import { Destructible } from '../../destructible';
-import { canSettle } from '../../state-graph/batch';
-import {
-  getStateContext,
-  getStateContextOptions,
-  withStateContext,
-} from '../../state-graph/context';
-import { getStateNode } from '../../state-graph/node';
-import { bindStateSubscriber } from '../../state-graph/subscriber';
-import { isFinalPendingType } from '../utils';
+import { Destructible } from '../destructible';
+import { StateBatch } from '../state-graph/utils/batch';
+import { StateContext } from '../state-graph/utils/context';
+import { StateNode } from '../state-graph/utils/node';
+import { bindStateSubscriber } from '../state-graph/utils/subscriber';
+import { isFinalPendingType } from './utils/predicates';
 
 type PendingType = 'next' | 'complete' | 'error';
 
 type PendingPayload = { value?: unknown; error?: unknown };
 
 export class ReactiveState<T> extends Destructible implements IReactiveState<T> {
-  private readonly node = getStateNode(this);
+  private readonly node = StateNode.get(this);
 
   private readonly subject: BehaviorSubject<T>;
 
@@ -155,7 +151,7 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
     const observable = new Observable(this.emitter);
 
-    const subscription = withStateContext(this.node, () =>
+    const subscription = StateContext.run(this.node, () =>
       observable.subscribe({
         next: this._next.bind(this),
         error: this._error.bind(this),
@@ -187,7 +183,7 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
   get value() {
     this.setup();
 
-    if (canSettle()) {
+    if (StateBatch.canSettle) {
       this.node.settle();
     }
 
@@ -201,9 +197,9 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
   }
 
   subscribe(subscriber: StateSubscriber<T>): Subscription {
-    const context = getStateContext();
+    const context = StateContext.current;
 
-    const options = getStateContextOptions();
+    const options = StateContext.options;
 
     this.setup();
 

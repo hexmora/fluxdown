@@ -17,7 +17,7 @@ import {
   useCreate,
   useMap,
   useSwitchMap,
-} from '../../../../index';
+} from '../../../..';
 
 describe('switchMapClosure', () => {
   test.each(['hook', 'member'] as const)(

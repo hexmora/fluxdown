@@ -5,10 +5,10 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { Processor, unified } from 'unified';
 
-import type { BlockCompilerItem } from './type';
+import type { BlockCompilerItem } from '../type';
 
-import { HastRoot, MdastRoot } from '../../../typings';
-import { isSectionEqual } from '../../base/text-chunker/utils';
+import { HastRoot, MdastRoot } from '../../../../typings';
+import { isSectionEqual } from '../../../base/text-chunker/utils';
 import { getFootnotePrefix, namespaceFootnoteLabel } from './footnote';
 
 export const isItemEqual = (item: BlockCompilerItem, other: BlockCompilerItem): boolean => {
@@ -24,11 +24,11 @@ type AstProcessor = Processor<MdastRoot, undefined, undefined, undefined, undefi
 
 type HastProcessor = Processor<MdastRoot, MdastRoot, HastRoot, undefined, undefined>;
 
-export interface GetAstProcessorByPluginsParams {
+interface GetAstProcessorByPluginsParams {
   remarks?: IRemarkPlugin[];
 }
 
-export const getAstProcessorByPlugins = ({ remarks = [] }: GetAstProcessorByPluginsParams) => {
+const getAstProcessorByPlugins = ({ remarks = [] }: GetAstProcessorByPluginsParams) => {
   let processor: AstProcessor = unified().use(remarkParse);
 
   for (const remark of remarks) {
@@ -70,7 +70,7 @@ const getHastProcessor = ({ remarks = [], rehypes = [], idPrefix }: GetHastProce
   return processor;
 };
 
-export type MarkdownToHastParams = {
+type MarkdownToHastParams = {
   text: string;
 
   remarks?: IRemarkPlugin[];

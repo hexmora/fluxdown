@@ -2,9 +2,6 @@ import { BehaviorSubject, Observable, type Observer, Subscription } from 'rxjs';
 
 import type { IReactiveState } from '../../type';
 
-import { batch } from '../../../..';
-import { assert } from '../../../../utils';
-import { ReactiveState } from '../base';
 import {
   combineMapState,
   combineState,
@@ -12,7 +9,10 @@ import {
   mapState,
   toReactiveState,
   toState,
-} from '../index';
+} from '..';
+import { ReactiveState } from '../..';
+import { batch } from '../../../..';
+import { assert } from '../../../../utils';
 
 const assertType = <T>(_value: T) => undefined;
 

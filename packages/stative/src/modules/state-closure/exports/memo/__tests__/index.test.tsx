@@ -5,7 +5,6 @@ import { isEqual } from 'lodash-es';
 import {
   BaseStateClosure,
   D,
-  getMapperComparers,
   type IReadableClosure,
   memo,
   memoReturns,
@@ -16,6 +15,7 @@ import {
   S,
   useCurrent,
 } from '../../../../..';
+import { getMapperComparers } from '../utils';
 
 function calculate(this: { scale: number }, value: number) {
   return this.scale * value;

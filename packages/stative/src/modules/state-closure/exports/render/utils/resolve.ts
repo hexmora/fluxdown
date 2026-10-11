@@ -9,86 +9,36 @@ import {
 } from 'lodash-es';
 
 import type { IReadableClosure } from '../../../type';
+import type { ResolvedMappingNode, RuntimeSlottedDescriptor } from '../type';
 import type { DescriptorScope } from './context';
-import type {
-  ImmediateDescriptor,
-  ResolvedMappingNode,
-  RuntimeSlottedDescriptor,
-  StateClosureDescriptor,
-} from './type';
 
 import { isClass } from '../../../../../utils';
 import { isReactiveStateLike } from '../../../../reactive-state';
-import { toClosure } from '../../base';
-import { withStateClosureHookRuntime } from '../../hooks/runtime/utils';
-import { isOnceFunction } from '../../once';
+import { toClosure } from '../../../main';
+import { StateClosureHookRuntime } from '../../hooks/utils/runtime';
+import { isOnceFunction } from '../../once/utils';
 import { immediateDescriptor, isMarkedStateClosureDescriptor } from './consts';
 import {
   assertDescriptorScope,
   bindRootDescriptorScope,
   createDescriptorScope,
+  DescriptorContext,
   destroyDescriptorScope,
   ownReadableClosure,
-  withDescriptorScope,
 } from './context';
 import { createMappedStateClosure } from './mapped';
+import {
+  isImmediateDescriptor,
+  isReadableClosure,
+  isReadableSourceDescriptor,
+  isSlottedDescriptor,
+  unwrapImmediateDescriptor,
+} from './predicates';
 
 const generatorTarget = /*#__PURE__*/ Symbol('generatorTarget');
 
 type StateClosureGenerator = ((...params: unknown[]) => unknown) & {
   readonly [generatorTarget]?: StateClosureGenerator;
-};
-
-export const isImmediateDescriptor = <T = unknown>(
-  value: unknown,
-): value is ImmediateDescriptor<T> => {
-  return isObject(value) && immediateDescriptor in value;
-};
-
-export const unwrapImmediateDescriptor = <T>(descriptor: ImmediateDescriptor<T>): T => {
-  return descriptor[immediateDescriptor];
-};
-
-export const isReadableClosure = <T = unknown>(value: unknown): value is IReadableClosure<T> => {
-  return (
-    isObject(value) &&
-    !isReactiveStateLike(value) &&
-    'value' in value &&
-    'destroy' in value &&
-    isFunction(value.destroy)
-  );
-};
-
-const isSlottedDescriptor = (value: unknown): value is RuntimeSlottedDescriptor => {
-  return (
-    isArray(value) &&
-    isFunction(value[0]) &&
-    (value.length === 2 ||
-      (value.length === 3 &&
-        !isClass(value[0]) &&
-        !isOnceFunction(value[0]) &&
-        (value[2] === undefined || isFunction(value[2]))))
-  );
-};
-
-export const isStateClosureDescriptor = <T = unknown>(
-  value: unknown,
-): value is StateClosureDescriptor<T> => {
-  return (
-    value === null ||
-    isImmediateDescriptor<T>(value) ||
-    isReadableClosure<T>(value) ||
-    isSlottedDescriptor(value) ||
-    isClass(value)
-  );
-};
-
-const isReadableSourceDescriptor = (source: unknown) => {
-  return (
-    isReadableClosure(source) ||
-    isClass(source) ||
-    (isMarkedStateClosureDescriptor(source) && isSlottedDescriptor(source))
-  );
 };
 
 const resolveReadableSource = (
@@ -112,7 +62,7 @@ const resolveGenerator = (generator: StateClosureGenerator, scope: DescriptorSco
   const resolved: StateClosureGenerator = (...params) => {
     assertDescriptorScope(scope);
 
-    const source = withStateClosureHookRuntime(null, () => target(...params));
+    const source = StateClosureHookRuntime.run(null, () => target(...params));
 
     return resolveReadableSource(source, scope);
   };
@@ -232,8 +182,8 @@ const buildSlottedStateClosure = (
       isMarkedStateClosureDescriptor(descriptor),
     );
 
-    return withDescriptorScope(scope, () =>
-      withStateClosureHookRuntime(null, () => new Factory(inputs)),
+    return DescriptorContext.run(scope, () =>
+      StateClosureHookRuntime.run(null, () => new Factory(inputs)),
     );
   }
 
@@ -290,8 +240,8 @@ export const buildStateClosure = (
     } else if (isSlottedDescriptor(descriptor)) {
       closure = buildSlottedStateClosure(descriptor, closureScope);
     } else if (isClass(descriptor)) {
-      closure = withDescriptorScope(closureScope, () =>
-        withStateClosureHookRuntime(null, () => new descriptor()),
+      closure = DescriptorContext.run(closureScope, () =>
+        StateClosureHookRuntime.run(null, () => new descriptor()),
       );
     } else {
       const dependencies: IReadableClosure<unknown>[] = [];

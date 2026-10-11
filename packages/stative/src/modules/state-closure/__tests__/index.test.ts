@@ -3,10 +3,6 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 
 import type { IReactiveState, StateSubscriber } from '../../reactive-state';
 
-import { batch } from '../../..';
-import { MutableState } from '../../mutable-state';
-import { combineMapState, mapState, ReactiveState, toReactiveState } from '../../reactive-state';
-import { D, render as renderDescriptor, S, type StateClosureResult } from '../exports/render';
 import {
   BaseStateClosure,
   combineMapClosure,
@@ -16,7 +12,11 @@ import {
   mapEachClosure,
   type StateClosureSource,
   toClosure,
-} from '../index';
+} from '..';
+import { batch } from '../../..';
+import { MutableState } from '../../mutable-state';
+import { combineMapState, mapState, ReactiveState, toReactiveState } from '../../reactive-state';
+import { D, render as renderDescriptor, S, type StateClosureResult } from '../exports/render';
 
 type SourceInputs<T> = {
   source: StateClosureSource<T>;

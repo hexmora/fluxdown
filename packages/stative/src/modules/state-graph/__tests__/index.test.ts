@@ -1,4 +1,6 @@
-import { batch, dequeue, enqueue, StateNode } from '../../..';
+import { batch } from '../../..';
+import { StateBatch } from '../utils/batch';
+import { StateNode } from '../utils/node';
 
 describe('state graph queue', () => {
   test('ignores idle and disposed nodes without blocking subsequent updates', () => {
@@ -9,8 +11,8 @@ describe('state graph queue', () => {
 
     disposed.destroy();
 
-    enqueue(idle);
-    enqueue(disposed);
+    StateBatch.enqueue(idle);
+    StateBatch.enqueue(disposed);
     active.schedule(update);
 
     expect(update).toHaveBeenCalledTimes(1);
@@ -89,9 +91,9 @@ describe('state graph queue', () => {
 
           current.schedule(() => events.push('current again'));
 
-          dequeue(later);
+          StateBatch.dequeue(later);
 
-          enqueue(later);
+          StateBatch.enqueue(later);
 
           added.schedule(() => events.push('added'));
         });
@@ -128,9 +130,9 @@ describe('state graph queue', () => {
 
         removed.destroy();
 
-        enqueue(idle);
+        StateBatch.enqueue(idle);
 
-        enqueue(removed);
+        StateBatch.enqueue(removed);
 
         last.schedule(() => events.push('last'));
       });

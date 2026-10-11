@@ -25,15 +25,15 @@ import {
   combineMapClosure,
   flattenClosure,
   mapClosure,
-  mapEachClosure,
   selectClosure,
-  switchMapClosure,
   toClosure,
-} from '../base';
+} from '../../main';
 import { mapKeyedClosure } from '../keyed';
-import { isStateClosureDescriptor, render } from '../render';
+import { mapEachClosure, switchMapClosure } from '../operator';
+import { render } from '../render';
 import { getReadableClosureScope, ownReadableClosure } from '../render/utils/context';
-import { getCurrentStateClosureHookRuntime } from './runtime/utils';
+import { isStateClosureDescriptor } from '../render/utils/predicates';
+import { StateClosureHookRuntime } from './utils';
 
 export * from './type';
 
@@ -42,7 +42,7 @@ export const useMap = <S, R>(
   mapper: StateMapper<StateValue<S>, R>,
   distinctor?: Distinctor<R>,
 ): IReadableClosure<R> => {
-  const { owner } = getCurrentStateClosureHookRuntime('useMap', 'once');
+  const { owner } = StateClosureHookRuntime.require('useMap', 'once');
 
   return ownReadableClosure(getReadableClosureScope(owner), mapClosure(source, mapper, distinctor));
 };
@@ -52,7 +52,7 @@ export const useSelect = <S, R>(
   mapper: StateMapper<StateValue<S>, R>,
   distinctor?: Distinctor<R>,
 ): IReadableClosure<R> => {
-  const { owner } = getCurrentStateClosureHookRuntime('useSelect', 'once');
+  const { owner } = StateClosureHookRuntime.require('useSelect', 'once');
 
   return ownReadableClosure(
     getReadableClosureScope(owner),
@@ -75,7 +75,7 @@ export function useSwitchMap<S, R>(
   mapper: (value: StateValue<S>) => StateClosureResult<R>,
   distinctor?: Distinctor<R>,
 ): IReadableClosure<R> {
-  const { owner } = getCurrentStateClosureHookRuntime('useSwitchMap', 'once');
+  const { owner } = StateClosureHookRuntime.require('useSwitchMap', 'once');
 
   return ownReadableClosure(
     getReadableClosureScope(owner),
@@ -89,7 +89,7 @@ export function useSwitchMap<S, R>(
 export const useFlatten = <T extends object>(
   source: IReadableClosure<T> | IReactiveState<T>,
 ): FlattenedState<T> => {
-  const { owner } = getCurrentStateClosureHookRuntime('useFlatten', 'once');
+  const { owner } = StateClosureHookRuntime.require('useFlatten', 'once');
 
   const fields = flattenClosure(source);
 
@@ -115,7 +115,7 @@ export function useMapEach<T, R>(
   mapper: (item: IReadableClosure<T>, index: number) => StateClosureSource<R>,
   itemDistinctor?: Distinctor<T>,
 ): IReadableClosure<R[]> {
-  const { owner } = getCurrentStateClosureHookRuntime('useMapEach', 'once');
+  const { owner } = StateClosureHookRuntime.require('useMapEach', 'once');
 
   return ownReadableClosure(
     getReadableClosureScope(owner),
@@ -135,7 +135,7 @@ export function useMapKeyed<T, R>(
   source: StateSource<readonly T[]>,
   mapper: (item: T) => StateClosureSource<R>,
 ): IReadableClosure<R[]> {
-  const { owner } = getCurrentStateClosureHookRuntime('useMapKeyed', 'once');
+  const { owner } = StateClosureHookRuntime.require('useMapKeyed', 'once');
 
   return ownReadableClosure(getReadableClosureScope(owner), mapKeyedClosure(source, mapper));
 }
@@ -145,7 +145,7 @@ export const useCombineMap = <const TSources extends [unknown, ...unknown[]], R>
   mapper: StateMapper<StateValues<TSources>, R>,
   distinctor?: Distinctor<R>,
 ): IReadableClosure<R> => {
-  const { owner } = getCurrentStateClosureHookRuntime('useCombineMap', 'once');
+  const { owner } = StateClosureHookRuntime.require('useCombineMap', 'once');
 
   return ownReadableClosure(
     getReadableClosureScope(owner),
@@ -158,7 +158,7 @@ export function useCreate<const D extends StateClosureDescriptor<unknown>>(
 ): BuiltClosure<D>;
 export function useCreate<T>(source: StateClosureSource<T>): IReadableClosure<T>;
 export function useCreate<T>(source: StateClosureSource<T>): IReadableClosure<T> {
-  const { owner } = getCurrentStateClosureHookRuntime('useCreate', 'once');
+  const { owner } = StateClosureHookRuntime.require('useCreate', 'once');
 
   return ownReadableClosure(
     getReadableClosureScope(owner),
@@ -170,7 +170,7 @@ export const useDefaults = <T>(
   source: IReadableClosure<T> | null | undefined,
   fallback: StateClosureSource<T>,
 ): IReadableClosure<T> => {
-  getCurrentStateClosureHookRuntime('useDefaults', 'once');
+  StateClosureHookRuntime.require('useDefaults', 'once');
 
   return useCreate(source ?? fallback);
 };
@@ -179,7 +179,7 @@ export const useDefaultsFalsy = <T>(
   source: IReadableClosure<T> | null | undefined | false | 0 | '' | 0n,
   fallback: StateClosureSource<T>,
 ): IReadableClosure<T> => {
-  getCurrentStateClosureHookRuntime('useDefaultsFalsy', 'once');
+  StateClosureHookRuntime.require('useDefaultsFalsy', 'once');
 
   return useCreate(source || fallback);
 };
@@ -191,15 +191,15 @@ export const useCombine = <const TSources extends [unknown, ...unknown[]]>(
 };
 
 export const useClearable = <T extends DestructibleTarget>(target: T): T => {
-  return getCurrentStateClosureHookRuntime('useClearable').clearable(target);
+  return StateClosureHookRuntime.require('useClearable').clearable(target);
 };
 
 export const useRef = <T>(initialValue: T): StateClosureRef<T> => {
-  return getCurrentStateClosureHookRuntime('useRef', 'mapper').ref(initialValue);
+  return StateClosureHookRuntime.require('useRef', 'mapper').ref(initialValue);
 };
 
 export const useCurrent = <T>(factory: () => T): T => {
-  return getCurrentStateClosureHookRuntime('useCurrent', 'mapper').current(factory);
+  return StateClosureHookRuntime.require('useCurrent', 'mapper').current(factory);
 };
 
 export const useStableFn = <TParams extends unknown[], TReturn>(

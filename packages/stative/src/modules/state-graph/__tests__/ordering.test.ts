@@ -1,4 +1,5 @@
-import { batch, StateNode } from '../../..';
+import { batch } from '../../..';
+import { StateNode } from '../utils/node';
 
 describe('ordering dependencies', () => {
   test('settles a prerequisite attached after a deep descendant is created', () => {

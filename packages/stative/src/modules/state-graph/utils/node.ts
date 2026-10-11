@@ -1,7 +1,7 @@
 import { noop } from 'lodash-es';
 
-import { dequeue, enqueue } from './batch';
-import { withStateContext } from './context';
+import { StateBatch } from './batch';
+import { StateContext } from './context';
 import { StateLinks } from './links';
 
 type StateUpdate = () => void;
@@ -11,10 +11,22 @@ type DependencyFrame = {
   dependencies: MapIterator<StateLinks<StateNode>>;
 };
 
-const nodes = /*#__PURE__*/ new WeakMap<object, StateNode>();
-
 /** Dependencies describe notification order; dirty nodes are pulled before publication. */
 export class StateNode {
+  private static readonly nodes = /*#__PURE__*/ new WeakMap<object, StateNode>();
+
+  static get(state: object): StateNode {
+    let node = this.nodes.get(state);
+
+    if (!node) {
+      node = new StateNode();
+
+      this.nodes.set(state, node);
+    }
+
+    return node;
+  }
+
   private readonly links: StateLinks<StateNode> = new StateLinks(this);
 
   private dirty = false;
@@ -82,7 +94,7 @@ export class StateNode {
 
     this.invalidate();
 
-    enqueue(this);
+    StateBatch.enqueue(this);
   }
 
   private needsSettle() {
@@ -128,10 +140,10 @@ export class StateNode {
 
     this.dirty = false;
 
-    dequeue(this);
+    StateBatch.dequeue(this);
 
     if (update) {
-      withStateContext(this, update);
+      StateContext.run(this, update);
     }
   }
 
@@ -191,20 +203,8 @@ export class StateNode {
 
     this.dirty = false;
 
-    dequeue(this);
+    StateBatch.dequeue(this);
 
     this.links.destroy();
   }
 }
-
-export const getStateNode = (state: object): StateNode => {
-  let node = nodes.get(state);
-
-  if (!node) {
-    node = new StateNode();
-
-    nodes.set(state, node);
-  }
-
-  return node;
-};
