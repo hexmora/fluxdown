@@ -24,6 +24,7 @@ import {
 
 import type { HastRoot } from '../../../../typings';
 
+import { countStateObservers } from '../../../../../../../scripts/testing/state';
 import { type IBlockSection, TextChunker } from '../../../base';
 import { BlockCompiler, type BlockCompilerConfig, type BlockRemarksConfig } from '../index';
 
@@ -201,14 +202,6 @@ const setupCompiler = ({
     remarks,
     sections,
   };
-};
-
-const getObserverCount = (state: IReactiveState<unknown>) => {
-  return (
-    state as unknown as {
-      subject: { observers: unknown[] };
-    }
-  ).subject.observers.length;
 };
 
 describe('BlockCompiler', () => {
@@ -469,7 +462,7 @@ describe('BlockCompiler', () => {
 
     harness.sections.next([section('a'), section('b'), section('c'), section('d')]);
 
-    expect(readRepairEnding).toHaveBeenCalledTimes(2);
+    expect(readRepairEnding).toHaveBeenCalledTimes(1);
 
     expect(blocks.map((block) => block.meta.value.blockCount)).toEqual([4, 4, 4]);
 
@@ -1002,10 +995,10 @@ describe('BlockCompiler', () => {
 
     expect(harness.getRemarks).toHaveBeenCalledTimes(1);
     expect(harness.getRehypes).toHaveBeenCalledTimes(1);
-    expect(getObserverCount(harness.sections)).toBe(0);
-    expect(getObserverCount(harness.config)).toBe(0);
-    expect(getObserverCount(sharedRemarks)).toBe(0);
-    expect(getObserverCount(sharedRehypes)).toBe(0);
+    expect(countStateObservers(harness.sections)).toBe(0);
+    expect(countStateObservers(harness.config)).toBe(0);
+    expect(countStateObservers(sharedRemarks)).toBe(0);
+    expect(countStateObservers(sharedRehypes)).toBe(0);
     expect(harness.sections.closed).toBe(false);
     expect(harness.config.closed).toBe(false);
     expect(sharedRemarks.closed).toBe(false);
@@ -1157,7 +1150,7 @@ describe('BlockCompiler', () => {
     expect(() => harness.closure.value).toThrow('Failed to read remarks.');
     expect(remarks.destroy).toHaveBeenCalledTimes(1);
     expect(remarksConfig?.closed).toBe(true);
-    expect(getObserverCount(harness.config)).toBe(0);
+    expect(countStateObservers(harness.config)).toBe(0);
 
     harness.closure.destroy();
 
@@ -1267,7 +1260,7 @@ describe('BlockCompiler', () => {
     expect(failedRemarks.destroy).toHaveBeenCalledTimes(1);
     expect(block?.value.closed).toBe(true);
     expect(harness.remarkConfigs.every(({ closed }) => closed)).toBe(true);
-    expect(getObserverCount(source)).toBe(0);
+    expect(countStateObservers(source)).toBe(0);
     expect(source.closed).toBe(false);
   });
 
@@ -1290,25 +1283,25 @@ describe('BlockCompiler', () => {
     expect(collectText(harness.closure.value.value[0]?.value.value as HastRoot)).toBe(
       'text|remark|rehype',
     );
-    expect(getObserverCount(remarkSource)).toBe(1);
-    expect(getObserverCount(rehypeSource)).toBe(1);
+    expect(countStateObservers(remarkSource)).toBe(1);
+    expect(countStateObservers(rehypeSource)).toBe(1);
 
     harness.closure.destroy();
 
     expect(remarkOwner.value.closed).toBe(true);
     expect(rehypeOwner.value.closed).toBe(true);
-    expect(getObserverCount(remarkOwner.value)).toBe(0);
-    expect(getObserverCount(rehypeOwner.value)).toBe(0);
-    expect(getObserverCount(remarkSource)).toBe(0);
-    expect(getObserverCount(rehypeSource)).toBe(0);
+    expect(countStateObservers(remarkOwner.value)).toBe(0);
+    expect(countStateObservers(rehypeOwner.value)).toBe(0);
+    expect(countStateObservers(remarkSource)).toBe(0);
+    expect(countStateObservers(rehypeSource)).toBe(0);
 
     remarkOwner.destroy();
     rehypeOwner.destroy();
 
     expect(remarkSource.closed).toBe(false);
     expect(rehypeSource.closed).toBe(false);
-    expect(getObserverCount(remarkSource)).toBe(0);
-    expect(getObserverCount(rehypeSource)).toBe(0);
+    expect(countStateObservers(remarkSource)).toBe(0);
+    expect(countStateObservers(rehypeSource)).toBe(0);
   });
 
   test('releases every removed block plugin subscription under sustained list changes', () => {
@@ -1324,14 +1317,14 @@ describe('BlockCompiler', () => {
     });
 
     expect(harness.closure.value.value).toHaveLength(100);
-    expect(getObserverCount(sharedRemarks)).toBe(100);
-    expect(getObserverCount(sharedRehypes)).toBe(100);
+    expect(countStateObservers(sharedRemarks)).toBe(100);
+    expect(countStateObservers(sharedRehypes)).toBe(100);
 
     harness.sections.next(initialSections.slice(0, 10));
 
     expect(harness.closure.value.value).toHaveLength(10);
-    expect(getObserverCount(sharedRemarks)).toBe(10);
-    expect(getObserverCount(sharedRehypes)).toBe(10);
+    expect(countStateObservers(sharedRemarks)).toBe(10);
+    expect(countStateObservers(sharedRehypes)).toBe(10);
 
     const runsBeforePluginUpdate = run.mock.calls.length;
 
@@ -1341,8 +1334,8 @@ describe('BlockCompiler', () => {
 
     harness.closure.destroy();
 
-    expect(getObserverCount(sharedRemarks)).toBe(0);
-    expect(getObserverCount(sharedRehypes)).toBe(0);
+    expect(countStateObservers(sharedRemarks)).toBe(0);
+    expect(countStateObservers(sharedRehypes)).toBe(0);
     expect(harness.config.closed).toBe(false);
     expect(sharedRemarks.closed).toBe(false);
     expect(sharedRehypes.closed).toBe(false);
@@ -1376,9 +1369,9 @@ describe('BlockCompiler', () => {
     fork?.destroy();
 
     expect(harness.remarkConfigs[0]?.closed).toBe(true);
-    expect(getObserverCount(harness.config)).toBe(0);
-    expect(getObserverCount(remarks)).toBe(0);
-    expect(getObserverCount(rehypes)).toBe(0);
+    expect(countStateObservers(harness.config)).toBe(0);
+    expect(countStateObservers(remarks)).toBe(0);
+    expect(countStateObservers(rehypes)).toBe(0);
     expect(harness.config.closed).toBe(false);
     expect(remarks.closed).toBe(false);
     expect(rehypes.closed).toBe(false);
@@ -1407,7 +1400,7 @@ describe('BlockCompiler', () => {
     harness.sections.next([]);
 
     expect(remarks.value.closed).toBe(true);
-    expect(getObserverCount(source)).toBe(0);
+    expect(countStateObservers(source)).toBe(0);
     expect(source.closed).toBe(false);
 
     harness.closure.destroy();

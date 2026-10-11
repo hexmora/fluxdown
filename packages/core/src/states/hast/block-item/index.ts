@@ -1,24 +1,15 @@
-import type { IReactiveState, IReadableClosure } from 'stative';
+import type { IReactiveState } from 'stative';
 
 import { stubFalse } from 'lodash-es';
 import { mapState } from 'stative';
 
 import type { HastRoot } from '../../../typings';
-import type { BaseBlockItemInputs } from '../../base/base-block/type';
 
 import { BaseBlockItem } from '../../base';
 import { getCommonPrefixLength, getHastProjection, retainHastProjection } from './utils';
 
 export class BlockItem extends BaseBlockItem<HastRoot> {
-  private readonly revisionSource: IReadableClosure<{ prefixLength: number }>;
-
   private prefixLengthState: IReactiveState<number> | null = null;
-
-  constructor(inputs: BaseBlockItemInputs<HastRoot>) {
-    super(inputs);
-
-    this.revisionSource = this.createRevisionSource();
-  }
 
   private createRevisionSource() {
     const { source } = this.inputs;
@@ -43,7 +34,7 @@ export class BlockItem extends BaseBlockItem<HastRoot> {
   get prevPrefixLength() {
     // Equal prefix values still identify separate source updates.
     return (this.prefixLengthState ??= this.clearable(
-      mapState(this.revisionSource, ({ prefixLength }) => prefixLength, stubFalse),
+      mapState(this.createRevisionSource(), ({ prefixLength }) => prefixLength, stubFalse),
     ));
   }
 

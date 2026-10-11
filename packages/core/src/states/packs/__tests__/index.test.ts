@@ -47,6 +47,7 @@ import type { HastRoot } from '../../../typings';
 import type { BlockCompilerConfig } from '../../hast';
 
 import { Core, type IPatchItem } from '..';
+import { countStateObservers } from '../../../../../../scripts/testing/state';
 import {
   BaseRenderer,
   BaseRenderPlugin,
@@ -272,14 +273,6 @@ const getFirstBlockTree = (state: {
   readonly value: IReactiveState<RenderedBlock[]>;
 }): HastRoot => {
   return getBlockTree(first(state.value.value));
-};
-
-const getObserverCount = (state: IReactiveState<unknown>): number => {
-  return (
-    state as unknown as {
-      subject: { observers: unknown[] };
-    }
-  ).subject.observers.length;
 };
 
 const setupCore = (initialText = 'base') => {
@@ -724,7 +717,7 @@ describe('Core', () => {
       harness.repairs,
     ];
 
-    expect(inputs.every((state) => getObserverCount(state) > 0)).toBe(true);
+    expect(inputs.every((state) => countStateObservers(state) > 0)).toBe(true);
 
     harness.state.destroy();
     harness.state.destroy();
@@ -738,7 +731,7 @@ describe('Core', () => {
     expect(harness.rehypes.closed).toBe(false);
     expect(harness.renders.closed).toBe(false);
     expect(harness.repairs.closed).toBe(false);
-    expect(inputs.map(getObserverCount)).toEqual(inputs.map(() => 0));
+    expect(inputs.map(countStateObservers)).toEqual(inputs.map(() => 0));
     expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(3);
     expect(AppendRehypePlugin.destroyed).toHaveBeenCalledTimes(3);
   });
@@ -748,20 +741,20 @@ describe('Core', () => {
 
     expect(harness.state.value.value).toHaveLength(3);
 
-    const initialRemarkObservers = getObserverCount(harness.remarks);
+    const initialRemarkObservers = countStateObservers(harness.remarks);
 
     expect(initialRemarkObservers).toBe(1);
 
     harness.text.next('first');
 
     expect(harness.state.value.value).toHaveLength(1);
-    expect(getObserverCount(harness.remarks)).toBe(initialRemarkObservers);
+    expect(countStateObservers(harness.remarks)).toBe(initialRemarkObservers);
     expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(2);
 
     harness.text.next('first\n\nfourth');
 
     expect(harness.state.value.value).toHaveLength(2);
-    expect(getObserverCount(harness.remarks)).toBe(initialRemarkObservers);
+    expect(countStateObservers(harness.remarks)).toBe(initialRemarkObservers);
     expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(2);
 
     harness.state.destroy();

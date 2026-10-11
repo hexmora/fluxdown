@@ -1,6 +1,7 @@
 import type { IBlockMeta, IBlockState, IBlockStateCloneParams, IRangeState } from '@fluxdown/types';
-import type { IReactiveState, IReadableClosure } from 'stative';
+import type { IReactiveState, IReadableClosure, StateClosureMode } from 'stative';
 
+import { assert } from '@fluxdown/utils';
 import { BaseStateClosure, toClosure } from 'stative';
 
 import type { BaseBlockItemInputs, BlockItemClass } from './type';
@@ -9,9 +10,9 @@ export abstract class BaseBlockItem<T>
   extends BaseStateClosure<T, BaseBlockItemInputs<T>>
   implements IBlockState<T>
 {
-  private readonly rangeSource: IReadableClosure<IRangeState | null>;
+  private __rangeSource: IReadableClosure<IRangeState | null> | null;
 
-  private readonly baseLengthSource: IReadableClosure<number>;
+  private baseLengthSource: IReadableClosure<number> | null = null;
 
   private lengthSource: IReadableClosure<number> | null = null;
 
@@ -20,9 +21,11 @@ export abstract class BaseBlockItem<T>
 
     const { range } = this.inputs;
 
-    this.rangeSource = this.defaults(range, null);
+    this.__rangeSource = range ? this.create(range) : null;
+  }
 
-    this.baseLengthSource = this.getBaseLengthState();
+  protected override get mode(): StateClosureMode {
+    return 'view';
   }
 
   get meta(): IReactiveState<IBlockMeta> {
@@ -40,7 +43,7 @@ export abstract class BaseBlockItem<T>
   }
 
   get baseLength(): IReactiveState<number> {
-    return this.baseLengthSource.value;
+    return (this.baseLengthSource ??= this.getBaseLengthState()).value;
   }
 
   protected abstract slice(value: T, start: number, end: number): T;
@@ -48,7 +51,11 @@ export abstract class BaseBlockItem<T>
   protected abstract lengthOf(value: T): number;
 
   protected render() {
-    const { mapper, source } = this.inputs;
+    const { mapper, source, range } = this.inputs;
+
+    if (!range && !mapper) {
+      return source;
+    }
 
     const rawValue = this.map([source, this.rangeSource], ([currentValue, currentRange]) => {
       if (!currentRange) {
@@ -65,6 +72,16 @@ export abstract class BaseBlockItem<T>
     }
 
     return rawValue;
+  }
+
+  private get rangeSource() {
+    if (this.__rangeSource) {
+      return this.__rangeSource;
+    }
+
+    assert(!this.destroyed, 'Cannot set up a destroyed state closure.');
+
+    return (this.__rangeSource = this.create<IRangeState | null>(null));
   }
 
   protected getLengthState() {
