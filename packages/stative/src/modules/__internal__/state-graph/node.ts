@@ -36,6 +36,11 @@ export class StateNode {
     this.nodes.set(state, this.get(source));
   }
 
+  /** Frozen borrowed views must not retain their source's live dependency graph. */
+  static clearAlias(state: object) {
+    this.nodes.delete(state);
+  }
+
   private readonly links: StateLinks<StateNode> = new StateLinks(this);
 
   private dirty = false;
