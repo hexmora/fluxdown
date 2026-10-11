@@ -11,8 +11,8 @@ import {
   once,
   ReactiveState,
   useClearable,
-  useMap,
   useDefaults,
+  useMap,
 } from 'stative';
 
 import type { FluxdownRef, IPluginItem } from '../types';
