@@ -8,7 +8,6 @@ import {
   BaseStateClosure,
   D,
   type IReadableClosure,
-  isStateClosureDescriptor,
   jsx,
   type JSXDescriptor,
   MutableState,
@@ -21,6 +20,7 @@ import {
   useClearable,
   useMapEach,
 } from '../../../../../..';
+import { isStateClosureDescriptor } from '../predicates';
 
 const Identity = <T,>({ value }: { value: T }) => value;
 

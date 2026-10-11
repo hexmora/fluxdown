@@ -4,8 +4,8 @@ import { expectTypeOf } from 'expect-type';
 
 import type { ReactiveState } from '../../reactive-state';
 
+import { MutableState } from '..';
 import { batch } from '../../..';
-import { MutableState } from '../index';
 
 describe('MutableState', () => {
   test('returns a shared readonly reactive state view', () => {

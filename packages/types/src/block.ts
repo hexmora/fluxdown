@@ -24,7 +24,7 @@ export interface IBlockRawMeta {
   currentIndex: number;
 }
 
-interface IBlockStateMapper<T> {
+export interface IBlockStateMapper<T> {
   (value: IReactiveState<T>, current: IBlockState<T>): IReactiveState<T> | IReadableClosure<T>;
 }
 

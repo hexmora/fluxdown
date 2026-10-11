@@ -21,15 +21,11 @@ import type {
   StateClosureResultValue,
 } from './utils';
 
-import {
-  buildStateClosure,
-  createDescriptorScope,
-  destroyDescriptorScope,
-  immediateDescriptor,
-  markStateClosureDescriptor,
-} from './utils';
+import { immediateDescriptor, markStateClosureDescriptor } from './utils/consts';
+import { createDescriptorScope, destroyDescriptorScope } from './utils/context';
+import { buildStateClosure } from './utils/resolve';
 
-export * from './utils';
+export * from './type';
 
 // oxlint-disable-next-line typescript/no-explicit-any
 type OneArgumentStateClosureClass = StateClosureClass<any, [any]>;

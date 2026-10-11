@@ -2,12 +2,12 @@ import { shallowEqual } from 'shallow-equal';
 
 import type { Distinctor } from '../../../../reactive-state';
 import type { IReadableClosure } from '../../../type';
-import type { AnyMappingFunction, StateClosureResult } from './type';
+import type { AnyMappingFunction, StateClosureResult } from '../type';
 
 import { combineMapState, ReactiveState } from '../../../../reactive-state';
-import { FactoryReadableClosure } from '../../base';
-import { StateClosureHookRuntime } from '../../hooks/runtime';
-import { getMapperComparers } from '../../memo';
+import { FactoryReadableClosure } from '../../../main';
+import { StateClosureHookRuntime } from '../../hooks/utils/runtime';
+import { getMapperComparers } from '../../memo/utils';
 import {
   clearWithDescriptorScope,
   detachWithDescriptorScope,

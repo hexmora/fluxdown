@@ -16,45 +16,50 @@ type ClosureContext = {
   owners: Set<DescriptorScope>;
 };
 
-const closureContext = /*#__PURE__*/ Symbol('closureContext');
+// oxlint-disable-next-line typescript/no-extraneous-class
+export class DescriptorContext {
+  private static readonly key = /*#__PURE__*/ Symbol('closureContext');
 
-let constructionScope: DescriptorScope | null = null;
+  private static constructionScope: DescriptorScope | null = null;
 
-const getClosureContext = (
-  closure: IReadableClosure<unknown> & { [closureContext]?: ClosureContext },
-): ClosureContext => {
-  const existing = Object.hasOwn(closure, closureContext) ? closure[closureContext] : undefined;
+  static get(closure: IReadableClosure<unknown>): ClosureContext {
+    const target = closure as IReadableClosure<unknown> & {
+      [DescriptorContext.key]?: ClosureContext;
+    };
 
-  if (existing) {
-    return existing;
+    const existing = Object.hasOwn(target, this.key) ? target[this.key] : undefined;
+
+    if (existing) {
+      return existing;
+    }
+
+    const context: ClosureContext = { scope: null, owners: new Set() };
+
+    Object.defineProperty(target, this.key, { value: context });
+
+    return context;
   }
 
-  const context: ClosureContext = { scope: null, owners: new Set() };
+  static run<T>(scope: DescriptorScope, callback: () => T): T {
+    const previous = this.constructionScope;
 
-  Object.defineProperty(closure, closureContext, { value: context });
+    this.constructionScope = scope;
 
-  return context;
-};
-
-export const withDescriptorScope = <T>(scope: DescriptorScope, callback: () => T): T => {
-  const previous = constructionScope;
-
-  constructionScope = scope;
-
-  try {
-    return callback();
-  } finally {
-    constructionScope = previous;
+    try {
+      return callback();
+    } finally {
+      this.constructionScope = previous;
+    }
   }
-};
 
-export const consumeDescriptorScope = (): DescriptorScope | null => {
-  const scope = constructionScope;
+  static consume(): DescriptorScope | null {
+    const scope = this.constructionScope;
 
-  constructionScope = null;
+    this.constructionScope = null;
 
-  return scope;
-};
+    return scope;
+  }
+}
 
 export const createDescriptorScope = (): DescriptorScope => ({
   detached: false,
@@ -86,7 +91,7 @@ export const ownReadableClosure = <T extends IReadableClosure<unknown>>(
     return closure;
   }
 
-  const { owners } = getClosureContext(closure);
+  const { owners } = DescriptorContext.get(closure);
 
   owners.add(scope);
 
@@ -103,7 +108,7 @@ export const releaseReadableClosure = (
     return;
   }
 
-  const { owners } = getClosureContext(closure);
+  const { owners } = DescriptorContext.get(closure);
 
   owners.delete(scope);
 
@@ -127,7 +132,7 @@ const detachDescriptorScope = (scope: DescriptorScope) => {
 
   for (const closure of scope.closures) {
     teardown.add(() => {
-      const { scope: childScope, owners } = getClosureContext(closure);
+      const { scope: childScope, owners } = DescriptorContext.get(closure);
 
       if (childScope && [...owners].every((owner) => owner.detached)) {
         detachDescriptorScope(childScope);
@@ -164,7 +169,7 @@ export const bindRootDescriptorScope = <T extends IReadableClosure<unknown>>(
   scope: DescriptorScope,
   closure: T,
 ): T => {
-  const context = getClosureContext(closure);
+  const context = DescriptorContext.get(closure);
 
   const previous = context.scope;
 
@@ -196,7 +201,7 @@ export const bindRootDescriptorScope = <T extends IReadableClosure<unknown>>(
 };
 
 export const getReadableClosureScope = (closure: IReadableClosure<unknown>): DescriptorScope => {
-  const { scope: current } = getClosureContext(closure);
+  const { scope: current } = DescriptorContext.get(closure);
 
   if (current) {
     return current;

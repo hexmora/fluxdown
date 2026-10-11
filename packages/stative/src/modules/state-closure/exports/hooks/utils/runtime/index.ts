@@ -1,22 +1,46 @@
 import { Subscription } from 'rxjs';
 
-import type { DestructibleTarget } from '../../../../destructible';
-import type { IReadableClosure } from '../../../type';
-import type { StateClosureRef } from '../type';
+import type { DestructibleTarget } from '../../../../../destructible';
+import type { IReadableClosure } from '../../../../type';
+import type { StateClosureRef } from '../../type';
 import type { HookSlot } from './type';
 
-import { clearByTarget } from '../../../../destructible/utils';
+import { clearByTarget } from '../../../../../destructible/utils';
 import {
   getReadableClosureScope,
   ownReadableClosure,
   releaseReadableClosure,
-} from '../../render/utils/context';
-import { isReadableClosure } from '../../render/utils/resolve';
-import { hookOrderError, withStateClosureHookRuntime } from './utils';
+} from '../../../render/utils/context';
+import { isReadableClosure } from '../../../render/utils/predicates';
+import { hookOrderError } from './utils';
 
 export * from './type';
 
 export class StateClosureHookRuntime {
+  private static active: StateClosureHookRuntime | null = null;
+
+  static run<T>(runtime: StateClosureHookRuntime | null, callback: () => T): T {
+    const previous = this.active;
+
+    this.active = runtime;
+
+    try {
+      return callback();
+    } finally {
+      this.active = previous;
+    }
+  }
+
+  static require(hook: string, kind?: 'mapper' | 'once'): StateClosureHookRuntime {
+    if (!this.active || (kind && this.active.kind !== kind)) {
+      const usage = kind ? `${kind} functions` : 'mapper or once functions';
+
+      throw new TypeError(`${hook} can only be used in ${usage}; hooks cannot be used in classes.`);
+    }
+
+    return this.active;
+  }
+
   private cursor = 0;
 
   private initialized = false;
@@ -87,7 +111,7 @@ export class StateClosureHookRuntime {
     const slot = this.useSlot('current', () => ({
       type: 'current',
 
-      value: withStateClosureHookRuntime(null, factory),
+      value: StateClosureHookRuntime.run(null, factory),
     }));
 
     return slot.value as T;
@@ -96,7 +120,7 @@ export class StateClosureHookRuntime {
   render<T>(read: () => T): T {
     this.cursor = 0;
 
-    return withStateClosureHookRuntime(this, () => {
+    return StateClosureHookRuntime.run(this, () => {
       const result = read();
 
       if (this.initialized && this.cursor !== this.slots.length) {

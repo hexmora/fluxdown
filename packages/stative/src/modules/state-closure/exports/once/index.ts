@@ -1,11 +1,11 @@
-import { isFunction } from 'lodash-es';
-
 import type { StateClosureResultNode } from '../render';
+
+import { onceFunction } from './utils';
+
+export { isOnceFunction } from './utils';
 
 // oxlint-disable-next-line typescript/no-explicit-any
 type StateFactory = (inputs: any) => StateClosureResultNode;
-
-const onceFunction = /*#__PURE__*/ Symbol('onceFunction');
 
 export type OnceFunctionMetadata = {
   readonly [onceFunction]: true;
@@ -22,8 +22,4 @@ export const once = <F extends StateFactory>(factory: F): OnceFunction<F> => {
       return key === onceFunction ? true : Reflect.get(target, key, receiver);
     },
   }) as OnceFunction<F>;
-};
-
-export const isOnceFunction = (factory: unknown): factory is AnyOnceFunction => {
-  return isFunction(factory) && Reflect.get(factory, onceFunction) === true;
 };

@@ -1,5 +1,5 @@
-import type { DestructibleTarget } from '../../../../destructible';
-import type { StateClosureRef } from '../type';
+import type { DestructibleTarget } from '../../../../../destructible';
+import type { StateClosureRef } from '../../type';
 
 export type HookSlot =
   | {

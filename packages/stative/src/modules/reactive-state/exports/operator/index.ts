@@ -1,87 +1,15 @@
-import { isFunction, isObject, isUndefined } from 'lodash-es';
+import { deriveState, isReactiveStateLike, isStateClosureLike, isStateSourceLike } from './utils';
+export { isReactiveStateLike } from './utils';
+
+import { isFunction, isUndefined } from 'lodash-es';
 import { BehaviorSubject, Observable, type Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
-import type { IReadableClosure } from '../../state-closure';
-import type {
-  Distinctor,
-  IReactiveState,
-  StateMapper,
-  StateSubscriber,
-  StateValue,
-  StateValues,
-} from '../type';
+import type { Distinctor, IReactiveState, StateMapper, StateValue, StateValues } from '../../type';
 
-import { compute } from '../../../utils';
-import { getStateContext, withStateContext } from '../../state-graph/context';
-import { getStateNode } from '../../state-graph/node';
-import { ReactiveState } from './base';
-
-type ReactiveStateSource<T> = IReactiveState<T> | BehaviorSubject<T>;
-
-const createMappedState = <A, B>(
-  source: ReactiveStateSource<A>,
-  initialSource: A,
-  mapper: StateMapper<A, B>,
-  distinctor?: Distinctor<B>,
-  ordering = false,
-): ReactiveState<B> => {
-  const initial = mapper(initialSource, null);
-
-  let prev: [A, B] = [initialSource, initial];
-
-  const state = new ReactiveState({
-    initial,
-    emitter: (observer) => {
-      const subscriber: StateSubscriber<A> = {
-        next: (value) => {
-          const nextResult = ordering
-            ? withStateContext(getStateContext(), () => mapper(value, prev))
-            : mapper(value, prev);
-
-          observer.next(nextResult);
-
-          prev = [value, nextResult];
-        },
-        error: (error) => observer.error(error),
-        complete: () => observer.complete(),
-      };
-
-      const subscription = ordering
-        ? withStateContext(getStateContext(), () => source.subscribe(subscriber), {
-            ordering: true,
-          })
-        : source.subscribe(subscriber);
-
-      return () => {
-        subscription.unsubscribe();
-      };
-    },
-    distinctor,
-  });
-
-  return state;
-};
-
-export const isReactiveStateLike = <T = unknown>(value: unknown): value is IReactiveState<T> =>
-  isObject(value) &&
-  'value' in value &&
-  'closed' in value &&
-  isFunction((value as Partial<IReactiveState<T>>).subscribe);
-
-const isStateClosureLike = <T = unknown>(value: unknown): value is IReadableClosure<T> => {
-  return (
-    isObject(value) &&
-    'value' in value &&
-    'destroy' in value &&
-    !isReactiveStateLike(value) &&
-    isFunction(value.destroy)
-  );
-};
-
-const isStateSourceLike = (value: unknown) => {
-  return isReactiveStateLike(value) || isStateClosureLike(value);
-};
+import { compute } from '../../../../utils';
+import { StateNode } from '../../../state-graph/utils/node';
+import { ReactiveState } from '../../main';
 
 export const toState = <S>(source: S): IReactiveState<StateValue<S>> => {
   if (isReactiveStateLike<StateValue<S>>(source)) {
@@ -152,21 +80,6 @@ export function toReactiveState<T>(
     distinctor: stateDistinctor,
   });
 }
-
-const deriveState = <S, B>(
-  source: S,
-  mapper: StateMapper<StateValue<S>, B>,
-  distinctor?: Distinctor<B>,
-  ordering = false,
-): ReactiveState<B> => {
-  if (!isStateSourceLike(source)) {
-    return ReactiveState.of(mapper(source as StateValue<S>, null));
-  }
-
-  const state = toState(source);
-
-  return createMappedState(state, state.value, mapper, distinctor, ordering);
-};
 
 export const mapState = <S, B>(
   source: S,
@@ -256,7 +169,7 @@ export const combineMapState = <const TSources extends [unknown, ...unknown[]], 
       };
 
       const scheduleRefresh = () => {
-        getStateNode(state).schedule(refresh);
+        StateNode.get(state).schedule(refresh);
       };
 
       const subscriptions: Subscription[] = [];

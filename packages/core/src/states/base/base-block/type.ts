@@ -1,4 +1,4 @@
-import type { IBlockMeta, IBlockState, IBlockStateCloneParams, IRangeState } from '@fluxdown/types';
+import type { IBlockMeta, IBlockState, IBlockStateMapper, IRangeState } from '@fluxdown/types';
 import type { Newable } from '@fluxdown/utils';
 import type { IReadableClosure } from 'stative';
 
@@ -9,7 +9,7 @@ export type BaseBlockItemInputs<T> = {
 
   range?: IReadableClosure<IRangeState | null>;
 
-  mapper?: NonNullable<IBlockStateCloneParams<T>['mapper']>;
+  mapper?: IBlockStateMapper<T>;
 };
 
 export type BlockItemClass<T> = Newable<IBlockState<T>, [BaseBlockItemInputs<T>]>;

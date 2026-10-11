@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 
-import type { IReadableClosure } from '../../../../index';
+import type { IReadableClosure } from '../../../..';
 
 import {
   batch,
@@ -14,7 +14,7 @@ import {
   S,
   useClearable,
   useMapKeyed,
-} from '../../../../index';
+} from '../../../..';
 import { mapKeyedClosure } from '../keyed';
 
 const createItem = (value: number) => ({ state: MutableState.of(value) });

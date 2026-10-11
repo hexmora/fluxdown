@@ -1,21 +1,21 @@
 import { Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
-import type { IReactiveState, StateSource } from '../../reactive-state';
-import type { IReadableClosure, StateClosureSource } from '../type';
-import type { MarkedStateClosureDescriptor } from './render';
+import type { IReactiveState, StateSource } from '../../../reactive-state';
+import type { IReadableClosure, StateClosureSource } from '../../type';
+import type { MarkedStateClosureDescriptor } from '../render';
 
-import { ReactiveState } from '../../reactive-state';
-import { batch } from '../../state-graph/batch';
-import { getStateNode } from '../../state-graph/node';
-import { FactoryReadableClosure, toClosure } from './base';
+import { ReactiveState } from '../../../reactive-state';
+import { batch } from '../../../state-graph/main';
+import { StateNode } from '../../../state-graph/utils/node';
+import { FactoryReadableClosure, toClosure } from '../../main';
 import {
   clearWithDescriptorScope,
   detachWithDescriptorScope,
   getReadableClosureScope,
   ownReadableClosure,
   releaseReadableClosure,
-} from './render/utils/context';
+} from '../render/utils/context';
 
 type KeyedEntry<T> = {
   closure: IReadableClosure<T>;
@@ -48,7 +48,7 @@ export function mapKeyedClosure<T, R>(
 
         const mapped = ownReadableClosure(childScope, toClosure(mapper(item)));
 
-        const disconnect = getStateNode(mapped.value).dependOn(getStateNode(sourceState), {
+        const disconnect = StateNode.get(mapped.value).dependOn(StateNode.get(sourceState), {
           ordering: true,
         });
 
@@ -140,7 +140,7 @@ export function mapKeyedClosure<T, R>(
           }
         };
 
-        const scheduleRefresh = () => getStateNode(state).schedule(refresh);
+        const scheduleRefresh = () => StateNode.get(state).schedule(refresh);
 
         const connectEntry = (entry: KeyedEntry<R>) => {
           entry.subscription = entry.state.subscribe({
