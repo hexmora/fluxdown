@@ -6,6 +6,7 @@ import type { RootReconcilerProps } from './type';
 
 import { ROOT_CLASS_NAME } from './consts';
 import styles from './index.module.less';
+import { isPropsEqual } from './utils';
 
 export const RootReconciler = /*#__PURE__*/ memo(function RootReconciler({
   children,
@@ -21,4 +22,4 @@ export const RootReconciler = /*#__PURE__*/ memo(function RootReconciler({
       ))}
     </div>
   );
-});
+}, isPropsEqual);
