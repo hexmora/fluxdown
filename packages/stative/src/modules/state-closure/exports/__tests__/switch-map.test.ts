@@ -1,11 +1,12 @@
 import { expectTypeOf } from 'expect-type';
 import { shallowEqual } from 'shallow-equal';
 
+import type { IReadableClosure } from '../../../..';
+
 import {
   BaseStateClosure,
   batch,
   D,
-  type IReadableClosure,
   mapClosure,
   MutableState,
   once,

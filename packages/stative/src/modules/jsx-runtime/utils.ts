@@ -1,4 +1,4 @@
-import { markStateClosureDescriptor } from '../state-closure/exports/render/utils/consts';
+import { markStateClosureDescriptor } from '../__internal__';
 import { Fragment } from './main';
 
 export type RuntimeProps = Readonly<Record<string, unknown>>;

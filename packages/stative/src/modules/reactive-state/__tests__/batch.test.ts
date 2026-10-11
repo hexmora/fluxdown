@@ -1,12 +1,12 @@
 import { batch } from '../../..';
 import { MutableState } from '../../mutable-state';
-import { combineMapState, combineState, mapState } from '../exports/operator';
+import { combineState, mapState } from '../exports';
 
 describe('batch', () => {
   test('publishes one consistent snapshot for multiple source updates', () => {
     const left = MutableState.of(1);
     const right = MutableState.of(2);
-    const combined = combineMapState([left, right], ([leftValue, rightValue]) => ({
+    const combined = mapState([left, right], ([leftValue, rightValue]) => ({
       left: leftValue,
       right: rightValue,
     }));
@@ -52,7 +52,7 @@ describe('batch', () => {
     const joinMapper = jest.fn(
       ([shortValue, longValue]: [number, number]) => `${shortValue}:${longValue}`,
     );
-    const joined = combineMapState([short, long], joinMapper);
+    const joined = mapState([short, long], joinMapper);
     const next = jest.fn();
 
     joined.subscribe(next);

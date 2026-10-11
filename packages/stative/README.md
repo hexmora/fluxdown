@@ -72,7 +72,7 @@ const Scale = once(({ input, factor }: { input: IReadableClosure<number>; factor
 );
 ```
 
-`once` runs on the first access to the closure's output. `useMap` derives a value from one input; `useCombineMap` combines several inputs, and `useCreate` builds a child closure. These helpers manage the resulting child closures for you.
+`once` runs on the first access to the closure's output. `useMap` derives a value from one source or a list of sources; `useSelect` creates a pure projection that stays unsubscribed until observed. `useCreate` builds a child closure. These helpers manage the resulting child closures for you.
 
 ### Use a class
 
@@ -90,7 +90,7 @@ class Scale extends BaseStateClosure<number, { input: IReadableClosure<number>; 
 }
 ```
 
-Class methods such as `this.map`, `this.combineMap`, and `this.create` serve the same purpose as the corresponding `once` helpers. Use the `useMap`, `useCombineMap`, and `useCreate` hooks inside `once`; use instance methods inside classes.
+Class methods such as `this.map`, `this.select`, and `this.create` serve the same purpose as the corresponding `once` helpers. Use the `useMap`, `useSelect`, and `useCreate` hooks inside `once`; use instance methods inside classes.
 
 ### Pass reactive and static inputs
 

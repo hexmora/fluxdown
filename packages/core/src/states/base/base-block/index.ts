@@ -50,7 +50,7 @@ export abstract class BaseBlockItem<T>
   protected render() {
     const { mapper, source } = this.inputs;
 
-    const rawValue = this.combineMap([source, this.rangeSource], ([currentValue, currentRange]) => {
+    const rawValue = this.map([source, this.rangeSource], ([currentValue, currentRange]) => {
       if (!currentRange) {
         return currentValue;
       }

@@ -72,7 +72,7 @@ const Scale = once(({ input, factor }: { input: IReadableClosure<number>; factor
 );
 ```
 
-`once` 在首次读取闭包输出时运行。`useMap` 从单个输入派生值，`useCombineMap` 组合多个输入，`useCreate` 创建子闭包。这些辅助函数会为你管理产生的子闭包。
+`once` 在首次读取闭包输出时运行。`useMap` 从单个来源或来源列表派生值；`useSelect` 创建纯投影，首次被观察前不订阅输入。`useCreate` 创建子闭包。这些辅助函数会为你管理产生的子闭包。
 
 ### 使用类
 
@@ -90,7 +90,7 @@ class Scale extends BaseStateClosure<number, { input: IReadableClosure<number>; 
 }
 ```
 
-`this.map`、`this.combineMap` 和 `this.create` 等实例方法，与对应的 `once` 辅助函数用途相同。在 `once` 中使用 `useMap`、`useCombineMap` 和 `useCreate` 钩子，在类中使用实例方法。
+`this.map`、`this.select` 和 `this.create` 等实例方法，与对应的 `once` 辅助函数用途相同。在 `once` 中使用 `useMap`、`useSelect` 和 `useCreate` 钩子，在类中使用实例方法。
 
 ### 传入响应式与静态输入
 

@@ -1,6 +1,8 @@
 import type { Distinctor } from '../../../reactive-state';
+import type { StateMapper } from '../../utils';
 
-import { isShallowEqual, type StateMapper, withComparers } from './utils';
+import { isShallowEqual, withComparers } from '../../utils';
+
 // oxlint-disable typescript/no-explicit-any
 
 export type StateMapperComparers<T = unknown, R = unknown> = {

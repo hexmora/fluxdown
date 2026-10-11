@@ -1,22 +1,21 @@
 import { isFunction } from 'lodash-es';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
+import type { IReadableClosure, StateClosureSource } from '..';
 import type { IReactiveState, StateSubscriber } from '../../reactive-state';
+import type { StateClosureResult } from '../exports';
 
 import {
   BaseStateClosure,
-  combineMapClosure,
   FactoryReadableClosure,
-  type IReadableClosure,
   mapClosure,
   mapEachClosure,
-  type StateClosureSource,
   toClosure,
 } from '..';
 import { batch } from '../../..';
 import { MutableState } from '../../mutable-state';
-import { combineMapState, mapState, ReactiveState, toReactiveState } from '../../reactive-state';
-import { D, render as renderDescriptor, S, type StateClosureResult } from '../exports/render';
+import { mapState, ReactiveState, toReactiveState } from '../../reactive-state';
+import { D, render as renderDescriptor, S } from '../exports';
 
 type SourceInputs<T> = {
   source: StateClosureSource<T>;
@@ -341,7 +340,7 @@ describe('BaseStateClosure runtime', () => {
     closure.destroy();
   });
 
-  test('filters identical derived values even when the source distinctor allows them', () => {
+  test('honors the derived distinctor without an additional closure equality boundary', () => {
     const source = MutableState.of(0);
 
     const value = { label: 'stable' };
@@ -358,7 +357,7 @@ describe('BaseStateClosure runtime', () => {
 
     source.next(1);
 
-    expect(next.mock.calls).toEqual([[value]]);
+    expect(next.mock.calls).toEqual([[value], [value]]);
 
     closure.destroy();
 
@@ -896,7 +895,7 @@ describe('BaseStateClosure runtime', () => {
       ([shortValue, longValue]: [number, number]) => `${shortValue}:${longValue}`,
     );
 
-    const joined = combineMapState([short, closure.value], joinMapper);
+    const joined = mapState([short, closure.value], joinMapper);
 
     const next = jest.fn();
 
@@ -1520,7 +1519,7 @@ describe('readable closure ownership and derivation', () => {
 
         this.doubled = this.map(input, (value) => value * 2);
 
-        this.joined = this.combineMap([this.doubled, input], ([doubled, value]) => doubled + value);
+        this.joined = this.map([this.doubled, input], ([doubled, value]) => doubled + value);
       }
 
       protected render() {
@@ -1562,7 +1561,7 @@ describe('readable closure ownership and derivation', () => {
 
     const first = mapClosure(source, (value) => value * 2);
 
-    const second = combineMapClosure([source, first], ([value, doubled]) => value + doubled);
+    const second = mapClosure([source, first], ([value, doubled]) => value + doubled);
 
     expect(subject.observed).toBe(false);
 
@@ -1704,7 +1703,7 @@ describe('readable closure construction', () => {
       readonly fallback = this.defaultsFalsy(false, 4);
 
       protected render() {
-        return this.combineMap([this.selected, this.fallback], ([selected, fallback]) => {
+        return this.map([this.selected, this.fallback], ([selected, fallback]) => {
           return selected + fallback;
         });
       }

@@ -5,6 +5,7 @@ import type { DestructibleTarget } from '../destructible';
 import type {
   Distinctor,
   IReactiveState,
+  StateInputValue,
   StateMapper,
   StateSource,
   StateValue,
@@ -17,53 +18,67 @@ import type {
   StateClosureResult,
   StateClosureResultNode,
   StateClosureResultValue,
-} from './exports/render';
-import type { FlattenedState, IReadableClosure, StateClosureSource } from './type';
+} from './exports';
+import type {
+  FlattenedState,
+  IReadableClosure,
+  StateClosureMode,
+  StateClosureSource,
+} from './type';
 
-import { assert } from '../../utils';
-import { Destructible } from '../destructible';
-import { clearByTarget } from '../destructible/utils';
-import { MutableState } from '../mutable-state';
 import {
-  combineMapState,
-  isReactiveStateLike,
-  mapState,
-  ReactiveState,
-  selectState,
-  toState,
-} from '../reactive-state';
-import { StateContext } from '../state-graph/utils/context';
-import { StateNode } from '../state-graph/utils/node';
-import { StateClosureHookRuntime } from './exports/hooks/utils/runtime';
-import { mapKeyedClosure } from './exports/keyed';
-import { mapEachClosure, switchMapClosure } from './exports/operator';
-import { render } from './exports/render';
-import {
+  assert,
   bindRootDescriptorScope,
   clearWithDescriptorScope,
   DescriptorContext,
   detachWithDescriptorScope,
   getReadableClosureScope,
+  isNativeStateLike,
+  isReactiveStateLike,
+  observeState,
   ownReadableClosure,
   releaseReadableClosure,
-} from './exports/render/utils/context';
-import { isReadableClosure, isStateClosureDescriptor } from './exports/render/utils/predicates';
+  StateContext,
+  StateNode,
+} from '../__internal__';
+import { clearByTarget, Destructible } from '../destructible';
+import { MutableState } from '../mutable-state';
+import { mapState, ReactiveState, selectState, toState } from '../reactive-state';
+import { mapKeyedClosure } from './exports';
+import { mapEachClosure, switchMapClosure } from './exports';
+import { render } from './exports';
+import { StateClosureHookRuntime } from './utils';
+import { isReadableClosure, isStateClosureDescriptor } from './utils';
 import {
   isResolvedClosureSource,
   isResolvedImmediateSource,
+  OwnedStateView,
+  OwnedValueState,
   resolveResult,
   resolveSource,
-} from './utils/source';
+} from './utils';
+
+type OwnedReactiveState<T> = IReactiveState<T> & { destroy(): void };
 
 export const toClosure = <T>(source: StateClosureSource<T>): IReadableClosure<T> => {
   return isReadableClosure<T>(source) ? source : new SourceReadableClosure({ source });
 };
 
-export const mapClosure = <S, R>(
-  source: S,
-  mapper: StateMapper<StateValue<S>, R>,
+export function mapClosure<const S extends readonly unknown[], R>(
+  sources: readonly [...S],
+  mapper: StateMapper<StateValues<[...S]>, R>,
   distinctor?: Distinctor<R>,
-): IReadableClosure<R> => {
+): IReadableClosure<R>;
+export function mapClosure<S, R>(
+  source: S,
+  mapper: StateMapper<StateInputValue<S>, R>,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R>;
+export function mapClosure<S, R>(
+  source: S,
+  mapper: StateMapper<StateInputValue<S>, R>,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R> {
   return new DerivedReadableClosure(source, () =>
     mapState(
       source,
@@ -71,21 +86,31 @@ export const mapClosure = <S, R>(
       distinctor,
     ),
   );
-};
+}
 
-export const selectClosure = <S, R>(
-  source: S,
-  mapper: StateMapper<StateValue<S>, R>,
+export function selectClosure<const S extends readonly unknown[], R>(
+  sources: readonly [...S],
+  mapper: (values: StateValues<[...S]>) => R,
   distinctor?: Distinctor<R>,
-): IReadableClosure<R> => {
+): IReadableClosure<R>;
+export function selectClosure<S, R>(
+  source: S,
+  mapper: (value: StateInputValue<S>) => R,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R>;
+export function selectClosure<S, R>(
+  source: S,
+  mapper: (value: StateInputValue<S>) => R,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R> {
   return new DerivedReadableClosure(source, () =>
     selectState(
       source,
-      (value, prev) => StateClosureHookRuntime.run(null, () => mapper(value, prev)),
+      (value) => StateClosureHookRuntime.run(null, () => mapper(value)),
       distinctor,
     ),
   );
-};
+}
 
 /** Derive field closures from the initial value without taking ownership of the source. */
 export const flattenClosure = <T extends object>(
@@ -98,25 +123,16 @@ export const flattenClosure = <T extends object>(
   ) as FlattenedState<T>;
 };
 
-export const combineMapClosure = <const TSources extends [unknown, ...unknown[]], R>(
-  sources: [...TSources],
-  mapper: StateMapper<StateValues<TSources>, R>,
-  distinctor?: Distinctor<R>,
-): IReadableClosure<R> => {
-  return new DerivedReadableClosure(sources, () =>
-    combineMapState(
-      sources,
-      (value, prev) => StateClosureHookRuntime.run(null, () => mapper(value, prev)),
-      distinctor,
-    ),
-  );
-};
-
 export abstract class BaseStateClosure<T, TInputs = void>
   extends Destructible
   implements IReadableClosure<T>
 {
-  private _value: MutableState<T> | null = null;
+  private _value: IReactiveState<T> | null = null;
+
+  /** Custom writable closures retain a mutable output; internal graphs can own or borrow it. */
+  protected get mode(): StateClosureMode {
+    return 'mutable';
+  }
 
   readonly inputs: TInputs;
 
@@ -131,7 +147,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
       bindRootDescriptorScope(scope, this);
     }
 
-    clearWithDescriptorScope(getReadableClosureScope(this), () => super.destroy());
+    getReadableClosureScope(this);
 
     // Descriptor inputs are already owned; rescanning would also capture D-wrapped values.
     if (scope) {
@@ -150,10 +166,40 @@ export abstract class BaseStateClosure<T, TInputs = void>
     }
   }
 
-  private createState(source: IReactiveState<T> | null, initial: T): MutableState<T> {
-    if (!source) {
-      return this.clearable(MutableState.of(initial));
+  private createState(source: IReactiveState<T> | null, initial: T): IReactiveState<T> {
+    if (source && this.mode === 'owned') {
+      detachWithDescriptorScope(getReadableClosureScope(this), () => {
+        (source as OwnedReactiveState<T>).destroy();
+      });
+
+      return source;
     }
+
+    if (source && this.mode === 'view' && isNativeStateLike(source)) {
+      // Reading the native publication does not set up a ReactiveState. A terminal
+      // source is already an immutable handle and needs no extra lifetime boundary.
+      if (source instanceof ReactiveState && source.__nativeState.getPublishedState().closed) {
+        return source;
+      }
+
+      const state = new OwnedStateView(source);
+
+      detachWithDescriptorScope(getReadableClosureScope(this), () => state.destroy());
+
+      return state;
+    }
+
+    if (!source) {
+      return this.clearable(
+        this.mode === 'mutable' ? MutableState.of(initial) : new OwnedValueState(initial),
+      );
+    }
+
+    return this.createForwardedState(source);
+  }
+
+  private createForwardedState(source: IReactiveState<T>): MutableState<T> {
+    const initial = source.value;
 
     let state: MutableState<T> | null = null;
 
@@ -162,7 +208,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
     };
 
     const subscription = StateContext.run(null, () =>
-      source.subscribe({
+      observeState(source, {
         next: (value) => {
           if (state) {
             state.next(value);
@@ -242,9 +288,7 @@ export abstract class BaseStateClosure<T, TInputs = void>
           ? directSource
           : null;
 
-      const initial = reactiveSource ? reactiveSource.value : (directSource as T);
-
-      const state = this.createState(reactiveSource, initial);
+      const state = this.createState(reactiveSource, directSource as T);
 
       this._value = state;
 
@@ -270,17 +314,37 @@ export abstract class BaseStateClosure<T, TInputs = void>
     return target;
   }
 
+  protected map<const S extends readonly unknown[], R>(
+    sources: readonly [...S],
+    mapper: StateMapper<StateValues<[...S]>, R>,
+    distinctor?: Distinctor<R>,
+  ): IReadableClosure<R>;
   protected map<S, R>(
     source: S,
-    mapper: StateMapper<StateValue<S>, R>,
+    mapper: StateMapper<StateInputValue<S>, R>,
+    distinctor?: Distinctor<R>,
+  ): IReadableClosure<R>;
+  protected map<S, R>(
+    source: S,
+    mapper: StateMapper<StateInputValue<S>, R>,
     distinctor?: Distinctor<R>,
   ): IReadableClosure<R> {
     return this.own(mapClosure(source, mapper, distinctor));
   }
 
+  protected select<const S extends readonly unknown[], R>(
+    sources: readonly [...S],
+    mapper: (values: StateValues<[...S]>) => R,
+    distinctor?: Distinctor<R>,
+  ): IReadableClosure<R>;
   protected select<S, R>(
     source: S,
-    mapper: StateMapper<StateValue<S>, R>,
+    mapper: (value: StateInputValue<S>) => R,
+    distinctor?: Distinctor<R>,
+  ): IReadableClosure<R>;
+  protected select<S, R>(
+    source: S,
+    mapper: (value: StateInputValue<S>) => R,
     distinctor?: Distinctor<R>,
   ): IReadableClosure<R> {
     return this.own(selectClosure(source, mapper, distinctor));
@@ -357,18 +421,10 @@ export abstract class BaseStateClosure<T, TInputs = void>
     return this.create(source || fallback);
   }
 
-  protected combineMap<const TSources extends [unknown, ...unknown[]], R>(
-    sources: [...TSources],
-    mapper: StateMapper<StateValues<TSources>, R>,
-    distinctor?: Distinctor<R>,
-  ): IReadableClosure<R> {
-    return this.own(combineMapClosure(sources, mapper, distinctor));
-  }
-
   protected combine<const TSources extends [unknown, ...unknown[]]>(
     ...sources: TSources
   ): IReadableClosure<StateValues<TSources>> {
-    return this.combineMap<TSources, StateValues<TSources>>(
+    return this.map<TSources, StateValues<TSources>>(
       sources,
       (stateValues) => stateValues,
       shallowEqual,
@@ -384,13 +440,22 @@ export abstract class BaseStateClosure<T, TInputs = void>
   }
 
   protected next(newValue: T) {
-    this.setup().next(newValue);
+    const state = this.setup();
+
+    assert(state instanceof MutableState, 'This closure has no writable output.');
+
+    state.next(newValue);
   }
 
   protected abstract render(): StateClosureResult<T>;
 }
 
 class SourceReadableClosure<T> extends BaseStateClosure<T, { source: StateClosureSource<T> }> {
+
+  protected override get mode(): StateClosureMode {
+    return 'view';
+  }
+
   protected render(): StateClosureResult<T> {
     const { source } = this.inputs;
 
@@ -410,9 +475,14 @@ class SourceReadableClosure<T> extends BaseStateClosure<T, { source: StateClosur
 
 class DerivedReadableClosure<T, S> extends BaseStateClosure<
   T,
-  { source: S; factory: () => ReactiveState<T> }
+  { source: S; factory: () => OwnedReactiveState<T> }
 > {
-  constructor(source: S, factory: () => ReactiveState<T>) {
+
+  protected override get mode(): StateClosureMode {
+    return 'owned';
+  }
+
+  constructor(source: S, factory: () => OwnedReactiveState<T>) {
     super({ source, factory });
 
     if (isArray(source)) {
@@ -427,20 +497,22 @@ class DerivedReadableClosure<T, S> extends BaseStateClosure<
   protected render() {
     const { factory } = this.inputs;
 
-    const state = factory();
-
-    detachWithDescriptorScope(getReadableClosureScope(this), () => state.destroy());
-
-    return state;
+    return factory();
   }
 }
 
 export class FactoryReadableClosure<T> extends BaseStateClosure<
   T,
-  { factory: () => StateClosureResult<T> }
+  { factory: () => StateClosureResult<T>; owned?: boolean }
 > {
-  static create<T>(factory: () => StateClosureResult<T>): FactoryReadableClosure<T> {
-    return new FactoryReadableClosure({ factory });
+  static create<T>(factory: () => OwnedReactiveState<T>, owned: true): FactoryReadableClosure<T>;
+  static create<T>(factory: () => StateClosureResult<T>, owned?: false): FactoryReadableClosure<T>;
+  static create<T>(factory: () => StateClosureResult<T>, owned = false): FactoryReadableClosure<T> {
+    return new FactoryReadableClosure({ factory, owned });
+  }
+
+  protected override get mode(): StateClosureMode {
+    return this.inputs.owned ? 'owned' : 'view';
   }
 
   protected render() {

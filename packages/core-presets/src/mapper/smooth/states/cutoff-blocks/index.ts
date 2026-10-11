@@ -1,7 +1,7 @@
 import type { IBlockState } from '@fluxdown/types';
 
 import { shallowEqual } from 'shallow-equal';
-import { once, useClearable, useCombineMap, useMap } from 'stative';
+import { once, useClearable, useMap } from 'stative';
 
 import type { CutoffBlockEntry, CutoffBlocksInputs } from './type';
 
@@ -25,7 +25,7 @@ export const CutoffBlocks = /*#__PURE__*/ once(function CutoffBlocks<T>({
 
   const blockIndex = useMap(end, (position) => position.blockIndex);
 
-  const visible = useCombineMap(
+  const visible = useMap(
     [items, blockIndex],
     ([current, index]) => current.slice(0, Math.max(0, index + 1)),
     shallowEqual,
@@ -33,7 +33,7 @@ export const CutoffBlocks = /*#__PURE__*/ once(function CutoffBlocks<T>({
 
   const count = useMap(visible, (current) => current.length);
 
-  return useCombineMap(
+  return useMap(
     [visible, end, count],
     ([current, position]) => {
       if (current !== previous) {

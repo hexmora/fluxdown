@@ -12,7 +12,6 @@ import {
   render,
   S,
   useClearable,
-  useCombineMap,
   useCreate,
   useCurrent,
   useDefaults,
@@ -292,7 +291,7 @@ describe('state closure hooks', () => {
     const Build = once(({ source }: { source: IReadableClosure<number> }) => {
       const mapped = useMap(source, (value) => value * 2);
       const composed = useCreate(source);
-      const combined = useCombineMap([mapped, composed], ([left, right]) => left + right);
+      const combined = useMap([mapped, composed], ([left, right]) => left + right);
 
       expectTypeOf(mapped).toEqualTypeOf<IReadableClosure<number>>();
       expectTypeOf(composed).toEqualTypeOf<IReadableClosure<number>>();
@@ -493,7 +492,7 @@ describe('state closure hooks', () => {
   test.each([
     ['useMap', () => useMap(1, (value) => value), 'once'],
     ['useCreate', () => useCreate(1), 'once'],
-    ['useCombineMap', () => useCombineMap([1, 2], ([a, b]) => a + b), 'once'],
+    ['useMap', () => useMap([1, 2], ([a, b]) => a + b), 'once'],
     ['useDefaults', () => useDefaults(undefined, 1), 'once'],
     ['useDefaultsFalsy', () => useDefaultsFalsy(false, 1), 'once'],
     ['useRef', () => useRef(1), 'mapper'],

@@ -3,7 +3,7 @@ import type { BehaviorSubject, Subscription } from 'rxjs';
 import type { IDestructible } from '../destructible';
 import type { MutableState } from '../mutable-state';
 import type { IReactiveState } from '../reactive-state';
-import type { ImmediateDescriptor, StateClosureDescriptor } from './exports/render';
+import type { ImmediateDescriptor, StateClosureDescriptor } from './exports';
 
 export type StateClosureDirectSource<T> = T | BehaviorSubject<T> | IReactiveState<T>;
 
@@ -26,3 +26,5 @@ export type ListEntry<T, R> = {
   state: IReactiveState<R>;
   subscription?: Subscription;
 };
+
+export type StateClosureMode = 'mutable' | 'view' | 'owned';
