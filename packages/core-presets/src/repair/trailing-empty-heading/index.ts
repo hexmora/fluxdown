@@ -17,6 +17,7 @@ export class TrailingEmptyHeadingRepairPlugin extends BaseRepairPlugin {
   static readonly key = 'repair-trailing-empty-heading';
 
   readonly config: RepairPluginSystemConfig = {
+    scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };

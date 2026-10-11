@@ -17,6 +17,7 @@ export class TrailingEscapeRepairPlugin extends BaseRepairPlugin {
   static readonly key = 'repair-trailing-escape';
 
   readonly config: RepairPluginSystemConfig = {
+    scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };

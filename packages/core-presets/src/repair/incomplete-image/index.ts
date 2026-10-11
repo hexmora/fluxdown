@@ -22,6 +22,7 @@ export class IncompleteImageRepairPlugin extends BaseRepairPlugin {
   static readonly key = 'repair-incomplete-image';
 
   readonly config: RepairPluginSystemConfig = {
+    scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };

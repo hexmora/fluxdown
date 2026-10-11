@@ -16,6 +16,7 @@ export class IncompleteEmphasisRepairPlugin extends BaseRepairPlugin {
   static readonly key = 'repair-incomplete-emphasis';
 
   readonly config: RepairPluginSystemConfig = {
+    scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };

@@ -16,6 +16,7 @@ export class IncompleteInlineCodeRepairPlugin extends BaseRepairPlugin {
   static readonly key = 'repair-incomplete-inline-code';
 
   readonly config: RepairPluginSystemConfig = {
+    scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };

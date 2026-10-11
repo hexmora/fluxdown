@@ -41,6 +41,7 @@ describe('IncompleteImageRepairPlugin', () => {
     expect(plugin.config).toEqual({
       ending: true,
       priority: PluginPriority.Default,
+      scope: 'tail',
     });
   });
 
