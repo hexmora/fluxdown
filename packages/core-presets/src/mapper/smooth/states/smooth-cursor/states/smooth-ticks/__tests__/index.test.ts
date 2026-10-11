@@ -67,6 +67,8 @@ describe('SmoothTicks', () => {
 
     const output = ticks.value;
 
+    expect(output.value).toBeNull();
+
     lengths.next([4]);
 
     const previous = latest(PrimarySmoothTicker.instances);
@@ -235,6 +237,8 @@ describe('SmoothTicks', () => {
     ticker.next(FinishingTicker);
 
     const output = ticks.value;
+
+    expect(output.value).toBeNull();
 
     lengths.next([4]);
 

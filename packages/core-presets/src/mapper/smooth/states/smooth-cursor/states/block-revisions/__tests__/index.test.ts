@@ -4,7 +4,7 @@ import { batch, MutableState, ReactiveState, render, S } from 'stative';
 
 import { BlockRevisions } from '..';
 import { createArrayBlock } from '../../../../../__tests__/block';
-import { observerCount } from '../../../../../__tests__/utils';
+import { countStateObservers } from '../../../../../../../../../../scripts/testing/state';
 
 describe('BlockRevisions', () => {
   test('keeps retained block subscriptions across append, reorder, and removal', () => {
@@ -42,7 +42,7 @@ describe('BlockRevisions', () => {
 
     expect(subscribeB).not.toHaveBeenCalled();
 
-    expect(observerCount(c.block.baseLength)).toBe(0);
+    expect(countStateObservers(c.block.baseLength)).toBe(0);
 
     a.source.next([1, 2, 3, 4]);
 
@@ -50,7 +50,7 @@ describe('BlockRevisions', () => {
 
     source.next([a.block]);
 
-    expect(observerCount(b.block.baseLength)).toBe(0);
+    expect(countStateObservers(b.block.baseLength)).toBe(0);
 
     b.source.next([5, 6, 7]);
 
@@ -64,9 +64,9 @@ describe('BlockRevisions', () => {
 
     state.destroy();
 
-    expect(observerCount(a.block.baseLength)).toBe(0);
+    expect(countStateObservers(a.block.baseLength)).toBe(0);
 
-    expect(observerCount(b.block.baseLength)).toBe(0);
+    expect(countStateObservers(b.block.baseLength)).toBe(0);
   });
 
   test('shares one revision subscription when a block occurs twice', () => {
@@ -92,7 +92,7 @@ describe('BlockRevisions', () => {
 
     state.destroy();
 
-    expect(observerCount(a.block.baseLength)).toBe(0);
+    expect(countStateObservers(a.block.baseLength)).toBe(0);
   });
 
   test('keeps observing block lengths after the source list completes', () => {
@@ -138,9 +138,9 @@ describe('BlockRevisions', () => {
 
     expect(changed).toHaveBeenCalledTimes(2);
 
-    expect(observerCount(a.block.baseLength)).toBe(0);
+    expect(countStateObservers(a.block.baseLength)).toBe(0);
 
-    expect(observerCount(b.block.baseLength)).toBeGreaterThan(0);
+    expect(countStateObservers(b.block.baseLength)).toBeGreaterThan(0);
 
     a.source.next([1, 2, 3, 4]);
 
@@ -152,7 +152,7 @@ describe('BlockRevisions', () => {
 
     state.destroy();
 
-    expect(observerCount(b.block.baseLength)).toBe(0);
+    expect(countStateObservers(b.block.baseLength)).toBe(0);
 
     expect(source.closed).toBe(false);
   });
@@ -204,13 +204,13 @@ describe('BlockRevisions', () => {
     expect(error).toHaveBeenCalledTimes(1);
     expect(error).toHaveBeenCalledWith(failure);
 
-    expect(observerCount(b.block.baseLength)).toBe(0);
+    expect(countStateObservers(b.block.baseLength)).toBe(0);
 
     expect(source.closed).toBe(false);
 
     state.destroy();
 
-    expect(observerCount(source)).toBe(0);
+    expect(countStateObservers(source)).toBe(0);
   });
 
   test('initializes from a pending source update and keeps observing the committed blocks', () => {
@@ -228,7 +228,7 @@ describe('BlockRevisions', () => {
       expect(state.value.value.map(({ length }) => length)).toEqual([2]);
     });
 
-    expect(observerCount(a.block.baseLength)).toBe(0);
+    expect(countStateObservers(a.block.baseLength)).toBe(0);
 
     b.source.next([2, 3, 4]);
 

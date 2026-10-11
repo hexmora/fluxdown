@@ -1,7 +1,7 @@
 import type { IRangeState } from '@fluxdown/types';
 
 import { isEqual } from 'lodash-es';
-import { D, once, useClearable, useMap, useSwitchMap } from 'stative';
+import { D, once, useClearable, useMap, useSelect, useSwitchMap } from 'stative';
 
 import type { CutoffBlockInputs } from './type';
 
@@ -14,7 +14,7 @@ export const CutoffBlock = /*#__PURE__*/ once(function CutoffBlock<T>({
   end,
   count,
 }: CutoffBlockInputs<T>) {
-  const meta = useMap(
+  const meta = useSelect(
     [source.meta, count],
     ([current, blockCount]) => ({ ...current, blockCount }),
     isMetaEqual,
