@@ -43,15 +43,21 @@ export const runRepairPlugin = <T extends Parent | RootContent>({
   safe = true,
   ...processOptions
 }: RunRepairPluginParams<T>) => {
-  const runners = isFunction(plugin.runner)
-    ? [plugin.runner.bind(plugin)]
-    : plugin.runner.map((item) => item.bind(plugin));
+  const runners = isFunction(plugin.runner) ? [plugin.runner] : [...plugin.runner];
   const { ending: _ending, priority: _priority, ...pluginOptions } = plugin.config;
+
+  const options = { ...processOptions, ...pluginOptions };
+
+  const { scope, order = 'pre', rightFirst = false } = options;
+
+  const tailOnly = scope === 'tail' && order === 'pre' && !rightFirst;
 
   plugin.before(node);
 
-  for (const runner of runners) {
+  for (const original of runners) {
     plugin.beforeEach(node);
+
+    const runner = original.bind(plugin);
 
     const handleRunner = (params: ProcessMdastRunnerParams<T>) => {
       runner({
@@ -71,8 +77,8 @@ export const runRepairPlugin = <T extends Parent | RootContent>({
       processMdast({
         node,
         runner: handleRunner,
-        ...processOptions,
-        ...pluginOptions,
+        ...options,
+        scope: tailOnly ? 'tail' : 'tree',
       });
     } catch (error) {
       if (!safe) {

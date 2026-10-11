@@ -16,6 +16,7 @@ export class IncompleteCodeFenceRepairPlugin extends BaseRepairPlugin {
   static readonly key = 'repair-incomplete-code-fence';
 
   readonly config: RepairPluginSystemConfig = {
+    scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };
