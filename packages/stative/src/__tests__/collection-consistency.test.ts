@@ -1,12 +1,6 @@
-import {
-  batch,
-  combineMapClosure,
-  type IReadableClosure,
-  mapClosure,
-  mapEachClosure,
-  mapState,
-  MutableState,
-} from '..';
+import type { IReadableClosure } from '..';
+
+import { batch, mapClosure, mapEachClosure, mapState, MutableState } from '..';
 
 describe('collection consistency', () => {
   test.each([
@@ -25,7 +19,7 @@ describe('collection consistency', () => {
       let child: IReadableClosure<number> | undefined;
 
       const collection = mapEachClosure(source, (item) => {
-        const scaled = combineMapClosure([item, scale], ([value, factor]) => value * factor);
+        const scaled = mapClosure([item, scale], ([value, factor]) => value * factor);
 
         child = mapClosure(scaled, (value) => value);
 

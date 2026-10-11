@@ -1,14 +1,15 @@
-import type { BehaviorSubject, Observer, Subscription, TeardownLogic } from 'rxjs';
+import type { BehaviorSubject } from 'rxjs';
 
+import type { Distinctor, EmitterFunction, IReactiveState } from '../__internal__';
 import type { IReadableClosure } from '../state-closure';
 
-export type NextFunction<T> = (value: T) => void;
-
-export type EmitterFunction<T> = (observer: Observer<T>) => TeardownLogic;
-
-export type Distinctor<T> = (from: T, to: T) => boolean;
-
-export type StateSubscriber<T> = NextFunction<T> | Partial<Observer<T>>;
+export type {
+  Distinctor,
+  EmitterFunction,
+  IReactiveState,
+  NextFunction,
+  StateSubscriber,
+} from '../__internal__';
 
 export type ReactiveStateParams<T> = {
   initial: T;
@@ -23,14 +24,6 @@ export type ReactiveStateParams<T> = {
    * @default true
    */
   lazy?: boolean;
-};
-
-export type IReactiveState<T> = {
-  readonly value: T;
-
-  readonly closed: boolean;
-
-  subscribe(subscriber: StateSubscriber<T>): Subscription;
 };
 
 export type StateValue<T> =
@@ -56,3 +49,6 @@ export type StateValues<TSources extends readonly unknown[]> = {
 };
 
 export type StateMapper<A, B> = (value: A, prev: [A, B] | null) => B;
+
+/** Arrays describe a list of sources; wrap an array value in a state to map it as one input. */
+export type StateInputValue<S> = S extends readonly unknown[] ? StateValues<[...S]> : StateValue<S>;

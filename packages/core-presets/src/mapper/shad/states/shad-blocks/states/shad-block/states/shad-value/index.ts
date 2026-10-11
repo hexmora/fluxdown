@@ -1,4 +1,4 @@
-import { combineMapClosure, once, useClearable, useMap, useSwitchMap } from 'stative';
+import { mapClosure, once, useClearable, useMap, useSwitchMap } from 'stative';
 
 import type { ShadValueInputs } from './type';
 
@@ -17,7 +17,7 @@ export const ShadValue = /*#__PURE__*/ once(function ShadValue({
 
   return useSwitchMap(active, (isTail) =>
     isTail
-      ? combineMapClosure([previous.value, progress], ([root, position]) =>
+      ? mapClosure([previous.value, progress], ([root, position]) =>
           position.length > 0 ? createShadRoot(root, position) : root,
         )
       : previous.value,

@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash-es';
-import { once, useCombineMap, useDefaults } from 'stative';
+import { once, useMap, useDefaults } from 'stative';
 
 import type { IBlockSection, TextChunkerInputs } from './type';
 
@@ -17,11 +17,11 @@ export const TextChunker = /*#__PURE__*/ once(function TextChunker({
 
   const chunker = new LexerChunker();
 
-  const texts = useCombineMap([text, config], ([currentText, currentConfig]) =>
+  const texts = useMap([text, config], ([currentText, currentConfig]) =>
     chunker.chunk(currentText, currentConfig),
   );
 
-  return useCombineMap(
+  return useMap(
     [texts, patches],
     ([currentTexts, currentPatches], previous): IBlockSection[] => {
       const patchGroups =

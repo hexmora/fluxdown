@@ -15,7 +15,7 @@ import {
   S,
   useCurrent,
 } from '../../../../..';
-import { getMapperComparers } from '../utils';
+import { getMapperComparers } from '../../../utils';
 
 function calculate(this: { scale: number }, value: number) {
   return this.scale * value;

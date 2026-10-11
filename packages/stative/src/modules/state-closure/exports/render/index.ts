@@ -1,6 +1,6 @@
+import type { AnyOnceFunction, OnceFunctionMetadata } from '..';
 import type { Distinctor } from '../../../reactive-state';
 import type { IReadableClosure } from '../../type';
-import type { AnyOnceFunction, OnceFunctionMetadata } from '../once';
 import type {
   AnyStateClosureClass,
   BuiltClosure,
@@ -19,11 +19,15 @@ import type {
   StateClosureResult,
   StateClosureResultNode,
   StateClosureResultValue,
-} from './utils';
+} from './type';
 
-import { immediateDescriptor, markStateClosureDescriptor } from './utils/consts';
-import { createDescriptorScope, destroyDescriptorScope } from './utils/context';
-import { buildStateClosure } from './utils/resolve';
+import {
+  createDescriptorScope,
+  destroyDescriptorScope,
+  immediateDescriptor,
+  markStateClosureDescriptor,
+} from '../../../__internal__';
+import { buildStateClosure } from '../../utils';
 
 export * from './type';
 

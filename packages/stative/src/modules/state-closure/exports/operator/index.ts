@@ -1,30 +1,40 @@
 import { Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
-import type { Distinctor, IReactiveState, StateSource, StateValue } from '../../../reactive-state';
-import type { IReadableClosure, ListEntry, StateClosureSource } from '../../type';
 import type {
   MarkedStateClosureDescriptor,
   StateClosureResult,
   StateClosureResultNode,
   StateClosureResultValue,
-} from '../render';
+} from '..';
+import type { StateSubscription } from '../../../__internal__';
+import type { Distinctor, IReactiveState, StateSource, StateValue } from '../../../reactive-state';
+import type { IReadableClosure, ListEntry, StateClosureSource } from '../../type';
 
-import { MutableState } from '../../../mutable-state';
-import { isReactiveStateLike, ReactiveState, toState } from '../../../reactive-state';
-import { batch } from '../../../state-graph/main';
-import { StateNode } from '../../../state-graph/utils/node';
-import { FactoryReadableClosure, toClosure } from '../../main';
-import { StateClosureHookRuntime } from '../hooks/utils/runtime';
-import { render } from '../render';
+import { render } from '..';
 import {
   clearWithDescriptorScope,
-  detachWithDescriptorScope,
   getReadableClosureScope,
+  isNativeStateLike,
+  isReactiveStateLike,
+  observeState,
   ownReadableClosure,
   releaseReadableClosure,
-} from '../render/utils/context';
-import { isImmediateDescriptor, isReadableClosure } from '../render/utils/predicates';
+  StateNode,
+} from '../../../__internal__';
+import { MutableState } from '../../../mutable-state';
+import { ReactiveState, toState } from '../../../reactive-state';
+import { batch } from '../../../state-graph';
+import { FactoryReadableClosure, toClosure } from '../../main';
+import { StateClosureHookRuntime } from '../../utils';
+import { isImmediateDescriptor, isReadableClosure } from '../../utils';
+
+type CollectionEntry<T, R> = Omit<ListEntry<T, R>, 'subscription'> & {
+  value: R;
+  native: boolean;
+  completed: boolean;
+  subscription?: StateSubscription;
+};
 
 /**
  * Follows the latest mapped child and releases the previous child graph on replacement.
@@ -93,7 +103,7 @@ export function switchMapClosure<S, R>(
       emitter: (observer) => {
         const subscriptions = new Subscription();
 
-        let subscription: Subscription | null = null;
+        let subscription: StateSubscription | null = null;
 
         let stopped = false;
 
@@ -112,7 +122,7 @@ export function switchMapClosure<S, R>(
         };
 
         const handleSubscribe = () => {
-          subscription = inner.subscribe({
+          subscription = observeState(inner, {
             next: handleSchedule,
 
             error: handleError,
@@ -165,7 +175,7 @@ export function switchMapClosure<S, R>(
           handleSubscribe();
 
           subscriptions.add(
-            input.subscribe({
+            observeState(input, {
               next: handleSchedule,
 
               error: handleError,
@@ -191,10 +201,8 @@ export function switchMapClosure<S, R>(
       },
     });
 
-    detachWithDescriptorScope(scope, () => state.destroy());
-
     return state;
-  });
+  }, true);
 
   const scope = getReadableClosureScope(closure);
 
@@ -227,7 +235,7 @@ export function mapEachClosure<T, R>(
   const closure = FactoryReadableClosure.create(() => {
     const sourceState = input.value;
 
-    const createEntry = (value: T, index: number): ListEntry<T, R> => {
+    const createEntry = (value: T, index: number): CollectionEntry<T, R> => {
       const item = new MutableState({ initial: value, distinctor: itemDistinctor });
 
       StateNode.get(item).dependOn(StateNode.get(sourceState), { ordering: true });
@@ -242,7 +250,16 @@ export function mapEachClosure<T, R>(
       ownReadableClosure(scope, child);
 
       try {
-        return { input: item, closure: child, state: child.value };
+        const state = child.value;
+
+        return {
+          input: item,
+          closure: child,
+          state,
+          value: state.value,
+          native: isNativeStateLike(state),
+          completed: state.closed,
+        };
       } catch (error) {
         releaseReadableClosure(scope, child);
 
@@ -250,7 +267,7 @@ export function mapEachClosure<T, R>(
       }
     };
 
-    const releaseEntries = (items: ListEntry<T, R>[]) => {
+    const releaseEntries = (items: CollectionEntry<T, R>[]) => {
       const cleanup = new Subscription();
 
       for (const entry of items) {
@@ -265,16 +282,18 @@ export function mapEachClosure<T, R>(
     };
 
     let previousItems = sourceState.value;
-    let entries = previousItems.map(createEntry);
+    const entries = previousItems.map(createEntry);
 
     const state: ReactiveState<R[]> = new ReactiveState({
-      initial: entries.map((entry) => entry.state.value),
+      initial: entries.map((entry) => entry.value),
       distinctor: shallowEqual,
       emitter: (observer) => {
         const subscriptions = new Subscription();
 
         let stopped = false;
         let completed = false;
+
+        let valuesChanged = false;
 
         const fail = (error: unknown) => {
           if (stopped) {
@@ -292,9 +311,18 @@ export function mapEachClosure<T, R>(
           }
 
           try {
-            observer.next(entries.map((entry) => entry.state.value));
+            if (valuesChanged) {
+              valuesChanged = false;
 
-            if (completed && entries.every((entry) => entry.state.closed)) {
+              observer.next(
+                entries.map((entry) => (entry.native ? entry.value : entry.state.value)),
+              );
+            }
+
+            if (
+              completed &&
+              entries.every((entry) => (entry.native ? entry.completed : entry.state.closed))
+            ) {
               stopped = true;
 
               observer.complete();
@@ -308,12 +336,32 @@ export function mapEachClosure<T, R>(
           StateNode.get(state).schedule(refresh);
         };
 
-        const connectEntry = (entry: ListEntry<T, R>) => {
-          entry.subscription = entry.state.subscribe({
-            next: scheduleRefresh,
+        const connectEntry = (entry: CollectionEntry<T, R>) => {
+          let connecting = true;
+
+          entry.subscription = observeState(entry.state, {
+            next: (value) => {
+              const current = connecting ? entry.state.value : value;
+
+              if (!entry.native || !Object.is(entry.value, current)) {
+                entry.value = current;
+
+                valuesChanged = true;
+
+                scheduleRefresh();
+              }
+            },
             error: fail,
-            complete: scheduleRefresh,
+            complete: () => {
+              entry.completed = true;
+
+              if (completed) {
+                scheduleRefresh();
+              }
+            },
           });
+
+          connecting = false;
 
           subscriptions.add(entry.subscription);
         };
@@ -323,25 +371,47 @@ export function mapEachClosure<T, R>(
             return;
           }
 
-          const created: ListEntry<T, R>[] = [];
+          const created: CollectionEntry<T, R>[] = [];
 
           try {
             for (let index = entries.length; index < items.length; index++) {
               created.push(createEntry(items[index], index));
             }
 
-            const removed = entries.slice(items.length);
+            const retainedLength = Math.min(entries.length, items.length);
+            const previous = previousItems;
+            const removed = items.length < entries.length ? entries.splice(items.length) : [];
 
-            entries = [...entries.slice(0, items.length), ...created];
+            for (const entry of created) {
+              entries.push(entry);
+            }
 
             previousItems = items;
 
+            if (removed.length > 0 || created.length > 0) {
+              valuesChanged = true;
+            }
+
             batch(() => {
-              entries.forEach((entry, index) => entry.input.next(items[index]));
+              for (let index = 0; index < retainedLength; index++) {
+                if (itemDistinctor || !Object.is(previous[index], items[index])) {
+                  entries[index].input.next(items[index]);
+                }
+              }
+
+              if (itemDistinctor) {
+                for (let index = retainedLength; index < entries.length; index++) {
+                  entries[index].input.next(items[index]);
+                }
+              }
+
               created.forEach(connectEntry);
 
               releaseEntries(removed);
-              scheduleRefresh();
+
+              if (valuesChanged) {
+                scheduleRefresh();
+              }
             });
           } catch (error) {
             releaseEntries(created);
@@ -353,7 +423,7 @@ export function mapEachClosure<T, R>(
           entries.forEach(connectEntry);
 
           subscriptions.add(
-            sourceState.subscribe({
+            observeState(sourceState, {
               next: update,
               error: fail,
               complete: () => {
@@ -376,10 +446,8 @@ export function mapEachClosure<T, R>(
       },
     });
 
-    detachWithDescriptorScope(scope, () => state.destroy());
-
     return state;
-  });
+  }, true);
 
   const scope = getReadableClosureScope(closure);
   const input = ownReadableClosure(scope, toClosure(source));

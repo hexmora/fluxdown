@@ -1,4 +1,6 @@
-import { Destructible, type DestructibleTarget } from '..';
+import type { DestructibleTarget } from '..';
+
+import { Destructible } from '..';
 
 class TestDestructible extends Destructible {
   track<T extends DestructibleTarget>(value: T): T {

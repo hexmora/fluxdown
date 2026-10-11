@@ -1,4 +1,4 @@
-import { batch, combineMapClosure, MutableState, ReactiveState, render, S } from 'stative';
+import { batch, mapClosure, MutableState, ReactiveState, render, S } from 'stative';
 
 import { Completed } from '..';
 
@@ -49,7 +49,7 @@ describe('Completed', () => {
 
     const completed = render(S([Completed, { source }]));
 
-    const output = combineMapClosure([source, completed], ([value, closed]) => ({ value, closed }));
+    const output = mapClosure([source, completed], ([value, closed]) => ({ value, closed }));
 
     const next = jest.fn();
 

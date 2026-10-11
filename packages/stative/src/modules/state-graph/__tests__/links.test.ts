@@ -1,6 +1,6 @@
 import { sortBy } from 'lodash-es';
 
-import { StateLinks } from '../utils/links';
+import { StateLinks } from '../../__internal__';
 
 describe('ordering prerequisites', () => {
   test('shares one prerequisite across existing descendants and converging paths', () => {

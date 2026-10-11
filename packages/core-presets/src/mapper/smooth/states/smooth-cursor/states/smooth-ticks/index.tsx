@@ -3,7 +3,7 @@
  */
 
 import { sumBy } from 'lodash-es';
-import { D, type JSXDescriptor, once, useCombineMap, useSwitchMap } from 'stative';
+import { D, type JSXDescriptor, once, useMap, useSwitchMap } from 'stative';
 
 import type { SmoothTickerClass } from '../../../../type';
 import type { SmoothTicksInputs } from './type';
@@ -17,7 +17,7 @@ export const SmoothTicks = /*#__PURE__*/ once(function SmoothTicks({
   ticker: _ticker,
   revisions: _revisions,
 }: SmoothTicksInputs) {
-  const active = useCombineMap(
+  const active = useMap(
     [_enabled, _ticker, _revisions],
     ([enabled, Ticker, revisions], previous): SmoothTickerClass | null => {
       if (!previous) {

@@ -1,6 +1,8 @@
-import { BehaviorSubject, type Subscription } from 'rxjs';
+import type { Subscription } from 'rxjs';
 
-import { batch, combineMapState, mapState, MutableState, ReactiveState } from '..';
+import { BehaviorSubject } from 'rxjs';
+
+import { batch, mapState, MutableState, ReactiveState } from '..';
 
 describe('dependency propagation', () => {
   test.each(['destroy', 'complete'] as const)(
@@ -90,7 +92,7 @@ describe('dependency propagation', () => {
     const mappedLeft = mapState(left, (value) => value * 10);
     const mappedRight = mapState(right, (value) => value * 100);
     const mapper = jest.fn(([a, b]: [number, number]) => [a, b]);
-    const joined = combineMapState([mappedLeft, mappedRight], mapper);
+    const joined = mapState([mappedLeft, mappedRight], mapper);
     const next = jest.fn();
 
     joined.subscribe(next);
@@ -143,7 +145,7 @@ describe('dependency propagation', () => {
         };
       },
     });
-    const joined = combineMapState([source, repeated], ([value, derived]) => [value, derived]);
+    const joined = mapState([source, repeated], ([value, derived]) => [value, derived]);
     const next = jest.fn();
 
     joined.subscribe(next);

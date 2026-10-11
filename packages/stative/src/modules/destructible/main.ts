@@ -1,6 +1,6 @@
 import type { DestructibleTarget, IDestructible } from './type';
 
-import { clearByTarget } from './utils';
+import { clearByTarget } from './exports';
 
 export class Destructible implements IDestructible {
   private targets: DestructibleTarget[] | null = null;

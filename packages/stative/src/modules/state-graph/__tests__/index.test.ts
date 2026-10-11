@@ -1,6 +1,5 @@
+import { StateBatch, StateNode } from '../../__internal__';
 import { batch } from '../../..';
-import { StateBatch } from '../utils/batch';
-import { StateNode } from '../utils/node';
 
 describe('state graph queue', () => {
   test('ignores idle and disposed nodes without blocking subsequent updates', () => {

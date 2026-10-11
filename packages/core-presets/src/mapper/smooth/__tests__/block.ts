@@ -38,7 +38,7 @@ export class ArrayBlock<T>
   }
 
   protected render() {
-    return this.combineMap([this.inputs.source, this.rangeSource], ([value, range]) =>
+    return this.map([this.inputs.source, this.rangeSource], ([value, range]) =>
       range ? value.slice(range.start, range.end) : value,
     );
   }

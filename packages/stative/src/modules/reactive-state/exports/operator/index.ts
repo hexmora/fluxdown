@@ -1,15 +1,27 @@
-import { deriveState, isReactiveStateLike, isStateClosureLike, isStateSourceLike } from './utils';
-export { isReactiveStateLike } from './utils';
-
-import { isFunction, isUndefined } from 'lodash-es';
-import { BehaviorSubject, Observable, type Subscription } from 'rxjs';
+import { isArray, isFunction, isUndefined } from 'lodash-es';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
-import type { Distinctor, IReactiveState, StateMapper, StateValue, StateValues } from '../../type';
+import type {
+  Distinctor,
+  IReactiveState,
+  StateInputValue,
+  StateMapper,
+  StateValue,
+  StateValues,
+} from '../../type';
 
-import { compute } from '../../../../utils';
-import { StateNode } from '../../../state-graph/utils/node';
+import {
+  compute,
+  isReactiveStateLike,
+  isStateClosureLike,
+  isStateSourceLike,
+} from '../../../__internal__';
 import { ReactiveState } from '../../main';
+import { deriveState } from '../../utils';
+import { mapSources } from './utils';
+
+export { isReactiveStateLike } from '../../../__internal__';
 
 export const toState = <S>(source: S): IReactiveState<StateValue<S>> => {
   if (isReactiveStateLike<StateValue<S>>(source)) {
@@ -81,152 +93,37 @@ export function toReactiveState<T>(
   });
 }
 
-export const mapState = <S, B>(
+export function mapState<const S extends readonly unknown[], R>(
+  sources: readonly [...S],
+  mapper: StateMapper<StateValues<[...S]>, R>,
+  distinctor?: Distinctor<R>,
+): ReactiveState<R>;
+export function mapState<S, R>(
   source: S,
-  mapper: StateMapper<StateValue<S>, B>,
-  distinctor?: Distinctor<B>,
-): ReactiveState<B> => deriveState(source, mapper, distinctor);
-
-/** Keep shared derived values behind an equality boundary while preserving synchronous reads. */
-export const selectState = <S, B>(
+  mapper: StateMapper<StateInputValue<S>, R>,
+  distinctor?: Distinctor<R>,
+): ReactiveState<R>;
+export function mapState<S, R>(
   source: S,
-  mapper: StateMapper<StateValue<S>, B>,
-  distinctor?: Distinctor<B>,
-): ReactiveState<B> => deriveState(source, mapper, distinctor, true);
+  mapper: StateMapper<StateInputValue<S>, R>,
+  distinctor?: Distinctor<R>,
+): ReactiveState<R> {
+  if (isArray(source)) {
+    if (source.every((item) => !isStateSourceLike(item))) {
+      return ReactiveState.of(mapper(source as StateInputValue<S>, null));
+    }
 
-export const combineMapState = <const TSources extends [unknown, ...unknown[]], T>(
-  sources: [...TSources],
-  mapper: StateMapper<StateValues<TSources>, T>,
-  distinctor?: Distinctor<T>,
-): ReactiveState<T> => {
-  type TValues = StateValues<TSources>;
-
-  if (sources.every((source) => !isStateSourceLike(source))) {
-    return ReactiveState.of(mapper(sources as TValues, null));
+    return mapSources(source.map(toState), mapper as StateMapper<unknown[], R>, distinctor);
   }
 
-  const states = sources.map(toState) as {
-    [K in keyof TSources]: IReactiveState<StateValue<TSources[K]>>;
-  };
+  if (!isStateSourceLike(source)) {
+    return ReactiveState.of(mapper(source as StateInputValue<S>, null));
+  }
 
-  const initialValues = states.map((state) => state.value) as TValues;
-
-  const initial = mapper(initialValues, null);
-
-  let prev: [TValues, T] = [initialValues, initial];
-
-  const state = new ReactiveState({
-    initial,
-    emitter: (observer) => {
-      const latestValues = [...prev[0]] as TValues;
-
-      const completed = states.map(() => false);
-
-      let previousValues = prev[0];
-
-      let closed = false;
-
-      let failed = false;
-
-      let finalError: unknown;
-
-      const refresh = () => {
-        if (closed) {
-          return;
-        }
-
-        if (failed) {
-          closed = true;
-
-          observer.error(finalError);
-
-          return;
-        }
-
-        for (let index = 0; index < states.length; index++) {
-          latestValues[index] = states[index].value;
-        }
-
-        if (!shallowEqual(latestValues, previousValues)) {
-          const nextValues = [...latestValues] as TValues;
-
-          previousValues = nextValues;
-
-          const nextResult = mapper(nextValues, prev);
-
-          prev = [nextValues, nextResult];
-
-          observer.next(nextResult);
-        }
-
-        if (!completed.every(Boolean)) {
-          return;
-        }
-
-        closed = true;
-
-        observer.complete();
-      };
-
-      const scheduleRefresh = () => {
-        StateNode.get(state).schedule(refresh);
-      };
-
-      const subscriptions: Subscription[] = [];
-
-      for (let index = 0; index < states.length; index++) {
-        if (closed) {
-          break;
-        }
-
-        const subscription = states[index].subscribe({
-          next: () => {
-            if (closed) {
-              return;
-            }
-
-            scheduleRefresh();
-          },
-          error: (error) => {
-            if (closed || failed) {
-              return;
-            }
-
-            failed = true;
-
-            finalError = error;
-
-            scheduleRefresh();
-          },
-          complete: () => {
-            if (closed) {
-              return;
-            }
-
-            completed[index] = true;
-
-            scheduleRefresh();
-          },
-        });
-
-        subscriptions.push(subscription);
-      }
-
-      return () => {
-        closed = true;
-
-        for (const subscription of subscriptions) {
-          subscription.unsubscribe();
-        }
-      };
-    },
-    distinctor,
-  });
-
-  return state;
-};
+  return deriveState(toState(source), mapper as StateMapper<StateValue<S>, R>, distinctor);
+}
 
 export const combineState = <const TSources extends [unknown, ...unknown[]]>(
   ...sources: TSources
 ): ReactiveState<StateValues<TSources>> =>
-  combineMapState<TSources, StateValues<TSources>>(sources, (values) => values, shallowEqual);
+  mapState<TSources, StateValues<TSources>>(sources, (values) => values, shallowEqual);

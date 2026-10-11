@@ -1,8 +1,8 @@
-import type { StateClosureResultNode } from '../render';
+import type { StateClosureResultNode } from '..';
 
-import { onceFunction } from './utils';
+import { onceFunction } from '../../utils';
 
-export { isOnceFunction } from './utils';
+export { isOnceFunction } from '../../utils';
 
 // oxlint-disable-next-line typescript/no-explicit-any
 type StateFactory = (inputs: any) => StateClosureResultNode;
