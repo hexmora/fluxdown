@@ -1,47 +1,30 @@
 import { isEqual } from 'lodash-es';
-import { once, S, useMap, useSelect, useCreate } from 'stative';
+import { once, S, useMap } from 'stative';
 
 import type { CompiledBlockContentInputs } from './type';
 
-import { BlockItem } from '../../../../../block-item';
+import { CompiledBlockResult } from '..';
 import { markdownToHast } from '../../../../utils';
-import { getRemarksConfig, isMetaEqual } from '../../utils';
+import { getRemarksConfig } from '../../utils';
 
 export * from './type';
 
 export const CompiledBlockContent = /*#__PURE__*/ once(
   ({ item, idPrefix, count, key, config, getRemarks, getRehypes }: CompiledBlockContentInputs) => {
-    const meta = useSelect(
-      [item, count],
-      ([
-        {
-          meta: currentMeta,
-          section: { text },
-        },
-        blockCount,
-      ]) => ({
-        ...currentMeta,
-        blockCount,
-        key,
-        sourceText: text,
-      }),
-      isMetaEqual,
-    );
-
     const remarksConfig = useMap([config, item], getRemarksConfig, isEqual);
 
     const remarks = getRemarks({ config: remarksConfig });
 
-    // Keep the factory per block so it can accept block-specific inputs in the future.
+    // Public factories remain per block, including custom side effects and ownership.
     const rehypes = getRehypes();
 
-    const section = useMap(item, (current) => current.section);
+    const text = useMap(item, (current) => current.section.text);
 
     const source = useMap(
-      [section, remarks, rehypes, idPrefix],
-      ([{ text }, currentRemarks, currentRehypes, currentPrefix]) =>
+      [text, remarks, rehypes, idPrefix],
+      ([currentText, currentRemarks, currentRehypes, currentPrefix]) =>
         markdownToHast({
-          text,
+          text: currentText,
           remarks: currentRemarks,
           rehypes: currentRehypes,
           idPrefix: currentPrefix,
@@ -49,9 +32,6 @@ export const CompiledBlockContent = /*#__PURE__*/ once(
       isEqual,
     );
 
-    const block = useCreate(S([BlockItem, { source, meta }]));
-
-    // Emit the block instance while keeping compilation active.
-    return useMap(source, () => block);
+    return S([CompiledBlockResult, { item, count, key, source }]);
   },
 );

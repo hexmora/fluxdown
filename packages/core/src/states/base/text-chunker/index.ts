@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash-es';
-import { once, useMap, useDefaults } from 'stative';
+import { once, useDefaults, useMap } from 'stative';
 
 import type { IBlockSection, TextChunkerInputs } from './type';
 

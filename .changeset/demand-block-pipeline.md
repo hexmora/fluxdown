@@ -2,6 +2,6 @@
 "@fluxdown/core": minor
 ---
 
-Reduce per-block state by sharing compiler inputs, deriving metadata on demand, and using read-only lifetime views for block content.
+Share compiler inputs and audited built-in plugin pipelines within each document. Derive metadata on demand and allocate range state only when needed. Custom plugins, opaque configuration, patches, and changed presets retain private pipelines.
 
-Blocks without a range or mapper forward their source publications directly, including intentional same-reference notifications. Unobserved metadata is a pure projection evaluated on demand; destruction freezes published input values instead of preserving an extra relay's queue position.
+Blocks without a range or mapper forward source publications directly, including same-reference notifications. Destroyed metadata freezes published inputs instead of an extra relay's queue position.
