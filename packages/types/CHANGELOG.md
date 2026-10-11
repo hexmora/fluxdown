@@ -1,5 +1,16 @@
 # @fluxdown/types
 
+## 0.7.2
+
+### Patch Changes
+
+- 177889c: Export the existing `IBlockStateMapper` type so block inputs can name their mapper directly.
+- Updated dependencies [632914d]
+- Updated dependencies [632914d]
+- Updated dependencies [f566cc2]
+  - stative@2.0.0
+  - @fluxdown/mdast@0.7.0
+
 ## 0.7.1
 
 ### Patch Changes

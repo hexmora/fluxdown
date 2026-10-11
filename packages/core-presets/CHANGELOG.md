@@ -1,5 +1,31 @@
 # @fluxdown/core-presets
 
+## 0.7.0
+
+### Minor Changes
+
+- 6658a55: Disabled Smooth and Shad mappers now return their source blocks without constructing animation graphs. Enabling starts from the settled content currently visible, including content updated in the same batch; subsequent additions animate. Disabling releases animation wrappers immediately, so wrapper identity can change across toggles. Explicitly retained forks keep independent lifetimes.
+
+  Derive visible block metadata on demand and avoid repeated linear membership searches while maintaining animation wrappers.
+
+  Disabled mappers expose the compiler's original HAST, including ignorable whitespace that a full-range projection previously removed.
+
+- f566cc2: Add an optional structural-tail traversal scope to `processMdast`. Built-in repair plugins declare `scope: 'tail'` in their config. The repair kernel uses the final child path for pre-order, left-first traversal and falls back to the whole tree for other traversal orders.
+
+  Plugin config takes precedence over repair call options. Subclasses that replace a built-in tail runner with a whole-tree repair should set `scope: 'tree'` in their config.
+
+  Upgrade compatible micromark dependencies, including the GFM table edit-map performance fix.
+
+### Patch Changes
+
+- Updated dependencies [177889c]
+- Updated dependencies [632914d]
+- Updated dependencies [632914d]
+- Updated dependencies [f566cc2]
+  - @fluxdown/types@0.7.2
+  - stative@2.0.0
+  - @fluxdown/mdast@0.7.0
+
 ## 0.6.5
 
 ### Patch Changes
