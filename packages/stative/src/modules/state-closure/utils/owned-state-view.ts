@@ -180,6 +180,8 @@ export class OwnedStateView<T> implements IReactiveState<T>, NativeStateAccess<T
 
     this.access = null;
 
+    StateNode.clearAlias(this);
+
     try {
       this.connection?.unsubscribe();
     } finally {
