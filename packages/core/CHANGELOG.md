@@ -1,5 +1,24 @@
 # @fluxdown/core
 
+## 0.9.0
+
+### Minor Changes
+
+- 7c651f1: Reduce per-block state by sharing compiler inputs, deriving metadata on demand, and using read-only lifetime views for block content.
+
+  Blocks without a range or mapper forward their source publications directly, including intentional same-reference notifications. Unobserved metadata is a pure projection evaluated on demand; destruction freezes published input values instead of preserving an extra relay's queue position.
+
+### Patch Changes
+
+- Updated dependencies [177889c]
+- Updated dependencies [632914d]
+- Updated dependencies [6658a55]
+- Updated dependencies [632914d]
+- Updated dependencies [f566cc2]
+  - @fluxdown/types@0.7.2
+  - stative@2.0.0
+  - @fluxdown/core-presets@0.7.0
+
 ## 0.8.2
 
 ### Patch Changes
