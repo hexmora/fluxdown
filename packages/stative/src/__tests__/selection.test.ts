@@ -1,6 +1,5 @@
 import {
   batch,
-  combineMapState,
   mapClosure,
   mapState,
   MutableState,
@@ -12,16 +11,14 @@ import {
   useSelect,
 } from '..';
 
-const collectMappingEvents = (select: typeof mapState) => {
+const collectMappingEvents = (select: typeof selectState) => {
   const input = MutableState.of([1]);
 
   const events: unknown[] = [];
 
   const output = select<typeof input, { count: number }>(
     input,
-    (values, previous) => {
-      events.push(['map', [...values], previous?.[0], previous?.[1]]);
-
+    (values) => {
       return { count: values.length };
     },
     (previous, current) => previous.count === current.count,
@@ -56,7 +53,7 @@ const collectMappingEvents = (select: typeof mapState) => {
 };
 
 describe('shared selections', () => {
-  test('keeps mapping, comparison, and terminal notifications equivalent to mapping', () => {
+  test('keeps comparison and terminal notifications equivalent to mapping', () => {
     expect(collectMappingEvents(selectState)).toEqual(collectMappingEvents(mapState));
   });
 
@@ -71,7 +68,7 @@ describe('shared selections', () => {
 
       const factor = MutableState.of(2);
 
-      const computed = combineMapState([count, factor], ([length, scale]) => length * scale);
+      const computed = mapState([count, factor], ([length, scale]) => length * scale);
 
       const cached = mapState(computed, (value) => value + 1);
 

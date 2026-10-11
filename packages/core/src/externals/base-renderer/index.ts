@@ -19,7 +19,7 @@ export abstract class BaseRenderer<T, E, P, R, C = {}> extends BaseStateClosure<
   protected render() {
     const { plugins, source } = this.inputs;
 
-    return this.combineMap(
+    return this.map(
       [source, plugins],
       (current, prev): R[] => mapRendererItems(current, prev, (item) => this.renderItem(item)),
       shallowEqual,

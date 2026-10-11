@@ -1,15 +1,17 @@
-// oxlint-disable typescript/no-explicit-any
-import type { IReadableClosure } from '../state-closure';
-import type { AnyOnceFunction } from '../state-closure/exports/once';
 import type {
+  AnyOnceFunction,
   Descriptor,
   FunctionalStateClosureValue,
+  IReadableClosure,
   JSXDescriptor,
   StateClosureClass,
   StateClosureInputProps,
-} from '../state-closure/exports/render';
+} from '../state-closure';
+import type { FragmentProps, RuntimeProps } from './utils';
 
-import { createDescriptorElement, type FragmentProps, type RuntimeProps } from './utils';
+import { createDescriptorElement } from './utils';
+
+// oxlint-disable typescript/no-explicit-any
 
 type AnyStateClosureClass = StateClosureClass<any, any[]>;
 

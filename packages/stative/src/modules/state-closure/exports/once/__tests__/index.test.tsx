@@ -11,10 +11,9 @@ import {
   ReactiveState,
   render,
   S,
-  useCombineMap,
   useMap,
 } from '../../../../..';
-import { isOnceFunction } from '../utils';
+import { isOnceFunction } from '../../../utils';
 
 const Double = ({ value }: { value: number }) => value * 2;
 
@@ -131,7 +130,7 @@ describe('once', () => {
         left: IReadableClosure<number>;
         right: IReadableClosure<number>;
         label: string;
-      }) => useCombineMap([left, right], ([a, b]) => `${label}: ${a + b}`),
+      }) => useMap([left, right], ([a, b]) => `${label}: ${a + b}`),
     );
 
     const fromS = render(

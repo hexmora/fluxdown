@@ -2,9 +2,9 @@ import { BehaviorSubject } from 'rxjs';
 
 import type { IReadableClosure } from '../../../..';
 
+import { mapKeyedClosure } from '..';
 import {
   batch,
-  combineMapClosure,
   mapClosure,
   mapState,
   MutableState,
@@ -15,7 +15,6 @@ import {
   useClearable,
   useMapKeyed,
 } from '../../../..';
-import { mapKeyedClosure } from '../keyed';
 
 const createItem = (value: number) => ({ state: MutableState.of(value) });
 
@@ -118,7 +117,7 @@ describe('mapKeyedClosure', () => {
     const source = MutableState.of([first]);
 
     const closure = mapKeyedClosure(source, (item) =>
-      combineMapClosure([item.state, factor], ([value, scale]) => value * scale),
+      mapClosure([item.state, factor], ([value, scale]) => value * scale),
     );
 
     const values: number[][] = [];

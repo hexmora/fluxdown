@@ -1,6 +1,6 @@
 import { last, sumBy } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
-import { once, ReactiveState, useClearable, useCombineMap, useSwitchMap } from 'stative';
+import { once, ReactiveState, useClearable, useMap, useSwitchMap } from 'stative';
 
 import type { ShadInputs } from '../../type';
 import type { ShadPosition } from './type';
@@ -18,11 +18,11 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
 
   const tailLength = useSwitchMap(source, (blocks) => last(blocks)?.length ?? emptyLength);
 
-  const visibleLength = useCombineMap([source, tailLength], ([blocks]) =>
+  const visibleLength = useMap([source, tailLength], ([blocks]) =>
     sumBy(blocks, (block) => block.length.value),
   );
 
-  const configuration = useCombineMap(
+  const configuration = useMap(
     [visibleLength, _enabled, _length],
     ([total, enabled, length]) => ({
       total,

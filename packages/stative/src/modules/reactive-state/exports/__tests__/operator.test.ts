@@ -1,18 +1,13 @@
-import { BehaviorSubject, Observable, type Observer, Subscription } from 'rxjs';
+import type { Observer } from 'rxjs';
+
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
 import type { IReactiveState } from '../../type';
 
-import {
-  combineMapState,
-  combineState,
-  isReactiveStateLike,
-  mapState,
-  toReactiveState,
-  toState,
-} from '..';
+import { combineState, mapState, toReactiveState, toState } from '..';
 import { ReactiveState } from '../..';
+import { assert, isReactiveStateLike } from '../../../__internal__';
 import { batch } from '../../../..';
-import { assert } from '../../../../utils';
 
 const assertType = <T>(_value: T) => undefined;
 
@@ -192,11 +187,11 @@ describe('mapState', () => {
   });
 });
 
-describe('combineMapState', () => {
+describe('mapState with multiple sources', () => {
   test('maps direct values as a completed state', () => {
     const mapper = jest.fn(([left, right]: [number, number]) => left + right);
 
-    const mapped = combineMapState([2, 3], mapper);
+    const mapped = mapState([2, 3], mapper);
 
     expect(mapped.value).toBe(5);
 
@@ -209,7 +204,7 @@ describe('combineMapState', () => {
     const sourceA = toReactiveState(new BehaviorSubject(1));
     const sourceB = toReactiveState(new BehaviorSubject('x'));
     const sourceC = toReactiveState(new BehaviorSubject(true));
-    const mapped = combineMapState([sourceA, sourceB, sourceC], ([valueA, valueB, valueC]) => ({
+    const mapped = mapState([sourceA, sourceB, sourceC], ([valueA, valueB, valueC]) => ({
       valueA,
       valueB,
       valueC,
@@ -222,7 +217,7 @@ describe('combineMapState', () => {
     const sourceA = new BehaviorSubject(1);
     const sourceB = new BehaviorSubject('b1');
     const sourceC = new BehaviorSubject(false);
-    const mapped = combineMapState(
+    const mapped = mapState(
       [sourceA, sourceB, sourceC],
       ([valueA, valueB, valueC]) => `${valueA}:${valueB}:${valueC}`,
     );
@@ -249,7 +244,7 @@ describe('combineMapState', () => {
     const state = toReactiveState(source);
     const mappedA = mapState(state, (value) => value * 10);
     const mappedB = mapState(mappedA, (value) => value * 10);
-    const mapped = combineMapState(
+    const mapped = mapState(
       [state, mappedA, mappedB],
       ([value, valueA, valueB]) => `${value}:${valueA}:${valueB}`,
     );
@@ -266,7 +261,7 @@ describe('combineMapState', () => {
   test('completes only after every source completes', () => {
     const sourceA = new BehaviorSubject(1);
     const sourceB = new BehaviorSubject('b');
-    const mapped = combineMapState([sourceA, sourceB], ([valueA, valueB]) => {
+    const mapped = mapState([sourceA, sourceB], ([valueA, valueB]) => {
       return `${valueA}:${valueB}`;
     });
     const complete = jest.fn();
@@ -285,7 +280,7 @@ describe('combineMapState', () => {
   test('releases source subscriptions without closing external sources', () => {
     const sourceA = new BehaviorSubject(1);
     const sourceB = new BehaviorSubject('b');
-    const mapped = combineMapState([sourceA, sourceB], ([valueA, valueB]) => {
+    const mapped = mapState([sourceA, sourceB], ([valueA, valueB]) => {
       return `${valueA}:${valueB}`;
     });
     const complete = jest.fn();
@@ -310,7 +305,7 @@ describe('combineMapState', () => {
   test('does not retain sources when destroyed before setup', () => {
     const sourceA = new BehaviorSubject(1);
     const sourceB = new BehaviorSubject('b');
-    const mapped = combineMapState([sourceA, sourceB], ([valueA, valueB]) => {
+    const mapped = mapState([sourceA, sourceB], ([valueA, valueB]) => {
       return `${valueA}:${valueB}`;
     });
 

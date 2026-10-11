@@ -1,13 +1,6 @@
-import {
-  batch,
-  combineMapClosure,
-  type IReadableClosure,
-  mapClosure,
-  mapEachClosure,
-  mapState,
-  MutableState,
-  switchMapClosure,
-} from '..';
+import type { IReadableClosure } from '..';
+
+import { batch, mapClosure, mapEachClosure, mapState, MutableState, switchMapClosure } from '..';
 
 describe('collection reading', () => {
   test.each([false, true])(
@@ -22,7 +15,7 @@ describe('collection reading', () => {
       const children: IReadableClosure<number>[] = [];
 
       const collection = mapEachClosure(source, (item) => {
-        const child = combineMapClosure([item, factor], ([value, scale]) => value * scale);
+        const child = mapClosure([item, factor], ([value, scale]) => value * scale);
 
         children.push(child);
 
@@ -89,7 +82,7 @@ describe('collection reading', () => {
     let child: IReadableClosure<number> | undefined;
 
     const collection = mapEachClosure(source, (item) => {
-      child = combineMapClosure([item, factor], ([value, scale]) => value * scale);
+      child = mapClosure([item, factor], ([value, scale]) => value * scale);
 
       return child;
     });

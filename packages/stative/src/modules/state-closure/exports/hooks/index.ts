@@ -1,16 +1,6 @@
 import { forEach } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
 
-import type { DestructibleTarget } from '../../../destructible';
-import type {
-  Distinctor,
-  IReactiveState,
-  StateMapper,
-  StateSource,
-  StateValue,
-  StateValues,
-} from '../../../reactive-state';
-import type { FlattenedState, IReadableClosure, StateClosureSource } from '../../type';
 import type {
   BuiltClosure,
   MarkedStateClosureDescriptor,
@@ -18,47 +8,72 @@ import type {
   StateClosureResult,
   StateClosureResultNode,
   StateClosureResultValue,
-} from '../render';
+} from '..';
+import type { DestructibleTarget } from '../../../destructible';
+import type {
+  Distinctor,
+  IReactiveState,
+  StateInputValue,
+  StateMapper,
+  StateSource,
+  StateValue,
+  StateValues,
+} from '../../../reactive-state';
+import type { FlattenedState, IReadableClosure, StateClosureSource } from '../../type';
 import type { StateClosureRef } from './type';
 
-import {
-  combineMapClosure,
-  flattenClosure,
-  mapClosure,
-  selectClosure,
-  toClosure,
-} from '../../main';
-import { mapKeyedClosure } from '../keyed';
-import { mapEachClosure, switchMapClosure } from '../operator';
-import { render } from '../render';
-import { getReadableClosureScope, ownReadableClosure } from '../render/utils/context';
-import { isStateClosureDescriptor } from '../render/utils/predicates';
-import { StateClosureHookRuntime } from './utils';
+import { mapKeyedClosure } from '..';
+import { mapEachClosure, switchMapClosure } from '..';
+import { render } from '..';
+import { getReadableClosureScope, ownReadableClosure } from '../../../__internal__';
+import { flattenClosure, mapClosure, selectClosure, toClosure } from '../../main';
+import { isStateClosureDescriptor } from '../../utils';
+import { StateClosureHookRuntime } from '../../utils';
 
 export * from './type';
 
-export const useMap = <S, R>(
-  source: S,
-  mapper: StateMapper<StateValue<S>, R>,
+export function useMap<const S extends readonly unknown[], R>(
+  sources: readonly [...S],
+  mapper: StateMapper<StateValues<[...S]>, R>,
   distinctor?: Distinctor<R>,
-): IReadableClosure<R> => {
+): IReadableClosure<R>;
+export function useMap<S, R>(
+  source: S,
+  mapper: StateMapper<StateInputValue<S>, R>,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R>;
+export function useMap<S, R>(
+  source: S,
+  mapper: StateMapper<StateInputValue<S>, R>,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R> {
   const { owner } = StateClosureHookRuntime.require('useMap', 'once');
 
   return ownReadableClosure(getReadableClosureScope(owner), mapClosure(source, mapper, distinctor));
-};
+}
 
-export const useSelect = <S, R>(
-  source: S,
-  mapper: StateMapper<StateValue<S>, R>,
+export function useSelect<const S extends readonly unknown[], R>(
+  sources: readonly [...S],
+  mapper: (values: StateValues<[...S]>) => R,
   distinctor?: Distinctor<R>,
-): IReadableClosure<R> => {
+): IReadableClosure<R>;
+export function useSelect<S, R>(
+  source: S,
+  mapper: (value: StateInputValue<S>) => R,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R>;
+export function useSelect<S, R>(
+  source: S,
+  mapper: (value: StateInputValue<S>) => R,
+  distinctor?: Distinctor<R>,
+): IReadableClosure<R> {
   const { owner } = StateClosureHookRuntime.require('useSelect', 'once');
 
   return ownReadableClosure(
     getReadableClosureScope(owner),
     selectClosure(source, mapper, distinctor),
   );
-};
+}
 
 export function useSwitchMap<S, R>(
   source: S,
@@ -140,19 +155,6 @@ export function useMapKeyed<T, R>(
   return ownReadableClosure(getReadableClosureScope(owner), mapKeyedClosure(source, mapper));
 }
 
-export const useCombineMap = <const TSources extends [unknown, ...unknown[]], R>(
-  sources: [...TSources],
-  mapper: StateMapper<StateValues<TSources>, R>,
-  distinctor?: Distinctor<R>,
-): IReadableClosure<R> => {
-  const { owner } = StateClosureHookRuntime.require('useCombineMap', 'once');
-
-  return ownReadableClosure(
-    getReadableClosureScope(owner),
-    combineMapClosure(sources, mapper, distinctor),
-  );
-};
-
 export function useCreate<const D extends StateClosureDescriptor<unknown>>(
   source: D,
 ): BuiltClosure<D>;
@@ -187,7 +189,7 @@ export const useDefaultsFalsy = <T>(
 export const useCombine = <const TSources extends [unknown, ...unknown[]]>(
   ...sources: TSources
 ): IReadableClosure<StateValues<TSources>> => {
-  return useCombineMap<TSources, StateValues<TSources>>(sources, (values) => values, shallowEqual);
+  return useMap<TSources, StateValues<TSources>>(sources, (values) => values, shallowEqual);
 };
 
 export const useClearable = <T extends DestructibleTarget>(target: T): T => {

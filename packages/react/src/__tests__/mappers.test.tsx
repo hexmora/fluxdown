@@ -11,9 +11,8 @@ import {
   once,
   ReactiveState,
   useClearable,
-  useCombineMap,
-  useDefaults,
   useMap,
+  useDefaults,
 } from 'stative';
 
 import type { FluxdownRef, IPluginItem } from '../types';
@@ -95,7 +94,7 @@ describe('Fluxdown mapper plugins', () => {
 
         const limit = useDefaults(count, 1);
 
-        return useCombineMap([source, limit], ([blocks, size]) => blocks.slice(0, size));
+        return useMap([source, limit], ([blocks, size]) => blocks.slice(0, size));
       }),
       { key: 'configured' },
     );

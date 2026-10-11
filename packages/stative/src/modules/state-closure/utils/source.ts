@@ -1,14 +1,14 @@
-import type { StateClosureResult } from '../exports/render';
+import type { StateClosureResult } from '../exports';
 import type { IReadableClosure, StateClosureDirectSource, StateClosureSource } from '../type';
 
-import { isReactiveStateLike } from '../../reactive-state';
-import { render } from '../exports/render';
+import { isReactiveStateLike } from '../../__internal__';
+import { render } from '../exports';
 import {
   isImmediateDescriptor,
   isReadableClosure,
   isStateClosureDescriptor,
   unwrapImmediateDescriptor,
-} from '../exports/render/utils/predicates';
+} from './descriptor';
 
 export type ResolvedDirectSource<T> = {
   readonly type: 'direct';

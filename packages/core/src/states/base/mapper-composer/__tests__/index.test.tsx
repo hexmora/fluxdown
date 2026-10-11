@@ -16,7 +16,6 @@ import {
   render,
   toClosure,
   useClearable,
-  useCombineMap,
   useMap,
 } from 'stative';
 
@@ -269,7 +268,7 @@ describe('MapperComposer', () => {
       ({ source, index: selection }: MapperInputs & { index: IReadableClosure<number> }) => {
         construct(selection);
 
-        return useCombineMap([source, selection], ([blocks, currentIndex]) =>
+        return useMap([source, selection], ([blocks, currentIndex]) =>
           blocks.slice(currentIndex, currentIndex + 1),
         );
       },

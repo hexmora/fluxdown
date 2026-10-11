@@ -2,12 +2,12 @@ import { expectTypeOf } from 'expect-type';
 import { isEqual } from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
 
+import type { IReadableClosure, StateClosureSource } from '../../../..';
+
 import {
   BaseStateClosure,
   batch,
-  combineMapClosure,
   D,
-  type IReadableClosure,
   mapClosure,
   mapEachClosure,
   MutableState,
@@ -15,7 +15,6 @@ import {
   ReactiveState,
   render,
   S,
-  type StateClosureSource,
   toClosure,
   useClearable,
   useMap,
@@ -157,7 +156,7 @@ describe('mapEachClosure', () => {
     const source = MutableState.of([1, 2]);
     const scale = MutableState.of(2);
     const closure = mapEachClosure(source, (item) =>
-      combineMapClosure([item, scale], ([value, currentScale]) => value * currentScale),
+      mapClosure([item, scale], ([value, currentScale]) => value * currentScale),
     );
 
     const next = jest.fn();
@@ -288,7 +287,7 @@ describe('mapEachClosure', () => {
     const source = new BehaviorSubject([1]);
     const producer = new BehaviorSubject(2);
     const closure = mapEachClosure(source, (item) =>
-      combineMapClosure([item, producer], ([value, current]) => value + current),
+      mapClosure([item, producer], ([value, current]) => value + current),
     );
 
     expect(closure.value.value).toEqual([3]);

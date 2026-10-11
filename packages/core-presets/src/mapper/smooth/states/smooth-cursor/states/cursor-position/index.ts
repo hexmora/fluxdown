@@ -1,6 +1,6 @@
 import { sumBy } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
-import { once, S, useCombine, useCombineMap, useCreate } from 'stative';
+import { once, S, useCombine, useMap, useCreate } from 'stative';
 
 import type { IScheduler } from '../../../../modules';
 import type { CursorPositionInputs, SmoothPosition } from './type';
@@ -25,7 +25,7 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
 
   let scheduler: IScheduler | null = null;
 
-  return useCombineMap(
+  return useMap(
     [configuration, ticks, completion],
     (current, previous): SmoothPosition => {
       if (previous && shallowEqual(current, previous[0])) {

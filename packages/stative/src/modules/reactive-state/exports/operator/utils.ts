@@ -1,97 +1,140 @@
-import type { BehaviorSubject } from 'rxjs';
+import { shallowEqual } from 'shallow-equal';
 
-import { isFunction, isObject } from 'lodash-es';
+import type { StateSubscription } from '../../../__internal__';
+import type { Distinctor, IReactiveState, StateMapper } from '../../type';
 
-import type { IReadableClosure } from '../../../state-closure';
-import type {
-  Distinctor,
-  IReactiveState,
-  StateMapper,
-  StateSubscriber,
-  StateValue,
-} from '../../type';
-
-import { toState } from '.';
-import { StateContext } from '../../../state-graph/utils/context';
+import { observeState, StateNode } from '../../../__internal__';
 import { ReactiveState } from '../../main';
+import { clearSubscriptions } from '../../utils';
 
-type ReactiveStateSource<T> = IReactiveState<T> | BehaviorSubject<T>;
+export const mapSources = <T>(
+  states: readonly IReactiveState<unknown>[],
+  mapper: StateMapper<unknown[], T>,
+  distinctor?: Distinctor<T>,
+): ReactiveState<T> => {
+  const initialValues = states.map((state) => state.value);
 
-const createMappedState = <A, B>(
-  source: ReactiveStateSource<A>,
-  initialSource: A,
-  mapper: StateMapper<A, B>,
-  distinctor?: Distinctor<B>,
-  ordering = false,
-): ReactiveState<B> => {
-  const initial = mapper(initialSource, null);
+  const initial = mapper(initialValues, null);
 
-  let prev: [A, B] = [initialSource, initial];
+  let prev: [unknown[], T] = [initialValues, initial];
 
   const state = new ReactiveState({
     initial,
     emitter: (observer) => {
-      const subscriber: StateSubscriber<A> = {
-        next: (value) => {
-          const nextResult = ordering
-            ? StateContext.run(StateContext.current, () => mapper(value, prev))
-            : mapper(value, prev);
+      const latestValues = [...prev[0]];
+
+      const completed = states.map(() => false);
+
+      let previousValues = prev[0];
+
+      let closed = false;
+
+      let failed = false;
+
+      let finalError: unknown;
+
+      const refresh = () => {
+        if (closed) {
+          return;
+        }
+
+        if (failed) {
+          closed = true;
+
+          observer.error(finalError);
+
+          return;
+        }
+
+        for (let index = 0; index < states.length; index++) {
+          latestValues[index] = states[index].value;
+        }
+
+        if (!shallowEqual(latestValues, previousValues)) {
+          const nextValues = [...latestValues];
+
+          previousValues = nextValues;
+
+          const nextResult = mapper(nextValues, prev);
+
+          prev = [nextValues, nextResult];
 
           observer.next(nextResult);
+        }
 
-          prev = [value, nextResult];
-        },
-        error: (error) => observer.error(error),
-        complete: () => observer.complete(),
+        if (!completed.every(Boolean)) {
+          return;
+        }
+
+        closed = true;
+
+        observer.complete();
       };
 
-      const subscription = ordering
-        ? StateContext.run(StateContext.current, () => source.subscribe(subscriber), {
-            ordering: true,
-          })
-        : source.subscribe(subscriber);
+      const scheduleRefresh = () => {
+        StateNode.get(state).schedule(refresh);
+      };
+
+      const subscriptions: StateSubscription[] = [];
+
+      try {
+        for (let index = 0; index < states.length; index++) {
+          if (closed) {
+            break;
+          }
+
+          const subscription = observeState(states[index], {
+            next: () => {
+              if (closed) {
+                return;
+              }
+
+              scheduleRefresh();
+            },
+            error: (error) => {
+              if (closed || failed) {
+                return;
+              }
+
+              failed = true;
+
+              finalError = error;
+
+              scheduleRefresh();
+            },
+            complete: () => {
+              if (closed) {
+                return;
+              }
+
+              completed[index] = true;
+
+              scheduleRefresh();
+            },
+          });
+
+          subscriptions.push(subscription);
+        }
+      } catch (error) {
+        closed = true;
+
+        try {
+          clearSubscriptions(subscriptions);
+        } catch {
+          // Cleanup attempts every input; keep the original setup failure primary.
+        }
+
+        throw error;
+      }
 
       return () => {
-        subscription.unsubscribe();
+        closed = true;
+
+        clearSubscriptions(subscriptions);
       };
     },
     distinctor,
   });
 
   return state;
-};
-
-export const isReactiveStateLike = <T = unknown>(value: unknown): value is IReactiveState<T> =>
-  isObject(value) &&
-  'value' in value &&
-  'closed' in value &&
-  isFunction((value as Partial<IReactiveState<T>>).subscribe);
-
-export const isStateClosureLike = <T = unknown>(value: unknown): value is IReadableClosure<T> => {
-  return (
-    isObject(value) &&
-    'value' in value &&
-    'destroy' in value &&
-    !isReactiveStateLike(value) &&
-    isFunction(value.destroy)
-  );
-};
-
-export const isStateSourceLike = (value: unknown) => {
-  return isReactiveStateLike(value) || isStateClosureLike(value);
-};
-
-export const deriveState = <S, B>(
-  source: S,
-  mapper: StateMapper<StateValue<S>, B>,
-  distinctor?: Distinctor<B>,
-  ordering = false,
-): ReactiveState<B> => {
-  if (!isStateSourceLike(source)) {
-    return ReactiveState.of(mapper(source as StateValue<S>, null));
-  }
-
-  const state = toState(source);
-
-  return createMappedState(state, state.value, mapper, distinctor, ordering);
 };
