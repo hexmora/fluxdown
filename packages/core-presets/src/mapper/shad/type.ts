@@ -5,6 +5,7 @@ import type { IReadableClosure } from 'stative';
 export interface ShadBaseInputs {
   /**
    * Whether newly visible text receives the tail shading.
+   * Disabled mappers return the source blocks without constructing shading state.
    */
   enabled?: IReadableClosure<boolean>;
 
