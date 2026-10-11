@@ -1,200 +1,81 @@
-import {
-  type IPluggable,
-  type IPluginWithConfig,
-  PluginPriority,
-  type PluginSet,
-} from '@fluxdown/types';
-import { assert } from '@fluxdown/utils';
-import {
-  every,
-  first,
-  get,
-  has,
-  isArray,
-  isEqualWith,
-  isFunction,
-  isObject,
-  isObjectLike,
-  isPlainObject,
-  isString,
-  sortBy,
-} from 'lodash-es';
+import { isArray, isObject } from 'lodash-es';
 
-import type { AnyPluggable, PluggableOf } from './type';
-
-const isOpaqueConfigValue = (value: unknown) => {
-  return (
-    isObject(value) &&
-    ((!isArray(value) && !isPlainObject(value)) ||
-      ('destroy' in value && isFunction(value.destroy)) ||
-      ('subscribe' in value && isFunction(value.subscribe)))
-  );
-};
-
-export const isPluginConfigEqual = (left: unknown, right: unknown) => {
-  return isEqualWith(left, right, (leftValue, rightValue) => {
-    if (isOpaqueConfigValue(leftValue) || isOpaqueConfigValue(rightValue)) {
-      return leftValue === rightValue;
-    }
-
-    return undefined;
-  });
-};
-
-export const isPluggableEqual = <T>(left: T | [T, unknown], right: T | [T, unknown]): boolean => {
-  return (
-    left === right ||
-    ((isArray(left) ? left[0] : left) === (isArray(right) ? right[0] : right) &&
-      isPluginConfigEqual(
-        isArray(left) ? left[1] : undefined,
-        isArray(right) ? right[1] : undefined,
-      ))
-  );
-};
-
-export const isPluggableEnabled = (pluggable: AnyPluggable): boolean =>
-  !isArray(pluggable) || pluggable[1].disabled !== true;
-
-export const isPluggablesEqual = <T>(
-  left: readonly T[] = [],
-  right: readonly T[] = [],
+const isLocalConfigEqual = (
+  left: unknown,
+  right: unknown,
+  comparison: { private: boolean },
+  ancestors: object[] = [],
 ): boolean => {
-  return (
-    left === right ||
-    (left.length === right.length &&
-      every(left, (pluggable, index) => {
-        const other = right[index];
-
-        return pluggable !== undefined && other !== undefined && isPluggableEqual(pluggable, other);
-      }))
-  );
-};
-
-export const mergePluginPluggables = <T>(presets: readonly T[], extras: readonly T[]): T[] => {
-  const pluggables = [...presets];
-
-  for (const extra of extras) {
-    const Plugin = isArray(extra) ? extra[0] : extra;
-
-    const index = pluggables.findIndex((item) => (isArray(item) ? item[0] : item) === Plugin);
-
-    if (index === -1) {
-      pluggables.push(extra);
-
-      continue;
-    }
-
-    pluggables[index] = extra;
+  if (!isObject(left) || !isObject(right)) {
+    return Object.is(left, right);
   }
 
-  return pluggables;
-};
+  if (isArray(left) !== isArray(right)) {
+    return false;
+  }
 
-export const isPluginSetTuple = <T, C extends object>(
-  pluginSet: PluginSet<T, C>,
-): pluginSet is [T[], C] => {
-  return (
-    isArray(pluginSet) &&
-    pluginSet.length === 2 &&
-    isArray(pluginSet[0]) &&
-    !isArray(pluginSet[1]) &&
-    isObjectLike(pluginSet[1])
-  );
-};
+  try {
+    const leftPrototype = Object.getPrototypeOf(left);
 
-export const isPluginSetEqual = <T, C extends object>(
-  left: PluginSet<T, C>,
-  right: PluginSet<T, C>,
-): boolean => {
-  return isPluginConfigEqual(left, right);
-};
+    const rightPrototype = Object.getPrototypeOf(right);
 
-export function toPluggable<T extends AnyPluggable, C extends object>(
-  pluginSet: PluginSet<T, C>,
-  defaultPlugins?: readonly T[],
-): PluggableOf<T>[];
+    if (
+      (isArray(left)
+        ? leftPrototype !== Array.prototype || rightPrototype !== Array.prototype
+        : (leftPrototype !== Object.prototype && leftPrototype !== null) ||
+          (rightPrototype !== Object.prototype && rightPrototype !== null)) ||
+      ancestors.includes(left) ||
+      ancestors.includes(right)
+    ) {
+      comparison.private = true;
 
-export function toPluggable(
-  pluginSet: PluginSet<AnyPluggable, object>,
-  defaultPlugins: readonly AnyPluggable[] = [],
-): AnyPluggable[] {
-  const [plugins, configs] = isPluginSetTuple(pluginSet)
-    ? pluginSet
-    : isArray(pluginSet)
-      ? [pluginSet, {}]
-      : [[], pluginSet];
-
-  const pluggables = defaultPlugins.length
-    ? mergePluginPluggables(defaultPlugins, plugins)
-    : plugins;
-
-  return pluggables.map((pluggable): AnyPluggable => {
-    const Plugin = isArray(pluggable) ? pluggable[0] : pluggable;
-
-    const { key } = Plugin;
-
-    if (!isString(key) || !has(configs, [key])) {
-      return pluggable;
+      return left === right;
     }
 
-    const config: unknown = get(configs, [key]);
+    const keys = Reflect.ownKeys(left);
 
-    if (!isObject(config)) {
-      return pluggable;
+    if (keys.length !== Reflect.ownKeys(right).length) {
+      return false;
     }
 
-    return [Plugin, { ...(isArray(pluggable) ? pluggable[1] : {}), ...config }];
-  });
-}
+    const path = [...ancestors, left, right];
 
-export function buildPluggables<T extends IPluginWithConfig>(): T[];
+    return keys.every((key) => {
+      const a = Object.getOwnPropertyDescriptor(left, key);
 
-export function buildPluggables<T extends IPluginWithConfig>(pluggable: IPluggable<T, unknown>): T;
+      const b = Object.getOwnPropertyDescriptor(right, key);
 
-export function buildPluggables<T extends IPluginWithConfig>(
-  first: IPluggable<T, unknown>,
-  second: IPluggable<T, unknown>,
-  ...rest: IPluggable<T, unknown>[]
-): T[];
-
-export function buildPluggables<T extends IPluginWithConfig>(
-  ...pluggables: IPluggable<T, unknown>[]
-): T | T[];
-
-export function buildPluggables<T extends IPluginWithConfig>(
-  ...pluggables: IPluggable<T, unknown>[]
-): T | T[] {
-  const instances = pluggables.map((item) => {
-    if (isArray(item)) {
-      const [clazz, config] = item;
-
-      const instance = new clazz(config);
-
-      if (config?.priority !== undefined) {
-        Object.defineProperty(instance, 'config', {
-          configurable: true,
-          enumerable: true,
-          value: { ...instance.config, priority: config.priority },
-        });
+      if (!a || !b) {
+        return false;
       }
 
-      return instance;
-    }
+      if (!('value' in a) || !('value' in b)) {
+        comparison.private = true;
 
-    return new item();
-  });
+        return left === right;
+      }
 
-  if (instances.length !== 1) {
-    return instances;
+      return isLocalConfigEqual(a.value, b.value, comparison, path);
+    });
+  } catch {
+    return false;
+  }
+};
+
+/** Retains identity-based local inputs; structural configurations use the store's snapshots. */
+export const isPrivatePluggableEqual = <T>(
+  left: T | [T, unknown],
+  right: T | [T, unknown],
+): boolean => {
+  if (!isArray(left) || !isArray(right)) {
+    return left === right;
   }
 
-  const instance = first(instances);
+  if (left[0] !== right[0]) {
+    return false;
+  }
 
-  assert(instance, 'A single pluggable must produce one plugin instance.');
+  const comparison = { private: false };
 
-  return instance;
-}
-
-export const sortPluginInstances = <T extends IPluginWithConfig>(instances: T[]) => {
-  return sortBy(instances, (item) => item.config.priority ?? PluginPriority.Default);
+  return isLocalConfigEqual(left[1], right[1], comparison) && comparison.private;
 };

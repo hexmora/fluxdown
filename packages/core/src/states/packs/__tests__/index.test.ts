@@ -732,11 +732,11 @@ describe('Core', () => {
     expect(harness.renders.closed).toBe(false);
     expect(harness.repairs.closed).toBe(false);
     expect(inputs.map(countStateObservers)).toEqual(inputs.map(() => 0));
-    expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(3);
-    expect(AppendRehypePlugin.destroyed).toHaveBeenCalledTimes(3);
+    expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(1);
+    expect(AppendRehypePlugin.destroyed).toHaveBeenCalledTimes(1);
   });
 
-  test('releases per-block descriptor scopes as blocks leave the graph', () => {
+  test('releases per-block descriptor scopes while preserving shared plugin instances', () => {
     const harness = setupCore('first\n\nsecond\n\nthird');
 
     expect(harness.state.value.value).toHaveLength(3);
@@ -749,21 +749,21 @@ describe('Core', () => {
 
     expect(harness.state.value.value).toHaveLength(1);
     expect(countStateObservers(harness.remarks)).toBe(initialRemarkObservers);
-    expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(2);
+    expect(AppendRemarkPlugin.destroyed).not.toHaveBeenCalled();
 
     harness.text.next('first\n\nfourth');
 
     expect(harness.state.value.value).toHaveLength(2);
     expect(countStateObservers(harness.remarks)).toBe(initialRemarkObservers);
-    expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(2);
+    expect(AppendRemarkPlugin.destroyed).not.toHaveBeenCalled();
 
     harness.state.destroy();
 
-    expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(4);
-    expect(AppendRehypePlugin.destroyed).toHaveBeenCalledTimes(4);
+    expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(1);
+    expect(AppendRehypePlugin.destroyed).toHaveBeenCalledTimes(1);
   });
 
-  test('releases per-block repair plugins as blocks leave the graph', () => {
+  test('releases shared repair plugins after the last block leaves the graph', () => {
     const harness = setupCore('first\n\nsecond');
 
     harness.remarks.next({});
@@ -783,21 +783,21 @@ describe('Core', () => {
 
     harness.text.next('first');
 
-    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(1);
+    expect(EndingMarkerRepairPlugin.destroyed).not.toHaveBeenCalled();
 
     harness.text.next('');
 
     expect(harness.state.value.value).toEqual([]);
-    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(2);
+    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(1);
 
     harness.text.next('rebuilt');
 
     expect(collectText(getFirstBlockTree(harness.state))).toBe('rebuilt|ending');
-    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(2);
+    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(1);
 
     harness.state.destroy();
 
-    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(3);
+    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(2);
     expect(harness.repairs.closed).toBe(false);
   });
 

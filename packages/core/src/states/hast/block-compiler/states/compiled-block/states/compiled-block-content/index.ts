@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash-es';
-import { once, S, useCreate, useMap, useSelect } from 'stative';
+import { once, S, useCreate, useMap } from 'stative';
 
 import type { CompiledBlockContentInputs } from './type';
 
@@ -11,7 +11,7 @@ export * from './type';
 
 export const CompiledBlockContent = /*#__PURE__*/ once(
   ({ item, idPrefix, count, key, config, getRemarks, getRehypes }: CompiledBlockContentInputs) => {
-    const meta = useSelect(
+    const meta = useMap(
       [item, count],
       ([
         {
