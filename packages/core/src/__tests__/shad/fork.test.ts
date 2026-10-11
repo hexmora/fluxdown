@@ -14,12 +14,12 @@ import {
 
 import type { HastRoot } from '../../typings';
 
+import { countStateObservers } from '../../../../../scripts/testing/state';
 import {
   collectText,
   createBlock,
   firstBlock,
   latest,
-  observerCount,
   paragraph,
   PrimarySmoothTicker,
   resetSmoothTests,
@@ -122,11 +122,11 @@ describe('Shad forks', () => {
 
     expect(range.closed).toBe(false);
 
-    expect(observerCount(range)).toBe(0);
+    expect(countStateObservers(range)).toBe(0);
 
     expect(meta.closed).toBe(false);
 
-    expect(observerCount(meta)).toBe(0);
+    expect(countStateObservers(meta)).toBe(0);
 
     source.source.next(paragraph('ABCDEFGH'));
 
@@ -138,9 +138,9 @@ describe('Shad forks', () => {
 
     state.destroy();
 
-    expect(observerCount(blocks)).toBe(0);
+    expect(countStateObservers(blocks)).toBe(0);
 
-    expect(observerCount(source.block.length)).toBe(0);
+    expect(countStateObservers(source.block.length)).toBe(0);
 
     expect(source.source.closed).toBe(false);
 
@@ -255,7 +255,7 @@ describe('Shad forks', () => {
 
     expect(source.source.closed).toBe(false);
 
-    expect(observerCount(source.source)).toBe(0);
+    expect(countStateObservers(source.source)).toBe(0);
 
     expect(jest.getTimerCount()).toBe(0);
   });

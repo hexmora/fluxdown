@@ -220,7 +220,7 @@ describe('Core shad pipeline', () => {
   test('uses the default tail length and applies live configuration', () => {
     const view = setup('abcd', enabled);
 
-    const fork = firstBlock(view.core.value.value);
+    let fork = firstBlock(view.core.value.value);
 
     expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
 
@@ -236,11 +236,17 @@ describe('Core shad pipeline', () => {
 
     expect(view.read()).toEqual(['abcde']);
 
-    expect(readParts(fork.value.value)).toBeUndefined();
+    expect(fork.value.closed).toBe(true);
+
+    expect(readParts(firstBlock(view.core.value.value).value.value)).toBeUndefined();
 
     view.shad.next(enabled);
 
-    expect(firstBlock(view.core.value.value)).toBe(fork);
+    const previous = fork;
+
+    fork = firstBlock(view.core.value.value);
+
+    expect(Object.is(fork, previous)).toBe(false);
 
     expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
   });

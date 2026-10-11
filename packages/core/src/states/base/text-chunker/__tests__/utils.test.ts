@@ -4,6 +4,7 @@ import { expectTypeOf } from 'expect-type';
 import { cloneDeep } from 'lodash-es';
 import { batch, type IReactiveState, MutableState, render, S } from 'stative';
 
+import { countStateObservers } from '../../../../../../../scripts/testing/state';
 import { type IBlockSection, TextChunker } from '../index';
 import { type ChunkedPatch, chunkPatchesByTexts } from '../utils';
 import { LexerChunker } from '../utils/chunker';
@@ -29,14 +30,6 @@ const expectChunks = (text: string, expected: string[]) => {
   if (text.trim() !== '') {
     expect(result.every((chunk) => chunk.trim() !== '')).toBe(true);
   }
-};
-
-const getObserverCount = (state: IReactiveState<unknown>) => {
-  return (
-    state as unknown as {
-      subject: { observers: unknown[] };
-    }
-  ).subject.observers.length;
 };
 
 const TABLE = `| a | b |
@@ -796,16 +789,16 @@ describe('TextChunker', () => {
     const closure = render(S([TextChunker, { text, patches }]));
     const outputSubscription = closure.value.subscribe(() => undefined);
 
-    expect(getObserverCount(text)).toBeGreaterThan(0);
-    expect(getObserverCount(patches)).toBeGreaterThan(0);
+    expect(countStateObservers(text)).toBeGreaterThan(0);
+    expect(countStateObservers(patches)).toBeGreaterThan(0);
 
     closure.destroy();
 
     expect(outputSubscription.closed).toBe(true);
     expect(text.closed).toBe(false);
     expect(patches.closed).toBe(false);
-    expect(getObserverCount(text)).toBe(0);
-    expect(getObserverCount(patches)).toBe(0);
+    expect(countStateObservers(text)).toBe(0);
+    expect(countStateObservers(patches)).toBe(0);
     expect(() => closure.destroy()).not.toThrow();
   });
 
@@ -869,9 +862,9 @@ describe('TextChunker', () => {
     expect(error).toHaveBeenCalledWith(reason);
     expect(subscription.closed).toBe(true);
     expect(patches.closed).toBe(false);
-    expect(getObserverCount(patches)).toBe(1);
+    expect(countStateObservers(patches)).toBe(0);
     expect(() => closure.destroy()).not.toThrow();
-    expect(getObserverCount(patches)).toBe(0);
+    expect(countStateObservers(patches)).toBe(0);
   });
 
   test('forwards errors from patches', () => {
@@ -888,8 +881,8 @@ describe('TextChunker', () => {
     expect(error).toHaveBeenCalledWith(reason);
     expect(subscription.closed).toBe(true);
     expect(text.closed).toBe(false);
-    expect(getObserverCount(text)).toBe(1);
+    expect(countStateObservers(text)).toBe(1);
     expect(() => closure.destroy()).not.toThrow();
-    expect(getObserverCount(text)).toBe(0);
+    expect(countStateObservers(text)).toBe(0);
   });
 });

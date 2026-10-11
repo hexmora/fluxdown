@@ -8,6 +8,7 @@ import {
   S,
 } from 'stative';
 
+import { countStateObservers } from '../../../../../../scripts/testing/state';
 import {
   BaseRenderPlugin,
   type IRenderPlugin,
@@ -106,14 +107,6 @@ const setupRenderer = (blocks: IBlockState<string>[]) => {
   );
 
   return { initialPlugin, patches, plugins, renderer, source };
-};
-
-const getObserverCount = (state: IReactiveState<unknown>) => {
-  return (
-    state as unknown as {
-      subject: { observers: unknown[] };
-    }
-  ).subject.observers.length;
 };
 
 describe('BaseRenderer', () => {
@@ -229,8 +222,8 @@ describe('BaseRenderer', () => {
 
     renderer.value.subscribe({ complete });
 
-    expect(getObserverCount(source)).toBeGreaterThan(0);
-    expect(getObserverCount(plugins)).toBeGreaterThan(0);
+    expect(countStateObservers(source)).toBeGreaterThan(0);
+    expect(countStateObservers(plugins)).toBeGreaterThan(0);
 
     renderer.destroy();
     renderer.destroy();
@@ -240,7 +233,7 @@ describe('BaseRenderer', () => {
     expect(source.closed).toBe(false);
     expect(patches.closed).toBe(false);
     expect(plugins.closed).toBe(false);
-    expect(getObserverCount(source)).toBe(0);
-    expect(getObserverCount(plugins)).toBe(0);
+    expect(countStateObservers(source)).toBe(0);
+    expect(countStateObservers(plugins)).toBe(0);
   });
 });

@@ -1,12 +1,12 @@
 import { batch } from 'stative';
 
+import { countStateObservers } from '../../../../../scripts/testing/state';
 import { StepSmoothScheduler } from '../utils/smooth';
 import {
   collectText,
   createBlock,
   firstBlock,
   latest,
-  observerCount,
   paragraph,
   PrimarySmoothTicker,
   resetSmoothTests,
@@ -65,7 +65,7 @@ describe('Smooth ownership', () => {
 
       harness.state.destroy();
 
-      expect(observerCount(block.block.prevPrefixLength)).toBe(0);
+      expect(countStateObservers(block.block.prevPrefixLength)).toBe(0);
 
       expect(PrimarySmoothTicker.instances.every((ticker) => !ticker.running)).toBe(true);
 
@@ -260,7 +260,7 @@ describe('Smooth ownership', () => {
 
     const destroySource = jest.spyOn(block.block, 'destroy');
 
-    expect(observerCount(block.block.prevPrefixLength)).toBeGreaterThan(0);
+    expect(countStateObservers(block.block.prevPrefixLength)).toBeGreaterThan(0);
 
     harness.source.next([]);
 
@@ -274,7 +274,7 @@ describe('Smooth ownership', () => {
 
     expect(destroySource).not.toHaveBeenCalled();
 
-    expect(observerCount(block.block.prevPrefixLength)).toBe(0);
+    expect(countStateObservers(block.block.prevPrefixLength)).toBe(0);
 
     harness.source.next([createBlock('new', paragraph('new')).block]);
 
@@ -320,7 +320,7 @@ describe('Smooth ownership', () => {
       block.block.prevPrefixLength,
     ];
 
-    expect(borrowed.every((state) => observerCount(state) > 0)).toBe(true);
+    expect(borrowed.every((state) => countStateObservers(state) > 0)).toBe(true);
 
     harness.state.destroy();
 
@@ -340,7 +340,7 @@ describe('Smooth ownership', () => {
 
     expect(destroySource).not.toHaveBeenCalled();
 
-    expect(borrowed.map(observerCount)).toEqual([0, 0, 0, 0, 0]);
+    expect(borrowed.map(countStateObservers)).toEqual([0, 0, 0, 0, 0]);
 
     expect([...borrowed, block.source, block.meta].every((state) => !state.closed)).toBe(true);
   });
@@ -353,7 +353,7 @@ describe('Smooth ownership', () => {
     const destroySource = jest.spyOn(block.block, 'destroy');
 
     expect(
-      [harness.source, harness.enabled, harness.ticker, harness.scheduler].map(observerCount),
+      [harness.source, harness.enabled, harness.ticker, harness.scheduler].map(countStateObservers),
     ).toEqual([0, 0, 0, 0]);
 
     harness.state.destroy();
@@ -399,6 +399,6 @@ describe('Smooth ownership', () => {
 
     expect(block.source.closed).toBe(false);
 
-    expect(observerCount(block.block.prevPrefixLength)).toBe(0);
+    expect(countStateObservers(block.block.prevPrefixLength)).toBe(0);
   });
 });

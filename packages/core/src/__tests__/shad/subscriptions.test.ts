@@ -4,8 +4,9 @@ import { D, MutableState, render, S, toClosure } from 'stative';
 
 import type { HastRoot } from '../../typings';
 
+import { countStateObservers } from '../../../../../scripts/testing/state';
 import { ShadValue } from '../../../../core-presets/src/mapper/shad/states/shad-blocks/states/shad-block/states/shad-value';
-import { collectText, createBlock, observerCount, paragraph } from '../smooth/utils';
+import { collectText, createBlock, paragraph } from '../smooth/utils';
 import { readParts } from './utils';
 
 test('only the current tail subscribes to shading progress', () => {
@@ -33,7 +34,7 @@ test('only the current tail subscribes to shading progress', () => {
 
   expect(collectText(state.value.value)).toBe('abcd');
 
-  expect(observerCount(position)).toBe(0);
+  expect(countStateObservers(position)).toBe(0);
 
   input.next({ length: 2, activeLength: 0 });
 
@@ -41,7 +42,7 @@ test('only the current tail subscribes to shading progress', () => {
 
   tail.next(first.block);
 
-  expect(observerCount(position)).toBe(1);
+  expect(countStateObservers(position)).toBe(1);
 
   expect(readParts(state.value.value)).toEqual({ leading: 'cd', active: '' });
 
@@ -51,7 +52,7 @@ test('only the current tail subscribes to shading progress', () => {
 
   tail.next(last.block);
 
-  expect(observerCount(position)).toBe(0);
+  expect(countStateObservers(position)).toBe(0);
 
   expect(readParts(state.value.value)).toBeUndefined();
 
@@ -61,11 +62,11 @@ test('only the current tail subscribes to shading progress', () => {
 
   tail.next(first.block);
 
-  expect(observerCount(position)).toBe(1);
+  expect(countStateObservers(position)).toBe(1);
 
   state.destroy();
 
-  expect(observerCount(position)).toBe(0);
+  expect(countStateObservers(position)).toBe(0);
 
   expect([first.source, last.source, tail, input].every((source) => !source.closed)).toBe(true);
 
