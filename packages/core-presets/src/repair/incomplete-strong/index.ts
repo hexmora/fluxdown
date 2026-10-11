@@ -17,6 +17,7 @@ export class IncompleteStrongRepairPlugin extends BaseRepairPlugin {
   static readonly key = 'repair-incomplete-strong';
 
   readonly config: RepairPluginSystemConfig = {
+    scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };

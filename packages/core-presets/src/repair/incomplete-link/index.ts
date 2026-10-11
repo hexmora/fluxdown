@@ -16,6 +16,7 @@ export class IncompleteLinkRepairPlugin extends BaseRepairPlugin {
   static readonly key = 'repair-incomplete-link';
 
   readonly config: RepairPluginSystemConfig = {
+    scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };

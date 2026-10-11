@@ -15,6 +15,7 @@ export class IncompleteListMarkerRepairPlugin extends BaseRepairPlugin {
   static readonly key = 'repair-incomplete-list-marker';
 
   readonly config: RepairPluginSystemConfig = {
+    scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };
