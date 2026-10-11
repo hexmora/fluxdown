@@ -5,7 +5,7 @@
 import type { IBlockState, IPluggableConfig } from '@fluxdown/types';
 import type { Root as HastRoot } from 'hast';
 
-import { type JSXDescriptor, once, useDefaults } from 'stative';
+import { type IReadableClosure, once, useDefaults, useSwitchMap } from 'stative';
 
 import type { ShadBaseInputs, ShadInputs } from './type';
 
@@ -27,16 +27,20 @@ export const Shad = /*#__PURE__*/ withKey(
     source,
     enabled: _enabled,
     length: _length,
-  }: ShadInputs): JSXDescriptor<IBlockState<HastRoot>[]> {
+  }: ShadInputs): IReadableClosure<IBlockState<HastRoot>[]> {
     const enabled = useDefaults(_enabled, false);
 
     const length = useDefaults(_length, 2);
 
-    return (
-      <ShadBlocks
-        source={source}
-        progress={<ShadProgress source={source} enabled={enabled} length={length} />}
-      />
+    return useSwitchMap(enabled, (active) =>
+      active ? (
+        <ShadBlocks
+          source={source}
+          progress={<ShadProgress source={source} enabled={enabled} length={length} />}
+        />
+      ) : (
+        source
+      ),
     );
   }),
 );

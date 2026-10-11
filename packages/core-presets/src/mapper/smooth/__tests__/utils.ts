@@ -36,10 +36,6 @@ export const resetSmoothTests = () => {
   DoubleStepSmoothScheduler.instances = [];
 };
 
-export const observerCount = (state: object) => {
-  return (state as { subject: { observers: unknown[] } }).subject.observers.length;
-};
-
 export const latest = <T>(instances: T[]): T => {
   const instance = last(instances);
 
