@@ -8,9 +8,10 @@ import type {
 import { PluginPriority } from '@fluxdown/types';
 import { isArray } from 'lodash-es';
 import { BehaviorSubject } from 'rxjs';
-import { D, type IReactiveState, render, S, toReactiveState } from 'stative';
+import { D, render, S, toReactiveState } from 'stative';
 
 import { buildPluggables, isPluggableEqual, PluginBuilder } from '..';
+import { countStateObservers } from '../../../../../../../scripts/testing/state';
 
 interface TestPluginConfig extends IBasePluginConfig {
   label?: string;
@@ -60,14 +61,6 @@ const setupBuilder = (initialPlugins: IPluggable<TestPlugin, unknown>[], sort = 
 
 const findPlugin = (plugins: TestPlugin[], key: string) => {
   return plugins.find((plugin) => plugin.key === key);
-};
-
-const getObserverCount = (state: IReactiveState<unknown>) => {
-  return (
-    state as unknown as {
-      subject: { observers: unknown[] };
-    }
-  ).subject.observers.length;
 };
 
 describe('PluginBuilder', () => {
@@ -181,7 +174,7 @@ describe('PluginBuilder', () => {
 
     expect(() => closure.value).toThrow(failure);
     expect(destroy).toHaveBeenCalledTimes(1);
-    expect(getObserverCount(plugins)).toBe(0);
+    expect(countStateObservers(plugins)).toBe(0);
     expect(plugins.closed).toBe(false);
     expect(pluginsSubject.isStopped).toBe(false);
 
@@ -412,13 +405,13 @@ describe('PluginBuilder', () => {
     const { closure, plugins } = setupBuilder([Plugin]);
     const [instance] = closure.value.value;
 
-    expect(getObserverCount(plugins)).toBeGreaterThan(0);
+    expect(countStateObservers(plugins)).toBeGreaterThan(0);
 
     closure.destroy();
 
     expect(instance?.destroy).toHaveBeenCalledTimes(1);
     expect(plugins.closed).toBe(false);
-    expect(getObserverCount(plugins)).toBe(0);
+    expect(countStateObservers(plugins)).toBe(0);
 
     plugins.destroy();
   });

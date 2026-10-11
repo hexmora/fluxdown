@@ -15,6 +15,7 @@ import {
 
 import type { BaseBlockItemInputs } from '../type';
 
+import { countStateObservers } from '../../../../../../../scripts/testing/state';
 import { BaseBlockItem } from '../index';
 
 class TextBlock extends BaseBlockItem<string> {
@@ -41,10 +42,6 @@ const createMeta = () =>
     blockCount: 1,
   });
 
-const getObserverCount = (state: object) => {
-  return (state as { subject: { observers: unknown[] } }).subject.observers.length;
-};
-
 describe('BaseBlockItem', () => {
   test('keeps input subscriptions lazy until the corresponding values are read', () => {
     const source = MutableState.of('value');
@@ -52,20 +49,20 @@ describe('BaseBlockItem', () => {
     const range = MutableState.of<IRangeState | null>({ start: 1 });
     const block = renderTextBlock({ source, meta, range });
 
-    expect([source, meta, range].map(getObserverCount)).toEqual([0, 0, 0]);
+    expect([source, meta, range].map(countStateObservers)).toEqual([0, 0, 0]);
 
     expect(block.baseLength.value).toBe(5);
-    expect(getObserverCount(source)).toBe(1);
-    expect(getObserverCount(meta)).toBe(0);
-    expect(getObserverCount(range)).toBe(0);
+    expect(countStateObservers(source)).toBe(1);
+    expect(countStateObservers(meta)).toBe(0);
+    expect(countStateObservers(range)).toBe(0);
 
     expect(block.value.value).toBe('alue');
-    expect(getObserverCount(range)).toBe(1);
-    expect(getObserverCount(meta)).toBe(0);
+    expect(countStateObservers(range)).toBe(1);
+    expect(countStateObservers(meta)).toBe(0);
 
     block.destroy();
 
-    expect([source, meta, range].map(getObserverCount)).toEqual([0, 0, 0]);
+    expect([source, meta, range].map(countStateObservers)).toEqual([0, 0, 0]);
   });
 
   test('clears internally constructed states without destroying its inputs', () => {
@@ -77,8 +74,8 @@ describe('BaseBlockItem', () => {
     expect(block.value.value).toBe('alue');
     expect(block.length.value).toBe(4);
     const baseLength = block.baseLength;
-    expect(getObserverCount(source)).toBeGreaterThan(0);
-    expect(getObserverCount(range)).toBeGreaterThan(0);
+    expect(countStateObservers(source)).toBeGreaterThan(0);
+    expect(countStateObservers(range)).toBeGreaterThan(0);
 
     block.destroy();
 
@@ -88,8 +85,8 @@ describe('BaseBlockItem', () => {
     expect(source.closed).toBe(false);
     expect(meta.closed).toBe(false);
     expect(range.closed).toBe(false);
-    expect(getObserverCount(source)).toBe(0);
-    expect(getObserverCount(range)).toBe(0);
+    expect(countStateObservers(source)).toBe(0);
+    expect(countStateObservers(range)).toBe(0);
   });
 
   test('binds its internally constructed fallback range to its lifecycle', () => {
@@ -112,12 +109,17 @@ describe('BaseBlockItem', () => {
     const block = renderTextBlock({ source, meta, mapper: D(() => mapped) });
 
     expect(block.value.value).toBe('mapped');
-    expect(getObserverCount(mapped)).toBe(1);
+    expect(countStateObservers(mapped)).toBe(0);
+
+    const subscription = block.value.subscribe(() => {});
+
+    expect(countStateObservers(mapped)).toBe(1);
 
     block.destroy();
 
     expect(mapped.closed).toBe(false);
-    expect(getObserverCount(mapped)).toBe(0);
+    expect(countStateObservers(mapped)).toBe(0);
+    expect(subscription.closed).toBe(true);
   });
 
   test('owns mapper-returned closures independently for each block and fork', () => {
@@ -167,7 +169,7 @@ describe('BaseBlockItem', () => {
 
     expect([source, meta, range].every((state) => !state.closed)).toBe(true);
 
-    expect([source, meta, range].map(getObserverCount)).toEqual([0, 0, 0]);
+    expect([source, meta, range].map(countStateObservers)).toEqual([0, 0, 0]);
   });
 
   test('renders a concrete fork without taking ownership of shared inputs', () => {
@@ -207,7 +209,7 @@ describe('BaseBlockItem', () => {
 
     fork.destroy();
 
-    expect(getObserverCount(source)).toBe(0);
+    expect(countStateObservers(source)).toBe(0);
     expect(source.closed).toBe(false);
   });
 });

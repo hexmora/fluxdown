@@ -24,7 +24,8 @@ import type { HastRoot } from '../../../../typings';
 
 import { MapperComposer } from '..';
 import { isPluggablesEqual } from '../..';
-import { createBlock, observerCount, paragraph } from '../../../../__tests__/smooth/utils';
+import { createBlock, paragraph } from '../../../../__tests__/smooth/utils';
+import { countStateObservers } from '../../../../../../../scripts/testing/state';
 
 const setup = (initialMappers: MapperPluggable[]) => {
   const first = createBlock('first', paragraph('first'));
@@ -136,9 +137,9 @@ describe('MapperComposer', () => {
 
     destroy();
 
-    expect(observerCount(source)).toBe(0);
+    expect(countStateObservers(source)).toBe(0);
 
-    expect(observerCount(mappers)).toBe(0);
+    expect(countStateObservers(mappers)).toBe(0);
   });
 
   test('keeps the unchanged prefix when appending, replacing, removing, and reordering mappers', () => {
@@ -204,13 +205,13 @@ describe('MapperComposer', () => {
 
     expect(closure.value.value).toBe(source.value);
 
-    expect(observerCount(source)).toBeGreaterThan(0);
+    expect(countStateObservers(source)).toBeGreaterThan(0);
 
     closure.destroy();
 
-    expect(observerCount(source)).toBe(0);
+    expect(countStateObservers(source)).toBe(0);
 
-    expect(observerCount(mappers)).toBe(0);
+    expect(countStateObservers(mappers)).toBe(0);
 
     expect(source.closed).toBe(false);
 
@@ -290,7 +291,7 @@ describe('MapperComposer', () => {
 
     destroy();
 
-    expect(observerCount(index)).toBe(0);
+    expect(countStateObservers(index)).toBe(0);
 
     expect(index.closed).toBe(false);
 
@@ -358,9 +359,9 @@ describe('MapperComposer', () => {
 
     expect(cleanup).toHaveBeenCalledTimes(1);
 
-    expect(observerCount(source)).toBe(0);
+    expect(countStateObservers(source)).toBe(0);
 
-    expect(observerCount(mappers)).toBe(0);
+    expect(countStateObservers(mappers)).toBe(0);
 
     expect(source.closed).toBe(false);
 
