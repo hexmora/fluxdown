@@ -1,48 +1,117 @@
-import type { IPluginWithConfig } from '@fluxdown/types';
+import type { IPluggable, IPluginWithConfig } from '@fluxdown/types';
 import type { IDestructible } from 'stative';
 
 import { cacheDiffMap } from '@fluxdown/utils';
-import { once, useClearable, useMap } from 'stative';
+import { useClearable, useCurrent } from 'stative';
 
-import type { PluginBuilderInputs, PluginEntry } from './type';
+import type { PluginBuilderInputs } from './type';
 
 import {
   buildPluggables,
   isPluggableEnabled,
   isPluggableEqual,
   sortPluginInstances,
-} from './utils';
+} from './exports';
+import { isPrivatePluggableEqual } from './utils';
 
+export * from './exports';
 export * from './type';
-export * from './utils';
 
-export const PluginBuilder = /*#__PURE__*/ once(function PluginBuilder<
-  T extends IPluginWithConfig & IDestructible,
->({ plugins, sort = true }: PluginBuilderInputs<T>) {
-  let entries: PluginEntry<T>[] = [];
+export function PluginBuilder<T extends IPluginWithConfig & IDestructible>({
+  plugins,
+  sort = true,
+  cacheStore,
+}: PluginBuilderInputs<T>): T[] {
+  const state = useCurrent(() => {
+    const instances: T[] = [];
 
-  useClearable(() => {
-    for (const { instance } of entries) {
-      instance.destroy();
-    }
+    const pluggables: IPluggable<T, unknown>[] = [];
 
-    entries = [];
+    return {
+      instances,
+      pluggables,
+      cacheStore,
+      destroy() {
+        const previous = this.instances;
+
+        if (this.cacheStore) {
+          this.instances = [];
+
+          this.pluggables = [];
+
+          this.cacheStore.release(...previous);
+
+          return;
+        }
+
+        for (const instance of previous) {
+          instance.destroy();
+        }
+
+        this.instances = [];
+
+        this.pluggables = [];
+      },
+    };
   });
 
-  return useMap(plugins, (currentPluggables) => {
-    entries = cacheDiffMap({
-      prev: entries.map((entry) => [entry.pluggable, entry]),
-      current: currentPluggables.filter(isPluggableEnabled),
-      mapper: (pluggable) => ({
-        instance: buildPluggables(pluggable),
-        pluggable,
-      }),
-      comparer: isPluggableEqual,
-      teardown: ({ instance }) => instance.destroy(),
+  useClearable(state);
+
+  if (state.cacheStore !== cacheStore) {
+    state.destroy();
+
+    state.cacheStore = cacheStore;
+  }
+
+  const retired: T[] = [];
+
+  const pluggables: IPluggable<T, unknown>[] = [];
+
+  const isEqual = cacheStore ? isPrivatePluggableEqual : isPluggableEqual;
+
+  try {
+    state.instances = cacheDiffMap({
+      prev: state.pluggables.map((pluggable, index) => [pluggable, state.instances[index]]),
+      current: plugins.filter(isPluggableEnabled),
+      mapper: (pluggable) => {
+        const instance = cacheStore ? cacheStore.build(pluggable) : buildPluggables(pluggable);
+
+        pluggables.push(pluggable);
+
+        return instance;
+      },
+      comparer: (previous, current) => {
+        if (!isEqual(previous, current)) {
+          return false;
+        }
+
+        pluggables.push(previous);
+
+        return true;
+      },
+      teardown: (instance) => {
+        if (cacheStore) {
+          retired.push(instance);
+        } else {
+          instance.destroy();
+        }
+      },
     });
 
-    const instances = entries.map(({ instance }) => instance);
+    state.pluggables = pluggables;
+  } catch (error) {
+    try {
+      cacheStore?.release(...retired);
+    } catch (cleanupError) {
+      throw new AggregateError([error, cleanupError], 'Failed to build and release plugins.', {
+        cause: cleanupError,
+      });
+    }
 
-    return sort ? sortPluginInstances(instances) : instances;
-  });
-});
+    throw error;
+  }
+
+  cacheStore?.release(...retired);
+
+  return sort ? sortPluginInstances(state.instances) : [...state.instances];
+}
