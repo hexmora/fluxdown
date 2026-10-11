@@ -1,7 +1,7 @@
 import type { Subscription, TeardownLogic } from 'rxjs';
 
 import { isFunction, noop } from 'lodash-es';
-import { Observable } from 'rxjs';
+import { Observable, UnsubscriptionError } from 'rxjs';
 
 import type {
   NativeStateAccess,
@@ -327,6 +327,10 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
   }
 
   private teardown() {
+    this.emitter = undefined;
+
+    this.isSetup = true;
+
     this.emitterObserver?.unsubscribe();
 
     this.emitterObserver = null;
@@ -335,7 +339,13 @@ export class ReactiveState<T> extends Destructible implements IReactiveState<T> 
 
     this.emitterTeardown = undefined;
 
-    this.disposeEmitter(teardown);
+    try {
+      this.disposeEmitter(teardown);
+    } catch (error) {
+      throw new UnsubscriptionError(
+        error instanceof UnsubscriptionError ? [...error.errors] : [error],
+      );
+    }
   }
 
   override destroy() {
