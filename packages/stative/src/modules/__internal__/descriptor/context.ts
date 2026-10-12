@@ -17,7 +17,8 @@ export type DescriptorScope = {
 
 type ClosureContext = {
   scope: DescriptorScope | null;
-  owners: Set<DescriptorScope> | null;
+  owners: number;
+  activeOwners: number;
   originalDestroy: (() => void) | null;
 };
 
@@ -38,7 +39,12 @@ export class DescriptorContext {
       return existing;
     }
 
-    const context: ClosureContext = { scope: null, owners: null, originalDestroy: null };
+    const context: ClosureContext = {
+      scope: null,
+      owners: 0,
+      activeOwners: 0,
+      originalDestroy: null,
+    };
 
     Object.defineProperty(closure, '__closureContext', { value: context });
 
@@ -114,7 +120,11 @@ export const ownReadableClosure = <T extends DestroyableLike>(
 
   const context = DescriptorContext.get(closure);
 
-  (context.owners ??= new Set()).add(scope);
+  context.owners += 1;
+
+  if (!scope.detached) {
+    context.activeOwners += 1;
+  }
 
   (scope.closures ??= new Set()).add(closure);
 
@@ -126,11 +136,15 @@ export const releaseReadableClosure = (scope: DescriptorScope, closure: Destroya
     return;
   }
 
-  const { owners } = DescriptorContext.get(closure);
+  const context = DescriptorContext.get(closure);
 
-  owners?.delete(scope);
+  context.owners -= 1;
 
-  if (!owners?.size) {
+  if (!scope.detached) {
+    context.activeOwners -= 1;
+  }
+
+  if (context.owners === 0) {
     closure.destroy();
   }
 };
@@ -188,6 +202,17 @@ const detachDescriptorScope = (scope: DescriptorScope) => {
 
   let errors: unknown[] | undefined;
 
+  // Publish every released owner before cleanup can reenter another shared scope.
+  if (scope.closures) {
+    for (const closure of scope.closures) {
+      try {
+        DescriptorContext.get(closure).activeOwners -= 1;
+      } catch (error) {
+        errors = appendCleanupError(errors, error);
+      }
+    }
+  }
+
   const detachers = scope.detachers;
 
   scope.detachers = null;
@@ -201,24 +226,10 @@ const detachDescriptorScope = (scope: DescriptorScope) => {
   if (scope.closures) {
     for (const closure of scope.closures) {
       try {
-        const { scope: childScope, owners } = DescriptorContext.get(closure);
+        const { scope: childScope, activeOwners } = DescriptorContext.get(closure);
 
-        if (childScope) {
-          let allDetached = true;
-
-          if (owners) {
-            for (const owner of owners) {
-              if (!owner.detached) {
-                allDetached = false;
-
-                break;
-              }
-            }
-          }
-
-          if (allDetached) {
-            detachDescriptorScope(childScope);
-          }
+        if (childScope && activeOwners === 0) {
+          detachDescriptorScope(childScope);
         }
       } catch (error) {
         errors = appendCleanupError(errors, error);
