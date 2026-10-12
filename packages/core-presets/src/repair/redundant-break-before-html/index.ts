@@ -16,6 +16,7 @@ export class RedundantBreakBeforeHtmlRepairPlugin extends BaseRepairPlugin {
 
   readonly config: RepairPluginSystemConfig = {
     ending: false,
+    allows: 'html',
     priority: PluginPriority.Default,
   };
 

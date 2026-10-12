@@ -12,6 +12,12 @@ export interface ProcessMdastParams<T extends RootContent | Parent = Parent> {
   runner: ProcessMdastRunner<T>;
 
   /**
+   * Invoke the runner only for these node types. Other nodes still have their
+   * children traversed. Omit to visit every node.
+   */
+  allows?: string | string[];
+
+  /**
    * Traversal order:
    * - pre: pre-order traversal
    * - post: post-order traversal
