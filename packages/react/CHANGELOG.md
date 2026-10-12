@@ -1,5 +1,20 @@
 # fluxdown
 
+## 0.8.0
+
+### Minor Changes
+
+- 0724e81: Add theme tokens for inline code, dividers, footnotes, and font smoothing while preserving the existing preset styles and shared-token defaults. Allow CSS values in shared font-weight tokens.
+- 5bfdbd3: Allow plugin tuples to set `disabled: true` to opt out of individual presets or custom plugins. Disabled plugins and mappers are not constructed, and their existing state is cleaned up when configuration changes.
+
+### Patch Changes
+
+- Updated dependencies [5bfdbd3]
+  - @fluxdown/types@0.8.0
+  - @fluxdown/core@0.10.0
+  - @fluxdown/core-presets@0.7.1
+  - @fluxdown/react-presets@0.6.6
+
 ## 0.7.5
 
 ### Patch Changes

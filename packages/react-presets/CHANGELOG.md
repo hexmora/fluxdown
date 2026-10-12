@@ -1,5 +1,14 @@
 # @fluxdown/react-presets
 
+## 0.6.6
+
+### Patch Changes
+
+- Updated dependencies [5bfdbd3]
+  - @fluxdown/types@0.8.0
+  - @fluxdown/core@0.10.0
+  - @fluxdown/core-presets@0.7.1
+
 ## 0.6.5
 
 ### Patch Changes
