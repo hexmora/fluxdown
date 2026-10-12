@@ -114,9 +114,7 @@ export const useStateOf = <T>(
 const useStateSubscribe = <T>(state: IReactiveState<T>) =>
   useCallback(
     (onStoreChange: () => void) => {
-      let active = true;
-
-      let subscribed = false;
+      let active = false;
 
       const notify = () => {
         if (active) {
@@ -125,14 +123,14 @@ const useStateSubscribe = <T>(state: IReactiveState<T>) =>
       };
 
       const subscription = state.subscribe(() => {
-        if (!subscribed) {
+        if (!active) {
           return;
         }
 
         notifyStoreChange(notify);
       });
 
-      subscribed = true;
+      active = true;
 
       return () => {
         active = false;
@@ -163,8 +161,6 @@ export function useStateValue<T, S = T>(
 ): S {
   const subscribe = useStateSubscribe(state);
 
-  const getSnapshot = useCallback(() => state.value, [state]);
-
   let selector: StateSelector<T, S>;
 
   let distinctor: Distinctor<S>;
@@ -184,11 +180,13 @@ export function useStateValue<T, S = T>(
     distinctor = selectorOrDistinctor ?? Object.is;
   }
 
-  const hasValueRef = useRef(false);
-
   const valueRef = useRef<StateValueInstance<S> | null>(null);
 
   const getSelection = useMemo(() => {
+    if (selector === selectStateValue && distinctor === Object.is) {
+      return () => selector(state.value);
+    }
+
     let hasSelection = false;
 
     let nextSnapshot: T;
@@ -196,7 +194,7 @@ export function useStateValue<T, S = T>(
     let nextSelection: S;
 
     return () => {
-      const snapshot = getSnapshot();
+      const snapshot = state.value;
 
       if (!hasSelection) {
         hasSelection = true;
@@ -205,16 +203,12 @@ export function useStateValue<T, S = T>(
 
         const selection = selector(snapshot);
 
-        if (hasValueRef.current) {
-          const instance = valueRef.current;
+        const instance = valueRef.current;
 
-          assert(instance, 'useStateValue has no committed value.');
+        if (instance && distinctor(instance.value, selection)) {
+          nextSelection = instance.value;
 
-          if (distinctor(instance.value, selection)) {
-            nextSelection = instance.value;
-
-            return nextSelection;
-          }
+          return nextSelection;
         }
 
         nextSelection = selection;
@@ -240,15 +234,17 @@ export function useStateValue<T, S = T>(
 
       return nextSelection;
     };
-  }, [distinctor, getSnapshot, selector]);
+  }, [distinctor, selector, state]);
 
   const selection = useSyncExternalStore(subscribe, getSelection, getSelection);
 
   // Record only committed selections; render-time writes can leak from abandoned renders.
   useEffect(() => {
-    valueRef.current = { value: selection };
-
-    hasValueRef.current = true;
+    if (valueRef.current) {
+      valueRef.current.value = selection;
+    } else {
+      valueRef.current = { value: selection };
+    }
   }, [selection]);
 
   useDebugValue(selection);
