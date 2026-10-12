@@ -17,6 +17,7 @@ export class ParagraphHtmlClosureRepairPlugin extends BaseRepairPlugin {
 
   readonly config: RepairPluginSystemConfig = {
     ending: false,
+    allows: 'paragraph',
     priority: PluginPriority.Low,
   };
 

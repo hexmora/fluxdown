@@ -1,7 +1,7 @@
 import type { Parent, RootContent } from 'mdast';
 
 import { assert } from '@fluxdown/utils';
-import { first, last } from 'lodash-es';
+import { castArray, first, last } from 'lodash-es';
 
 import type { ProcessMdastParams } from './type';
 import type { ProcessFrame } from './utils';
@@ -15,10 +15,13 @@ export * from './type';
 export const processMdast = <T extends RootContent | Parent>({
   node: root,
   runner,
+  allows,
   order = 'pre',
   rightFirst = false,
   scope = 'tree',
 }: ProcessMdastParams<T>) => {
+  const types = allows === undefined ? undefined : castArray(allows);
+
   let stopped = false;
 
   let skipped = false;
@@ -49,6 +52,10 @@ export const processMdast = <T extends RootContent | Parent>({
   };
 
   const visit = ({ node, parents }: ProcessFrame<T>) => {
+    if (types && !types.includes(node.type)) {
+      return;
+    }
+
     const parent = first(parents);
 
     const index = parent ? getIndex(parent, node) : undefined;

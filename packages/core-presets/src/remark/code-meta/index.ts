@@ -22,6 +22,7 @@ export class CodeMetaRemarkPlugin extends BaseRemarkPlugin {
   plugin: Plugin<[], Root, Root> = () => (tree) => {
     processMdast({
       node: tree,
+      allows: 'code',
       runner: ({ node }) => {
         if (node.type !== 'code' || typeof node.meta !== 'string' || node.meta.length === 0) {
           return;
