@@ -120,6 +120,12 @@ export class StateNode {
       return true;
     }
 
+    const barrier = this.links.barrier?.node;
+
+    if (barrier?.dirty && !barrier.settling && !barrier.disposed) {
+      return true;
+    }
+
     if (this.links.barriers) {
       for (const { node } of this.links.barriers.keys()) {
         if (node.dirty && !node.settling && !node.disposed) {

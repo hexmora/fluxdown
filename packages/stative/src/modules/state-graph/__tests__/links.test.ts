@@ -2,6 +2,12 @@ import { sortBy } from 'lodash-es';
 
 import { StateLinks } from '../../__internal__';
 
+const getBarriers = <T>(links: StateLinks<T>): StateLinks<T>[] => {
+  const roots = [...(links.barriers?.keys() ?? [])];
+
+  return links.barrier ? [links.barrier, ...roots] : roots;
+};
+
 describe('ordering prerequisites', () => {
   test('shares one prerequisite across existing descendants and converging paths', () => {
     const source = new StateLinks('source');
@@ -20,17 +26,17 @@ describe('ordering prerequisites', () => {
 
     second.connect(source, true);
 
-    expect([...output.barriers!.keys()]).toEqual([source]);
+    expect(getBarriers(output)).toEqual([source]);
 
     first.disconnect(source, true);
 
-    expect(first.barriers).toBeNull();
+    expect(getBarriers(first)).toEqual([]);
 
-    expect([...output.barriers!.keys()]).toEqual([source]);
+    expect(getBarriers(output)).toEqual([source]);
 
     second.disconnect(source, true);
 
-    expect(output.barriers).toBeNull();
+    expect(getBarriers(output)).toEqual([]);
   });
 
   test('counts ordering and value subscriptions independently', () => {
@@ -46,11 +52,11 @@ describe('ordering prerequisites', () => {
 
     target.disconnect(source, true);
 
-    expect([...target.barriers!.keys()]).toEqual([source]);
+    expect(getBarriers(target)).toEqual([source]);
 
     target.disconnect(source, true);
 
-    expect(target.barriers).toBeNull();
+    expect(getBarriers(target)).toEqual([]);
 
     expect(target.sources.has(source)).toBe(true);
 
@@ -58,7 +64,7 @@ describe('ordering prerequisites', () => {
 
     target.disconnect(source, false);
 
-    expect([...target.barriers!.keys()]).toEqual([source]);
+    expect(getBarriers(target)).toEqual([source]);
 
     target.disconnect(source, true);
 
@@ -66,7 +72,7 @@ describe('ordering prerequisites', () => {
 
     expect(source.targets.size).toBe(0);
 
-    expect(target.barriers).toBeNull();
+    expect(getBarriers(target)).toEqual([]);
   });
 
   test('removes a detached prerequisite from cycles while retaining an independent input', () => {
@@ -90,18 +96,18 @@ describe('ordering prerequisites', () => {
 
     second.connect(retained, true);
 
-    expect(output.barriers?.size).toBe(2);
+    expect(getBarriers(output)).toHaveLength(2);
 
     first.disconnect(detached, true);
 
     for (const links of [first, second, output]) {
-      expect([...links.barriers!.keys()]).toEqual([retained]);
+      expect(getBarriers(links)).toEqual([retained]);
     }
 
     retained.destroy();
 
     for (const links of [first, second, output]) {
-      expect(links.barriers).toBeNull();
+      expect(getBarriers(links)).toEqual([]);
     }
   });
 
@@ -122,17 +128,17 @@ describe('ordering prerequisites', () => {
 
     output.connect(outer, true);
 
-    expect(output.barriers?.size).toBe(2);
+    expect(getBarriers(output)).toHaveLength(2);
 
     inner.destroy();
 
-    expect(item.barriers).toBeNull();
+    expect(getBarriers(item)).toEqual([]);
 
-    expect([...output.barriers!.keys()]).toEqual([outer]);
+    expect(getBarriers(output)).toEqual([outer]);
 
     outer.destroy();
 
-    expect(output.barriers).toBeNull();
+    expect(getBarriers(output)).toEqual([]);
   });
 
   test('removes inherited prerequisites when a connecting value dependency is detached', () => {
@@ -150,13 +156,13 @@ describe('ordering prerequisites', () => {
 
     output.connect(middle, false);
 
-    expect([...output.barriers!.keys()]).toEqual([source]);
+    expect(getBarriers(output)).toEqual([source]);
 
     middle.disconnect(item, false);
 
-    expect(middle.barriers).toBeNull();
+    expect(getBarriers(middle)).toEqual([]);
 
-    expect(output.barriers).toBeNull();
+    expect(getBarriers(output)).toEqual([]);
   });
 
   test('matches reachable ordering prerequisites through repeated graph changes', () => {
@@ -226,7 +232,7 @@ describe('ordering prerequisites', () => {
           }
         }
 
-        const actual = [...(node.barriers?.keys() ?? [])].map((root) => root.node);
+        const actual = getBarriers(node).map((root) => root.node);
 
         expect(sortBy(actual)).toEqual(sortBy([...expected]));
       }
