@@ -1,4 +1,4 @@
-import { D, once, S, useMap, useMapEach, useSelect } from 'stative';
+import { D, once, S, useMap, useMapEach } from 'stative';
 
 import type { BlockCompilerInputs, IBlockCompiler } from './type';
 
@@ -15,7 +15,7 @@ export const BlockCompiler = /*#__PURE__*/ once(
 
     let nextKey = 0;
 
-    const count = useSelect(sections, (current) => current.length);
+    const count = useMap(sections, (current) => current.length);
 
     const idPrefix = useMap(config, (current) => current.idPrefix);
 

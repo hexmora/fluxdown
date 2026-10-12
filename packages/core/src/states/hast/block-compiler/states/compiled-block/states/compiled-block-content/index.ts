@@ -1,11 +1,12 @@
 import { isEqual } from 'lodash-es';
-import { once, S, useCreate, useMap } from 'stative';
+import { once, S, useCreate, useMap, useSelect } from 'stative';
 
 import type { CompiledBlockContentInputs } from './type';
 
 import { BlockItem } from '../../../../../block-item';
 import { MarkdownCompiler } from '../../../../exports';
 import { getRemarksConfig, isMetaEqual } from '../../utils';
+import { isInputsEqual } from './utils';
 
 export * from './type';
 
@@ -20,7 +21,7 @@ export const CompiledBlockContent = /*#__PURE__*/ once(
     getRehypes,
     compiler,
   }: CompiledBlockContentInputs) => {
-    const meta = useMap(
+    const meta = useSelect(
       [item, count],
       ([
         {
@@ -44,17 +45,33 @@ export const CompiledBlockContent = /*#__PURE__*/ once(
     // Keep the factory per block so it can accept block-specific inputs in the future.
     const rehypes = getRehypes();
 
-    const section = useMap(item, (current) => current.section);
-
     const source = useMap(
-      [section, remarks, rehypes, idPrefix],
-      ([{ text }, currentRemarks, currentRehypes, currentPrefix]) =>
-        (compiler ?? MarkdownCompiler).build({
+      [item, remarks, rehypes, idPrefix],
+      (inputs, prev) => {
+        if (prev) {
+          const [values, root] = prev;
+
+          if (isInputsEqual(inputs, values)) {
+            return root;
+          }
+        }
+
+        const [
+          {
+            section: { text },
+          },
+          currentRemarks,
+          currentRehypes,
+          currentPrefix,
+        ] = inputs;
+
+        return (compiler ?? MarkdownCompiler).build({
           text,
           remarks: currentRemarks,
           rehypes: currentRehypes,
           idPrefix: currentPrefix,
-        }),
+        });
+      },
       isEqual,
     );
 
