@@ -10,8 +10,9 @@ export const getInputRevision = (source: IReactiveState<unknown>, value: unknown
 
 export const isValuesEqual = (previous: readonly unknown[], current: readonly unknown[]) => {
   return (
-    previous.length === current.length &&
-    current.every((value, index) => Object.is(previous[index], value))
+    previous === current ||
+    (previous.length === current.length &&
+      current.every((value, index) => Object.is(previous[index], value)))
   );
 };
 
