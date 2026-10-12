@@ -1,17 +1,16 @@
 import { Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
+import type { StateSubscription } from '../../../__internal__';
+import type { Distinctor, IReactiveState, StateSource, StateValue } from '../../../reactive-state';
+import type { IReadableClosure, ListEntry, StateClosureSource } from '../../type';
 import type {
   MarkedStateClosureDescriptor,
   StateClosureResult,
   StateClosureResultNode,
   StateClosureResultValue,
-} from '..';
-import type { StateSubscription } from '../../../__internal__';
-import type { Distinctor, IReactiveState, StateSource, StateValue } from '../../../reactive-state';
-import type { IReadableClosure, ListEntry, StateClosureSource } from '../../type';
+} from '../render';
 
-import { render } from '..';
 import {
   clearWithDescriptorScope,
   getReadableClosureScope,
@@ -26,11 +25,17 @@ import { MutableState } from '../../../mutable-state';
 import { ReactiveState, toState } from '../../../reactive-state';
 import { batch } from '../../../state-graph';
 import { FactoryReadableClosure, toClosure } from '../../main';
-import { StateClosureHookRuntime } from '../../utils';
-import { isImmediateDescriptor, isReadableClosure } from '../../utils';
+import {
+  isFreshDescriptor,
+  isImmediateDescriptor,
+  isReadableClosure,
+  StateClosureHookRuntime,
+} from '../../utils';
+import { render } from '../render';
 
 type CollectionEntry<T, R> = Omit<ListEntry<T, R>, 'subscription'> & {
   value: R;
+  inputClosure?: IReadableClosure<T>;
   native: boolean;
   completed: boolean;
   subscription?: StateSubscription;
@@ -244,16 +249,30 @@ export function mapEachClosure<T, R>(
 
       clearWithDescriptorScope(getReadableClosureScope(readable), () => item.destroy());
 
-      const child = FactoryReadableClosure.create(() => toClosure(mapper(readable, index)));
+      ownReadableClosure(scope, readable);
 
-      ownReadableClosure(getReadableClosureScope(child), readable);
-      ownReadableClosure(scope, child);
+      let child: IReadableClosure<R> | undefined;
 
       try {
+        const result = StateClosureHookRuntime.run(null, () => mapper(readable, index));
+
+        const direct = isFreshDescriptor<R>(result);
+
+        child = direct ? render<R>(result) : FactoryReadableClosure.create(() => toClosure(result));
+
+        if (!direct) {
+          ownReadableClosure(getReadableClosureScope(child), readable);
+
+          releaseReadableClosure(scope, readable);
+        }
+
+        ownReadableClosure(scope, child);
+
         const state = child.value;
 
         return {
           input: item,
+          inputClosure: direct ? readable : undefined,
           closure: child,
           state,
           value: state.value,
@@ -261,7 +280,13 @@ export function mapEachClosure<T, R>(
           completed: state.closed,
         };
       } catch (error) {
-        releaseReadableClosure(scope, child);
+        try {
+          if (child) {
+            releaseReadableClosure(scope, child);
+          }
+        } finally {
+          releaseReadableClosure(scope, readable);
+        }
 
         throw error;
       }
@@ -271,11 +296,15 @@ export function mapEachClosure<T, R>(
       const cleanup = new Subscription();
 
       for (const entry of items) {
-        cleanup.add(() => {
-          entry.subscription?.unsubscribe();
+        const { subscription, closure: child, inputClosure } = entry;
 
-          releaseReadableClosure(scope, entry.closure);
-        });
+        cleanup.add(subscription);
+
+        cleanup.add(() => releaseReadableClosure(scope, child));
+
+        if (inputClosure) {
+          cleanup.add(() => releaseReadableClosure(scope, inputClosure));
+        }
       }
 
       cleanup.unsubscribe();

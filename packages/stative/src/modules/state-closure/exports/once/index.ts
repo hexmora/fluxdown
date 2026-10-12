@@ -1,4 +1,4 @@
-import type { StateClosureResultNode } from '..';
+import type { StateClosureResultNode } from '../render';
 
 import { onceFunction } from '../../utils';
 

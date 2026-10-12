@@ -4,8 +4,8 @@ import { shallowEqual } from 'shallow-equal';
 import type { StateSubscription } from '../../../__internal__';
 import type { IReactiveState, StateInputValue } from '../../type';
 
-import { toState } from '..';
 import { isStateSourceLike } from '../../../__internal__';
+import { toState } from '../operator';
 
 export type Input = {
   source: unknown;

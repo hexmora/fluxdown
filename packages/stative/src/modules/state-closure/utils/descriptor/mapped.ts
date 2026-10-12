@@ -4,11 +4,11 @@ import type { Distinctor } from '../../../reactive-state';
 import type { AnyMappingFunction, StateClosureResult } from '../../exports';
 import type { IReadableClosure } from '../../type';
 
-import { StateClosureHookRuntime } from '..';
-import { getMapperComparers } from '..';
 import { clearWithDescriptorScope, getReadableClosureScope } from '../../../__internal__';
 import { mapState, ReactiveState } from '../../../reactive-state';
 import { FactoryReadableClosure } from '../../main';
+import { StateClosureHookRuntime } from '../hook-runtime';
+import { getMapperComparers } from '../memo';
 
 /** Builds functional closures lazily and keeps mapper hooks local to each instance. */
 export const createMappedStateClosure = <T>(

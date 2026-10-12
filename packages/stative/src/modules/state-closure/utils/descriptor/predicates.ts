@@ -7,13 +7,13 @@ import type {
 } from '../../exports';
 import type { IReadableClosure } from '../../type';
 
-import { isOnceFunction } from '..';
 import {
   immediateDescriptor,
   isClass,
   isMarkedStateClosureDescriptor,
   isReactiveStateLike,
 } from '../../../__internal__';
+import { isOnceFunction } from '../once';
 
 export const isImmediateDescriptor = <T = unknown>(
   value: unknown,
@@ -65,4 +65,11 @@ export const isReadableSourceDescriptor = (source: unknown) => {
     isClass(source) ||
     (isMarkedStateClosureDescriptor(source) && isSlottedDescriptor(source))
   );
+};
+
+/** Descriptors create their own lifetime; existing closures can be shared by other owners. */
+export const isFreshDescriptor = <T = unknown>(
+  value: unknown,
+): value is StateClosureDescriptor<T> => {
+  return isStateClosureDescriptor<T>(value) && !isReadableClosure(value);
 };
