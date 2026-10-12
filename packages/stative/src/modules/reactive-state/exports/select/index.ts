@@ -17,7 +17,6 @@ import type {
   StateValues,
 } from '../../type';
 
-import { toState } from '..';
 import {
   getNativeStateAccess,
   hasNativeAccessors,
@@ -28,6 +27,7 @@ import {
 } from '../../../__internal__';
 import { ReactiveState } from '../../main';
 import { clearSubscriptions, deriveState } from '../../utils';
+import { toState } from '../operator';
 import { getInputRevision, hasRevisions, isValuesEqual } from './utils';
 
 /** Pure projections keep no input subscriptions until their output is observed. */
@@ -104,18 +104,53 @@ class SelectedState<T> implements IReactiveState<T>, NativeStateAccess<T> {
       return this.active.value;
     }
 
-    let values: unknown[];
+    const sources = this.sources!;
 
-    const revisions: (number | undefined)[] = [];
+    const { inputValues, inputRevisions } = this;
+
+    let changed = !inputValues || !inputRevisions || inputValues.length !== sources.length;
+
+    let values = !changed && inputValues ? inputValues : [];
+
+    let revisions: (number | undefined)[] = !changed && inputRevisions ? inputRevisions : [];
+
+    let revisionIndex = 0;
 
     try {
-      values = this.sources!.map((source) => {
+      for (let index = 0; index < sources.length; index++) {
+        if (!(index in sources)) {
+          continue;
+        }
+
+        const source = sources[index];
+
         const value = source.value;
 
-        revisions.push(getInputRevision(source, value));
+        const revision = getInputRevision(source, value);
 
-        return value;
-      });
+        if (
+          !changed &&
+          (!Object.is(values[index], value) || revisions[revisionIndex] !== revision)
+        ) {
+          values = values.slice(0, index);
+
+          revisions = revisions.slice(0, revisionIndex);
+
+          changed = true;
+        }
+
+        if (changed) {
+          values[index] = value;
+
+          revisions[revisionIndex] = revision;
+        }
+
+        revisionIndex += 1;
+      }
+
+      if (changed) {
+        values.length = sources.length;
+      }
     } catch (error) {
       if (!this.snapshot) {
         throw error;
