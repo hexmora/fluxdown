@@ -5,13 +5,13 @@ import type { StateClosureRef } from '../../exports';
 import type { IReadableClosure } from '../../type';
 import type { HookSlot } from './type';
 
-import { isReadableClosure } from '..';
 import {
   getReadableClosureScope,
   ownReadableClosure,
   releaseReadableClosure,
 } from '../../../__internal__';
 import { clearByTarget } from '../../../destructible';
+import { isReadableClosure } from '../descriptor';
 import { hookOrderError } from './utils';
 
 export * from './type';

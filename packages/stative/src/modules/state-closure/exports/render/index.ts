@@ -1,6 +1,6 @@
-import type { AnyOnceFunction, OnceFunctionMetadata } from '..';
 import type { Distinctor } from '../../../reactive-state';
 import type { IReadableClosure } from '../../type';
+import type { AnyOnceFunction, OnceFunctionMetadata } from '../once';
 import type {
   AnyStateClosureClass,
   BuiltClosure,

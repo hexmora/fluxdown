@@ -12,8 +12,6 @@ import type { DescriptorScope } from '../../../__internal__';
 import type { ResolvedMappingNode, RuntimeSlottedDescriptor } from '../../exports';
 import type { IReadableClosure } from '../../type';
 
-import { StateClosureHookRuntime } from '..';
-import { isOnceFunction } from '..';
 import {
   assertDescriptorScope,
   bindRootDescriptorScope,
@@ -27,6 +25,8 @@ import {
   ownReadableClosure,
 } from '../../../__internal__';
 import { toClosure } from '../../main';
+import { StateClosureHookRuntime } from '../hook-runtime';
+import { isOnceFunction } from '../once';
 import { createMappedStateClosure } from './mapped';
 import {
   isImmediateDescriptor,

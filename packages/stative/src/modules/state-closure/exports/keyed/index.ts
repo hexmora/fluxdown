@@ -1,10 +1,10 @@
 import { Subscription } from 'rxjs';
 import { shallowEqual } from 'shallow-equal';
 
-import type { MarkedStateClosureDescriptor } from '..';
 import type { StateSubscription } from '../../../__internal__';
 import type { IReactiveState, StateSource } from '../../../reactive-state';
 import type { IReadableClosure, StateClosureSource } from '../../type';
+import type { MarkedStateClosureDescriptor } from '../render';
 
 import {
   clearWithDescriptorScope,
@@ -18,6 +18,8 @@ import {
 import { ReactiveState } from '../../../reactive-state';
 import { batch } from '../../../state-graph';
 import { FactoryReadableClosure, toClosure } from '../../main';
+import { isStateClosureDescriptor } from '../../utils';
+import { render } from '../render';
 
 type KeyedEntry<T> = {
   closure: IReadableClosure<T>;
@@ -51,7 +53,12 @@ export function mapKeyedClosure<T, R>(
       const child = FactoryReadableClosure.create(() => {
         const childScope = getReadableClosureScope(child);
 
-        const mapped = ownReadableClosure(childScope, toClosure(mapper(item)));
+        const result = mapper(item);
+
+        const mapped = ownReadableClosure(
+          childScope,
+          isStateClosureDescriptor<R>(result) ? render<R>(result) : toClosure(result),
+        );
 
         const disconnect = StateNode.get(mapped.value).dependOn(StateNode.get(sourceState), {
           ordering: true,

@@ -1,14 +1,6 @@
 import { forEach } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
 
-import type {
-  BuiltClosure,
-  MarkedStateClosureDescriptor,
-  StateClosureDescriptor,
-  StateClosureResult,
-  StateClosureResultNode,
-  StateClosureResultValue,
-} from '..';
 import type { DestructibleTarget } from '../../../destructible';
 import type {
   Distinctor,
@@ -20,15 +12,22 @@ import type {
   StateValues,
 } from '../../../reactive-state';
 import type { FlattenedState, IReadableClosure, StateClosureSource } from '../../type';
+import type {
+  BuiltClosure,
+  MarkedStateClosureDescriptor,
+  StateClosureDescriptor,
+  StateClosureResult,
+  StateClosureResultNode,
+  StateClosureResultValue,
+} from '../render';
 import type { StateClosureRef } from './type';
 
-import { mapKeyedClosure } from '..';
-import { mapEachClosure, switchMapClosure } from '..';
-import { render } from '..';
 import { getReadableClosureScope, ownReadableClosure } from '../../../__internal__';
 import { flattenClosure, mapClosure, selectClosure, toClosure } from '../../main';
-import { isStateClosureDescriptor } from '../../utils';
-import { StateClosureHookRuntime } from '../../utils';
+import { isStateClosureDescriptor, StateClosureHookRuntime } from '../../utils';
+import { mapKeyedClosure } from '../keyed';
+import { mapEachClosure, switchMapClosure } from '../operator';
+import { render } from '../render';
 
 export * from './type';
 

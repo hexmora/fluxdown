@@ -1,9 +1,9 @@
 import type { BehaviorSubject } from 'rxjs';
 
-import type { AnyOnceFunction, OnceFunctionMetadata } from '..';
 import type { Newable } from '../../../../typings';
 import type { Distinctor, IReactiveState } from '../../../reactive-state';
 import type { IReadableClosure } from '../../type';
+import type { AnyOnceFunction, OnceFunctionMetadata } from '../once';
 
 import { immediateDescriptor } from '../../../__internal__';
 
