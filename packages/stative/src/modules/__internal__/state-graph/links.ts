@@ -10,19 +10,36 @@ export class StateLinks<T> {
   readonly targets = new Map<StateLinks<T>, Dependency>();
 
   /** One supporting path per root; null marks a direct ordering prerequisite. */
+  private root: StateLinks<T> | null = null;
+
+  private support: StateLinks<T> | null = null;
+
   private roots: Map<StateLinks<T>, StateLinks<T> | null> | null = null;
 
   constructor(readonly node: T) {}
 
+  get barrier(): StateLinks<T> | null {
+    return this.root;
+  }
+
+  /** Additional roots beyond the inline barrier. */
   get barriers(): ReadonlyMap<StateLinks<T>, StateLinks<T> | null> | null {
     return this.roots;
   }
 
-  private addBarrier(root: StateLinks<T>, support: StateLinks<T> | null) {
-    if (this.roots?.has(root)) {
-      if (support === null) {
-        this.roots.set(root, null);
-      }
+  private hasBarrier(root: StateLinks<T>) {
+    return this.root === root || Boolean(this.roots?.has(root));
+  }
+
+  private getSupport(root: StateLinks<T>) {
+    return this.root === root ? this.support : this.roots?.get(root);
+  }
+
+  private setBarrier(root: StateLinks<T>, support: StateLinks<T> | null) {
+    if (!this.root || this.root === root) {
+      this.root = root;
+
+      this.support = support;
 
       return;
     }
@@ -30,6 +47,42 @@ export class StateLinks<T> {
     this.roots ??= new Map();
 
     this.roots.set(root, support);
+  }
+
+  private clearBarriers() {
+    this.root = null;
+
+    this.support = null;
+
+    this.roots = null;
+  }
+
+  private inheritBarriers(source: StateLinks<T>) {
+    if (source.root) {
+      this.addBarrier(source.root, source);
+    }
+
+    if (source.roots) {
+      for (const root of source.roots.keys()) {
+        this.addBarrier(root, source);
+      }
+    }
+  }
+
+  private addBarrier(root: StateLinks<T>, support: StateLinks<T> | null) {
+    if (this.hasBarrier(root)) {
+      if (support === null) {
+        this.setBarrier(root, null);
+      }
+
+      return;
+    }
+
+    this.setBarrier(root, support);
+
+    if (this.targets.size === 0) {
+      return;
+    }
 
     const pending: StateLinks<T>[] = [this];
 
@@ -37,13 +90,11 @@ export class StateLinks<T> {
       const links = pending[index];
 
       for (const target of links.targets.keys()) {
-        if (target.roots?.has(root)) {
+        if (target.hasBarrier(root)) {
           continue;
         }
 
-        target.roots ??= new Map();
-
-        target.roots.set(root, links);
+        target.setBarrier(root, links);
 
         pending.push(target);
       }
@@ -73,12 +124,8 @@ export class StateLinks<T> {
       dependency.normal += 1;
     }
 
-    const { roots } = source;
-
-    if (!connected && roots) {
-      for (const root of roots.keys()) {
-        this.addBarrier(root, source);
-      }
+    if (!connected && source.root) {
+      this.inheritBarriers(source);
     }
   }
 
@@ -100,7 +147,7 @@ export class StateLinks<T> {
 
       source.targets.delete(this);
 
-      if (!ordering && !source.roots) {
+      if (!ordering && !source.root) {
         return;
       }
     } else if (!ordering || dependency.ordering > 0) {
@@ -125,7 +172,7 @@ export class StateLinks<T> {
     while (!visited.has(current)) {
       visited.add(current);
 
-      const support = current.roots?.get(root);
+      const support = current.getSupport(root);
 
       if (support === null) {
         return (current.sources.get(root)?.ordering ?? 0) > 0;
@@ -142,39 +189,45 @@ export class StateLinks<T> {
   }
 
   private repair(removed: StateLinks<T>) {
-    if (!this.roots) {
-      return true;
+    if (this.root && !this.repairBarrier(this.root, this.support, removed)) {
+      return false;
     }
 
-    for (const [root, support] of this.roots) {
-      if (support !== removed && !(support === null && root === removed)) {
-        continue;
-      }
-
-      if ((this.sources.get(root)?.ordering ?? 0) > 0) {
-        this.roots.set(root, null);
-
-        continue;
-      }
-
-      let replacement: StateLinks<T> | undefined;
-
-      for (const source of this.sources.keys()) {
-        if (StateLinks.reachesBarrier(source, root, this)) {
-          replacement = source;
-
-          break;
+    if (this.roots) {
+      for (const [root, support] of this.roots) {
+        if (!this.repairBarrier(root, support, removed)) {
+          return false;
         }
       }
-
-      if (!replacement) {
-        return false;
-      }
-
-      this.roots.set(root, replacement);
     }
 
     return true;
+  }
+
+  private repairBarrier(
+    root: StateLinks<T>,
+    support: StateLinks<T> | null,
+    removed: StateLinks<T>,
+  ) {
+    if (support !== removed && !(support === null && root === removed)) {
+      return true;
+    }
+
+    if ((this.sources.get(root)?.ordering ?? 0) > 0) {
+      this.setBarrier(root, null);
+
+      return true;
+    }
+
+    for (const source of this.sources.keys()) {
+      if (StateLinks.reachesBarrier(source, root, this)) {
+        this.setBarrier(root, source);
+
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private rebuild(initial: StateLinks<T>[]) {
@@ -188,7 +241,7 @@ export class StateLinks<T> {
 
     // Clear the whole affected region before seeding it, including dependency cycles.
     for (const links of affected) {
-      links.roots = null;
+      links.clearBarriers();
     }
 
     for (const links of affected) {
@@ -197,15 +250,11 @@ export class StateLinks<T> {
           links.addBarrier(source, null);
         }
 
-        const { roots } = source;
-
-        if (affected.has(source) || !roots) {
+        if (affected.has(source)) {
           continue;
         }
 
-        for (const root of roots.keys()) {
-          links.addBarrier(root, source);
-        }
+        links.inheritBarriers(source);
       }
     }
   }
@@ -221,15 +270,15 @@ export class StateLinks<T> {
       target.sources.delete(this);
     }
 
-    const hadBarriers = this.roots !== null;
+    const hadBarriers = this.root !== null;
 
     this.sources.clear();
 
     this.targets.clear();
 
-    this.roots = null;
+    this.clearBarriers();
 
-    if (hadBarriers || targets.some((target) => target.roots?.has(this))) {
+    if (hadBarriers || targets.some((target) => target.hasBarrier(this))) {
       this.rebuild(targets.filter((target) => !target.repair(this)));
     }
   }
