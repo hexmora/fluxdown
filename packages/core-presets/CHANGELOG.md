@@ -1,5 +1,12 @@
 # @fluxdown/core-presets
 
+## 0.7.1
+
+### Patch Changes
+
+- Updated dependencies [5bfdbd3]
+  - @fluxdown/types@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

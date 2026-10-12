@@ -1,5 +1,11 @@
 # @fluxdown/types
 
+## 0.8.0
+
+### Minor Changes
+
+- 5bfdbd3: Allow plugin tuples to set `disabled: true` to opt out of individual presets or custom plugins. Disabled plugins and mappers are not constructed, and their existing state is cleaned up when configuration changes.
+
 ## 0.7.2
 
 ### Patch Changes

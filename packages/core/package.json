@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/core",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Headless pure-computation utilities for turning streaming Markdown strings into HAST structures.",
   "keywords": [
     "hast",
