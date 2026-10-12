@@ -1,5 +1,13 @@
 # fluxdown
 
+## 0.8.1
+
+### Patch Changes
+
+- Updated dependencies [6e5d714]
+  - @fluxdown/core@0.11.0
+  - @fluxdown/react-presets@0.6.7
+
 ## 0.8.0
 
 ### Minor Changes
