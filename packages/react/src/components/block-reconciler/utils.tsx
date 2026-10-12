@@ -10,7 +10,7 @@ import {
   isHastParent,
   PATCH_MARKER,
 } from '@fluxdown/react-presets/base';
-import { isString } from 'lodash-es';
+import { isObject, isString } from 'lodash-es';
 import { Fragment } from 'react';
 
 import type { RenderNodeParams } from './type';
@@ -43,11 +43,13 @@ export const renderParentChildren = (
       return null;
     }
 
-    return (
-      <Fragment key={getChildKey(child, index)}>
-        {renderNode({ node: child, parents, patches, plugins })}
-      </Fragment>
-    );
+    const node = renderNode({ node: child, parents, patches, plugins });
+
+    if (isObject(node)) {
+      return <Fragment key={getChildKey(child, index)}>{node}</Fragment>;
+    }
+
+    return node;
   });
 
 const renderNode = ({ node, parents, patches, plugins }: RenderNodeParams): ReactNode => {
