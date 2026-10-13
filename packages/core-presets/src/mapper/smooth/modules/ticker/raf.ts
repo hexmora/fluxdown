@@ -4,11 +4,13 @@ import { BaseSmoothTicker } from './base';
 import { getNow } from './utils';
 
 export class RafSmoothTicker extends BaseSmoothTicker {
-  static readonly name = 'raf';
-
   private frame: number | null = null;
 
   private generation = 0;
+
+  static get name() {
+    return 'raf';
+  }
 
   get running() {
     return this.frame !== null;

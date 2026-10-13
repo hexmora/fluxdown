@@ -4,9 +4,11 @@ import { BaseSmoothTicker } from './base';
 import { getNow } from './utils';
 
 export class IntervalSmoothTicker extends BaseSmoothTicker {
-  static readonly name = 'interval';
-
   private timer: ReturnType<typeof setInterval> | null = null;
+
+  static get name() {
+    return 'interval';
+  }
 
   constructor(private readonly interval = 1000 / 60) {
     super();
