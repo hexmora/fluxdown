@@ -1,5 +1,11 @@
 # @fluxdown/core-presets
 
+## 0.7.2
+
+### Patch Changes
+
+- b59c0a9: Expose built-in smooth scheduler and ticker names through static getters to avoid read-only constructor name initialization errors in older V8 engines.
+
 ## 0.7.1
 
 ### Patch Changes
