@@ -5,8 +5,8 @@ import { create, has, last } from 'lodash-es';
 import { unified } from 'unified';
 
 import { HoistFootnoteRehypePlugin, RawParserRehypePlugin, SanitizerRehypePlugin } from '..';
+import { MarkdownCompiler } from '../../../../core/src/states/hast/block-compiler/exports';
 import { SyntaxFootnoteRemarkPlugin } from '../../remark';
-import { markdownToHast } from '../../remark/__tests__/utils';
 
 const FOOTNOTE_MARKDOWN = ['A statement with a note[^note].', '', '[^note]: Supporting text.'].join(
   '\n',
@@ -34,7 +34,7 @@ const parseFootnote = (hoist: boolean): Root => {
     rehypes.push(new HoistFootnoteRehypePlugin());
   }
 
-  return markdownToHast({
+  return MarkdownCompiler.build({
     text: FOOTNOTE_MARKDOWN,
     remarks: [new SyntaxFootnoteRemarkPlugin()],
     rehypes,

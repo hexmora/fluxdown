@@ -4,8 +4,8 @@ import type { Schema as SanitizationSchema } from 'hast-util-sanitize';
 import { cloneDeep } from 'lodash-es';
 
 import { RawParserRehypePlugin, SanitizerRehypePlugin, type SanitizerRehypePluginConfig } from '..';
+import { MarkdownCompiler } from '../../../../core/src/states/hast/block-compiler/exports';
 import { PatchesRemarkPlugin, SyntaxMathRemarkPlugin } from '../../remark';
-import { markdownToHast } from '../../remark/__tests__/utils';
 import { createSchema } from '../sanitizer/utils';
 
 const findElement = (root: Nodes, tagName: string): Element | undefined => {
@@ -35,7 +35,7 @@ const buildSchema = (config: SanitizerRehypePluginConfig = {}): SanitizationSche
 };
 
 const sanitizeMarkdown = (text: string, config: SanitizerRehypePluginConfig = {}) => {
-  return markdownToHast({
+  return MarkdownCompiler.build({
     text,
     rehypes: [new RawParserRehypePlugin(), new SanitizerRehypePlugin(config)],
   });
@@ -48,7 +48,7 @@ describe('SanitizerRehypePlugin', () => {
 
     allowedTags.push('blink');
 
-    const root = markdownToHast({
+    const root = MarkdownCompiler.build({
       text: '<blink>content</blink>',
       rehypes: [new RawParserRehypePlugin(), plugin],
     });
@@ -57,7 +57,7 @@ describe('SanitizerRehypePlugin', () => {
   });
 
   test('preserves inline-math metadata and text', () => {
-    const root = markdownToHast({
+    const root = MarkdownCompiler.build({
       text: '$1+1=2$',
       remarks: [new SyntaxMathRemarkPlugin()],
       rehypes: [new SanitizerRehypePlugin({ allowedTags: [] })],
@@ -74,7 +74,7 @@ describe('SanitizerRehypePlugin', () => {
   });
 
   test('preserves parser-patch metadata and replaced text', () => {
-    const root = markdownToHast({
+    const root = MarkdownCompiler.build({
       text: 'hello',
       remarks: [
         new PatchesRemarkPlugin({

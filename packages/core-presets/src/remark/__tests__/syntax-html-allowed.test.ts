@@ -1,8 +1,9 @@
 import type { Paragraph, PhrasingContent, PhrasingContentMap, Root, Text } from 'mdast';
 
 import { SyntaxHtmlAllowedRemarkPlugin } from '..';
+import { MarkdownCompiler } from '../../../../core/src/states/hast/block-compiler/exports';
 import { RawParserRehypePlugin, SanitizerRehypePlugin } from '../../rehype';
-import { findHastElement, markdownToHast, parseMarkdown, runRemarkPlugin } from './utils';
+import { findHastElement, parseMarkdown, runRemarkPlugin } from './utils';
 
 const parseWithAllowlist = (text: string, enabledTags?: string[] | boolean): Root => {
   return parseMarkdown(text, [new SyntaxHtmlAllowedRemarkPlugin({ enabledTags })]);
@@ -137,11 +138,11 @@ describe('SyntaxHtmlAllowedRemarkPlugin', () => {
 
   test('downgrades disallowed HTML before raw parsing instead of relying on sanitization', () => {
     const text = '<div>content</div>';
-    const sanitized = markdownToHast({
+    const sanitized = MarkdownCompiler.build({
       text,
       rehypes: [new RawParserRehypePlugin(), new SanitizerRehypePlugin()],
     });
-    const downgraded = markdownToHast({
+    const downgraded = MarkdownCompiler.build({
       text,
       remarks: [new SyntaxHtmlAllowedRemarkPlugin()],
       rehypes: [new RawParserRehypePlugin(), new SanitizerRehypePlugin()],

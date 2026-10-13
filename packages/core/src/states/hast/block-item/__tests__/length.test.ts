@@ -8,7 +8,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 
-import { markdownToHast } from '../../block-compiler/utils';
+import { MarkdownCompiler } from '../../block-compiler/exports';
 
 const root = (children: RootContent[]): Root => ({
   type: 'root',
@@ -68,7 +68,7 @@ describe('compiled HAST length', () => {
   });
 
   test('counts non-table separators from parsed Markdown', () => {
-    const tree = markdownToHast({
+    const tree = MarkdownCompiler.build({
       text: 'Hello **世界**\n\n👨‍👩‍👧‍👦',
     });
 

@@ -1,6 +1,6 @@
 import type { Plugin } from 'unified';
 
-import type { HastRoot } from '../../../../typings';
+import type { HastRoot } from '../../../../../../typings';
 
 /** Encode namespaces without whitespace, URI escapes, or collisions between input strings. */
 export const getFootnotePrefix = (namespace?: string): string =>

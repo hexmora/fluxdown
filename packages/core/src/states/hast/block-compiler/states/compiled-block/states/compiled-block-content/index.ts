@@ -4,13 +4,22 @@ import { once, S, useCreate, useMap } from 'stative';
 import type { CompiledBlockContentInputs } from './type';
 
 import { BlockItem } from '../../../../../block-item';
-import { markdownToHast } from '../../../../utils';
+import { MarkdownCompiler } from '../../../../exports';
 import { getRemarksConfig, isMetaEqual } from '../../utils';
 
 export * from './type';
 
 export const CompiledBlockContent = /*#__PURE__*/ once(
-  ({ item, idPrefix, count, key, config, getRemarks, getRehypes }: CompiledBlockContentInputs) => {
+  ({
+    item,
+    idPrefix,
+    count,
+    key,
+    config,
+    getRemarks,
+    getRehypes,
+    compiler,
+  }: CompiledBlockContentInputs) => {
     const meta = useMap(
       [item, count],
       ([
@@ -40,7 +49,7 @@ export const CompiledBlockContent = /*#__PURE__*/ once(
     const source = useMap(
       [section, remarks, rehypes, idPrefix],
       ([{ text }, currentRemarks, currentRehypes, currentPrefix]) =>
-        markdownToHast({
+        (compiler ?? MarkdownCompiler).build({
           text,
           remarks: currentRemarks,
           rehypes: currentRehypes,

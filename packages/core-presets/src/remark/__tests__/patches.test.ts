@@ -25,7 +25,8 @@ import {
   SyntaxMathRemarkPlugin,
   SyntaxTableRemarkPlugin,
 } from '..';
-import { markdownToHast, parseMarkdown, runRemarkPlugin, stripPositions, walkMdast } from './utils';
+import { MarkdownCompiler } from '../../../../core/src/states/hast/block-compiler/exports';
+import { parseMarkdown, runRemarkPlugin, stripPositions, walkMdast } from './utils';
 
 type MdastWalkNode = MdastRoot | RootContent;
 
@@ -42,7 +43,7 @@ const parseTableWithPatches = (text: string, patches: IRawPatchItem[]): MdastRoo
   ]);
 
 const parseHastWithPatches = (text: string, patches: IRawPatchItem[]): HastRoot =>
-  markdownToHast({
+  MarkdownCompiler.build({
     text,
     remarks: [new PatchesRemarkPlugin({ patches })],
   });

@@ -1,7 +1,7 @@
 import type { Element, Nodes } from 'hast';
 
 import { RawParserRehypePlugin } from '..';
-import { markdownToHast } from '../../remark/__tests__/utils';
+import { MarkdownCompiler } from '../../../../core/src/states/hast/block-compiler/exports';
 
 const findElement = (root: Nodes, tagName: string): Element | undefined => {
   if (root.type === 'element' && root.tagName === tagName) {
@@ -33,7 +33,7 @@ const containsRawNode = (root: Nodes | { type: 'raw' }): boolean => {
 
 describe('RawParserRehypePlugin', () => {
   test('parses embedded HTML into standard HAST before sanitization', () => {
-    const root = markdownToHast({
+    const root = MarkdownCompiler.build({
       text: 'before <mark data-token="kept">inside</mark> after',
       rehypes: [new RawParserRehypePlugin()],
     });
@@ -59,7 +59,7 @@ describe('RawParserRehypePlugin', () => {
 
     config.tagfilter = false;
 
-    const root = markdownToHast({
+    const root = MarkdownCompiler.build({
       text: '<script>alert(1)</script>',
       rehypes: [plugin],
     });

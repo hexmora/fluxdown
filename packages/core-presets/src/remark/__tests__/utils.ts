@@ -1,15 +1,12 @@
-import type { IRehypePlugin, IRemarkPlugin } from '@fluxdown/types';
-import type { Nodes as HastNode, Root as HastRoot } from 'hast';
+import type { IRemarkPlugin } from '@fluxdown/types';
+import type { Nodes as HastNode } from 'hast';
 import type { Root as MdastRoot, Root, RootContent } from 'mdast';
 
 import { isArray, toPairs } from 'lodash-es';
 import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
 import { type Processor, unified } from 'unified';
 
 type AstProcessor = Processor<MdastRoot, undefined, undefined, undefined, undefined>;
-
-type HastProcessor = Processor<MdastRoot, MdastRoot, HastRoot, undefined, undefined>;
 
 export interface GetAstProcessorByPluginsParams {
   remarks?: IRemarkPlugin[];
@@ -23,39 +20,6 @@ export const getAstProcessorByPlugins = ({ remarks = [] }: GetAstProcessorByPlug
   }
 
   return processor;
-};
-
-interface GetHastProcessorParams {
-  remarks?: IRemarkPlugin[];
-
-  rehypes?: IRehypePlugin[];
-}
-
-const getHastProcessor = ({ remarks = [], rehypes = [] }: GetHastProcessorParams) => {
-  let processor: AstProcessor | HastProcessor = getAstProcessorByPlugins({ remarks });
-
-  processor = processor.use(remarkRehype, { allowDangerousHtml: true });
-
-  for (const rehype of rehypes) {
-    processor = processor.use(rehype.plugin);
-  }
-
-  return processor;
-};
-
-export type MarkdownToHastParams = {
-  text: string;
-
-  remarks?: IRemarkPlugin[];
-
-  rehypes?: IRehypePlugin[];
-};
-
-export const markdownToHast = ({ text, remarks, rehypes }: MarkdownToHastParams): HastRoot => {
-  const processor = getHastProcessor({ remarks, rehypes });
-  const mdast = processor.parse(text);
-
-  return processor.runSync(mdast, text);
 };
 
 export type MdastNode = Root | RootContent;

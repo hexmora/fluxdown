@@ -2,12 +2,15 @@ import type { IBlockRawMeta } from '@fluxdown/types';
 import type { IReadableClosure } from 'stative';
 
 import type { IBlockSection } from '../../../../base';
+import type { MarkdownCompiler } from '../../exports';
 import type { BlockCompilerInputs } from '../../type';
 
 export type CompiledBlockInputs = Pick<
   BlockCompilerInputs,
   'config' | 'getRemarks' | 'getRehypes'
 > & {
+  compiler?: MarkdownCompiler;
+
   section: IReadableClosure<IBlockSection>;
 
   meta: IReadableClosure<IBlockRawMeta>;
