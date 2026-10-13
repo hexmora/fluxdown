@@ -3,8 +3,6 @@ import { clamp, isUndefined } from 'lodash-es';
 import { BaseSmoothScheduler } from './base';
 
 export class SpringSmoothScheduler extends BaseSmoothScheduler {
-  static readonly name = 'spring';
-
   /**
    * Initial speed, buffer size, elasticity, resume speed, and maximum speed.
    * @default [20, 15, 1 / 700 / 1000, 2, 100_001]
@@ -18,6 +16,10 @@ export class SpringSmoothScheduler extends BaseSmoothScheduler {
   private speed = 0;
 
   private remainder = 0;
+
+  static get name() {
+    return 'spring';
+  }
 
   override reset(index = 0) {
     super.reset(index);
