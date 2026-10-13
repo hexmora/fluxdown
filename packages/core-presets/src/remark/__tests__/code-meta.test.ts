@@ -1,12 +1,13 @@
 import type { Code, Root } from 'mdast';
 
 import { CodeMetaRemarkPlugin } from '..';
+import { MarkdownCompiler } from '../../../../core/src/states/hast/block-compiler/exports';
 import { RawParserRehypePlugin, SanitizerRehypePlugin } from '../../rehype';
-import { findHastElement, markdownToHast, runRemarkPlugin } from './utils';
+import { findHastElement, runRemarkPlugin } from './utils';
 
 describe('CodeMetaRemarkPlugin', () => {
   test('preserves fenced-code metadata through raw parsing and sanitization', () => {
-    const tree = markdownToHast({
+    const tree = MarkdownCompiler.build({
       text: ['```html type="renderer"', '<div></div>', '```'].join('\n'),
       remarks: [new CodeMetaRemarkPlugin()],
       rehypes: [new RawParserRehypePlugin(), new SanitizerRehypePlugin({ allowedTags: [] })],

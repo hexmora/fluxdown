@@ -2,13 +2,8 @@ import type { Element } from 'hast';
 import type { Root, Table } from 'mdast';
 
 import { SyntaxTableRemarkPlugin, TableNoralizerRemarkPlugin } from '..';
-import {
-  findHastElement,
-  markdownToHast,
-  parseMarkdown,
-  runRemarkPlugin,
-  stripPositions,
-} from './utils';
+import { MarkdownCompiler } from '../../../../core/src/states/hast/block-compiler/exports';
+import { findHastElement, parseMarkdown, runRemarkPlugin, stripPositions } from './utils';
 
 const SOURCE_WITH_WIDER_BODY = ['| Header |', '| :---: |', '| first | second |'].join('\n');
 
@@ -33,7 +28,7 @@ describe('TableNoralizerRemarkPlugin', () => {
   });
 
   test('preserves the extra body cell and creates an empty header cell in HAST', () => {
-    const tree = markdownToHast({
+    const tree = MarkdownCompiler.build({
       text: SOURCE_WITH_WIDER_BODY,
       remarks: [new SyntaxTableRemarkPlugin(), new TableNoralizerRemarkPlugin()],
     });

@@ -1,7 +1,8 @@
-import { once, S, useMap, useMapEach, useSelect } from 'stative';
+import { D, once, S, useMap, useMapEach, useSelect } from 'stative';
 
 import type { BlockCompilerInputs, IBlockCompiler } from './type';
 
+import { MarkdownCompiler } from './exports';
 import { CompiledBlockContent } from './states';
 import { getItems } from './utils';
 
@@ -10,6 +11,8 @@ export * from './type';
 
 export const BlockCompiler = /*#__PURE__*/ once(
   ({ sections, config, getRemarks, getRehypes }: BlockCompilerInputs): IBlockCompiler => {
+    const compiler = new MarkdownCompiler();
+
     let nextKey = 0;
 
     const count = useSelect(sections, (current) => current.length);
@@ -23,6 +26,7 @@ export const BlockCompiler = /*#__PURE__*/ once(
         CompiledBlockContent,
         {
           item,
+          compiler: D(compiler),
           idPrefix,
           count,
           key: String(++nextKey),

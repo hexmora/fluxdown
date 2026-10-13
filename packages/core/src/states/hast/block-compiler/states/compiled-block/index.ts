@@ -1,4 +1,4 @@
-import { once, S, useMap } from 'stative';
+import { D, once, S, useMap } from 'stative';
 
 import type { CompiledBlockInputs } from './type';
 
@@ -7,7 +7,7 @@ import { CompiledBlockContent } from './states';
 export * from './type';
 
 export const CompiledBlock = /*#__PURE__*/ once(
-  ({ section, meta, isLast, ...inputs }: CompiledBlockInputs) => {
+  ({ section, meta, isLast, compiler, ...inputs }: CompiledBlockInputs) => {
     const item = useMap(
       [section, meta, isLast],
       ([currentSection, currentMeta, currentIsLast]) => ({
@@ -19,6 +19,6 @@ export const CompiledBlock = /*#__PURE__*/ once(
 
     const idPrefix = useMap(inputs.config, (current) => current.idPrefix);
 
-    return S([CompiledBlockContent, { ...inputs, item, idPrefix }]);
+    return S([CompiledBlockContent, { ...inputs, item, idPrefix, compiler: D(compiler) }]);
   },
 );

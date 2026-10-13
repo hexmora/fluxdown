@@ -12,10 +12,10 @@ import {
   type SyntaxMathRemarkPluginConfig,
   SyntaxTableRemarkPlugin,
 } from '..';
+import { MarkdownCompiler } from '../../../../core/src/states/hast/block-compiler/exports';
 import {
   collectTextValues,
   getAstProcessorByPlugins,
-  markdownToHast,
   parseMarkdown,
   runRemarkPlugin,
   walkMdast,
@@ -112,7 +112,7 @@ const parseMathPlaceholders = (
   config?: SyntaxMathRemarkPluginConfig,
 ): MathPlaceholder[] => {
   return collectMathPlaceholders(
-    markdownToHast({
+    MarkdownCompiler.build({
       text,
       remarks: [createPlugin(config)],
     }),
@@ -805,7 +805,7 @@ f'(x) &= 2x
     });
 
     test('uses only the camelCase dataType property and a raw text child', () => {
-      const tree = markdownToHast({
+      const tree = MarkdownCompiler.build({
         text: 'prefix $1+1=2$ suffix',
         remarks: [new SyntaxMathRemarkPlugin()],
       });
