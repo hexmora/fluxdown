@@ -99,7 +99,7 @@ describe('comparison utilities', () => {
       style: { color: 'red' },
       text: 'content',
     };
-    const equivalent: FluxdownProps = {
+    const equivalent = {
       className: 'markdown',
       build: {},
       patches: [{ key: 'inline', range: [0, 2], render: renderPatch }],
@@ -116,7 +116,7 @@ describe('comparison utilities', () => {
       ],
       style: { color: 'red' },
       text: 'content',
-    };
+    } satisfies FluxdownProps;
 
     expect(isPropsEqual(base, equivalent)).toBe(true);
     expect(isPropsEqual({ ...base, plugins: Array<IPluginItem>(1) }, equivalent)).toBe(false);
@@ -142,6 +142,30 @@ describe('comparison utilities', () => {
         ],
       }),
     ).toBe(false);
+  });
+
+  test('compares single plugin packs with equivalent arrays and detects configuration changes', () => {
+    const pack: IPluginItem = {
+      config: { [TestPlugin.key]: { nested: { enabled: true } } },
+      remarks: [TestPlugin as unknown as IPluggable<IRemarkPlugin, unknown>],
+    };
+    const base: FluxdownProps = { text: 'content', plugins: pack };
+    const equivalent: IPluginItem = {
+      ...pack,
+      config: { [TestPlugin.key]: { nested: { enabled: true } } },
+    };
+    const changed: IPluginItem = {
+      ...pack,
+      config: { [TestPlugin.key]: { nested: { enabled: false } } },
+    };
+
+    expect(isPropsEqual(base, { ...base, plugins: equivalent })).toBe(true);
+    expect(isPropsEqual(base, { ...base, plugins: [equivalent] })).toBe(true);
+    expect(isPropsEqual({ ...base, plugins: [equivalent] }, base)).toBe(true);
+    expect(isPropsEqual(base, { ...base, plugins: changed })).toBe(false);
+    expect(isPropsEqual(base, { ...base, plugins: [changed] })).toBe(false);
+    expect(isPropsEqual(base, { ...base, plugins: [] })).toBe(false);
+    expect(isPropsEqual(base, { ...base, plugins: [pack, pack] })).toBe(false);
   });
 
   test('compares smoothing enablement and ticker choices', () => {

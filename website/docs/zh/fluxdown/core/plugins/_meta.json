@@ -1,0 +1,22 @@
+[
+  {
+    "type": "file",
+    "name": "remark",
+    "label": "Remark 插件"
+  },
+  {
+    "type": "file",
+    "name": "repair",
+    "label": "Repair 插件"
+  },
+  {
+    "type": "file",
+    "name": "rehype",
+    "label": "Rehype 插件"
+  },
+  {
+    "type": "file",
+    "name": "mapper",
+    "label": "Mapper 插件"
+  }
+]

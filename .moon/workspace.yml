@@ -3,6 +3,7 @@ projects:
     workspace: .
   globs:
     - packages/*/moon.yml
+    - website/moon.yml
 
 vcs:
   defaultBranch: main

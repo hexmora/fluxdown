@@ -1,0 +1,47 @@
+language: typescript
+layer: application
+
+dependsOn:
+  - core
+  - core-presets
+  - react
+  - react-presets
+  - stative
+
+fileGroups:
+  sources:
+    - docs/**/*
+    - components/**/*
+    - theme/**/*
+    - rspress.config.ts
+    - env.d.ts
+    - tsconfig.json
+    - package.json
+    - /package.json
+    - /.node-version
+    - /pnpm-lock.yaml
+    - /pnpm-workspace.yaml
+    - /tsconfig.base.json
+    - /packages/*/package.json
+    - /packages/*/tsconfig*.json
+    - /packages/*/src/**/*
+
+tasks:
+  dev:
+    command: pnpm run dev
+    preset: server
+  build:
+    command: pnpm run build
+    inputs: ["@group(sources)"]
+    outputs: [doc_build]
+  preview:
+    command: pnpm run preview
+    preset: server
+  typecheck:
+    command: pnpm run typecheck
+    inputs: ["@group(sources)"]
+  lint:
+    command: pnpm run lint
+    inputs: ["@group(sources)", .oxlintrc.json, /.oxlintrc.json, /packages/react/.oxlintrc.json]
+  check:
+    deps: [typecheck, lint, build]

@@ -1,0 +1,17 @@
+[
+  {
+    "type": "file",
+    "name": "index",
+    "label": "认识 Fluxdown"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "react",
+    "label": "React"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "core",
+    "label": "Core"
+  }
+]

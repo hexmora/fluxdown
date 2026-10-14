@@ -1,0 +1,9 @@
+[
+  { "type": "file", "name": "index", "label": "认识 Stative" },
+  { "type": "file", "name": "getting-started", "label": "快速上手" },
+  { "type": "file", "name": "state-and-derived", "label": "状态与派生" },
+  { "type": "file", "name": "composition", "label": "组合计算" },
+  { "type": "file", "name": "collections", "label": "切换与列表" },
+  { "type": "file", "name": "lifecycle", "label": "生命周期" },
+  { "type": "file", "name": "jsx", "label": "使用 JSX" }
+]

@@ -1,0 +1,9 @@
+[
+  { "type": "file", "name": "index", "label": "Introduction" },
+  { "type": "file", "name": "getting-started", "label": "Getting started" },
+  { "type": "file", "name": "state-and-derived", "label": "State and derived values" },
+  { "type": "file", "name": "composition", "label": "Composing computations" },
+  { "type": "file", "name": "collections", "label": "Switching and lists" },
+  { "type": "file", "name": "lifecycle", "label": "Lifecycle" },
+  { "type": "file", "name": "jsx", "label": "Using JSX" }
+]

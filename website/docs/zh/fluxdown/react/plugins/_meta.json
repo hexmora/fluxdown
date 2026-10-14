@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "slot",
+    "label": "Slot 插件"
+  },
+  {
+    "type": "file",
+    "name": "render",
+    "label": "Render 插件"
+  }
+]

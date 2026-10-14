@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - website
 
 catalogMode: strict
 
@@ -7,6 +8,7 @@ catalogMode: strict
 verifyDepsBeforeRun: error
 
 catalog:
+  "@rspress/core": ^2.0.23
   ahooks: ^3.9.7
   classnames: ^2.5.1
   inversify: ^8.1.1
@@ -33,6 +35,8 @@ catalog:
   micromark-util-character: ^2.1.1
   micromark-util-types: ^2.0.3
   react-error-boundary: ^6.1.2
+  react: ^19.3.0
+  react-dom: ^19.3.0
   react-use: ^17.6.1
   rehype-raw: ^7.0.0
   rehype-sanitize: ^6.0.0

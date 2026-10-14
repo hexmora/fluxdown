@@ -92,9 +92,9 @@ export interface FluxdownProps {
   patches?: IPatchItem<ReactNode>[];
 
   /**
-   * Plugin packs extending the compiler and React renderer.
+   * One plugin pack or an ordered list extending the compiler and React renderer.
    */
-  plugins?: IPluginItem[];
+  plugins?: IPluginItem | IPluginItem[];
 }
 
 export type FluxdownRef = IReadableClosure<ReactNode[]>;

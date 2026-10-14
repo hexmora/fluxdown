@@ -13,7 +13,8 @@ import {
 import { PRESET_RENDER_PLUGINS } from '@fluxdown/react-presets/render';
 import { PRESET_SLOT_PLUGINS } from '@fluxdown/react-presets/slot';
 import cn from 'classnames';
-import { forwardRef, memo, useId, useImperativeHandle } from 'react';
+import { castArray } from 'lodash-es';
+import { forwardRef, memo, useId, useImperativeHandle, useMemo } from 'react';
 import { shallowEqual } from 'shallow-equal';
 import { D, render, S } from 'stative';
 
@@ -68,17 +69,19 @@ export const Fluxdown = /*#__PURE__*/ memo(
 
     const text = useStateOf(_text);
 
-    const _remarks = usePlugins(_plugins, 'remarks');
+    const plugins = useMemo(() => castArray(_plugins), [_plugins]);
 
-    const _rehypes = usePlugins(_plugins, 'rehypes');
+    const _remarks = usePlugins(plugins, 'remarks');
 
-    const _repairs = usePlugins(_plugins, 'repairs');
+    const _rehypes = usePlugins(plugins, 'rehypes');
 
-    const _mappers = usePlugins(_plugins, 'mappers');
+    const _repairs = usePlugins(plugins, 'repairs');
 
-    const _renders = usePlugins(_plugins, 'renders', PRESET_RENDER_PLUGINS);
+    const _mappers = usePlugins(plugins, 'mappers');
 
-    const slots = usePlugins(_plugins, 'slots', PRESET_SLOT_PLUGINS);
+    const _renders = usePlugins(plugins, 'renders', PRESET_RENDER_PLUGINS);
+
+    const slots = usePlugins(plugins, 'slots', PRESET_SLOT_PLUGINS);
 
     const remarks = useStateOf(_remarks, isPluggablesEqual);
 

@@ -1,5 +1,5 @@
 import { isPluggablesEqual, isPluginConfigEqual } from '@fluxdown/core';
-import { every, isEqual } from 'lodash-es';
+import { castArray, every, isEqual } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
 
 import type { FluxdownProps, IPluginItem } from '../types';
@@ -22,17 +22,23 @@ const isPluginItemEqual = (left: IPluginItem, right: IPluginItem): boolean => {
 };
 
 const isPluginItemsEqual = (
-  left: readonly IPluginItem[] = EL,
-  right: readonly IPluginItem[] = EL,
+  left: IPluginItem | IPluginItem[] = EL,
+  right: IPluginItem | IPluginItem[] = EL,
 ): boolean => {
-  return (
-    left === right ||
-    (left.length === right.length &&
-      every(left, (item, index) => {
-        const other = right[index];
+  if (left === right) {
+    return true;
+  }
 
-        return item !== undefined && other !== undefined && isPluginItemEqual(item, other);
-      }))
+  const leftItems = castArray(left);
+  const rightItems = castArray(right);
+
+  return (
+    leftItems.length === rightItems.length &&
+    every(leftItems, (item, index) => {
+      const other = rightItems[index];
+
+      return item !== undefined && other !== undefined && isPluginItemEqual(item, other);
+    })
   );
 };
 
