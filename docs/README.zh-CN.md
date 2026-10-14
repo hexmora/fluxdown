@@ -8,7 +8,7 @@
 
 从 AI 对话到实时预览，Fluxdown 随内容到达持续渲染 Markdown，让不断增长的内容保持流畅，并让你自由控制渲染结果的外观与行为。
 
-可以直接使用现有的 React 组件，也可以基于框架无关的核心构建自己的渲染器。
+可以直接使用现有的 React 或 React Native 组件，也可以基于框架无关的核心构建自己的渲染器。
 
 ## 特点
 
@@ -62,6 +62,20 @@ export function StreamingMessage({ text }) {
   theme={["dark", { tokens: { heading: { h1: { fontSize: "2.25rem" } } } }]}
 />
 ```
+
+## React Native
+
+[`@fluxdown/react-native`](../packages/react-native/README.md) 使用原生 `View`/`Text` 渲染，沿用 core、流式参数和插件架构。原生渲染与插槽预设位于 [`@fluxdown/react-native-presets`](../packages/react-native-presets/README.md)。
+
+```tsx
+import { Fluxdown } from "@fluxdown/react-native";
+
+<Fluxdown text={text} streaming selectable />;
+```
+
+运行 `pnpm --filter @fluxdown/react-native storybook` 启动设备端 Storybook。
+
+两个组件都封装了 [`BaseFluxdown`](../packages/react-base/README.md)，共享 React 渲染生命周期和 render 插件，不依赖 DOM 或原生元素。Web 和 Native 预设分别提供平台插槽组件。
 
 ## 参与贡献
 

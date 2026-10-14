@@ -13,7 +13,7 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm build
-pnpm build:storybook
+pnpm --filter fluxdown build:storybook
 ```
 
 For a single project, use its directory name as the moon project ID:

@@ -8,7 +8,7 @@
 
 Render Markdown as it arrives, from AI chat responses to live previews. Fluxdown keeps growing content responsive and gives you control over how it looks and behaves.
 
-Start with the React component, or use the framework-independent core to build your own renderer.
+Start with the React or React Native component, or use the framework-independent core to build your own renderer.
 
 ## Features
 
@@ -62,6 +62,20 @@ Use `"light"` (default), `"dark"`, or `[preset, overrides]`. Partial token confi
   theme={["dark", { tokens: { heading: { h1: { fontSize: "2.25rem" } } } }]}
 />
 ```
+
+## React Native
+
+Use [`@fluxdown/react-native`](./packages/react-native/README.md) for native `View`/`Text` rendering with the same core, streaming props, and plugin architecture. Native presets live in [`@fluxdown/react-native-presets`](./packages/react-native-presets/README.md).
+
+```tsx
+import { Fluxdown } from "@fluxdown/react-native";
+
+<Fluxdown text={text} streaming selectable />;
+```
+
+Run `pnpm --filter @fluxdown/react-native storybook` for the on-device Storybook.
+
+Both components wrap [`BaseFluxdown`](./packages/react-base/README.md), which shares the React rendering lifecycle and render plugins without depending on DOM or native elements. Web and native presets provide their respective slot components.
 
 ## Contributing
 
