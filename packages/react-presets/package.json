@@ -1,7 +1,7 @@
 {
   "name": "@fluxdown/react-presets",
   "version": "0.6.8",
-  "description": "Preset render and slot plugins with shared React rendering infrastructure for Fluxdown.",
+  "description": "Platform slot plugins for Fluxdown React DOM.",
   "keywords": [
     "hast",
     "markdown",
@@ -34,7 +34,6 @@
   ],
   "exports": {
     "./base": "./src/base/index.ts",
-    "./render": "./src/render/index.ts",
     "./slot": "./src/slot/index.ts",
     "./styles.css": "./dist/esm/styles.css"
   },
@@ -52,20 +51,6 @@
           "browser": "./dist/cjs/base.browser.cjs",
           "node": "./dist/cjs/base.cjs",
           "default": "./dist/cjs/base.browser.cjs"
-        }
-      },
-      "./render": {
-        "import": {
-          "types": "./dist/esm/render/index.d.ts",
-          "browser": "./dist/esm/render.browser.js",
-          "node": "./dist/esm/render.js",
-          "default": "./dist/esm/render.browser.js"
-        },
-        "require": {
-          "types": "./dist/cjs/render/index.d.cts",
-          "browser": "./dist/cjs/render.browser.cjs",
-          "node": "./dist/cjs/render.cjs",
-          "default": "./dist/cjs/render.browser.cjs"
         }
       },
       "./slot": {
@@ -94,20 +79,14 @@
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },
   "dependencies": {
-    "@fluxdown/core": "workspace:^",
-    "@fluxdown/core-presets": "workspace:^",
+    "@fluxdown/react-base-presets": "workspace:^",
     "@fluxdown/types": "workspace:^",
     "@fluxdown/utils": "workspace:^",
-    "@mathjax/mathjax-tex-font": "catalog:",
-    "@mathjax/src": "catalog:",
     "@types/hast": "catalog:",
     "classnames": "catalog:",
     "katex": "catalog:",
     "lodash-es": "catalog:",
-    "react-error-boundary": "catalog:",
-    "shallow-equal": "catalog:",
-    "shiki": "catalog:",
-    "stative": "workspace:^"
+    "shiki": "catalog:"
   },
   "devDependencies": {
     "@rslib/core": "catalog:",

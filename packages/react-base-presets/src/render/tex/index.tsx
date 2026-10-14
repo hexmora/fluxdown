@@ -1,0 +1,34 @@
+import type { IPluggableConfig } from '@fluxdown/types';
+
+import { assert } from '@fluxdown/utils';
+
+import type { ReactRenderMatchParams, ReactRenderParams } from '../../base';
+
+import { BaseReactRenderPlugin, createTypeOfSlot, isElementWithTag } from '../../base';
+import { getTex, getTexMode } from './utils';
+
+const Tex = /*#__PURE__*/ createTypeOfSlot('Tex');
+
+declare global {
+  interface RenderConfigs {
+    'render-tex'?: IPluggableConfig<void>;
+  }
+}
+
+export class TexRenderPlugin extends BaseReactRenderPlugin {
+  static readonly key = 'render-tex';
+
+  match(params: ReactRenderMatchParams) {
+    return getTexMode(params) !== null && getTex(params) !== null;
+  }
+
+  render({ node, parents, render }: ReactRenderParams) {
+    const mode = getTexMode({ node, parents });
+
+    const tex = getTex({ node, parents });
+
+    assert(isElementWithTag(node, 'span') && mode !== null && tex !== null);
+
+    return <Tex current={node} mode={mode} parents={parents} render={render} tex={tex} />;
+  }
+}

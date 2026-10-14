@@ -2,6 +2,7 @@ import cn from 'classnames';
 
 import type { EmphasisProps } from '../../../base';
 
+import { getReactProps } from '../../../base';
 import styles from './index.module.scss';
 
 export const EmphasisRenderer = ({ Raw: _Raw, ...props }: EmphasisProps) => {
@@ -12,7 +13,7 @@ export const EmphasisRenderer = ({ Raw: _Raw, ...props }: EmphasisProps) => {
     parents: _parents,
     render: _render,
     ...elementProps
-  } = props;
+  } = { ...getReactProps(props.current), ...props };
 
   return (
     <em {...elementProps} className={cn(styles.root, className)}>

@@ -1,15 +1,14 @@
 import type {
   AnySlotPluggable,
-  HeadingProps,
-  ParagraphProps,
   RuntimeSlotProps,
   SlotInputProps,
   SlotPositionType,
-} from '@fluxdown/react-presets/base';
+} from '@fluxdown/react-base-presets/base';
+import type { HeadingProps, ParagraphProps } from '@fluxdown/react-presets/base';
 import type { Element } from 'hast';
 import type { ComponentType } from 'react';
 
-import { createTypeOfSlot, SlotProvider } from '@fluxdown/react-presets/base';
+import { createTypeOfSlot, SlotProvider } from '@fluxdown/react-base-presets/base';
 import { PRESET_SLOT_PLUGINS } from '@fluxdown/react-presets/slot';
 import { render, screen } from '@testing-library/react';
 import { expectTypeOf } from 'expect-type';
@@ -82,11 +81,11 @@ describe('Raw slots', () => {
   test('retains each slot prop contract while excluding recursive Raw props', () => {
     expectTypeOf<ParagraphProps>()
       .toHaveProperty('Raw')
-      .branded.toEqualTypeOf<SlotPositionType<SlotInputProps<'Paragraph'>>>();
+      .branded.toEqualTypeOf<SlotPositionType<Omit<ParagraphProps, 'Raw'>>>();
 
     expectTypeOf<HeadingProps>()
       .toHaveProperty('Raw')
-      .branded.toEqualTypeOf<SlotPositionType<SlotInputProps<'Heading'>>>();
+      .branded.toEqualTypeOf<SlotPositionType<Omit<HeadingProps, 'Raw'>>>();
 
     expectTypeOf<SlotInputProps<'Heading'>>().toHaveProperty('level').toEqualTypeOf<number>();
 

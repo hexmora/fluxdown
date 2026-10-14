@@ -33,16 +33,19 @@ tasks:
       # Workspace exports resolve to source, so these checks read other packages.
       - /packages/*/src/**/*
       - /jest.config.*
+      - /jest.native.config.*
       - /scripts/testing/**/*
 
   test:
     command: pnpm run test
     inputs:
       - src/**/*
+      - stories/**/*
       - jest.setup.*
       - tsconfig*.json
       - /packages/*/src/**/*
       - /jest.config.*
+      - /jest.native.config.*
       - /scripts/testing/**/*
     options:
       cache: false

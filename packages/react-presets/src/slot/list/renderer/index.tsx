@@ -3,6 +3,7 @@ import { createElement } from 'react';
 
 import type { ListProps } from '../../../base';
 
+import { getReactProps } from '../../../base';
 import styles from './index.module.scss';
 
 export const ListRenderer = ({ Raw: _Raw, ...props }: ListProps) => {
@@ -14,7 +15,7 @@ export const ListRenderer = ({ Raw: _Raw, ...props }: ListProps) => {
     render: _render,
     type,
     ...elementProps
-  } = props;
+  } = { ...getReactProps(props.current), ...props };
 
   return createElement(
     type === 'ordered' ? 'ol' : 'ul',

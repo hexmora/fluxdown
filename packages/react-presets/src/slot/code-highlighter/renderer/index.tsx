@@ -1,13 +1,15 @@
+import { useHighlighted } from '@fluxdown/react-base-presets/base';
 import cn from 'classnames';
 
 import type { CodeHighlighterProps } from '../../../base';
 
-import { useHighlighted } from './hooks';
+import { HIGHLIGHT_THEME } from './consts';
 import styles from './index.module.scss';
 
 export const CodeHighlighterRenderer = ({ Raw: _Raw, ...props }: CodeHighlighterProps) => {
   const { className, code, language = 'plaintext', meta: _meta, ...elementProps } = props;
-  const tokens = useHighlighted(code, language);
+
+  const tokens = useHighlighted(code, language, HIGHLIGHT_THEME);
 
   return (
     // Keyboard users need to focus the overflow container to scroll long lines.

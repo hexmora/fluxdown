@@ -1,0 +1,33 @@
+import type { IPluggableConfig } from '@fluxdown/types';
+
+import { assert } from '@fluxdown/utils';
+
+import type { ReactRenderMatchParams, ReactRenderParams } from '../../base';
+
+import { BaseReactRenderPlugin, createTypeOfSlot, isElementWithTag } from '../../base';
+
+const Blockquote = /*#__PURE__*/ createTypeOfSlot('Blockquote');
+
+declare global {
+  interface RenderConfigs {
+    'render-blockquote'?: IPluggableConfig<void>;
+  }
+}
+
+export class BlockquoteRenderPlugin extends BaseReactRenderPlugin {
+  static readonly key = 'render-blockquote';
+
+  match({ node }: ReactRenderMatchParams) {
+    return isElementWithTag(node, 'blockquote');
+  }
+
+  render({ node, parents, render, renderChildren }: ReactRenderParams) {
+    assert(isElementWithTag(node, 'blockquote'));
+
+    return (
+      <Blockquote current={node} parents={parents} render={render}>
+        {renderChildren(node)}
+      </Blockquote>
+    );
+  }
+}

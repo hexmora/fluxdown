@@ -1,8 +1,9 @@
+import { createTypeOfSlot } from '@fluxdown/react-base-presets/base';
 import cn from 'classnames';
 
 import type { CodeBlockProps } from '../../../base';
 
-import { createTypeOfSlot } from '../../../base';
+import { getReactProps } from '../../../base';
 import styles from './index.module.scss';
 
 const CodeHeader = /*#__PURE__*/ createTypeOfSlot('CodeHeader');
@@ -11,6 +12,13 @@ const CodeHighlighter = /*#__PURE__*/ createTypeOfSlot('CodeHighlighter');
 
 export const CodeBlockRenderer = ({ Raw: _Raw, ...props }: CodeBlockProps) => {
   const {
+    'data-meta': _dataMeta,
+    dataMeta: _camelDataMeta,
+    ...nodeProps
+  } = getReactProps(props.current);
+
+  const {
+    current: _current,
     className,
     code,
     language,
@@ -19,7 +27,7 @@ export const CodeBlockRenderer = ({ Raw: _Raw, ...props }: CodeBlockProps) => {
     onCopy,
     showHeader = true,
     ...elementProps
-  } = props;
+  } = { ...nodeProps, ...props };
 
   return (
     <div {...elementProps} className={cn(styles.root, className)} aria-busy={loading || undefined}>

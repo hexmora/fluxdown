@@ -11,7 +11,11 @@ const node: Element = {
   children: [],
 };
 
-const nodeProps = { current: node, parents: [], render: () => null };
+const nodeProps = {
+  current: node,
+  parents: [],
+  render: () => null,
+};
 
 describe('lazy math rendering', () => {
   test('keeps a lightweight source fallback until KaTeX loads', async () => {
@@ -20,12 +24,15 @@ describe('lazy math rendering', () => {
     );
 
     expect(container.textContent).toBe('x^2');
+
     expect(container.firstElementChild).toHaveClass('custom-tex');
 
     await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull());
 
     expect(container.firstElementChild).toHaveAttribute('data-mode', 'inline');
+
     expect(container.firstElementChild).toHaveClass('custom-tex');
+
     expect(container.querySelector('math')).not.toBeNull();
   });
 
@@ -44,7 +51,9 @@ describe('lazy math rendering', () => {
     await waitFor(() => expect(container.querySelector('.katex-display')).not.toBeNull());
 
     expect(container.firstElementChild?.tagName).toBe('DIV');
+
     expect(container.firstElementChild).toHaveClass('display-tex');
+
     expect(container.firstElementChild).toHaveStyle({ marginTop: '12px' });
   });
 
@@ -57,11 +66,13 @@ describe('lazy math rendering', () => {
     });
 
     expect(container.firstElementChild).toHaveAttribute('role', 'math');
+
     expect(container.firstElementChild).toHaveAttribute('aria-label', '\\bbox[5px]{x}');
   }, 15_000);
 
   test('keeps invalid expressions readable and escapes the source', async () => {
     const tex = '\\notARealCommand{<script>alert(1)</script>}';
+
     const { container } = render(<TexRenderer Raw={null} {...nodeProps} tex={tex} />);
 
     await waitFor(() =>
@@ -69,6 +80,7 @@ describe('lazy math rendering', () => {
     );
 
     expect(container.textContent).toBe(tex);
+
     expect(container.querySelector('script')).toBeNull();
   });
 

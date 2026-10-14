@@ -1,6 +1,7 @@
 import type { IPluggableConfig } from '@fluxdown/types';
 
-import { BaseSlotPlugin } from '../../base';
+import { BaseSlotPlugin } from '@fluxdown/react-base-presets/base';
+
 import { HeadingRenderer } from './renderer';
 
 declare global {

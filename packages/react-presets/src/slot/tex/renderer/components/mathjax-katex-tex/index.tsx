@@ -12,7 +12,18 @@ const LazyMathjaxTexRenderer = /*#__PURE__*/ lazy(() =>
 );
 
 export const MathjaxKatexTexRenderer = (props: TexProps) => {
-  const { className, mode = 'inline', style, tex } = props;
+  const {
+    Raw: _Raw,
+    current: _current,
+    parents: _parents,
+    render: _render,
+    className,
+    mode = 'inline',
+    style,
+    tex,
+    ...elementProps
+  } = props;
+
   const html = useMemo(() => katexTexToHtml(tex, mode), [mode, tex]);
 
   useEffect(() => {
@@ -33,6 +44,7 @@ export const MathjaxKatexTexRenderer = (props: TexProps) => {
 
   return (
     <Root
+      {...elementProps}
       className={cn(styles.root, className)}
       dangerouslySetInnerHTML={{ __html: html }}
       data-mode={mode}

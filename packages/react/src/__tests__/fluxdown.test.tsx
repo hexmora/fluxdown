@@ -1,8 +1,8 @@
-import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-presets/base';
+import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-base-presets/base';
 import type { IPluggable, IPluggableConfig, IRemarkPlugin } from '@fluxdown/types';
 
 import { SyntaxSoftEndlineRemarkPlugin } from '@fluxdown/core-presets/remark';
-import { ParagraphRenderPlugin } from '@fluxdown/react-presets/render';
+import { ParagraphRenderPlugin } from '@fluxdown/react-base-presets/render';
 import { ParagraphSlotPlugin } from '@fluxdown/react-presets/slot';
 import { PluginPriority } from '@fluxdown/types';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -23,6 +23,7 @@ declare global {
 
 interface ParagraphSlotProps {
   Raw: ComponentType<Omit<ParagraphSlotProps, 'Raw'>> | null;
+
   children?: ReactNode;
 }
 
@@ -76,17 +77,21 @@ describe('Fluxdown', () => {
     );
 
     expect(container.querySelector('br')).toBeNull();
+
     expect(container.querySelector('p')?.textContent).toBe('first\nsecond');
+
     expect(container.querySelector('p')?.className).toBe('');
 
     rerender(<Fluxdown text={'first\nsecond'} />);
 
     expect(container.querySelector('br')).toBeInTheDocument();
+
     expect(container.querySelector('p')?.className).not.toBe('');
   });
 
   test('omits disabled slots from the Raw composition chain', () => {
     const capture = jest.fn();
+
     const CustomParagraph = createParagraphSlotPlugin('custom-paragraph', ({ Raw, children }) => {
       capture(Raw);
 
@@ -101,6 +106,7 @@ describe('Fluxdown', () => {
     );
 
     expect(screen.getByText('custom paragraph')).toBeInTheDocument();
+
     expect(capture).toHaveBeenCalledWith(null);
   });
 
@@ -135,21 +141,32 @@ describe('Fluxdown', () => {
     const { container } = render(<Fluxdown text={text} />);
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Heading');
+
     expect(container.querySelector('p')).toHaveTextContent(
       'A strong and emphasized link with code.',
     );
+
     expect(container.querySelector('strong')).toHaveTextContent('strong');
+
     expect(container.querySelector('em')).toHaveTextContent('emphasized');
+
     expect(screen.getByRole('link', { name: 'link' })).toHaveAttribute(
       'href',
       'https://example.com',
     );
+
     expect(container.querySelector('blockquote')).toHaveTextContent('quote');
+
     expect(container.querySelector('ol')).toHaveTextContent('first second');
+
     expect(container.querySelector('hr')).toBeInTheDocument();
+
     expect(container.querySelector('pre code')).toHaveTextContent('const answer = 42;');
+
     expect(container.querySelector('table')).toHaveTextContent('AB12');
+
     expect(container.querySelectorAll('th')).toHaveLength(2);
+
     expect(container.querySelectorAll('td')).toHaveLength(2);
   });
 
@@ -157,18 +174,25 @@ describe('Fluxdown', () => {
     const { container, rerender } = render(
       <Fluxdown className="consumer-root" style={{ color: 'red' }} text="hello" />,
     );
+
     const root = container.firstElementChild;
 
     expect(root?.tagName).toBe('DIV');
+
     expect(root).toHaveClass('fluxdown-root');
+
     expect(root).toHaveClass('consumer-root');
+
     expect(root).toHaveStyle({ color: 'rgb(255, 0, 0)' });
 
     rerender(<Fluxdown className="updated-root" style={{ color: 'blue' }} text="hello" />);
 
     expect(container.firstElementChild).toBe(root);
+
     expect(root).toHaveClass('updated-root');
+
     expect(root).not.toHaveClass('consumer-root');
+
     expect(root).toHaveStyle({ color: 'rgb(0, 0, 255)' });
   });
 
@@ -183,11 +207,15 @@ describe('Fluxdown', () => {
     ].join('\n');
 
     const { container } = render(<Fluxdown build={{ tex: true }} text={text} />);
+
     const image = screen.getByRole('img', { name: 'diagram' });
 
     expect(image).toHaveAttribute('src', 'http://example.com/diagram.png');
+
     expect(image).toHaveAttribute('title', 'Diagram');
+
     expect(container.querySelector('br')).toBeInTheDocument();
+
     expect(container).toHaveTextContent('x + y');
   });
 
@@ -207,11 +235,13 @@ describe('Fluxdown', () => {
     );
 
     expect(screen.getByTestId('fluxdown-slot-a')).toBeInTheDocument();
+
     expect(screen.getByTestId('fluxdown-slot-b')).toHaveTextContent('B[A[hello]]');
   });
 
   test('isolates slot plugin composition between Fluxdown instances', () => {
     const pluginA = createParagraphSlotPlugin('isolated-fluxdown-a', IsolatedSlotA);
+
     const pluginB = createParagraphSlotPlugin('isolated-fluxdown-b', IsolatedSlotB);
 
     render(
@@ -226,19 +256,29 @@ describe('Fluxdown', () => {
     );
 
     const first = within(screen.getByTestId('first-fluxdown'));
+
     const second = within(screen.getByTestId('second-fluxdown'));
 
     expect(first.getByTestId('isolated-fluxdown-a')).toHaveTextContent('A[first]');
+
     expect(first.queryByTestId('isolated-fluxdown-b')).not.toBeInTheDocument();
+
     expect(second.getByTestId('isolated-fluxdown-b')).toHaveTextContent('B[second]');
+
     expect(second.queryByTestId('isolated-fluxdown-a')).not.toBeInTheDocument();
   });
 
   test('gives custom render plugins a match opportunity before the fallback renderer', () => {
-    type RenderNode = { type: string; value?: string };
+    type RenderNode = {
+      type: string;
+
+      value?: string;
+    };
+
     let captured:
       | {
           node: RenderNode;
+
           parents: unknown[];
         }
       | undefined;
@@ -252,7 +292,14 @@ describe('Fluxdown', () => {
         return node.type === 'text' && node.value === 'custom-token';
       }
 
-      render({ node, parents }: { node: RenderNode; parents: unknown[] }) {
+      render({
+        node,
+        parents,
+      }: {
+        node: RenderNode;
+
+        parents: unknown[];
+      }) {
         captured = { node, parents };
 
         return <u data-testid="custom-render">CUSTOM:{node.value}</u>;
@@ -273,12 +320,15 @@ describe('Fluxdown', () => {
     );
 
     expect(screen.getByTestId('custom-render')).toHaveTextContent('CUSTOM:custom-token');
+
     expect(captured).toBeDefined();
+
     expect(captured?.parents).not.toContain(captured?.node);
   });
 
   test('maps reactive plugin-pack config entries to constructor configuration', async () => {
     const pluginKey = 'test-configured-remark';
+
     let receivedConfig: unknown;
 
     class ConfiguredRemarkPlugin {
@@ -290,6 +340,7 @@ describe('Fluxdown', () => {
 
       constructor(config: { suffix?: string } = {}) {
         receivedConfig = config;
+
         this.suffix = config.suffix ?? '';
       }
 
@@ -316,21 +367,25 @@ describe('Fluxdown', () => {
         ]}
       />
     );
+
     const { rerender } = render(renderConfigured('|configured'));
 
     expect(receivedConfig).toEqual({ suffix: '|configured' });
+
     expect(screen.getByText('|configured')).toBeInTheDocument();
 
     rerender(renderConfigured('|updated'));
 
     await waitFor(() => {
       expect(receivedConfig).toEqual({ suffix: '|updated' });
+
       expect(screen.getByText('|updated')).toBeInTheDocument();
     });
   });
 
   test('keeps an empty root for blank Markdown', () => {
     const { container } = render(<Fluxdown text={'\n \n'} />);
+
     const root = container.firstElementChild;
 
     expect(root).toBeEmptyDOMElement();
@@ -338,14 +393,19 @@ describe('Fluxdown', () => {
 
   test('keeps the core closure ref stable, updates text, and destroys it on unmount', async () => {
     const ref = createRef<FluxdownRef>();
+
     const { rerender, unmount } = render(<Fluxdown ref={ref} text="alpha" />);
 
     expect(screen.getByText('alpha')).toBeInTheDocument();
+
     expect(ref.current).not.toBeNull();
+
     expect(ref.current?.value).toBeDefined();
 
     const closure = ref.current;
+
     const destroy = jest.spyOn(closure!, 'destroy');
+
     const firstBlock = screen.getByText('alpha');
 
     rerender(<Fluxdown ref={ref} text={'alpha\n\nbeta'} />);
@@ -355,7 +415,9 @@ describe('Fluxdown', () => {
     });
 
     expect(ref.current).toBe(closure);
+
     expect(screen.getByText('alpha')).toBe(firstBlock);
+
     expect(
       [...(screen.getByText('alpha').parentElement?.children ?? [])].map(
         (element) => element.textContent,
@@ -366,14 +428,18 @@ describe('Fluxdown', () => {
 
     await waitFor(() => {
       expect(destroy).toHaveBeenCalledTimes(1);
+
       expect(closure?.value.closed).toBe(true);
     });
   });
 
   test('updates a changed ref when memoized props stay equal', () => {
     const firstRef = createRef<FluxdownRef>();
+
     const secondRef = createRef<FluxdownRef>();
+
     const { rerender } = render(<Fluxdown ref={firstRef} text="stable" />);
+
     const closure = firstRef.current;
 
     expect(closure).not.toBeNull();
@@ -381,11 +447,13 @@ describe('Fluxdown', () => {
     rerender(<Fluxdown ref={secondRef} text="stable" />);
 
     expect(firstRef.current).toBeNull();
+
     expect(secondRef.current).toBe(closure);
   });
 
   test('keeps the rendered block element mounted while text streams within that block', async () => {
     const { container, rerender } = render(<Fluxdown text="stream" />);
+
     const paragraph = container.querySelector('p');
 
     rerender(<Fluxdown text="stream continues" />);
@@ -399,6 +467,7 @@ describe('Fluxdown', () => {
 
   test('survives StrictMode effect replay, updates once, and destroys the committed closure once', async () => {
     let closure: FluxdownRef | undefined;
+
     let destroyCalls = 0;
 
     const captureRef = (value: FluxdownRef | null) => {
@@ -407,13 +476,16 @@ describe('Fluxdown', () => {
       }
 
       closure = value;
+
       const destroy = value.destroy.bind(value);
 
       value.destroy = () => {
         destroyCalls += 1;
+
         destroy();
       };
     };
+
     const view = render(
       <StrictMode>
         <Fluxdown ref={captureRef} text="strict-alpha" />
@@ -421,6 +493,7 @@ describe('Fluxdown', () => {
     );
 
     expect(screen.getByText('strict-alpha')).toBeInTheDocument();
+
     expect(closure).toBeDefined();
 
     view.rerender(

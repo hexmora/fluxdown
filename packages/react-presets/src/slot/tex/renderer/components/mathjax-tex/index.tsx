@@ -1,17 +1,29 @@
+import { texToSvg } from '@fluxdown/react-base-presets/math';
 import cn from 'classnames';
 import { useMemo } from 'react';
 
 import type { TexProps } from '../../../../../base';
 
 import styles from '../../index.module.scss';
-import { texToSvg } from './utils';
 
-export const MathjaxTexRenderer = ({ className, mode = 'inline', style, tex }: TexProps) => {
+export const MathjaxTexRenderer = ({
+  Raw: _Raw,
+  current: _current,
+  parents: _parents,
+  render: _render,
+  className,
+  mode = 'inline',
+  style,
+  tex,
+  ...elementProps
+}: TexProps) => {
   const html = useMemo(() => texToSvg(tex, mode), [mode, tex]);
+
   const Root = mode === 'display' ? 'div' : 'span';
 
   return (
     <Root
+      {...elementProps}
       aria-label={html === null ? undefined : tex}
       className={cn(styles.root, className)}
       data-formula-error={html === null || undefined}

@@ -1,6 +1,6 @@
 import type { Element } from 'hast';
 
-import { SlotProvider } from '@fluxdown/react-presets/base';
+import { SlotProvider } from '@fluxdown/react-base-presets/base';
 import {
   CodeBlockSlotPlugin,
   HeadingSlotPlugin,
@@ -13,8 +13,11 @@ import { render, screen } from '@testing-library/react';
 import { Fluxdown } from '..';
 
 const CodeBlockRenderer = new CodeBlockSlotPlugin().Component;
+
 const HeadingRenderer = new HeadingSlotPlugin().Component;
+
 const ImageRenderer = new ImageSlotPlugin().Component;
+
 const LinkRenderer = new LinkSlotPlugin().Component;
 
 const node: Element = {
@@ -37,6 +40,7 @@ describe('minimal slot renderers', () => {
     render(<Fluxdown text={'3. Third step\n4. Fourth step'} />);
 
     expect(screen.getByRole('list')).toHaveAttribute('start', '3');
+
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 
@@ -59,17 +63,25 @@ describe('minimal slot renderers', () => {
     const heading = screen.getByRole('heading', { name: 'Review section' });
 
     expect(heading).toHaveAttribute('id', 'review-heading');
+
     expect(heading).toHaveAttribute('data-section', 'review');
+
     expect(heading).toHaveClass('consumer-heading');
+
     expect(heading).toHaveStyle({ color: 'rgb(128, 0, 128)' });
+
     expect(heading).not.toHaveAttribute('current');
+
     expect(heading).not.toHaveAttribute('parents');
+
     expect(heading).not.toHaveAttribute('render');
+
     expect(heading).not.toHaveAttribute('raw');
   });
 
   test('exposes CodeBlock loading state through native accessibility semantics', () => {
     const { container, rerender } = render(<CodeBlockHarness loading />);
+
     const codeBlock = container.firstElementChild;
 
     expect(codeBlock).toHaveAttribute('aria-busy', 'true');
@@ -100,6 +112,7 @@ describe('minimal slot renderers', () => {
       'href',
       '/docs/start',
     );
+
     expect(screen.getByRole('img', { name: 'Diagram' })).toHaveAttribute('src', './diagram.png');
   });
 
@@ -127,6 +140,7 @@ describe('minimal slot renderers', () => {
     );
 
     expect(screen.getByText('Unsafe link').closest('a')).not.toHaveAttribute('href');
+
     expect(screen.getByRole('img', { name: 'Unsafe image' })).not.toHaveAttribute('src');
   });
 
@@ -149,11 +163,17 @@ describe('minimal slot renderers', () => {
       'href',
       'mailto:hello@example.com',
     );
+
     expect(screen.getByRole('img')).not.toHaveAttribute('src');
   });
 
   test('preserves HTTP URLs and updates memoized links and images when their sources change', () => {
-    const nodeProps = { current: node, parents: [], render: () => null };
+    const nodeProps = {
+      current: node,
+      parents: [],
+      render: () => null,
+    };
+
     const view = render(
       <>
         <LinkRenderer
@@ -180,11 +200,14 @@ describe('minimal slot renderers', () => {
     );
 
     expect(screen.getByRole('link')).toHaveAttribute('href', 'http://example.com/docs');
+
     expect(screen.getByRole('link')).toHaveAttribute('title', 'Documentation');
+
     expect(screen.getByRole('img', { name: 'Diagram' })).toHaveAttribute(
       'src',
       'http://example.com/diagram.png',
     );
+
     expect(screen.getByRole('img', { name: 'Relative protocol' })).toHaveAttribute(
       'src',
       '//example.com/diagram.png',
@@ -200,6 +223,7 @@ describe('minimal slot renderers', () => {
     );
 
     expect(screen.getByRole('link')).toHaveAttribute('href', '#notes');
+
     expect(screen.getByRole('img')).not.toHaveAttribute('src');
   });
 });

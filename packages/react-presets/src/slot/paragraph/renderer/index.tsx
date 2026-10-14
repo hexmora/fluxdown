@@ -2,6 +2,7 @@ import cn from 'classnames';
 
 import type { ParagraphProps } from '../../../base';
 
+import { getReactProps } from '../../../base';
 import styles from './index.module.scss';
 
 export const ParagraphRenderer = ({ Raw: _Raw, ...props }: ParagraphProps) => {
@@ -12,7 +13,7 @@ export const ParagraphRenderer = ({ Raw: _Raw, ...props }: ParagraphProps) => {
     parents: _parents,
     render: _render,
     ...elementProps
-  } = props;
+  } = { ...getReactProps(props.current), ...props };
 
   return (
     <p {...elementProps} className={cn(styles.root, className)}>
