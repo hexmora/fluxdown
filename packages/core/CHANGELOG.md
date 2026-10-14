@@ -1,5 +1,19 @@
 # @fluxdown/core
 
+## 0.11.1
+
+### Patch Changes
+
+- d346cb1: Remove redundant per-block compilation projections and compute unobserved metadata on demand while sharing the document block count.
+- b6eea33: Reuse the latest prepared Markdown processor while its plugin functions and namespace stay unchanged. All plugins participate in reuse and must keep input-specific state within each run.
+- Updated dependencies [9fbd532]
+- Updated dependencies [c129be9]
+- Updated dependencies [811e8ec]
+- Updated dependencies [4147678]
+- Updated dependencies [ecf42cf]
+  - stative@2.0.1
+  - @fluxdown/core-presets@0.7.3
+
 ## 0.11.0
 
 ### Minor Changes

@@ -1,5 +1,12 @@
 # @fluxdown/mdast
 
+## 0.7.1
+
+### Patch Changes
+
+- 811e8ec: Filter Markdown visitors by node type before allocating traversal context, and restrict HTML repairs and code metadata processing to their relevant nodes.
+- c4ae73a: Reduce AST traversal bookkeeping and repeated allocations while preserving live mutation, traversal order, and tail traversal behavior.
+
 ## 0.7.0
 
 ### Minor Changes

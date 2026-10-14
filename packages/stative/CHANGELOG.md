@@ -1,5 +1,14 @@
 # stative
 
+## 2.0.1
+
+### Patch Changes
+
+- 9fbd532: Track shared descriptor lifetime with owner counts instead of reverse owner sets, preserving cleanup order and reentrant detach behavior.
+- c129be9: Build list item descriptors without an intermediate source closure while preserving lazy setup and per-item ownership.
+- 4147678: Store the first ordering prerequisite inline, allocating a map only when a state has additional independent prerequisites.
+- ecf42cf: Reuse unchanged select input snapshots without allocating arrays on every read, preserving revision checks and reentrant behavior.
+
 ## 2.0.0
 
 ### Major Changes

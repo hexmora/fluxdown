@@ -1,5 +1,21 @@
 # @fluxdown/react-presets
 
+## 0.6.8
+
+### Patch Changes
+
+- 4434b3a: Reduce per-subscription React hooks and snapshot bookkeeping without changing selector equality or committed snapshot behavior.
+- Updated dependencies [d346cb1]
+- Updated dependencies [9fbd532]
+- Updated dependencies [c129be9]
+- Updated dependencies [811e8ec]
+- Updated dependencies [4147678]
+- Updated dependencies [b6eea33]
+- Updated dependencies [ecf42cf]
+  - @fluxdown/core@0.11.1
+  - stative@2.0.1
+  - @fluxdown/core-presets@0.7.3
+
 ## 0.6.7
 
 ### Patch Changes

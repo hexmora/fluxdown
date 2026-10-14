@@ -1,5 +1,19 @@
 # @fluxdown/core-presets
 
+## 0.7.3
+
+### Patch Changes
+
+- 811e8ec: Filter Markdown visitors by node type before allocating traversal context, and restrict HTML repairs and code metadata processing to their relevant nodes.
+- Updated dependencies [9fbd532]
+- Updated dependencies [c129be9]
+- Updated dependencies [811e8ec]
+- Updated dependencies [4147678]
+- Updated dependencies [c4ae73a]
+- Updated dependencies [ecf42cf]
+  - stative@2.0.1
+  - @fluxdown/mdast@0.7.1
+
 ## 0.7.2
 
 ### Patch Changes

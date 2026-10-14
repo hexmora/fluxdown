@@ -1,5 +1,23 @@
 # fluxdown
 
+## 0.8.2
+
+### Patch Changes
+
+- 0062bce: Render primitive children without redundant Fragment fibers while preserving grouping and keys for element, array, and portal outputs.
+- Updated dependencies [d346cb1]
+- Updated dependencies [9fbd532]
+- Updated dependencies [c129be9]
+- Updated dependencies [811e8ec]
+- Updated dependencies [4147678]
+- Updated dependencies [4434b3a]
+- Updated dependencies [b6eea33]
+- Updated dependencies [ecf42cf]
+  - @fluxdown/core@0.11.1
+  - stative@2.0.1
+  - @fluxdown/core-presets@0.7.3
+  - @fluxdown/react-presets@0.6.8
+
 ## 0.8.1
 
 ### Patch Changes
