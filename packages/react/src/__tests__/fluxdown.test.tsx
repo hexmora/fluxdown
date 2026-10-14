@@ -9,7 +9,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import { type ComponentType, createRef, type ReactNode, StrictMode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import type { FluxdownRef } from '../types';
+import type { FluxdownRef, IPluginItem } from '../types';
 
 import { Fluxdown } from '..';
 
@@ -277,7 +277,7 @@ describe('Fluxdown', () => {
     expect(captured?.parents).not.toContain(captured?.node);
   });
 
-  test('maps reactive plugin-pack config entries to constructor configuration', async () => {
+  test.each([false, true])('updates plugin-pack config with single=%s', async (single) => {
     const pluginKey = 'test-configured-remark';
     let receivedConfig: unknown;
 
@@ -303,19 +303,14 @@ describe('Fluxdown', () => {
       destroy() {}
     }
 
-    const renderConfigured = (suffix: string) => (
-      <Fluxdown
-        text="base"
-        plugins={[
-          {
-            config: {
-              [pluginKey]: { suffix },
-            },
-            remarks: [ConfiguredRemarkPlugin as unknown as RemarkPluggable],
-          },
-        ]}
-      />
-    );
+    const renderConfigured = (suffix: string) => {
+      const plugin: IPluginItem = {
+        config: { [pluginKey]: { suffix } },
+        remarks: [ConfiguredRemarkPlugin as unknown as RemarkPluggable],
+      };
+
+      return <Fluxdown text="base" plugins={single ? plugin : [plugin]} />;
+    };
     const { rerender } = render(renderConfigured('|configured'));
 
     expect(receivedConfig).toEqual({ suffix: '|configured' });

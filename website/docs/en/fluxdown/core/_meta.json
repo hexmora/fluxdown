@@ -1,0 +1,22 @@
+[
+  {
+    "type": "file",
+    "name": "quick-start",
+    "label": "Quick start"
+  },
+  {
+    "type": "file",
+    "name": "streaming",
+    "label": "State and updates"
+  },
+  {
+    "type": "file",
+    "name": "configuration",
+    "label": "Configuration"
+  },
+  {
+    "type": "dir",
+    "name": "plugins",
+    "label": "Using and writing plugins"
+  }
+]

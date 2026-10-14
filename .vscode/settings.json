@@ -1,4 +1,14 @@
 {
+  "json.schemas": [
+    {
+      "fileMatch": ["website/docs/**/_meta.json"],
+      "url": "./website/node_modules/@rspress/core/meta-json-schema.json"
+    },
+    {
+      "fileMatch": ["website/docs/**/_nav.json"],
+      "url": "./website/node_modules/@rspress/core/nav-json-schema.json"
+    }
+  ],
   "editor.formatOnSave": false,
   "editor.formatOnSaveMode": "file",
   "editor.defaultFormatter": "oxc.oxc-vscode",

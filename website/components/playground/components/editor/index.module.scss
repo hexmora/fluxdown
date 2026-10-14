@@ -1,0 +1,256 @@
+.playground {
+  width: min(1280px, calc(100% - 80px));
+  margin: 0 auto;
+  padding: 72px 0 88px;
+  color: var(--site-ink, #171717);
+
+  * {
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 860px) {
+    width: calc(100% - 40px);
+    padding-top: 44px;
+  }
+}
+
+.heading {
+  margin-bottom: 36px;
+
+  h1 {
+    margin: 0 0 12px;
+    font-size: clamp(30px, 4vw, 42px);
+    font-weight: 550;
+    line-height: 1.2;
+    letter-spacing: -0.045em;
+  }
+
+  p {
+    margin: 0;
+    color: var(--site-muted, #737373);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+}
+
+.workspace {
+  border: 1px solid var(--site-line, #e5e5e5);
+  border-radius: 10px;
+  background: var(--site-surface, #fff);
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--site-line, #e5e5e5);
+  font-size: 12px;
+
+  button {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 1px solid var(--site-line, #e5e5e5);
+    border-radius: 5px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 150ms;
+
+    &:hover:not(:disabled) {
+      background: var(--site-paper, #fafafa);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--site-ink, #171717);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 520px) {
+      padding-inline: 6px;
+      font-size: 11px;
+      white-space: normal;
+    }
+
+    @media (hover: none) {
+      min-height: 40px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  @media (max-width: 520px) {
+    padding-inline: 16px;
+  }
+}
+
+.options {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: var(--site-ink, #171717);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--site-ink, #171717);
+      outline-offset: 3px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    gap: 12px 20px;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 8px;
+
+  svg {
+    flex: none;
+  }
+
+  @media (max-width: 860px) {
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 520px) {
+    display: grid;
+    align-items: stretch;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.source,
+.preview {
+  min-width: 0;
+}
+
+.source textarea,
+.output {
+  width: 100%;
+  height: min(650px, 65vh);
+  min-height: 420px;
+  padding: 26px 28px;
+  overflow: auto;
+
+  @media (max-width: 520px) {
+    padding-inline: 20px;
+  }
+}
+
+.source {
+  border-right: 1px solid var(--site-line, #e5e5e5);
+  background: var(--site-paper, #fafafa);
+
+  textarea {
+    display: block;
+    margin: 0;
+    border: 0;
+    outline: 0;
+    resize: none;
+    background: transparent;
+    color: inherit;
+    font-family: var(--rp-font-family-mono);
+    font-size: 13px;
+    line-height: 1.9;
+    tab-size: 2;
+
+    &:focus-visible {
+      box-shadow: inset 0 0 0 2px var(--site-ink, #171717);
+    }
+
+    &::placeholder {
+      color: var(--site-muted, #737373);
+    }
+
+    @media (max-width: 860px) {
+      height: 340px;
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 860px) {
+    border-right: 0;
+    border-bottom: 1px solid var(--site-line, #e5e5e5);
+  }
+}
+
+.output {
+  @media (max-width: 860px) {
+    height: 460px;
+    min-height: 0;
+  }
+}
+
+.empty {
+  margin: 0;
+  color: var(--site-muted, #737373);
+  font-size: 14px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 22px;
+  border-top: 1px solid var(--site-line, #e5e5e5);
+  color: var(--site-muted, #737373);
+  font-size: 11px;
+  line-height: 1.5;
+
+  @media (max-width: 520px) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+    padding-inline: 16px;
+  }
+}

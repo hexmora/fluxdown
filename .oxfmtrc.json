@@ -3,6 +3,19 @@
   "ignorePatterns": [],
   "overrides": [
     {
+      "files": ["website/**/*.md", "website/**/*.mdx"],
+      "options": {
+        "printWidth": 80,
+        "singleQuote": true
+      }
+    },
+    {
+      "files": ["website/docs/*/stative/jsx.md"],
+      "options": {
+        "singleAttributePerLine": true
+      }
+    },
+    {
       "files": ["*.js", "*.jsx", "*.ts", "*.tsx", "*.mjs", "*.cjs", "*.mts", "*.cts"],
       "options": {
         "singleQuote": true,

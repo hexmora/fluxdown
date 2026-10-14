@@ -1,6 +1,8 @@
 node_modules
 dist
 storybook-static
+doc_build
+.rspress
 coverage
 .agent/logs
 .reports

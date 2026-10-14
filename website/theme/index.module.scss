@@ -1,0 +1,108 @@
+:global {
+  :root {
+    --rp-c-brand: #00847c;
+    --rp-c-brand-light: #13968e;
+    --rp-c-brand-lighter: #31aaa1;
+    --rp-c-brand-dark: #006f68;
+    --rp-c-brand-darker: #005c56;
+    --rp-c-brand-tint: rgb(0 132 124 / 7%);
+    --rp-font-family-base:
+      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei",
+      sans-serif;
+    --rp-c-bg: #fafbfc;
+    --site-paper: #f8f9fb;
+    --site-surface: #fff;
+    --site-inset: #f0f2f5;
+    --site-ink: #20262f;
+    --site-muted: #717b88;
+    --site-line: #e3e7ec;
+    --site-line-strong: #cbd2da;
+    --site-scrollbar: #d6dce3;
+    --site-hover: #e9edf1;
+    --site-accent: #00847c;
+    --site-accent-tint: rgb(0 132 124 / 9%);
+    --site-accent-line: rgb(0 132 124 / 24%);
+  }
+
+  .dark {
+    --rp-c-brand: #65c8be;
+    --rp-c-brand-light: #82d8cf;
+    --rp-c-brand-lighter: #a1e3db;
+    --rp-c-brand-dark: #42b4a9;
+    --rp-c-brand-darker: #26998f;
+    --rp-c-brand-tint: rgb(101 200 190 / 10%);
+    --rp-c-bg: #14171c;
+    --site-paper: #14171c;
+    --site-surface: #1b1f26;
+    --site-inset: #161a20;
+    --site-ink: #e4e8ed;
+    --site-muted: #929daa;
+    --site-line: #2c333e;
+    --site-line-strong: #414b59;
+    --site-scrollbar: #424d5b;
+    --site-hover: #2b333d;
+    --site-accent: #65c8be;
+    --site-accent-tint: rgb(101 200 190 / 9%);
+    --site-accent-line: rgb(101 200 190 / 25%);
+  }
+
+  body {
+    background: var(--site-paper);
+  }
+
+  .rp-nav {
+    background: transparent !important;
+    border-bottom: 0 !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    backdrop-filter: blur(18px) !important;
+
+    // Rspress collapses language and appearance controls at 1280px by default.
+    @media (min-width: 1024px) {
+      .rp-nav__others {
+        display: flex;
+      }
+
+      .rp-nav-hamburger__md {
+        display: none;
+      }
+    }
+  }
+
+  .rp-nav-menu__item {
+    font-weight: 500;
+  }
+
+  .rp-doc {
+    h1 {
+      letter-spacing: -0.04em;
+    }
+
+    .field-tag {
+      display: inline-block;
+      vertical-align: middle;
+      margin-inline-start: 2px;
+      padding: 3px 8px;
+      border: 1px solid var(--site-line);
+      border-radius: 5px;
+      background: var(--site-inset);
+      color: var(--site-muted);
+      font-size: 11px;
+      font-weight: 450;
+      line-height: 1.4;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+  }
+
+  .rp-toc-item {
+    .field-tag {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}

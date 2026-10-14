@@ -184,14 +184,31 @@ describe('Raw slots', () => {
     expect(receivedProps).toHaveProperty('Raw', null);
   });
 
-  test('updates and removes overrides without losing the default renderer', () => {
+  test('updates single and array plugin packs without losing the default renderer', () => {
     const { rerender } = render(
-      <Fluxdown plugins={[{ slots: [StyledParagraphPlugin] }]} text="changing content" />,
+      <Fluxdown plugins={{ slots: [StyledParagraphPlugin] }} text="changing content" />,
     );
+
+    const paragraph = screen.getByText('changing content');
+
+    expect(paragraph).toHaveClass('custom-paragraph');
+
+    rerender(<Fluxdown plugins={[{ slots: [StyledParagraphPlugin] }]} text="changing content" />);
+
+    expect(screen.getByText('changing content')).toBe(paragraph);
+
+    rerender(
+      <Fluxdown
+        plugins={[{ slots: [StyledParagraphPlugin] }, { slots: [OuterParagraphPlugin] }]}
+        text="changing content"
+      />,
+    );
+
+    expect(screen.getByTestId('outer-paragraph')).toHaveTextContent('changing content');
 
     expect(screen.getByText('changing content')).toHaveClass('custom-paragraph');
 
-    rerender(<Fluxdown plugins={[{ slots: [OuterParagraphPlugin] }]} text="changing content" />);
+    rerender(<Fluxdown plugins={{ slots: [OuterParagraphPlugin] }} text="changing content" />);
 
     expect(screen.getByTestId('outer-paragraph')).toHaveTextContent('changing content');
 

@@ -1,0 +1,22 @@
+[
+  {
+    "type": "file",
+    "name": "remark",
+    "label": "Remark plugins"
+  },
+  {
+    "type": "file",
+    "name": "repair",
+    "label": "Repair plugins"
+  },
+  {
+    "type": "file",
+    "name": "rehype",
+    "label": "Rehype plugins"
+  },
+  {
+    "type": "file",
+    "name": "mapper",
+    "label": "Mapper plugins"
+  }
+]
