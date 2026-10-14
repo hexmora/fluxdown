@@ -934,7 +934,8 @@ async function prepareRelease(options: ReturnType<typeof parseReleaseOptions>) {
       const destination = path.join(stage, 'packages', pkg.directory);
       const manifest = await readManifest(destination);
 
-      for (const field of dependencyFields) {
+      // Packing resolves development workspace ranges even without an installed staging tree.
+      for (const field of [...dependencyFields, 'devDependencies'] as const) {
         for (const [name, range] of Object.entries(manifest[field] ?? {})) {
           const version = stagedVersions.get(name);
 
