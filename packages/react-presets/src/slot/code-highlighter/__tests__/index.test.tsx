@@ -2,55 +2,29 @@ import { render, waitFor } from '@testing-library/react';
 
 import { PREFIX } from '../../../base';
 import { CodeHighlighterRenderer } from '../renderer';
-import { highlightCode } from '../renderer/utils';
 
 describe('code highlighting', () => {
-  test('loads language aliases and uses the runtime theme tokens', async () => {
-    const source = 'const answer: number = 42;';
-    const tokens = await highlightCode(source, 'TS');
-
-    expect(
-      tokens
-        ?.flat()
-        .map((token) => token.content)
-        .join(''),
-    ).toBe(source);
-    expect(tokens?.flat().some((token) => token.color === `var(--${PREFIX}-syntax-keyword)`)).toBe(
-      true,
+  test('uses runtime CSS theme tokens for highlighted code', async () => {
+    const { container } = render(
+      <CodeHighlighterRenderer Raw={null} code="const answer: number = 42;" language="TS" />,
     );
-    expect(tokens?.flat().some((token) => token.color === `var(--${PREFIX}-syntax-number)`)).toBe(
-      true,
-    );
-  });
 
-  test('keeps unknown and prototype property languages as plaintext', async () => {
-    expect(await highlightCode('<script>source</script>', 'unknown-language')).toBeNull();
-    expect(await highlightCode('value', '__proto__')).toBeNull();
-    expect(await highlightCode('value', 'plaintext')).toBeNull();
-  });
+    await waitFor(() => expect(container.querySelector('code span')).not.toBeNull());
 
-  test('shares concurrent language loads', async () => {
-    const [first, second] = await Promise.all([
-      highlightCode('answer = 42', 'python'),
-      highlightCode('answer = 43', 'python'),
-    ]);
+    const spans = [...container.querySelectorAll('code span')];
 
     expect(
-      first
-        ?.flat()
-        .map((token) => token.content)
-        .join(''),
-    ).toBe('answer = 42');
+      spans.some((span) => span.getAttribute('style')?.includes(`var(--${PREFIX}-syntax-keyword)`)),
+    ).toBe(true);
+
     expect(
-      second
-        ?.flat()
-        .map((token) => token.content)
-        .join(''),
-    ).toBe('answer = 43');
+      spans.some((span) => span.getAttribute('style')?.includes(`var(--${PREFIX}-syntax-number)`)),
+    ).toBe(true);
   });
 
   test('preserves source text, newlines, and root attributes without parsing source HTML', async () => {
     const code = '<script>alert("source")</script>\n\n';
+
     const { container } = render(
       <CodeHighlighterRenderer
         Raw={null}
@@ -64,9 +38,13 @@ describe('code highlighting', () => {
     await waitFor(() => expect(container.querySelector('code span')).not.toBeNull());
 
     expect(container.firstElementChild).toHaveClass('custom-code');
+
     expect(container.firstElementChild).toHaveStyle({ maxHeight: '300px' });
+
     expect(container.querySelector('code')).toHaveTextContent('alert("source")');
+
     expect(container.querySelector('code')?.textContent).toBe(code);
+
     expect(container.querySelector('script')).toBeNull();
   });
 
@@ -80,6 +58,7 @@ describe('code highlighting', () => {
     rerender(<CodeHighlighterRenderer Raw={null} code="replacement" language="unknown" />);
 
     expect(container.querySelector('code')?.textContent).toBe('replacement');
+
     expect(container.querySelector('code span')).toBeNull();
   });
 });

@@ -114,7 +114,10 @@ async function checkExports(directory: string, source = false): Promise<PackageM
   }
 
   for (const [entry, value] of publicEntries(manifest)) {
-    for (const environment of ['node', 'browser']) {
+    // Bob uses scoped package.json files for ESM/CJS, both with .js/.d.ts.
+    const native = Boolean(manifest.peerDependencies?.['react-native']);
+
+    for (const environment of native ? ['node'] : ['node', 'browser']) {
       for (const [format, extension, declaration] of [
         ['import', '.js', '.d.ts'],
         ['require', '.cjs', '.d.cts'],
@@ -122,14 +125,38 @@ async function checkExports(directory: string, source = false): Promise<PackageM
         const mode = format === 'import' ? 'ESM' : 'CJS';
 
         assert(
-          resolveExport(value, [environment, format])?.endsWith(extension),
+          resolveExport(value, [environment, format])?.endsWith(native ? '.js' : extension),
           `${label}${entry}: missing ${environment} ${mode} runtime`,
         );
 
         assert(
-          resolveExport(value, ['types', environment, format])?.endsWith(declaration),
+          resolveExport(value, ['types', environment, format])?.endsWith(
+            native ? '.d.ts' : declaration,
+          ),
           `${label}${entry}: missing ${environment} ${mode} declarations`,
         );
+      }
+    }
+  }
+
+  if (manifest.peerDependencies?.['react-native']) {
+    for (const [entry, value] of publicEntries(manifest)) {
+      assert(
+        resolveExport(value, ['react-native'])?.endsWith('.js'),
+        `${label}${entry}: missing native runtime`,
+      );
+      assert(
+        resolveExport(value, ['types', 'react-native'])?.endsWith('.d.ts'),
+        `${label}${entry}: missing native declarations`,
+      );
+    }
+
+    for (const format of ['module', 'commonjs']) {
+      for (const tree of ['dist', 'dist/typescript']) {
+        const scope = JSON.parse(
+          await readFile(path.join(directory, tree, format, 'package.json'), 'utf8'),
+        ) as { type?: string };
+        assert.equal(scope.type, format, `${label}: invalid ${tree}/${format} module scope`);
       }
     }
   }

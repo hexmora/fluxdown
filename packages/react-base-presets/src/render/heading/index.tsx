@@ -1,0 +1,36 @@
+import type { IPluggableConfig } from '@fluxdown/types';
+
+import { assert } from '@fluxdown/utils';
+
+import type { ReactRenderMatchParams, ReactRenderParams } from '../../base';
+
+import { BaseReactRenderPlugin, createTypeOfSlot } from '../../base';
+import { getHeadingLevel, isHeadingNode } from './utils';
+
+const Heading = /*#__PURE__*/ createTypeOfSlot('Heading');
+
+declare global {
+  interface RenderConfigs {
+    'render-heading'?: IPluggableConfig<void>;
+  }
+}
+
+export class HeadingRenderPlugin extends BaseReactRenderPlugin {
+  static readonly key = 'render-heading';
+
+  match({ node }: ReactRenderMatchParams) {
+    return isHeadingNode(node);
+  }
+
+  render({ node, parents, render, renderChildren }: ReactRenderParams) {
+    assert(isHeadingNode(node));
+
+    const level = getHeadingLevel(node.tagName);
+
+    return (
+      <Heading current={node} level={level} parents={parents} render={render}>
+        {renderChildren(node)}
+      </Heading>
+    );
+  }
+}

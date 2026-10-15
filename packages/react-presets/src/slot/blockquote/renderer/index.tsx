@@ -2,6 +2,7 @@ import cn from 'classnames';
 
 import type { BlockquoteProps } from '../../../base';
 
+import { getReactProps } from '../../../base';
 import styles from './index.module.scss';
 
 export const BlockquoteRenderer = ({ Raw: _Raw, ...props }: BlockquoteProps) => {
@@ -12,7 +13,7 @@ export const BlockquoteRenderer = ({ Raw: _Raw, ...props }: BlockquoteProps) => 
     parents: _parents,
     render: _render,
     ...elementProps
-  } = props;
+  } = { ...getReactProps(props.current), ...props };
 
   return (
     <blockquote {...elementProps} className={cn(styles.root, className)}>

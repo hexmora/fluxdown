@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Fluxdown Storybook",
+    "slug": "fluxdown-react-native-storybook",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.fluxdown.storybook"
+    }
+  }
+}

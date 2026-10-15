@@ -1,0 +1,33 @@
+import type { IPluggableConfig } from '@fluxdown/types';
+
+import { assert } from '@fluxdown/utils';
+
+import type { ReactRenderMatchParams, ReactRenderParams } from '../../base';
+
+import { BaseReactRenderPlugin, createTypeOfSlot, isElementWithTag } from '../../base';
+
+const Emphasis = /*#__PURE__*/ createTypeOfSlot('Emphasis');
+
+declare global {
+  interface RenderConfigs {
+    'render-emphasis'?: IPluggableConfig<void>;
+  }
+}
+
+export class EmphasisRenderPlugin extends BaseReactRenderPlugin {
+  static readonly key = 'render-emphasis';
+
+  match({ node }: ReactRenderMatchParams) {
+    return isElementWithTag(node, 'em');
+  }
+
+  render({ node, parents, render, renderChildren }: ReactRenderParams) {
+    assert(isElementWithTag(node, 'em'));
+
+    return (
+      <Emphasis current={node} parents={parents} render={render}>
+        {renderChildren(node)}
+      </Emphasis>
+    );
+  }
+}

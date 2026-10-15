@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 import type { LinkProps } from '../../../base';
 
-import { normalizePublicUrl } from '../../../base';
+import { getReactProps, normalizePublicUrl } from '../../../base';
 import styles from './index.module.scss';
 
 export const LinkRenderer = ({ Raw: _Raw, ...props }: LinkProps) => {
@@ -16,7 +16,7 @@ export const LinkRenderer = ({ Raw: _Raw, ...props }: LinkProps) => {
     parents: _parents,
     render: _render,
     ...elementProps
-  } = props;
+  } = { ...getReactProps(props.current), ...props };
 
   const safeHref = useMemo(
     () => normalizePublicUrl(href, { allowHash: true, allowMailto: true }),

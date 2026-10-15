@@ -1,131 +1,39 @@
-import type { MapperPluggable } from '@fluxdown/core';
-import type { ReactRenderExtraParams } from '@fluxdown/react-presets/base';
-import type { PluginSet } from '@fluxdown/types';
-import type { ReactNode } from 'react';
-
-import { Core, isPluggablesEqual, isPluginSetEqual } from '@fluxdown/core';
-import {
-  SlotProvider,
-  useDeferredUnmount,
-  useStateOf,
-  useStatic,
-} from '@fluxdown/react-presets/base';
-import { PRESET_RENDER_PLUGINS } from '@fluxdown/react-presets/render';
+import { BaseFluxdown } from '@fluxdown/react-base';
+import { PREFIX } from '@fluxdown/react-presets/base';
 import { PRESET_SLOT_PLUGINS } from '@fluxdown/react-presets/slot';
 import cn from 'classnames';
-import { forwardRef, memo, useId, useImperativeHandle } from 'react';
-import { shallowEqual } from 'shallow-equal';
-import { D, render, S } from 'stative';
+import { isBoolean } from 'lodash-es';
+import { forwardRef, memo, useMemo } from 'react';
 
 import type { FluxdownProps, FluxdownRef } from './types';
 
-import { RootReconciler } from './components';
-import { EL, EO } from './consts';
-import { usePluginConfig, usePlugins, useShadStyles } from './hooks';
-import { ReactRenderer } from './modules';
+import { useShadStyles } from './hooks';
 import styles from './styles/index.module.scss';
 import { useThemeStyles } from './theme';
-import {
-  isPatchesEqual,
-  isPropsEqual,
-  toBuildConfig,
-  toShadConfig,
-  toSmoothConfig,
-  toStreamingConfig,
-} from './utils';
 
 export * from './types';
 
 export const Fluxdown = /*#__PURE__*/ memo(
   /*#__PURE__*/ forwardRef<FluxdownRef, FluxdownProps>(function Fluxdown(
-    {
-      className,
-      style,
-      theme = 'light',
-      text: _text,
-      build: _build = EO,
-      streaming = false,
-      patches: _patches = EL,
-      plugins: _plugins = EL,
-    },
+    { className, style, theme = 'light', streaming = false, plugins: _plugins, ...props },
     ref,
   ) {
-    const { repairEnding, smooth: _smooth, shad: _shad } = toStreamingConfig(streaming);
+    const plugins = useMemo(
+      () => [{ slots: PRESET_SLOT_PLUGINS }, ...(_plugins ?? [])],
+      [_plugins],
+    );
 
     const themeStyles = useThemeStyles(theme);
 
-    const shadStyles = useShadStyles(_shad);
-
-    const idPrefix = useId();
-
-    const build = useStateOf(toBuildConfig({ base: _build, repairEnding, idPrefix }), shallowEqual);
-
-    const smooth = usePluginConfig(toSmoothConfig(_smooth));
-
-    const shad = usePluginConfig(toShadConfig(_shad));
-
-    const patches = useStateOf(_patches, isPatchesEqual);
-
-    const text = useStateOf(_text);
-
-    const _remarks = usePlugins(_plugins, 'remarks');
-
-    const _rehypes = usePlugins(_plugins, 'rehypes');
-
-    const _repairs = usePlugins(_plugins, 'repairs');
-
-    const _mappers = usePlugins(_plugins, 'mappers');
-
-    const _renders = usePlugins(_plugins, 'renders', PRESET_RENDER_PLUGINS);
-
-    const slots = usePlugins(_plugins, 'slots', PRESET_SLOT_PLUGINS);
-
-    const remarks = useStateOf(_remarks, isPluggablesEqual);
-
-    const rehypes = useStateOf(_rehypes, isPluggablesEqual);
-
-    const repairs = useStateOf(_repairs, isPluggablesEqual);
-
-    const mappers = useStateOf<PluginSet<MapperPluggable, MapperConfigs>>(
-      [_mappers, { smooth, shad }],
-      isPluginSetEqual,
-    );
-
-    const renders = useStateOf(_renders, isPluggablesEqual);
-
-    const core = useStatic(() =>
-      render(
-        S([
-          Core<ReactNode, ReactRenderExtraParams>,
-          {
-            Renderer: D(ReactRenderer),
-            build,
-            patches,
-            rehypes,
-            remarks,
-            renders,
-            repairs,
-            mappers,
-            text,
-          },
-        ]),
-      ),
-    );
-
-    useImperativeHandle(ref, () => core, [core]);
-
-    useDeferredUnmount(() => core.destroy());
+    const shadStyles = useShadStyles(isBoolean(streaming) ? streaming : (streaming.shad ?? true));
 
     return (
-      <SlotProvider plugins={slots}>
-        <RootReconciler
-          className={cn(styles.root, className)}
-          style={{ ...themeStyles, ...shadStyles, ...style }}
-        >
-          {core.value}
-        </RootReconciler>
-      </SlotProvider>
+      <div
+        className={cn(styles.root, `${PREFIX}-root`, className)}
+        style={{ ...themeStyles, ...shadStyles, ...style }}
+      >
+        <BaseFluxdown {...props} ref={ref} streaming={streaming} plugins={plugins} />
+      </div>
     );
   }),
-  isPropsEqual,
 );

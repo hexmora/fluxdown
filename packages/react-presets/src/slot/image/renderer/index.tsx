@@ -3,7 +3,7 @@ import { createElement, useMemo } from 'react';
 
 import type { ImageProps } from '../../../base';
 
-import { normalizePublicUrl } from '../../../base';
+import { getReactProps, normalizePublicUrl } from '../../../base';
 import styles from './index.module.scss';
 
 export const ImageRenderer = ({ Raw: _Raw, ...props }: ImageProps) => {
@@ -16,7 +16,7 @@ export const ImageRenderer = ({ Raw: _Raw, ...props }: ImageProps) => {
     render: _render,
     src,
     ...elementProps
-  } = props;
+  } = { ...getReactProps(props.current), ...props };
 
   const safeSrc = useMemo(() => normalizePublicUrl(src), [src]);
 

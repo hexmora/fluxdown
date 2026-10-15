@@ -1,0 +1,138 @@
+{
+  "name": "@fluxdown/react-native",
+  "version": "0.1.0",
+  "description": "React Native streaming Markdown component built on @fluxdown/core.",
+  "keywords": [
+    "llm",
+    "markdown",
+    "react-native",
+    "streaming"
+  ],
+  "homepage": "https://github.com/hexmora/fluxdown/tree/main/packages/react-native#readme",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/react-native"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.tsx",
+  "module": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "publishConfig": {
+    "main": "./dist/commonjs/index.js",
+    "module": "./dist/module/index.js",
+    "types": "./dist/typescript/module/index.d.ts",
+    "react-native": "./dist/module/index.js",
+    "exports": {
+      ".": {
+        "react-native": {
+          "types": "./dist/typescript/module/index.d.ts",
+          "default": "./dist/module/index.js"
+        },
+        "import": {
+          "types": "./dist/typescript/module/index.d.ts",
+          "default": "./dist/module/index.js"
+        },
+        "require": {
+          "types": "./dist/typescript/commonjs/index.d.ts",
+          "default": "./dist/commonjs/index.js"
+        }
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "bob build",
+    "lint": "oxlint .",
+    "test": "jest --config ../../jest.native.config.cjs --selectProjects react-native --runInBand",
+    "typecheck": "pnpm run storybook:generate && tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source",
+    "dev": "pnpm run storybook",
+    "storybook": "pnpm --filter @fluxdown/react-base-presets build && expo start .storybook",
+    "build:storybook": "pnpm --filter @fluxdown/react-base-presets build && cd .storybook && expo export --platform android --platform ios --output-dir ../storybook-static",
+    "storybook:generate": "sb-rn-get-stories --config-path .storybook"
+  },
+  "dependencies": {
+    "@fluxdown/react-base": "workspace:^",
+    "@fluxdown/react-base-presets": "workspace:^",
+    "@fluxdown/react-native-presets": "workspace:^"
+  },
+  "devDependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-presets": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@gorhom/bottom-sheet": "catalog:native",
+    "@react-native/jest-preset": "catalog:native",
+    "@storybook/addon-ondevice-actions": "catalog:native",
+    "@storybook/addon-ondevice-controls": "catalog:native",
+    "@storybook/react-native": "catalog:native",
+    "@testing-library/react-native": "catalog:native",
+    "@types/hast": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/react": "catalog:native",
+    "babel-preset-expo": "catalog:native",
+    "expect-type": "catalog:",
+    "expo": "catalog:native",
+    "lodash-es": "catalog:",
+    "oxlint": "catalog:",
+    "react": "catalog:native",
+    "react-dom": "catalog:native",
+    "react-native": "catalog:native",
+    "react-native-builder-bob": "catalog:native",
+    "react-native-gesture-handler": "catalog:native",
+    "react-native-reanimated": "catalog:native",
+    "react-native-safe-area-context": "catalog:native",
+    "react-native-svg": "catalog:native",
+    "react-native-web": "catalog:native",
+    "react-native-worklets": "catalog:native",
+    "react-test-renderer": "catalog:native",
+    "stative": "workspace:^",
+    "storybook": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "react-native": ">=0.76.0",
+    "react-native-svg": ">=15.0.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "dist",
+    "exclude": "**/{__tests__,__snapshots__}/**",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "commonjs",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  }
+}

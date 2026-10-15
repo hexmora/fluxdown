@@ -4,6 +4,7 @@ import { createElement } from 'react';
 
 import type { HeadingProps } from '../../../base';
 
+import { getReactProps } from '../../../base';
 import styles from './index.module.scss';
 
 export const HeadingRenderer = ({ Raw: _Raw, ...props }: HeadingProps) => {
@@ -15,7 +16,7 @@ export const HeadingRenderer = ({ Raw: _Raw, ...props }: HeadingProps) => {
     parents: _parents,
     render: _render,
     ...elementProps
-  } = props;
+  } = { ...getReactProps(props.current), ...props };
 
   const safeLevel =
     isNumber(level) && Number.isInteger(level) && level >= 1 && level <= 6 ? level : 1;

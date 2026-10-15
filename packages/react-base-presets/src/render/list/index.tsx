@@ -1,0 +1,45 @@
+import type { IPluggableConfig } from '@fluxdown/types';
+
+import { assert } from '@fluxdown/utils';
+
+import type { ReactRenderMatchParams, ReactRenderParams } from '../../base';
+
+import { BaseReactRenderPlugin, createTypeOfSlot, isElementWithTag } from '../../base';
+import { hasClassName } from './utils';
+
+const List = /*#__PURE__*/ createTypeOfSlot('List');
+
+declare global {
+  interface RenderConfigs {
+    'render-list'?: IPluggableConfig<void>;
+  }
+}
+
+export class ListRenderPlugin extends BaseReactRenderPlugin {
+  static readonly key = 'render-list';
+
+  match({ node }: ReactRenderMatchParams) {
+    return isElementWithTag(node, 'ol', 'ul');
+  }
+
+  render({ node, parents, render, renderChildren }: ReactRenderParams) {
+    assert(isElementWithTag(node, 'ol', 'ul'));
+
+    return (
+      <List
+        current={node}
+        parents={parents}
+        render={render}
+        type={
+          node.tagName === 'ol'
+            ? 'ordered'
+            : hasClassName(node.properties?.className, 'contains-task-list')
+              ? 'task'
+              : 'bullet'
+        }
+      >
+        {renderChildren(node)}
+      </List>
+    );
+  }
+}
