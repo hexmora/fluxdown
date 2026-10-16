@@ -4,6 +4,8 @@
 
 **English** | [简体中文](./docs/README.zh-CN.md)
 
+[Documentation](https://hexmora.github.io/fluxdown/) | [Playground](https://hexmora.github.io/fluxdown/playground.html)
+
 **A reactive Markdown rendering library built for streaming.**
 
 Render Markdown as it arrives, from AI chat responses to live previews. Fluxdown keeps growing content responsive and gives you control over how it looks and behaves.

@@ -11,7 +11,7 @@
     "react",
     "streaming"
   ],
-  "homepage": "https://github.com/hexmora/fluxdown#readme",
+  "homepage": "https://hexmora.github.io/fluxdown/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },
@@ -24,13 +24,16 @@
   "scripts": {
     "build": "moon run :build",
     "build:storybook": "moon run react:build-storybook",
+    "build:website": "moon run website:build",
     "commitlint": "commitlint --from=HEAD~1 --to=HEAD --verbose",
     "commitlint:edit": "commitlint --edit",
     "dev": "moon run react:dev",
+    "dev:website": "moon run website:dev",
     "format": "moon run workspace:format",
     "format:check": "moon run workspace:format-check",
     "lint": "moon run :lint",
     "prepare": "husky",
+    "preview:website": "moon run website:preview",
     "test": "jest --config jest.config.ts",
     "typecheck": "moon run :typecheck",
     "check": "moon run --concurrency 4 :typecheck :lint :test",

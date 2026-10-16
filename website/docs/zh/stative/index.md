@@ -50,4 +50,4 @@ count.destroy();
 - [组合计算](./composition)：把计算封装成可复用的状态闭包。
 - [生命周期](./lifecycle)：让订阅、定时器和子计算随功能一起结束。
 
-Stative 不依赖 UI 框架。它的 [JSX 写法](./jsx)使用独立运行时，也不依赖 React。如果你只是想在页面中展示流式 Markdown，可以直接从 [Fluxdown React](../fluxdown/react/quick-start) 开始。
+Stative 不依赖 UI 框架。它的 [JSX 写法](./jsx)使用独立运行时，也不依赖 React。如果你只是想在页面中展示流式 Markdown，可以直接从 [Fluxdown React](../guide/react/quick-start) 开始。

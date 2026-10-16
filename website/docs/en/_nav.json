@@ -1,14 +1,14 @@
 [
   {
     "text": "React",
-    "link": "/fluxdown/react/quick-start",
-    "activeMatch": "/fluxdown/react/",
+    "link": "/guide/react/quick-start",
+    "activeMatch": "/guide/react/",
     "position": "left"
   },
   {
     "text": "Core",
-    "link": "/fluxdown/core/quick-start",
-    "activeMatch": "/fluxdown/core/",
+    "link": "/guide/core/quick-start",
+    "activeMatch": "/guide/core/",
     "position": "left"
   },
   {
