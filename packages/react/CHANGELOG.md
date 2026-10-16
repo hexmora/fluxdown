@@ -1,5 +1,11 @@
 # fluxdown
 
+## 0.9.0
+
+### Minor Changes
+
+- c8829f8: Accept a single plugin pack as well as an ordered array in `plugins`. Equivalent single-pack and array configurations share the existing prop comparison behavior.
+
 ## 0.8.2
 
 ### Patch Changes

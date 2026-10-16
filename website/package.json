@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/website",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "homepage": "https://hexmora.github.io/fluxdown/",
   "type": "module",
