@@ -336,9 +336,9 @@ export function validateResume(
 }
 function packagesAt(commit: string) {
   assert(sha(commit), 'Invalid manifest commit');
-  const entries = git('ls-tree', '-r', '--name-only', commit, '--', 'packages')
+  const entries = git('ls-tree', '-r', '--name-only', commit, '--', 'packages', 'website')
     .split('\n')
-    .filter((path) => /^packages\/[^/]+\/package\.json$/.test(path));
+    .filter((path) => /^(packages\/[^/]+|website)\/package\.json$/.test(path));
   return new Map(
     entries.map((path) => {
       const manifest = JSON.parse(git('show', `${commit}:${path}`)) as {
@@ -381,10 +381,16 @@ function verifyVersionDiff(candidate: Candidate, target: string) {
     'Versioned packages differ from the prepared candidate',
   );
   const paths = git('diff', '--name-only', candidate.baseSha, target).split('\n').filter(Boolean);
+  const packageFiles = new Set(
+    [...before.values()].flatMap((pkg) => [
+      pkg.path,
+      pkg.path.replace(/package\.json$/, 'CHANGELOG.md'),
+    ]),
+  );
   assert(
     paths.every(
       (path) =>
-        /^packages\/[^/]+\/(package\.json|CHANGELOG\.md)$/.test(path) ||
+        packageFiles.has(path) ||
         path === 'pnpm-lock.yaml' ||
         /^\.changeset\/[^/]+\.md$/.test(path),
     ),
