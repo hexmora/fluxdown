@@ -13,15 +13,15 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm build
-pnpm build:storybook
 ```
 
-For a single project, use its directory name as the moon project ID:
+Run a single project's commands from its directory. For example, for React:
 
 ```bash
-pnpm exec moon run core:build
-pnpm exec moon run react:test
-pnpm exec moon tasks
+cd packages/react
+pnpm dev
+pnpm build
+pnpm build:storybook
 ```
 
 Place package tests in `__tests__` directories.

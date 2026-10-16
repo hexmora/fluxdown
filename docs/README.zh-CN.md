@@ -4,7 +4,7 @@
 
 [English](../README.md) | **简体中文**
 
-[在线文档](https://hexmora.github.io/fluxdown/zh/) | [在线体验](https://hexmora.github.io/fluxdown/zh/playground.html)
+[文档站](https://hexmora.github.io/fluxdown/zh/) | [Playground](https://hexmora.github.io/fluxdown/zh/playground.html)
 
 **专为流式场景打造的响应式 Markdown 渲染库。**
 
