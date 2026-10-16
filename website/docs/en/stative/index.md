@@ -50,4 +50,4 @@ Start with a plain function for simple calculations. Use `once` or a class when 
 - [Composing computations](./composition): package a state flow into a reusable closure.
 - [Lifecycle](./lifecycle): clean up subscriptions, timers, and child computations together.
 
-Stative does not depend on a UI framework. Its optional [JSX syntax](./jsx) uses its own runtime and does not require React. If you only need to display streaming Markdown in an application, start with [Fluxdown React](../fluxdown/react/quick-start).
+Stative does not depend on a UI framework. Its optional [JSX syntax](./jsx) uses its own runtime and does not require React. If you only need to display streaming Markdown in an application, start with [Fluxdown React](../guide/react/quick-start).

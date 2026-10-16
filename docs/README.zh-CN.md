@@ -4,6 +4,8 @@
 
 [English](../README.md) | **简体中文**
 
+[在线文档](https://hexmora.github.io/fluxdown/zh/) | [在线体验](https://hexmora.github.io/fluxdown/zh/playground.html)
+
 **专为流式场景打造的响应式 Markdown 渲染库。**
 
 从 AI 对话到实时预览，Fluxdown 随内容到达持续渲染 Markdown，让不断增长的内容保持流畅，并让你自由控制渲染结果的外观与行为。

@@ -1,4 +1,4 @@
-import { useLang, withBase } from '@rspress/core/runtime';
+import { normalizeHrefInRuntime, useLang, withBase } from '@rspress/core/runtime';
 import { useEffect, useState } from 'react';
 
 import type { Locale, Stream } from './type';
@@ -10,7 +10,8 @@ export const useLocale = () => {
 
   return {
     lang,
-    href: (path: string) => withBase(`${lang === 'zh' ? '/zh' : ''}${path}`),
+    href: (path: string) =>
+      withBase(normalizeHrefInRuntime(`${lang === 'zh' ? '/zh' : ''}${path}`)),
   };
 };
 

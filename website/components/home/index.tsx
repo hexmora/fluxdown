@@ -83,7 +83,7 @@ export const Home = () => {
             <CodeBlockRuntime code={quickStart} lang="tsx" wrapCode />
           </div>
         </div>
-        <a className={styles.textLink} href={href('/fluxdown/react/quick-start')}>
+        <a className={styles.textLink} href={href('/guide/react/quick-start')}>
           {copy.quickLink}
           <ArrowIcon />
         </a>
@@ -96,7 +96,7 @@ export const Home = () => {
         </div>
         <div className={styles.diagram}>
           <div className={styles.renderers}>
-            <a className={styles.frameworkCard} href={href('/fluxdown/react/quick-start')}>
+            <a className={styles.frameworkCard} href={href('/guide/react/quick-start')}>
               <strong>React</strong>
               <span>{copy.react}</span>
             </a>
@@ -111,7 +111,7 @@ export const Home = () => {
           <a
             aria-labelledby="core-label core-description"
             className={styles.layerCard}
-            href={href('/fluxdown/core/quick-start')}
+            href={href('/guide/core/quick-start')}
           >
             <img alt="" src={withBase('/logo.svg')} width="25" height="32" />
             <div>
@@ -153,7 +153,7 @@ export const Home = () => {
 
       <section className={styles.closing}>
         <h2>{copy.finalTitle}</h2>
-        <a className={styles.primaryLink} href={href('/fluxdown/react/quick-start')}>
+        <a className={styles.primaryLink} href={href('/guide/react/quick-start')}>
           {copy.finalButton}
           <ArrowIcon />
         </a>

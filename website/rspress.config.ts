@@ -1,11 +1,13 @@
 import { pluginLess } from '@rsbuild/plugin-less';
 import { pluginSass } from '@rsbuild/plugin-sass';
 import { pluginSvgr } from '@rsbuild/plugin-svgr';
-import { defineConfig } from '@rspress/core';
+import { defineConfig, normalizeHref } from '@rspress/core';
 import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
   root: 'docs',
+  base: '/fluxdown/',
+  siteOrigin: 'https://hexmora.github.io',
   title: 'Fluxdown',
   description:
     'Markdown that keeps up. Smooth streaming, resilient syntax, and a framework-free core.',
@@ -27,7 +29,22 @@ export default defineConfig({
   ],
   icon: '/logo.svg',
   logo: '/logo.svg',
-  route: { cleanUrls: true, localeRedirect: 'auto' },
+  // Publish real HTML URLs so direct visits work without server rewrites.
+  route: { cleanUrls: false, localeRedirect: 'auto' },
+  plugins: [
+    {
+      name: 'static-search-links',
+      modifySearchIndexData(pages) {
+        // Rspress 2 emits extensionless search targets even with cleanUrls disabled.
+        for (const page of pages) {
+          // Directory URLs already resolve to index.html and identify page metadata.
+          if (!page.routePath.endsWith('/')) {
+            page.routePath = normalizeHref(page.routePath, false);
+          }
+        }
+      },
+    },
+  ],
   markdown: {
     defaultWrapCode: true,
     link: { checkDeadLinks: true, checkAnchors: true },

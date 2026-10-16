@@ -14,42 +14,42 @@ export const COPY = {
         description:
           '以内容块为单位缓存解析结果，复用稳定的部分，把计算留给正在变化的内容。长回答也能从容展开。',
         link: '了解分块与更新',
-        path: '/fluxdown/core/streaming',
+        path: '/guide/core/streaming',
       },
       {
         title: '熟悉的 Markdown',
         description:
           '支持 GFM 表格、任务列表、删除线与自动链接。写下你熟悉的语法，得到读者期待的样子。',
         link: '查看 Markdown 支持',
-        path: '/fluxdown/react/customization',
+        path: '/guide/react/customization',
       },
       {
         title: '能力，按需组合',
         description:
           '从解析到呈现，以插件组合能力。接入 remark、rehype 生态，也可以为自己的内容写一个小插件。',
         link: '探索插件体系',
-        path: '/fluxdown/react/plugins',
+        path: '/guide/react/plugins',
       },
       {
         title: '做成你的风格',
         description:
           '用语义化插槽、HTML 渲染与主题调整外观，继续定制平滑算法和动效。每个细节，都可以贴合你的产品。',
         link: '开始定制',
-        path: '/fluxdown/react/customization',
+        path: '/guide/react/customization',
       },
       {
         title: '不被框架限制',
         description:
           '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React 开始。',
         link: '认识 Fluxdown Core',
-        path: '/fluxdown/core/quick-start',
+        path: '/guide/core/quick-start',
       },
       {
         title: '不止于文字',
         description:
           '公式渲染、代码高亮、HTML 过滤与链接安全检查，一起照顾真实内容。公式与高亮按需加载，减轻首次加载的负担。',
         link: '浏览预设能力',
-        path: '/fluxdown/react/plugins',
+        path: '/guide/react/plugins',
       },
     ],
     quickTitle: '几行代码，就能开始。',
@@ -81,42 +81,42 @@ export const COPY = {
         description:
           'Block-level caching reuses stable content and focuses processing on what is changing. Give long answers room to grow.',
         link: 'Explore blocks and updates',
-        path: '/fluxdown/core/streaming',
+        path: '/guide/core/streaming',
       },
       {
         title: 'Markdown you know',
         description:
           'GFM tables, task lists, strikethrough, and autolinks. Write familiar syntax and get the result your readers expect.',
         link: 'See Markdown support',
-        path: '/fluxdown/react/customization',
+        path: '/guide/react/customization',
       },
       {
         title: 'Compose what you need',
         description:
           'Plugins connect every stage, from parsing to presentation. Bring in remark and rehype, or write a small plugin of your own.',
         link: 'Explore the plugin system',
-        path: '/fluxdown/react/plugins',
+        path: '/guide/react/plugins',
       },
       {
         title: 'Make it yours',
         description:
           'Shape the experience with semantic slots, HTML rendering, themes, smoothing algorithms, and animations. Let every detail fit your product.',
         link: 'Start customizing',
-        path: '/fluxdown/react/customization',
+        path: '/guide/react/customization',
       },
       {
         title: 'Free to choose a framework',
         description:
           'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React integration.',
         link: 'Meet Fluxdown Core',
-        path: '/fluxdown/core/quick-start',
+        path: '/guide/core/quick-start',
       },
       {
         title: 'Beyond plain text',
         description:
           'Math, code highlighting, HTML filtering, and link safety checks take care of real content. Math and highlighting load on demand to keep the initial load light.',
         link: 'Explore built-in plugins',
-        path: '/fluxdown/react/plugins',
+        path: '/guide/react/plugins',
       },
     ],
     quickTitle: 'A few lines. A good beginning.',
