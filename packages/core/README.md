@@ -1,37 +1,32 @@
-**English** | [简体中文](./docs/README.zh-CN.md)
-
 # @fluxdown/core
 
-**The framework-independent engine for streaming Markdown.**
+A framework-independent Markdown engine for streaming content.
 
-Turn Markdown into reactive content blocks and connect them to your own renderer. `@fluxdown/core` handles Markdown processing and updates, while you choose the UI framework or output format.
+[Documentation](../../website/docs/en/guide/core/quick-start.md) · [简体中文](./docs/README.zh-CN.md)
 
-Use it to build a framework integration or work with Markdown as structured data. For a ready-to-use React component, see [Fluxdown](../../README.md#quick-start-react). Core's state flows are powered by [`stative`](../stative/README.md).
+`@fluxdown/core` turns changing Markdown into reactive content blocks backed by HAST, an HTML syntax tree. It handles parsing, syntax repair, and updates; your renderer decides what each block becomes.
 
-## Features
+Core runs without a browser. Use it to build a custom renderer or a framework integration. For a ready-to-use React component, use [`fluxdown`](../react).
 
-- **High performance.** Reuses existing blocks and reduces unnecessary compilation as text updates.
-- **Fully reactive.** Text, configuration, and plugin changes flow through to the output.
-- **Framework-independent.** Runs without React or a DOM environment.
-- **Your own renderer.** Work with HTML syntax trees (HAST) or connect blocks to components for your target framework.
-- **Pluggable.** Extend Markdown syntax, tree transformations, handling of incomplete Markdown, and rendering.
-
-## Quick start
-
-### Install
+## Install
 
 ```sh
-npm install @fluxdown/core stative
+pnpm add @fluxdown/core @fluxdown/types stative
+pnpm add -D @types/hast
 ```
 
-### Process streaming Markdown
+The example below imports public block and HAST types from `@fluxdown/types` and `@types/hast`.
 
-`Core` takes a renderer that determines the output for each block. This small renderer returns the reactive blocks themselves so you can inspect their HAST trees:
+## Read content blocks
+
+This renderer returns each block unchanged so you can inspect its current syntax tree:
 
 ```ts
-import { BaseRenderer, Core, type HastRoot } from "@fluxdown/core";
+import type { BlockCompilerConfig, HastRoot } from "@fluxdown/core";
 import type { IBlockState } from "@fluxdown/types";
 import type { ElementContent, Parent } from "hast";
+
+import { BaseRenderer, Core } from "@fluxdown/core";
 import { D, MutableState, render, S } from "stative";
 
 type MarkdownBlock = IBlockState<HastRoot>;
@@ -43,20 +38,22 @@ class BlocksRenderer extends BaseRenderer<HastRoot, ElementContent, Parent, Mark
 }
 
 const text = MutableState.of("# Hello, Fluxdown");
+const build = MutableState.of<BlockCompilerConfig>({
+  repair: true,
+  repairEnding: true,
+  footnote: false,
+  tex: false,
+  indentedCode: false,
+  setextHeading: false,
+});
+
 const core = render(
   S([
     Core<MarkdownBlock>,
     {
       Renderer: D(BlocksRenderer),
       text,
-      build: {
-        repair: true,
-        repairEnding: true,
-        footnote: false,
-        tex: false,
-        indentedCode: false,
-        setextHeading: false,
-      },
+      build,
       patches: [],
       renders: [],
     },
@@ -66,44 +63,34 @@ const core = render(
 const readTrees = () => core.value.value.map((block) => block.value.value);
 
 console.log(readTrees());
-
-text.next(text.value + "\n\nMarkdown that **keeps up**.");
+text.next(text.value + "\n\nThe content **keeps growing");
 console.log(readTrees());
 
+// End trailing syntax repair when the stream finishes.
+build.next({ ...build.value, repairEnding: false });
+
+// Run when this content is no longer needed.
 core.destroy();
 text.destroy();
+build.destroy();
 ```
 
-Pass the full Markdown text received so far to `text.next`, appending each new chunk to the previous text. The example keeps repairs enabled for incomplete Markdown throughout the stream.
+`S` describes the computation, `render` creates it, and `D` passes the renderer class as a plain value. These come from [`stative`](../stative), Core's reactive foundation.
 
-Set `build.indentedCode` or `build.setextHeading` to `true` to enable those block syntaxes in both the chunker and the default remark syntax policy. Explicit policy plugin settings override parsing options without changing the chunker's build settings.
+## Follow updates
 
-`D(BlocksRenderer)` passes the renderer class as a static value. `render` creates the core instance, and `core.value.value` gives its current output array. See the [`stative` guide](../stative/README.md) for more on state closures and input values.
+Keep one Core instance for each message and pass the full current Markdown to `text.next()`. `core.value` tracks the block list, and each block's `value` tracks its content. In a live renderer, subscribe to both: an existing block can change without changing the list or block references. The [state and updates guide](../../website/docs/en/guide/core/streaming.md) covers subscriptions and cleanup.
 
-## Rendering and updates
+Core manages the resources it creates. Clean up your own subscriptions and the `MutableState` inputs you created when they are no longer needed.
 
-Each compiled block exposes its content through `block.value`. In the example above, `block.value.value` is its current HAST tree. Your renderer can use these blocks to produce framework components or another output type.
+## Configure the pipeline
 
-Block content can change while the block and output array keep the same identity. When connecting a UI, observe the outer `core.value` for list changes and each `block.value` for content updates. Manage those subscriptions as blocks enter and leave the list.
+Use `build` to control syntax and repair. Parsing, HTML processing, repair, and mapping can be extended through plugins. Smooth output and trailing fade markers are available as presets and are disabled by default; the visual result depends on your renderer.
 
-Destroy the core instance when you are done with it. Core releases the state closures and plugin instances it owns; external inputs such as `text` remain under your control and need their own cleanup.
+- [State and updates](../../website/docs/en/guide/core/streaming.md) — follow content changes and enable smooth output.
+- [Configuration](../../website/docs/en/guide/core/configuration.md) — Core inputs and syntax switches.
+- [Plugins](../../website/docs/en/guide/core/plugins.md) — remark, rehype, repair, and mapper plugins.
 
-Set `mappers: { shad: { enabled: render(true), length: render(2) } }` to mark the newly visible tail for shading. Shad runs after Smooth in the default mapper list and is disabled by default. `length` counts visible characters and defaults to `2`. The active tail settles after 200 ms without growth.
+## Contributing and license
 
-Renderers can recognize the `SHAD_TAG_NAME`, `SHAD_DATA_ATTR`, and `SHAD_HOST_VALUE` marker exported by `@fluxdown/core-presets/mapper` and render its two child spans as the committed and active parts. React's `fluxdown` package includes that renderer and a separate `maskWidth` option.
-
-## Plugins
-
-Core includes preset Markdown processing plugins. Add to them through `remarks` for Markdown syntax, `rehypes` for HAST transformations, and `repairs` for handling incomplete Markdown. Supply render plugins through `renders` for your renderer to use.
-
-These inputs can be reactive, so you can update plugin configuration alongside the text. For the available preset plugins, see [`@fluxdown/core-presets`](../core-presets).
-
-## Contributing
-
-Bug reports, documentation improvements, and pull requests are welcome. When [reporting a bug](https://github.com/hexmora/fluxdown/issues), include a minimal reproduction, the Markdown input, and the sequence of updates that triggers it.
-
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for development commands and pull request guidelines.
-
-## License
-
-[MIT](../../LICENSE)
+See [CONTRIBUTING.md](../../CONTRIBUTING.md). Licensed under [MIT](../../LICENSE).

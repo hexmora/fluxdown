@@ -2,74 +2,76 @@
   <img src="./assets/logo.png" alt="Fluxdown" width="480" />
 </p>
 
-[English](../README.md) | **简体中文**
+**为流式内容打造的 Markdown 渲染器。**
 
-[文档站](https://hexmora.github.io/fluxdown/zh/) | [Playground](https://hexmora.github.io/fluxdown/zh/playground.html)
+[文档站](https://hexmora.github.io/fluxdown/zh/index.html) · [在线体验](https://hexmora.github.io/fluxdown/zh/playground.html) · [文档](../website/docs/zh/guide/index.md) · [English](../README.md)
 
-**专为流式场景打造的响应式 Markdown 渲染库。**
+Fluxdown 让 Markdown 在生成过程中保持可读，适用于 AI 对话、实时写作等内容持续增长的界面。
 
-从 AI 对话到实时预览，Fluxdown 随内容到达持续渲染 Markdown，让不断增长的内容保持流畅，并让你自由控制渲染结果的外观与行为。
+- **流畅的阅读体验。** 逐步展示新文本，让尚未完成的链接、强调和代码保持可读。
+- **减少重复计算。** 以内容块为单位缓存结果，复用消息中已稳定的部分。
+- **熟悉的 Markdown。** 支持 GFM 表格、任务列表、删除线、自动链接和代码高亮，也可按需启用公式。
+- **灵活的呈现方式。** 定制主题、替换组件，或通过插件扩展解析与渲染。
+- **框架无关的核心。** 直接使用 React 组件，或为自己的界面构建渲染器。
 
-可以直接使用现有的 React 组件，也可以基于框架无关的核心构建自己的渲染器。
+## 快速上手
 
-## 特点
-
-- **高性能。** 复用未变化的内容块，减少新文本到达时的渲染开销。
-- **纯响应式。** 文本、配置和插件都响应状态变化，渲染结果自动更新，无需手动刷新。
-- **高度可定制。** 自定义样式，也可以用自己的组件渲染链接、代码块等元素。
-- **插件化。** 通过可组合的插件扩展 Markdown 语法与渲染方式。
-- **核心层框架无关。** [`@fluxdown/core`](../packages/core/docs/README.zh-CN.md) 基于框架无关的 [`stative`](../packages/stative/docs/README.zh-CN.md) 包构建，可用于实现不同 UI 框架的渲染器。
-
-## 快速上手：React
-
-以下示例使用 `fluxdown` 包提供的 React 组件。
-
-### 安装
-
-在已有的 React 项目中安装：
+在 React 18 或 19 应用中安装：
 
 ```sh
-npm install fluxdown
+pnpm add fluxdown
 ```
 
-### 渲染 Markdown
-
-```jsx
+```tsx
 import { Fluxdown } from "fluxdown";
 
-export default function App() {
-  return <Fluxdown text={"# Hello, Fluxdown\n\nMarkdown that **keeps up**."} />;
+type MessageProps = {
+  text: string;
+  isStreaming: boolean;
+};
+
+export function Message({ text, isStreaming }: MessageProps) {
+  return <Fluxdown text={text} streaming={isStreaming} />;
 }
 ```
 
-### 流式渲染
+将**截至目前收到的完整消息**传给 `text`。生成完成、取消或失败时，将 `isStreaming` 设为 `false`。渲染静态内容时可省略 `streaming`。
 
-每收到一个片段，就将累积的 Markdown 传给 `text`。开启 `streaming` 后，新内容会逐步平滑显示，可搭配任意流式 API。
+如果打包工具没有自动加载样式，请在应用的全局样式入口中添加：
 
-```jsx
-import { Fluxdown } from "fluxdown";
-
-export function StreamingMessage({ text }) {
-  return <Fluxdown streaming text={text} />;
-}
+```ts
+import "fluxdown/styles.css";
 ```
 
-### 定制主题
+更多示例见 [React 快速上手](../website/docs/zh/guide/react/quick-start.md)。
 
-支持 `"light"`（默认）、`"dark"` 或 `[preset, overrides]`。直接传入部分 token 配置时扩展 light。
+## 包
 
-```jsx
-<Fluxdown
-  text="# 你的 Markdown"
-  theme={["dark", { tokens: { heading: { h1: { fontSize: "2.25rem" } } } }]}
-/>
-```
+| 包                                                   | 用途                                             |
+| ---------------------------------------------------- | ------------------------------------------------ |
+| [`fluxdown`](../packages/react/docs/README.zh-CN.md) | 开箱即用的 React Markdown 渲染组件。             |
+| [`@fluxdown/core`](../packages/core)                 | 为自定义渲染器提供解析、修复和响应式内容块。     |
+| [`stative`](../packages/stative)                     | 可组合的状态与派生计算，也是 Core 的响应式基础。 |
+
+## 文档
+
+- [流式内容](../website/docs/zh/guide/react/streaming.md) — 接入文本流，调整流式效果。
+- [样式定制](../website/docs/zh/guide/react/customization.md) — 调整主题、排版和布局。
+- [插件](../website/docs/zh/guide/react/plugins.md) — 定制语法、内容和交互。
+- [Core](../website/docs/zh/guide/core/quick-start.md) — 直接处理响应式内容块。
+- [Stative](../website/docs/zh/stative/getting-started.md) — 创建和组合状态流。
 
 ## 参与贡献
 
-欢迎报告问题、改进文档或提交 Pull Request。[报告问题](https://github.com/hexmora/fluxdown/issues)时，请提供最小复现示例，以及触发问题的 Markdown 输入。
+欢迎报告问题、改进文档或提交 Pull Request。可以通过 [Issues](https://github.com/hexmora/fluxdown/issues) 报告缺陷或讨论想法。报告问题时，请尽量提供最小复现示例，帮助我们定位原因。
 
-开发命令和 Pull Request 指南见 [CONTRIBUTING.md](../CONTRIBUTING.md)。
+开发环境和 Pull Request 指南见 [CONTRIBUTING.md](../CONTRIBUTING.md)。安全漏洞请按 [SECURITY.md](../SECURITY.md) 中的说明私下报告。
+
+## 贡献者
+
+感谢所有贡献代码、文档、问题反馈和想法的人。
+
+[![贡献者](https://contrib.rocks/image?repo=hexmora/fluxdown)](https://github.com/hexmora/fluxdown/graphs/contributors)
 
 ## 许可证
 

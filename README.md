@@ -2,74 +2,76 @@
   <img src="./docs/assets/logo.png" alt="Fluxdown" width="480" />
 </p>
 
-**English** | [简体中文](./docs/README.zh-CN.md)
+**A Markdown renderer built for streaming.**
 
-[Documentation](https://hexmora.github.io/fluxdown/) | [Playground](https://hexmora.github.io/fluxdown/playground.html)
+[Website](https://hexmora.github.io/fluxdown/) · [Playground](https://hexmora.github.io/fluxdown/playground.html) · [Documentation](./website/docs/en/guide/index.md) · [简体中文](./docs/README.zh-CN.md)
 
-**A reactive Markdown rendering library built for streaming.**
+Fluxdown keeps streaming Markdown readable, from unfinished syntax to the final response. Use it for AI conversations, live writing, and other interfaces where text keeps growing.
 
-Render Markdown as it arrives, from AI chat responses to live previews. Fluxdown keeps growing content responsive and gives you control over how it looks and behaves.
+- **Smooth streaming.** Reveal incoming text gradually and handle unfinished links, emphasis, and code.
+- **Less repeated work.** Block-level caching reuses stable content as the message grows.
+- **Familiar Markdown.** Render GFM tables, task lists, strikethrough, and autolinks, with code highlighting and optional math.
+- **Adaptable presentation.** Customize themes, replace components, or extend parsing and rendering with plugins.
+- **A framework-independent core.** Start with the React component or build a renderer for your own interface.
 
-Start with the React component, or use the framework-independent core to build your own renderer.
+## Get started
 
-## Features
-
-- **High performance.** Reuses unchanged blocks and limits rendering work as new text arrives.
-- **Fully reactive.** Text, configuration, and plugins react to state changes, keeping the output up to date without manual refreshes.
-- **Highly customizable.** Bring your own styles and components, from links to code blocks.
-- **Pluggable.** Extend Markdown syntax and rendering with composable plugins.
-- **Framework-independent core.** [`@fluxdown/core`](./packages/core/README.md) is built on the framework-free [`stative`](./packages/stative/README.md) package and can power renderers for different UI frameworks.
-
-## Quick start: React
-
-The examples below use the React component provided by the `fluxdown` package.
-
-### Install
-
-In an existing React project:
+In a React 18 or 19 app:
 
 ```sh
-npm install fluxdown
+pnpm add fluxdown
 ```
 
-### Render Markdown
-
-```jsx
+```tsx
 import { Fluxdown } from "fluxdown";
 
-export default function App() {
-  return <Fluxdown text={"# Hello, Fluxdown\n\nMarkdown that **keeps up**."} />;
+type MessageProps = {
+  text: string;
+  isStreaming: boolean;
+};
+
+export function Message({ text, isStreaming }: MessageProps) {
+  return <Fluxdown text={text} streaming={isStreaming} />;
 }
 ```
 
-### Render a stream
+Pass the **full message received so far** as `text`. Set `isStreaming` to `false` when generation finishes, is cancelled, or fails. For static content, omit `streaming`.
 
-Pass the accumulated Markdown to `text` as chunks arrive. Enable `streaming` to reveal new content gradually, with any streaming API.
+If your bundler does not load the styles automatically, add this to your app's global style entry:
 
-```jsx
-import { Fluxdown } from "fluxdown";
-
-export function StreamingMessage({ text }) {
-  return <Fluxdown streaming text={text} />;
-}
+```ts
+import "fluxdown/styles.css";
 ```
 
-### Customize the theme
+See the [React quick start](./website/docs/en/guide/react/quick-start.md) for more examples.
 
-Use `"light"` (default), `"dark"`, or `[preset, overrides]`. Partial token configurations extend light.
+## Packages
 
-```jsx
-<Fluxdown
-  text="# Your Markdown"
-  theme={["dark", { tokens: { heading: { h1: { fontSize: "2.25rem" } } } }]}
-/>
-```
+| Package                             | Use it for                                                          |
+| ----------------------------------- | ------------------------------------------------------------------- |
+| [`fluxdown`](./packages/react)      | Ready-to-use Markdown rendering in React.                           |
+| [`@fluxdown/core`](./packages/core) | Parsing, repair, and reactive content blocks for a custom renderer. |
+| [`stative`](./packages/stative)     | Composable state and derived computations, also used by Core.       |
+
+## Documentation
+
+- [Streaming](./website/docs/en/guide/react/streaming.md) — connect incoming text and control streaming effects.
+- [Styling](./website/docs/en/guide/react/customization.md) — adjust themes, typography, and layout.
+- [Plugins](./website/docs/en/guide/react/plugins.md) — customize syntax, content, and interactions.
+- [Core](./website/docs/en/guide/core/quick-start.md) — work with reactive content blocks directly.
+- [Stative](./website/docs/en/stative/getting-started.md) — create and compose state flows.
 
 ## Contributing
 
-Bug reports, documentation improvements, and pull requests are welcome. When [reporting a bug](https://github.com/hexmora/fluxdown/issues), include a minimal reproduction and the Markdown input that triggers it.
+Bug reports, documentation improvements, and pull requests are welcome. Use [issues](https://github.com/hexmora/fluxdown/issues) to report bugs or discuss ideas. A minimal reproduction helps us investigate a problem.
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development commands and pull request guidelines.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup and pull request guidelines. Report vulnerabilities privately as described in [SECURITY.md](./SECURITY.md).
+
+## Contributors
+
+Thanks to everyone who contributes code, documentation, bug reports, and ideas.
+
+[![Contributors](https://contrib.rocks/image?repo=hexmora/fluxdown)](https://github.com/hexmora/fluxdown/graphs/contributors)
 
 ## License
 

@@ -1,129 +1,70 @@
-**English** | [简体中文](./docs/README.zh-CN.md)
-
 # stative
 
-**Composable reactive state, independent of any UI framework.**
+Composable reactive state, independent of a UI framework.
 
-Build derived state from changing inputs and compose it into reusable units called **state closures**. Each closure exposes a current value, follows its dependencies, and manages the lifetime of its child computations.
+[Documentation](../../website/docs/en/stative/index.md) · [简体中文](./docs/README.zh-CN.md)
 
-`stative` powers [Fluxdown](../../README.md)'s core and can also be used independently for application state and data processing.
+Stative connects changing inputs to reusable computations. Each computation exposes a current result and notifies subscribers when it changes. Compose these computations into larger state flows with their own lifecycles.
 
-## Features
+Use it for derived form values, editor analysis, and streaming pipelines. Stative powers [Fluxdown Core](../core) and works in browsers and Node.js.
 
-- **Framework-independent.** Use reactive state without React or a DOM environment.
-- **Composable.** Declare computations with functions or classes, then connect them with `S` or JSX.
-- **Lazy.** State flows initialize when their output is first accessed.
-- **Efficient updates.** Use `memo` to skip equivalent inputs and suppress unchanged results.
-- **Managed lifetimes.** Owned child closures and subscriptions are cleaned up when no longer needed, including when a root is destroyed.
-
-## Quick start
-
-### Install
+## Install
 
 ```sh
-npm install stative
+pnpm add stative
 ```
 
-### Create and observe derived state
+## Create a state flow
 
 ```ts
 import { MutableState, render, S } from "stative";
 
-const Scale = ({ input, factor }: { input: number; factor: number }) => input * factor;
+type TotalInputs = {
+  price: number;
+  quantity: number;
+};
 
-const input = MutableState.of(2);
-const scaled = render(S([Scale, { input, factor: 3 }]));
+const Total = ({ price, quantity }: TotalInputs) => price * quantity;
 
-const subscription = scaled.value.subscribe((value) => console.log(value)); // 6
+const quantity = MutableState.of(2);
+const total = render(S([Total, { price: 20, quantity }]));
+const subscription = total.value.subscribe((amount) => console.log(amount));
+// Logs 40 immediately.
 
-input.next(4); // Logs 12
-console.log(scaled.value.value); // 12
+quantity.next(3); // Logs 60.
+console.log(total.value.value); // 60
 
+// Run when this state flow is no longer needed.
 subscription.unsubscribe();
-scaled.destroy();
-input.destroy();
+total.destroy();
+quantity.destroy();
 ```
 
-`S` describes a computation and its inputs; `render` creates a state closure from that description. A mapper such as `Scale` receives the current input values and runs again when they change.
+`MutableState` holds an input. `S` describes a computation and its inputs; `render` creates a **state closure** that runs it and manages its children. The computation initializes when its output is first accessed. `total.value` is the subscribable result state, and `total.value.value` is its current value.
 
-The closure's `value` is a readable state: subscribe to it for updates, or read `value.value` for the current result. In this example, subscribing immediately logs the current result.
+`Total` receives ordinary numbers, whether its inputs are constants or changing states. Destroying its closure releases the managed children and internal subscriptions. The `quantity` state was created outside the closure and needs its own cleanup.
 
-Destroy root closures when you are done with them. They release their owned children and subscriptions; external state sources such as `input` remain under your control and need their own cleanup.
+## Compose as your state flow grows
 
-## Choose a declaration
+Choose the form that fits the computation. All three work with `S` and `render`:
 
-All three forms use the same `render(S([Scale, inputs]))` pattern:
+| Form                     | Use it for                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------ |
+| Plain function           | Calculate a result from the current input values.                                                |
+| `once`                   | Connect child computations and resources once, then let the resulting state flow handle updates. |
+| `BaseStateClosure` class | Organize a state flow with instance methods and local state.                                     |
 
-| Form            | Use it for                                        | How it updates                                        |
-| --------------- | ------------------------------------------------- | ----------------------------------------------------- |
-| Mapper function | Calculating a value from current inputs           | Runs again as inputs change                           |
-| `once` function | Composing state flows and child closures          | Builds once; the resulting state flow handles updates |
-| Class           | Computations with instance methods or local state | Builds once; the resulting state flow handles updates |
+Optional JSX describes the same compositions through Stative's own runtime; it does not require React or produce DOM.
 
-### Compose with `once`
+## Documentation
 
-Use `once` to connect reactive inputs and build a state flow. Here is the same `Scale` declared with `once`:
+- [Getting started](../../website/docs/en/stative/getting-started.md) — create, update, and observe state.
+- [State and derived values](../../website/docs/en/stative/state-and-derived.md) — combine inputs, batch changes, and memoize results.
+- [Composition](../../website/docs/en/stative/composition.md) — connect functions, `once` closures, and classes.
+- [Switching and lists](../../website/docs/en/stative/collections.md) — follow changing sources and manage item lifetimes.
+- [Lifecycle](../../website/docs/en/stative/lifecycle.md) — clean up subscriptions, timers, and other resources.
+- [JSX](../../website/docs/en/stative/jsx.md) — declare state flows with optional JSX syntax.
 
-```ts
-import { type IReadableClosure, once, useMap } from "stative";
+## Contributing and license
 
-const Scale = once(({ input, factor }: { input: IReadableClosure<number>; factor: number }) =>
-  useMap(input, (value) => value * factor),
-);
-```
-
-`once` runs on the first access to the closure's output. `useMap` derives a value from one source or a list of sources; `useSelect` creates a pure projection that stays unsubscribed until observed. `useCreate` builds a child closure. These helpers manage the resulting child closures for you.
-
-### Use a class
-
-Extend `BaseStateClosure` when a class fits your application better:
-
-```ts
-import { BaseStateClosure, type IReadableClosure } from "stative";
-
-class Scale extends BaseStateClosure<number, { input: IReadableClosure<number>; factor: number }> {
-  protected render() {
-    const { input, factor } = this.inputs;
-
-    return this.map(input, (value) => value * factor);
-  }
-}
-```
-
-Class methods such as `this.map`, `this.select`, and `this.create` serve the same purpose as the corresponding `once` helpers. Use the `useMap`, `useSelect`, and `useCreate` hooks inside `once`; use instance methods inside classes.
-
-### Pass reactive and static inputs
-
-Mappers receive plain values. In `once` and class declarations, reactive inputs arrive as `IReadableClosure<T>`, while primitive constants such as `factor: 3` stay plain values.
-
-Wrap static objects and ordinary callbacks in `D(value)` when passing them to `once` or a class. To provide a constant as a reactive input, use `ReactiveState.of(value)`.
-
-## Optional JSX
-
-JSX can describe the same computations as `S`. For TypeScript, set `jsx` to `"react-jsx"` and `jsxImportSource` to `"stative"` in your compiler options, then use a `.tsx` file:
-
-```tsx
-import { MutableState, render } from "stative";
-
-const Scale = ({ input, factor }: { input: number; factor: number }) => input * factor;
-
-const input = MutableState.of(2);
-const scaled = render(<Scale input={input} factor={3} />);
-
-console.log(scaled.value.value); // 6
-
-scaled.destroy();
-input.destroy();
-```
-
-This JSX describes reactive computations using `stative`'s own runtime. It does not require React.
-
-## Contributing
-
-Bug reports, documentation improvements, and pull requests are welcome. When [reporting a bug](https://github.com/hexmora/fluxdown/issues), include a minimal reproduction with the input updates and expected result.
-
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for development commands and pull request guidelines.
-
-## License
-
-[MIT](../../LICENSE)
+See [CONTRIBUTING.md](../../CONTRIBUTING.md). Licensed under [MIT](../../LICENSE).
