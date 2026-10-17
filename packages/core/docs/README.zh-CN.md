@@ -1,37 +1,32 @@
-[English](../README.md) | **简体中文**
-
 # @fluxdown/core
 
-**框架无关的流式 Markdown 处理引擎。**
+框架无关的流式 Markdown 处理引擎。
 
-将 Markdown 转为响应式内容块，并连接到自己的渲染器。`@fluxdown/core` 负责 Markdown 的处理与更新，UI 框架和输出格式由你选择。
+[文档](../../../website/docs/zh/guide/core/quick-start.md) · [English](../README.md)
 
-可以用它构建框架集成，也可以将 Markdown 作为结构化数据处理。如果需要开箱即用的 React 组件，请参阅 [Fluxdown](../../../docs/README.zh-CN.md#快速上手react)。Core 的状态流由 [`stative`](../../stative/docs/README.zh-CN.md) 提供支持。
+`@fluxdown/core` 将不断变化的 Markdown 转为基于 HAST（HTML 语法树）的响应式内容块。它负责解析、语法修复和更新，由你的渲染器决定每个块如何输出。
 
-## 特点
+Core 无需浏览器即可运行，适合构建自定义渲染器或框架集成。如果需要开箱即用的 React 组件，请使用 [`fluxdown`](../../react/docs/README.zh-CN.md)。
 
-- **高性能。** 复用已有内容块，减少文本更新时不必要的重复编译。
-- **纯响应式。** 文本、配置和插件的变化会传递到输出。
-- **框架无关。** 无需 React 或 DOM 环境即可运行。
-- **自定义渲染器。** 直接处理 HTML 语法树（HAST），或将内容块连接到目标框架的组件。
-- **插件化。** 扩展 Markdown 语法、语法树转换、不完整 Markdown 的处理和渲染。
-
-## 快速上手
-
-### 安装
+## 安装
 
 ```sh
-npm install @fluxdown/core stative
+pnpm add @fluxdown/core @fluxdown/types stative
+pnpm add -D @types/hast
 ```
 
-### 处理流式 Markdown
+下面的示例从 `@fluxdown/types` 和 `@types/hast` 导入内容块与 HAST 的公共类型。
 
-`Core` 接收一个渲染器，由它决定每个内容块的输出。下面的简单渲染器直接返回响应式内容块，便于查看它们的 HAST 树：
+## 读取内容块
+
+这个渲染器原样返回每个内容块，方便查看当前的语法树：
 
 ```ts
-import { BaseRenderer, Core, type HastRoot } from "@fluxdown/core";
+import type { BlockCompilerConfig, HastRoot } from "@fluxdown/core";
 import type { IBlockState } from "@fluxdown/types";
 import type { ElementContent, Parent } from "hast";
+
+import { BaseRenderer, Core } from "@fluxdown/core";
 import { D, MutableState, render, S } from "stative";
 
 type MarkdownBlock = IBlockState<HastRoot>;
@@ -43,13 +38,22 @@ class BlocksRenderer extends BaseRenderer<HastRoot, ElementContent, Parent, Mark
 }
 
 const text = MutableState.of("# Hello, Fluxdown");
+const build = MutableState.of<BlockCompilerConfig>({
+  repair: true,
+  repairEnding: true,
+  footnote: false,
+  tex: false,
+  indentedCode: false,
+  setextHeading: false,
+});
+
 const core = render(
   S([
     Core<MarkdownBlock>,
     {
       Renderer: D(BlocksRenderer),
       text,
-      build: { repair: true, repairEnding: true, footnote: false, tex: false },
+      build,
       patches: [],
       renders: [],
     },
@@ -59,38 +63,34 @@ const core = render(
 const readTrees = () => core.value.value.map((block) => block.value.value);
 
 console.log(readTrees());
-
-text.next(text.value + "\n\nMarkdown that **keeps up**.");
+text.next(text.value + "\n\nThe content **keeps growing");
 console.log(readTrees());
 
+// 流结束后，关闭尾部语法修复。
+build.next({ ...build.value, repairEnding: false });
+
+// 不再需要这些内容时，释放资源。
 core.destroy();
 text.destroy();
+build.destroy();
 ```
 
-向 `text.next` 传入当前已收到的完整 Markdown 文本，每收到一个新片段，就将它追加到之前的文本。示例在整个流式过程中始终开启对不完整 Markdown 的修复。
+`S` 描述计算，`render` 创建计算实例，`D` 将渲染器类作为普通值传入。它们都来自 Core 的响应式基础 [`stative`](../../stative)。
 
-`D(BlocksRenderer)` 将渲染器类作为静态值传入。`render` 创建 Core 实例，`core.value.value` 获取当前的输出数组。有关状态闭包和输入值的更多说明，请参阅 [`stative` 指南](../../stative/docs/README.zh-CN.md)。
+## 跟随内容更新
 
-## 渲染与更新
+每条消息保留一个 Core 实例，并将当前的完整 Markdown 传给 `text.next()`。`core.value` 跟踪内容块列表，每个块的 `value` 跟踪块内内容。接入实时渲染器时，两层都需要订阅：已有块的内容可能改变，而列表和块的引用保持不变。订阅和清理方式见[状态与更新指南](../../../website/docs/zh/guide/core/streaming.md)。
 
-每个编译后的内容块通过 `block.value` 提供内容。在上面的示例中，`block.value.value` 是当前的 HAST 树。渲染器可以用这些内容块生成框架组件或其他类型的输出。
+Core 会管理自己创建的资源。你创建的订阅和 `MutableState` 输入，需要在不再使用时自行清理。
 
-内容块的内容可能发生变化，而内容块和输出数组仍保持相同的引用。接入 UI 时，请订阅外层的 `core.value` 以接收列表变化，同时订阅各个 `block.value` 以接收内容更新。内容块加入或离开列表时，需要相应地建立或清理订阅。
+## 配置处理流程
 
-使用完毕后，请销毁 Core 实例。Core 会释放自己管理的状态闭包和插件实例；`text` 这样的外部输入仍由你管理，需要单独清理。
+通过 `build` 控制语法和修复选项，通过插件扩展解析、HTML 处理、修复和映射。预设包含平滑输出和尾部淡入标记，默认关闭；最终的视觉效果由渲染器实现。
 
-## 插件
+- [状态与更新](../../../website/docs/zh/guide/core/streaming.md) — 订阅内容变化，启用平滑输出。
+- [配置](../../../website/docs/zh/guide/core/configuration.md) — Core 输入和语法开关。
+- [插件](../../../website/docs/zh/guide/core/plugins.md) — remark、rehype、repair 和 mapper 插件。
 
-Core 内置预设的 Markdown 处理插件。可以通过 `remarks` 扩展 Markdown 语法，通过 `rehypes` 转换 HAST，以及通过 `repairs` 处理不完整的 Markdown。渲染插件通过 `renders` 传入，供渲染器使用。
+## 参与贡献与许可证
 
-这些输入可以是响应式的，因此可以随文本一起更新插件配置。可用的预设插件见 [`@fluxdown/core-presets`](../../core-presets)。
-
-## 参与贡献
-
-欢迎报告问题、改进文档或提交 Pull Request。[报告问题](https://github.com/hexmora/fluxdown/issues)时，请提供最小复现示例、Markdown 输入，以及触发问题的更新过程。
-
-开发命令和 Pull Request 指南见 [CONTRIBUTING.md](../../../CONTRIBUTING.md)。
-
-## 许可证
-
-[MIT](../../../LICENSE)
+贡献指南见 [CONTRIBUTING.md](../../../CONTRIBUTING.md)。本项目采用 [MIT](../../../LICENSE) 许可证。
