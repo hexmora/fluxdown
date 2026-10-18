@@ -153,8 +153,8 @@ afterEach(() => {
 });
 
 describe('Core shad pipeline', () => {
-  test('keeps a bare Shad disabled and defaults its configured tail length to two', () => {
-    const view = setup('abcd');
+  test('keeps a bare Shad disabled and defaults its configured tail length to ten', () => {
+    const view = setup('abcdefghijkl');
 
     view.mappers.next([Shad]);
 
@@ -163,15 +163,15 @@ describe('Core shad pipeline', () => {
     view.mappers.next([[Shad, { enabled: ReactiveState.of(true) }]]);
 
     expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
-      leading: 'cd',
+      leading: 'cdefghijkl',
       active: '',
     });
 
-    view.text.next('abcde');
+    view.text.next('abcdefghijklm');
 
     expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
-      leading: 'd',
-      active: 'e',
+      leading: 'defghijkl',
+      active: 'm',
     });
   });
 

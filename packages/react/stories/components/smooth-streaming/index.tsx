@@ -14,7 +14,7 @@ export const SmoothStreaming = ({ initialText = SMOOTH_MARKDOWN }: SmoothStreami
 
   const [shad, setShad] = useState(true);
 
-  const [shadLength, setShadLength] = useState(2);
+  const [shadLength, setShadLength] = useState(10);
 
   const [maskWidth, setMaskWidth] = useState(15);
 

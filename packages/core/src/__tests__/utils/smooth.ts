@@ -19,6 +19,10 @@ export class StepSmoothScheduler extends BaseSmoothScheduler {
     StepSmoothScheduler.instances.push(this);
   }
 
+  override get idle() {
+    return true;
+  }
+
   override reset(index = 0) {
     super.reset(index);
 

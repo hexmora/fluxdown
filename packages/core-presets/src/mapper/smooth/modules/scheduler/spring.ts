@@ -5,9 +5,9 @@ import { BaseSmoothScheduler } from './base';
 export class SpringSmoothScheduler extends BaseSmoothScheduler {
   /**
    * Initial speed, buffer size, elasticity, resume speed, and maximum speed.
-   * @default [20, 15, 1 / 700 / 1000, 2, 100_001]
+   * @default [20, 15, 1 / 700 / 1000, 2, 100_000]
    */
-  protected readonly defaultTuple = [20, 15, 1 / 700 / 1000, 2, 100_001];
+  protected readonly defaultTuple = [20, 15, 1 / 700 / 1000, 2, 100_000];
 
   private timestamp?: number;
 
@@ -19,6 +19,12 @@ export class SpringSmoothScheduler extends BaseSmoothScheduler {
 
   static get name() {
     return 'spring';
+  }
+
+  override get idle() {
+    const [, , , resumeSpeed] = this.tuple;
+
+    return this.position >= this.fullIndex && this.speed <= resumeSpeed / 1000;
   }
 
   override reset(index = 0) {
@@ -34,6 +40,10 @@ export class SpringSmoothScheduler extends BaseSmoothScheduler {
   start(timestamp: number, index = 0) {
     this.reset(index);
 
+    this.timestamp = timestamp;
+  }
+
+  override resume(timestamp: number) {
     this.timestamp = timestamp;
   }
 
@@ -54,6 +64,10 @@ export class SpringSmoothScheduler extends BaseSmoothScheduler {
 
     if (this.position >= this.fullIndex) {
       this.speed = Math.max(this.speed * 0.9, resumeSpeed / 1000);
+
+      if (this.speed < 0.5 / 1000) {
+        this.speed = 0;
+      }
 
       return 0;
     }

@@ -17,6 +17,10 @@ export abstract class BaseSmoothScheduler implements IScheduler {
     return tuple;
   }
 
+  get idle() {
+    return false;
+  }
+
   push(length: number) {
     this.fullIndex += length;
   }
@@ -26,6 +30,10 @@ export abstract class BaseSmoothScheduler implements IScheduler {
   }
 
   abstract start(timestamp: number, index?: number): void;
+
+  resume(timestamp: number) {
+    this.start(timestamp, this.fullIndex);
+  }
 
   abstract tick(timestamp: number): number;
 }

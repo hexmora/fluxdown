@@ -29,17 +29,21 @@ describe('Fluxdown shad streaming', () => {
 
     expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
 
-    view.rerender(<Fluxdown streaming={{ shad: true, smooth: false }} text="abcdef" />);
+    view.rerender(<Fluxdown streaming={{ shad: true, smooth: false }} text="abcdefghijklmnop" />);
 
-    expect(view.container.textContent).toBe('abcdef');
+    expect(view.container.textContent).toBe('abcdefghijklmnop');
 
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('ef');
+    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('ghijklmnop');
+
+    expect(view.container.firstElementChild).toHaveStyle({
+      [`--${PREFIX}-shad-mask-width`]: '15px',
+    });
 
     expect(view.container.querySelector(`.${styles.mask}`)).toHaveAttribute('aria-hidden', 'true');
 
     await act(async () => jest.advanceTimersByTime(200));
 
-    expect(view.container.textContent).toBe('abcdef');
+    expect(view.container.textContent).toBe('abcdefghijklmnop');
 
     expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('');
 
@@ -165,7 +169,7 @@ describe('Fluxdown shad streaming', () => {
 
     expect(view.container.textContent).toBe('firstseco');
 
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('co');
+    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('seco');
 
     await act(async () => ticker.current().tick(48));
 
