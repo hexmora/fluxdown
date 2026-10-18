@@ -1,5 +1,13 @@
 # @fluxdown/core
 
+## 0.11.2
+
+### Patch Changes
+
+- cd2389a: Improve the visual appearance of streaming text with a longer fading tail and smoother continuation. Require scheduler `idle` and `resume` members, with default implementations in `BaseSmoothScheduler`.
+- Updated dependencies [cd2389a]
+  - @fluxdown/core-presets@0.8.0
+
 ## 0.11.1
 
 ### Patch Changes
