@@ -9,7 +9,7 @@ Slot 插件负责渲染插槽：代码块、链接、标题等内容已经准备
 ```tsx
 import type { CodeBlockProps } from '@fluxdown/react-presets/base';
 
-import { BaseSlotPlugin } from '@fluxdown/react-presets/base';
+import { BaseSlotPlugin } from '@fluxdown/react-base-presets/base';
 import { Fluxdown } from 'fluxdown';
 
 function CompactCodeBlock({ Raw, ...props }: CodeBlockProps) {
@@ -35,7 +35,7 @@ export function Message({ text }: MessageProps) {
 
 `key` 标识插件，`type` 选择插槽，`Component` 提供组件。把插件类放进 `slots`，Fluxdown 会管理它的创建和清理。
 
-> 插件基类和属性类型从 `@fluxdown/react-presets/base` 导入。先运行 `pnpm add @fluxdown/react-presets` 安装扩展包。
+> 共享插件基类从 `@fluxdown/react-base-presets/base` 导入，Web 属性类型从 `@fluxdown/react-presets/base` 导入。先运行 `pnpm add @fluxdown/react-base-presets @fluxdown/react-presets` 安装两个扩展包。
 
 ## 保留默认功能
 
@@ -82,6 +82,9 @@ Fluxdown 默认包含这些插件，无需手动添加。
 | `ParagraphSlotPlugin`       | 提供段落排版。                                       |
 | `StrongSlotPlugin`          | 显示加粗文字。                                       |
 | `TableSlotPlugin`           | 提供表格容器与布局。                                 |
+| `TableCellSlotPlugin`       | 提供表头和单元格，并保留列对齐方式。                 |
+| `NodeSlotPlugin`            | 渲染其余支持的节点，包括普通文本和行内代码。         |
+| `ShadSlotPlugin`            | 显示流式输出末尾的渐变效果。                         |
 | `TexSlotPlugin`             | 显示数学公式，并在完整公式渲染器加载前提供轻量展示。 |
 
 > 公式预设已包含在内，但仍需要通过 `build={{ tex: true }}` 开启公式语法。

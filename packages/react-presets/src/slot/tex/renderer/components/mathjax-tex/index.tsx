@@ -1,10 +1,10 @@
+import { texToSvg } from '@fluxdown/react-base-presets/math';
 import cn from 'classnames';
 import { useMemo } from 'react';
 
 import type { TexProps } from '../../../../../base';
 
 import styles from '../../index.module.scss';
-import { texToSvg } from './utils';
 
 export const MathjaxTexRenderer = ({ className, mode = 'inline', style, tex }: TexProps) => {
   const html = useMemo(() => texToSvg(tex, mode), [mode, tex]);

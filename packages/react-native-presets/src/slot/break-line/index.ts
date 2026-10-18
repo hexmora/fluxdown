@@ -1,0 +1,19 @@
+import type { IPluggableConfig } from '@fluxdown/types';
+
+import { BaseSlotPlugin } from '@fluxdown/react-base-presets/base';
+
+import { BreakLineRenderer } from './renderer';
+
+declare global {
+  interface SlotConfigs {
+    'slot-break-line'?: IPluggableConfig<void>;
+  }
+}
+
+export class BreakLineSlotPlugin extends BaseSlotPlugin<'BreakLine'> {
+  static readonly key = 'slot-break-line';
+
+  readonly Component = BreakLineRenderer;
+
+  readonly type = 'BreakLine';
+}

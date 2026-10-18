@@ -2,6 +2,8 @@
 
 在 React 应用中使用 Fluxdown，传入 Markdown 就可以开始渲染。常用语法、代码高亮、复制按钮和基础样式已经准备好。
 
+原生应用请阅读 [React Native 快速上手](../react-native/quick-start.md)。
+
 ## 安装
 
 ```sh

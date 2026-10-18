@@ -1,8 +1,8 @@
+import type { SlotType } from '@fluxdown/react-base-presets/base';
 import type { Element, Text } from 'hast';
 
-import type { SlotType } from '../base';
+import { PRESET_RENDER_PLUGINS } from '@fluxdown/react-base-presets/render';
 
-import { PRESET_RENDER_PLUGINS } from '../render';
 import { PRESET_SLOT_PLUGINS } from '../slot';
 
 const EXPECTED_SLOT_TYPES: SlotType[] = [
@@ -19,6 +19,9 @@ const EXPECTED_SLOT_TYPES: SlotType[] = [
   'Paragraph',
   'Strong',
   'Table',
+  'TableCell',
+  'Node',
+  'Shad',
   'Tex',
 ];
 

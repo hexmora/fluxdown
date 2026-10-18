@@ -6,12 +6,13 @@ Use it for AI conversations, live writing, streaming reports, or any interface w
 
 ## Where to start
 
-| What you need                                             | Start here                                                   |
-| --------------------------------------------------------- | ------------------------------------------------------------ |
-| Display Markdown and streaming responses in a React app   | [React quick start](./react/quick-start.md) · `fluxdown`     |
-| Use another framework or control how content is presented | [Core quick start](./core/quick-start.md) · `@fluxdown/core` |
+| What you need                                             | Start here                                                                           |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Display Markdown and streaming responses in a React app   | [React quick start](./react/quick-start.md) · `fluxdown`                             |
+| Display Markdown and streaming responses in a native app  | [React Native quick start](./react-native/quick-start.md) · `@fluxdown/react-native` |
+| Use another framework or control how content is presented | [Core quick start](./core/quick-start.md) · `@fluxdown/core`                         |
 
-React provides a ready-to-use presentation layer. Core handles Markdown independently of any UI framework. Both share the same syntax, repair, and streaming capabilities.
+React and React Native provide ready-to-use components for the web and native apps. Core handles Markdown independently of any UI framework. All share the same syntax, repair, and streaming capabilities.
 
 ## Made for content in progress
 
@@ -23,6 +24,6 @@ React provides a ready-to-use presentation layer. Core handles Markdown independ
 
 ## One core, different interfaces
 
-Fluxdown is built on [stative](../stative/index.md), which connects text, configuration, and output in a single reactive data flow. React is the currently available framework integration. React Native, Vue 3, Svelte, and React Lynx are planned directions.
+Fluxdown is built on [stative](../stative/index.md), which connects text, configuration, and output in a single reactive data flow. React and React Native share a platform-independent React foundation, with slots that provide DOM or native components. Vue 3, Svelte, and React Lynx are planned directions.
 
-Start with the [React quick start](./react/quick-start.md). Explore Core when you need to handle the output yourself.
+Start with the [React](./react/quick-start.md) or [React Native](./react-native/quick-start.md) quick start. Explore Core when you need to handle the output yourself.

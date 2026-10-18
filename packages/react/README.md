@@ -66,7 +66,7 @@ import "fluxdown/styles.css";
 - [Configuration](../../website/docs/en/guide/react/configuration.md)
 - [Using and writing plugins](../../website/docs/en/guide/react/plugins.md)
 
-For a custom renderer outside React, see [`@fluxdown/core`](../core).
+For native apps, use [`@fluxdown/react-native`](../react-native). For a custom renderer outside React, see [`@fluxdown/core`](../core).
 
 ## Contributing and license
 

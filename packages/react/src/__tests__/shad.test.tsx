@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import type { FluxdownRef } from '../types';
 
-import styles from '../../../react-presets/src/render/shad/renderer/index.module.scss';
+import styles from '../../../react-presets/src/slot/shad/renderer/index.module.scss';
 import { Fluxdown } from '../index';
 import { createManualTicker, createStepScheduler } from './utils/smooth';
 

@@ -11,6 +11,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "react-native",
+    "label": "React Native"
+  },
+  {
+    "type": "dir-section-header",
     "name": "core",
     "label": "Core"
   }

@@ -16,3 +16,6 @@ CLAUDE.md
 .moon/workspace-graph.json
 .release
 *.tgz
+
+.expo
+packages/react-native/.storybook/storybook.requires.ts

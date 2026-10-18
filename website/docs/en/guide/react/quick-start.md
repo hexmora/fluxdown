@@ -2,6 +2,8 @@
 
 Add Fluxdown to a React app and pass it Markdown. Common syntax, code highlighting, copy buttons, and base styles are already included.
 
+For native apps, use the [React Native quick start](../react-native/quick-start.md).
+
 ## Install
 
 ```sh

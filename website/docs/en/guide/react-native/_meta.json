@@ -1,0 +1,6 @@
+[
+  { "type": "file", "name": "quick-start", "label": "Quick start" },
+  { "type": "file", "name": "customization", "label": "Styling guide" },
+  { "type": "file", "name": "configuration", "label": "Configuration" },
+  { "type": "file", "name": "plugins", "label": "Using and writing plugins" }
+]

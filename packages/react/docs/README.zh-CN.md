@@ -66,7 +66,7 @@ import "fluxdown/styles.css";
 - [配置](../../../website/docs/zh/guide/react/configuration.md)
 - [使用与编写插件](../../../website/docs/zh/guide/react/plugins.md)
 
-如果需要在 React 之外构建自定义渲染器，请参阅 [`@fluxdown/core`](../../core/docs/README.zh-CN.md)。
+原生应用请使用 [`@fluxdown/react-native`](../../react-native/docs/README.zh-CN.md)。如果需要在 React 之外构建自定义渲染器，请参阅 [`@fluxdown/core`](../../core/docs/README.zh-CN.md)。
 
 ## 参与贡献与许可证
 

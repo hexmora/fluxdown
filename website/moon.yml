@@ -5,6 +5,7 @@ dependsOn:
   - core
   - core-presets
   - react
+  - react-base-presets
   - react-presets
   - stative
 

@@ -1,8 +1,8 @@
+import { createTypeOfSlot } from '@fluxdown/react-base-presets/base';
 import cn from 'classnames';
 
 import type { CodeBlockProps } from '../../../base';
 
-import { createTypeOfSlot } from '../../../base';
 import styles from './index.module.scss';
 
 const CodeHeader = /*#__PURE__*/ createTypeOfSlot('CodeHeader');

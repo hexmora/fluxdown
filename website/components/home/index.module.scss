@@ -323,6 +323,13 @@
   }
 }
 
+.quickLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 28px;
+}
+
 .textLink {
   display: inline-flex;
   align-items: center;

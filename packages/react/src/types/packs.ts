@@ -1,32 +1,16 @@
-import type { BlockCompilerConfig, IPatchItem, MapperPluggable } from '@fluxdown/core';
-import type { ShadConfig as CoreShadConfig, SmoothConfig } from '@fluxdown/core-presets/mapper';
-import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-presets/base';
-import type { IPluggable, IRehypePlugin, IRemarkPlugin, IRepairPlugin } from '@fluxdown/types';
-import type { CSSProperties, ReactNode } from 'react';
-import type { IReadableClosure } from 'stative';
+import type {
+  BaseFluxdownProps,
+  BaseFluxdownRef,
+  ShadConfig as BaseShadConfig,
+  StreamingConfig as BaseStreamingConfig,
+} from '@fluxdown/react-base';
+import type { CSSProperties } from 'react';
 
-import type { PluginConfigs } from './plugins.js';
 import type { Theme } from './theme';
 
-export interface IPluginItem {
-  config?: PluginConfigs;
+export type { BaseBuildConfig, IPluginItem, PluginConfigs } from '@fluxdown/react-base';
 
-  remarks?: IPluggable<IRemarkPlugin, unknown>[];
-
-  rehypes?: IPluggable<IRehypePlugin, unknown>[];
-
-  repairs?: IPluggable<IRepairPlugin, unknown>[];
-
-  mappers?: MapperPluggable[];
-
-  renders?: IReactRenderPluggable[];
-
-  slots?: AnySlotPluggable[];
-}
-
-export type BaseBuildConfig = Partial<Omit<BlockCompilerConfig, 'repairEnding'>>;
-
-export interface ShadConfig extends CoreShadConfig {
+export interface ShadConfig extends BaseShadConfig {
   /**
    * Width of the trailing mask in pixels. Set to 0 to hide it.
    * @default 15
@@ -34,67 +18,18 @@ export interface ShadConfig extends CoreShadConfig {
   maskWidth?: number;
 }
 
-export interface StreamingConfig {
-  /**
-   * Repair incomplete Markdown syntax at the end of the document.
-   * @default true
-   */
-  repairEnding?: boolean;
-
-  /**
-   * Smoothly reveal appended compiled content.
-   * @default true
-   */
-  smooth?: boolean | SmoothConfig;
-
-  /**
-   * Fade the trailing characters of newly revealed content.
-   * @default true
-   */
+export interface StreamingConfig extends BaseStreamingConfig {
   shad?: boolean | ShadConfig;
 }
 
-export interface FluxdownProps {
-  /**
-   * Additional class name applied to the rendered root.
-   */
+export interface FluxdownProps extends Omit<BaseFluxdownProps, 'Renderer' | 'streaming'> {
   className?: string;
 
-  /**
-   * Inline styles applied to the rendered root.
-   */
   style?: CSSProperties;
 
-  /**
-   * Preset theme, deep partial overrides of light, or a preset/overrides tuple.
-   */
   theme?: Theme;
 
-  /**
-   * Markdown source text to compile and render.
-   */
-  text: string;
-
-  /**
-   * Static build configuration.
-   */
-  build?: BaseBuildConfig;
-
-  /**
-   * Streaming effect configuration.
-   * @default false
-   */
   streaming?: boolean | StreamingConfig;
-
-  /**
-   * Inline render patches applied to the Markdown source.
-   */
-  patches?: IPatchItem<ReactNode>[];
-
-  /**
-   * One plugin pack or an ordered list extending the compiler and React renderer.
-   */
-  plugins?: IPluginItem | IPluginItem[];
 }
 
-export type FluxdownRef = IReadableClosure<ReactNode[]>;
+export type FluxdownRef = BaseFluxdownRef;
