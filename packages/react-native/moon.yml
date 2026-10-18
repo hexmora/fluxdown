@@ -1,0 +1,18 @@
+language: typescript
+layer: library
+
+tasks:
+  dev:
+    command: pnpm run dev
+    preset: server
+  storybook:
+    command: pnpm run storybook
+    preset: server
+  build-storybook:
+    command: pnpm run build:storybook
+    inputs:
+      - "stories/**/*"
+      - ".storybook/**/*"
+      - /packages/*/src/**/*
+      - /pnpm-lock.yaml
+    outputs: [storybook-static]

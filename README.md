@@ -12,9 +12,11 @@ Fluxdown keeps streaming Markdown readable, from unfinished syntax to the final 
 - **Less repeated work.** Block-level caching reuses stable content as the message grows.
 - **Familiar Markdown.** Render GFM tables, task lists, strikethrough, and autolinks, with code highlighting and optional math.
 - **Adaptable presentation.** Customize themes, replace components, or extend parsing and rendering with plugins.
-- **A framework-independent core.** Start with the React component or build a renderer for your own interface.
+- **A framework-independent core.** Start with the React or React Native component or build a renderer for your own interface.
 
 ## Get started
+
+### React
 
 In a React 18 or 19 app:
 
@@ -45,16 +47,30 @@ import "fluxdown/styles.css";
 
 See the [React quick start](./website/docs/en/guide/react/quick-start.md) for more examples.
 
+### React Native
+
+Follow the [React Native quick start](./website/docs/en/guide/react-native/quick-start.md) to install `@fluxdown/react-native` and `react-native-svg` in an Expo or bare React Native app.
+
+```tsx
+import { Fluxdown } from "@fluxdown/react-native";
+
+<Fluxdown text={text} streaming={isStreaming} selectable />;
+```
+
+The native component uses the same accumulated text, streaming effects, and plugin packs as React, with native styles and text selection. Full, Lite, and Raw let you choose highlighting and formula dependencies. Your app controls the vertical scroll container. See [native presets](./website/docs/en/guide/react-native/bundle-size.md) and the [React Native Web comparison](./website/docs/en/guide/react-native/streaming.mdx).
+
 ## Packages
 
-| Package                             | Use it for                                                          |
-| ----------------------------------- | ------------------------------------------------------------------- |
-| [`fluxdown`](./packages/react)      | Ready-to-use Markdown rendering in React.                           |
-| [`@fluxdown/core`](./packages/core) | Parsing, repair, and reactive content blocks for a custom renderer. |
-| [`stative`](./packages/stative)     | Composable state and derived computations, also used by Core.       |
+| Package                                             | Use it for                                                          |
+| --------------------------------------------------- | ------------------------------------------------------------------- |
+| [`fluxdown`](./packages/react)                      | Ready-to-use Markdown rendering in React.                           |
+| [`@fluxdown/react-native`](./packages/react-native) | Markdown rendering with native views and text.                      |
+| [`@fluxdown/core`](./packages/core)                 | Parsing, repair, and reactive content blocks for a custom renderer. |
+| [`stative`](./packages/stative)                     | Composable state and derived computations, also used by Core.       |
 
 ## Documentation
 
+- [React Native](./website/docs/en/guide/react-native/quick-start.md) — install the native component and customize its styles and slots.
 - [Streaming](./website/docs/en/guide/react/streaming.md) — connect incoming text and control streaming effects.
 - [Styling](./website/docs/en/guide/react/customization.md) — adjust themes, typography, and layout.
 - [Plugins](./website/docs/en/guide/react/plugins.md) — customize syntax, content, and interactions.

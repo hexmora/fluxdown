@@ -1,0 +1,44 @@
+.comparison {
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    > div + div {
+      border-left: 1px solid var(--site-line);
+    }
+  }
+
+  .label {
+    margin: 0;
+    padding: 12px 28px;
+    border-bottom: 1px solid var(--site-line);
+    color: var(--site-muted);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .position {
+    flex: 1;
+    min-width: 160px;
+    accent-color: var(--site-accent);
+  }
+
+  .placeholder {
+    min-height: 360px;
+    padding: 26px 30px;
+    color: var(--site-muted);
+    font-size: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .columns {
+      grid-template-columns: minmax(0, 1fr);
+
+      > div + div {
+        border-top: 1px solid var(--site-line);
+        border-left: 0;
+      }
+    }
+  }
+}

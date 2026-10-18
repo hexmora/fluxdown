@@ -12,9 +12,11 @@ Fluxdown 让 Markdown 在生成过程中保持可读，适用于 AI 对话、实
 - **减少重复计算。** 以内容块为单位缓存结果，复用消息中已稳定的部分。
 - **熟悉的 Markdown。** 支持 GFM 表格、任务列表、删除线、自动链接和代码高亮，也可按需启用公式。
 - **灵活的呈现方式。** 定制主题、替换组件，或通过插件扩展解析与渲染。
-- **框架无关的核心。** 直接使用 React 组件，或为自己的界面构建渲染器。
+- **框架无关的核心。** 直接使用 React 或 React Native 组件，或为自己的界面构建渲染器。
 
 ## 快速上手
+
+### React
 
 在 React 18 或 19 应用中安装：
 
@@ -45,16 +47,32 @@ import "fluxdown/styles.css";
 
 更多示例见 [React 快速上手](../website/docs/zh/guide/react/quick-start.md)。
 
+### React Native
+
+按 [React Native 快速上手](../website/docs/zh/guide/react-native/quick-start.md) 在 Expo 或原生 React Native 应用中安装 `@fluxdown/react-native` 和 `react-native-svg`。
+
+```tsx
+import { Fluxdown } from "@fluxdown/react-native";
+
+<Fluxdown text={text} streaming={isStreaming} selectable />;
+```
+
+原生组件沿用累计文本和流式参数，并使用原生样式和文本选择。纵向滚动容器由应用控制。
+
+React Native 与 React 一样提供 Full、Lite、Raw 入口、模块化插件及 `shad`、`scale`、`chunk`、`suffix` 效果。参阅[原生预设](../website/docs/zh/guide/react-native/bundle-size.md)与 [React Native Web 对比](../website/docs/zh/guide/react-native/streaming.mdx)。
+
 ## 包
 
-| 包                                                   | 用途                                             |
-| ---------------------------------------------------- | ------------------------------------------------ |
-| [`fluxdown`](../packages/react/docs/README.zh-CN.md) | 开箱即用的 React Markdown 渲染组件。             |
-| [`@fluxdown/core`](../packages/core)                 | 为自定义渲染器提供解析、修复和响应式内容块。     |
-| [`stative`](../packages/stative)                     | 可组合的状态与派生计算，也是 Core 的响应式基础。 |
+| 包                                                                        | 用途                                             |
+| ------------------------------------------------------------------------- | ------------------------------------------------ |
+| [`fluxdown`](../packages/react/docs/README.zh-CN.md)                      | 开箱即用的 React Markdown 渲染组件。             |
+| [`@fluxdown/react-native`](../packages/react-native/docs/README.zh-CN.md) | 使用原生视图和文本的 Markdown 渲染组件。         |
+| [`@fluxdown/core`](../packages/core)                                      | 为自定义渲染器提供解析、修复和响应式内容块。     |
+| [`stative`](../packages/stative)                                          | 可组合的状态与派生计算，也是 Core 的响应式基础。 |
 
 ## 文档
 
+- [React Native](../website/docs/zh/guide/react-native/quick-start.md) — 安装原生组件，定制样式和插槽。
 - [流式内容](../website/docs/zh/guide/react/streaming.md) — 接入文本流，调整流式效果。
 - [样式定制](../website/docs/zh/guide/react/customization.md) — 调整主题、排版和布局。
 - [插件](../website/docs/zh/guide/react/plugins.md) — 定制语法、内容和交互。

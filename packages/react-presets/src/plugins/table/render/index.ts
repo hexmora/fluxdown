@@ -1,2 +1,1 @@
-export * from './table';
-export * from './table-cell';
+export * from '@fluxdown/react-base-presets/plugins/table';

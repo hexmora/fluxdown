@@ -1,1 +1,1 @@
-export * from './break-line';
+export * from '@fluxdown/react-base-presets/plugins/break-line';

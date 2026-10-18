@@ -24,6 +24,24 @@ pnpm build
 pnpm build:storybook
 ```
 
+### React Native
+
+The native packages use React Native Builder Bob. Their JavaScript builds and unit tests run without an Android or iOS SDK. To work on the component and its on-device Storybook:
+
+```bash
+cd packages/react-native
+pnpm storybook
+pnpm test
+pnpm build
+pnpm build:storybook
+```
+
+Storybook runs with Expo and Metro. Use an Expo Go version compatible with the Expo SDK in [`pnpm-workspace.yaml`](./pnpm-workspace.yaml), or a development build. Open it on a phone or follow Expo's [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/) or [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/) setup. This development app does not make Expo a requirement for library consumers.
+
+Stories live in `packages/react-native/stories`. The Playground includes a complete Markdown message with play, pause, resume, and reset controls. `build:storybook` exports Android and iOS bundles; it does not compile an APK or IPA. Use the [React Native environment guide](https://reactnative.dev/docs/set-up-your-environment) when building a native app locally.
+
+### Tests and changesets
+
 Place package tests in `__tests__` directories.
 
 Every PR that changes a workspace package's `src/**` must add a new, nonempty

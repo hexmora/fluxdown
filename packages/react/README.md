@@ -39,6 +39,12 @@ If your bundler does not load the styles automatically, add this to your app's g
 import "fluxdown/styles.css";
 ```
 
+## Choose a preset
+
+Use `Fluxdown` from `fluxdown` or `fluxdown/full` for Shiki highlighting and on-demand formula typesetting. Use `FluxdownLite` from `fluxdown/lite` for code and formula source without those engines, or `FluxdownRaw` from `fluxdown/raw` to supply the required plugin list. All presets support the same streaming configuration.
+
+See [Reduce bundle size](../../website/docs/en/guide/react/bundle-size.mdx) for the plugin packs and examples.
+
 ## Make it your own
 
 | Option               | Purpose                                                                       |
@@ -49,7 +55,7 @@ import "fluxdown/styles.css";
 | `plugins`            | Customize parsing, rendering, semantic slots, and interactions.               |
 | `className`, `style` | Set container layout and styling.                                             |
 
-`streaming={true}` enables trailing repair and smooth output. Add an optional visual effect:
+`streaming={true}` enables trailing repair, smooth output, and the default `scale` effect. Choose another effect with `streaming.effect`:
 
 ```tsx
 <Fluxdown text={text} streaming={isStreaming && { effect: "shad" }} />
@@ -63,7 +69,7 @@ import "fluxdown/styles.css";
 - [Configuration](../../website/docs/en/guide/react/configuration.md)
 - [Using and writing plugins](../../website/docs/en/guide/react/plugins.md)
 
-For a custom renderer outside React, see [`@fluxdown/core`](../core).
+For native apps, use [`@fluxdown/react-native`](../react-native). For a custom renderer outside React, see [`@fluxdown/core`](../core).
 
 ## Contributing and license
 

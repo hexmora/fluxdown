@@ -29,34 +29,34 @@ const config: Config = {
     'stative',
     'core-presets',
     'core',
+    'react-base-presets',
+    'react-base',
     'react-presets',
     'react',
-  ].map((name) => ({
-    displayName: name,
-    rootDir,
-    // Release dry runs contain package copies; keep them outside Jest's module map.
-    roots: ['<rootDir>/packages', '<rootDir>/scripts/testing'],
-    modulePathIgnorePatterns: ['<rootDir>/packages/[^/]+/dist/'],
-    testMatch: [`<rootDir>/packages/${name}/src/**/*.test.{ts,tsx}`],
-    testEnvironment:
-      name === 'react' || name === 'react-presets'
-        ? '<rootDir>/scripts/testing/jsdom-environment.ts'
-        : 'node',
-    setupFilesAfterEnv:
-      name === 'react' || name === 'react-presets'
-        ? [`<rootDir>/packages/${name}/jest.setup.ts`]
-        : [],
-    moduleNameMapper: { '^(.+\\.svg)\\?react$': '$1' },
-    transform: {
-      // A project may import another package's sources, so select JSX by source path.
-      '^.+/packages/(?:stative|core|core-presets)/.+\\.[jt]sx?$': swc('stative'),
-      '^.+\\.[cm]?[jt]sx?$': swc('react'),
-      '^.+\\.(?:css|scss|sass|less|svg)$': '<rootDir>/scripts/testing/assets-transformer.ts',
-    },
-    // Markdown and Shiki dependencies are ESM-only. SWC also transforms dependencies
-    // so the CJS Jest runtime can execute them without experimental VM flags.
-    transformIgnorePatterns: [],
-  })),
+  ].map((name) => {
+    const react = name.startsWith('react');
+
+    return {
+      displayName: name,
+      rootDir,
+      // Release dry runs contain package copies; keep them outside Jest's module map.
+      roots: ['<rootDir>/packages', '<rootDir>/scripts/testing'],
+      modulePathIgnorePatterns: ['<rootDir>/packages/[^/]+/dist/'],
+      testMatch: [`<rootDir>/packages/${name}/src/**/*.test.{ts,tsx}`],
+      testEnvironment: react ? '<rootDir>/scripts/testing/jsdom-environment.ts' : 'node',
+      setupFilesAfterEnv: react ? [`<rootDir>/packages/${name}/jest.setup.ts`] : [],
+      moduleNameMapper: { '^(.+\\.svg)\\?react$': '$1' },
+      transform: {
+        // A project may import another package's sources, so select JSX by source path.
+        '^.+/packages/(?:stative|core|core-presets)/.+\\.[jt]sx?$': swc('stative'),
+        '^.+\\.[cm]?[jt]sx?$': swc('react'),
+        '^.+\\.(?:css|scss|sass|less|svg)$': '<rootDir>/scripts/testing/assets-transformer.ts',
+      },
+      // Markdown and Shiki dependencies are ESM-only. SWC also transforms dependencies
+      // so the CJS Jest runtime can execute them without experimental VM flags.
+      transformIgnorePatterns: [],
+    };
+  }),
 };
 
 export default config;

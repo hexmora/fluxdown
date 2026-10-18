@@ -1,5 +1,3 @@
-import type { PluggableConfigs } from '@fluxdown/types';
-
 import '../../plugins/blockquote';
 import '../../plugins/break-line';
 import '../../plugins/code';
@@ -23,5 +21,4 @@ import '../../plugins/tex';
 import '../../plugins/tex-katex';
 import '../../plugins/tex-mathjax-katex';
 
-export type PluginConfigs = PluggableConfigs<MapperConfigs> &
-  Partial<RemarkConfigs & RehypeConfigs & RepairConfigs & RenderConfigs & SlotConfigs>;
+export type { PluginConfigs } from '@fluxdown/react-base-presets/typings';

@@ -1,1 +1,1 @@
-export * from './emphasis';
+export * from '@fluxdown/react-base-presets/plugins/emphasis';

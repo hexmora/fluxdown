@@ -1,1 +1,1 @@
-export * from './image';
+export * from '@fluxdown/react-base-presets/plugins/image';

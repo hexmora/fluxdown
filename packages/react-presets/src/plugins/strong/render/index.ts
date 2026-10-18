@@ -1,1 +1,1 @@
-export * from './strong';
+export * from '@fluxdown/react-base-presets/plugins/strong';

@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "rootDir": "./src",
+    "paths": {
+      "@fluxdown/types": ["../types/dist/esm/index.d.ts"],
+      "@fluxdown/core": ["../core/dist/esm/index.d.ts"],
+      "@fluxdown/hast": ["../hast/dist/esm/index.d.ts"],
+      "@fluxdown/utils": ["../utils/dist/esm/index.d.ts"],
+      "@fluxdown/core-presets/mapper": ["../core-presets/dist/esm/mapper/index.d.ts"],
+      "@fluxdown/core-presets/rehype": ["../core-presets/dist/esm/rehype/index.d.ts"],
+      "@fluxdown/core-presets/remark": ["../core-presets/dist/esm/remark/index.d.ts"],
+      "@fluxdown/core-presets/repair": ["../core-presets/dist/esm/repair/index.d.ts"],
+      "@fluxdown/mdast": ["../mdast/dist/esm/index.d.ts"],
+      "stative": ["../stative/dist/esm/index.d.ts"],
+      "stative/jsx-runtime": ["../stative/dist/esm/jsx-runtime.d.ts"],
+      "@fluxdown/react-base-presets/base": ["../react-base-presets/dist/esm/base/index.d.ts"],
+      "@fluxdown/react-base-presets/render": ["../react-base-presets/dist/esm/render/index.d.ts"],
+      "react": ["./node_modules/@types/react"],
+      "react/*": ["./node_modules/@types/react/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["src/**/__tests__/**", "src/**/*.test.*"]
+}

@@ -39,6 +39,12 @@ export function Message({ text, isStreaming }: MessageProps) {
 import "fluxdown/styles.css";
 ```
 
+## 选择预设
+
+从 `fluxdown` 或 `fluxdown/full` 导入 `Fluxdown`，可使用 Shiki 高亮和按需加载的公式排版。通过 `fluxdown/lite` 导入 `FluxdownLite`，可以显示代码和公式源码而不引入这些引擎；通过 `fluxdown/raw` 导入 `FluxdownRaw`，可以自行提供必填的插件列表。所有预设使用相同的流式配置。
+
+插件包与示例见[减少打包体积](../../../website/docs/zh/guide/react/bundle-size.mdx)。
+
 ## 按需定制
 
 | 选项                 | 用途                                         |
@@ -49,7 +55,7 @@ import "fluxdown/styles.css";
 | `plugins`            | 定制解析、渲染、语义化插槽和交互。           |
 | `className`、`style` | 设置容器布局和样式。                         |
 
-`streaming={true}` 启用末尾语法修复和平滑输出。可以额外指定视觉特效：
+`streaming={true}` 启用末尾语法修复、平滑输出和默认的 `scale` 效果。可以通过 `streaming.effect` 选择其他效果：
 
 ```tsx
 <Fluxdown text={text} streaming={isStreaming && { effect: "shad" }} />
@@ -63,7 +69,7 @@ import "fluxdown/styles.css";
 - [配置](../../../website/docs/zh/guide/react/configuration.md)
 - [使用与编写插件](../../../website/docs/zh/guide/react/plugins.md)
 
-如果需要在 React 之外构建自定义渲染器，请参阅 [`@fluxdown/core`](../../core/docs/README.zh-CN.md)。
+原生应用请使用 [`@fluxdown/react-native`](../../react-native/docs/README.zh-CN.md)。如果需要在 React 之外构建自定义渲染器，请参阅 [`@fluxdown/core`](../../core/docs/README.zh-CN.md)。
 
 ## 参与贡献与许可证
 

@@ -4,6 +4,8 @@
 
 用它构建框架集成、自定义渲染器，或一条响应式的 Markdown 处理流程。
 
+如果需要开箱即用的组件，请从 [React](../react/quick-start.md) 或 [React Native](../react-native/quick-start.md) 开始。
+
 ## 安装
 
 ```sh

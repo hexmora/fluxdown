@@ -1,11 +1,12 @@
 export const INSTALL_COMMAND = 'pnpm install fluxdown';
-export const UPCOMING_FRAMEWORKS = ['React Native', 'Vue 3', 'Svelte', 'React Lynx'];
+export const UPCOMING_FRAMEWORKS = ['Vue 3', 'Svelte', 'React Lynx'];
 
 export const COPY = {
   zh: {
     description: '为 AI 流式输出而生的 Markdown 渲染器。',
     qualities: '高性能，高度可定制，跨平台，开箱即用。',
     install: '复制安装命令',
+    nativeLink: '使用 React Native',
     featuresTitle: '从第一段文字，到完整体验。',
     featuresDescription: '平滑每一段输出，照顾尚未闭合的语法。',
     features: [
@@ -33,14 +34,14 @@ export const COPY = {
       {
         title: '做成你的风格',
         description:
-          '用语义化插槽、HTML 渲染与主题调整外观，继续定制平滑算法和动效。每个细节，都可以贴合你的产品。',
+          '用语义化插槽、平台组件与主题调整外观，继续定制平滑算法和动效。每个细节，都可以贴合你的产品。',
         link: '开始定制',
         path: '/guide/react/customization',
       },
       {
         title: '不被框架限制',
         description:
-          '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React 开始。',
+          '框架无关的 Core 管理解析与响应式更新。使用开箱即用的 React 和 React Native 组件，或构建自己的渲染方式。',
         link: '认识 Fluxdown Core',
         path: '/guide/core/quick-start',
       },
@@ -55,7 +56,7 @@ export const COPY = {
     quickTitle: '几行代码，就能开始。',
     quickDescription: '把收到的文字交给 Fluxdown。以下以 React 版组件为例。',
     codeComment: '// text 是截至目前收到的完整消息',
-    quickLink: '阅读接入指南',
+    quickLink: 'React 快速上手',
     organizationsTitle: '他们也在用',
     organizationsNote: '你的组织也在使用 Fluxdown？',
     organizationsLink: '联系维护者，加入这里。',
@@ -73,6 +74,7 @@ export const COPY = {
     description: 'A Markdown renderer built for AI streaming.',
     qualities: 'Fast, customizable, cross-platform. Ready to go.',
     install: 'Copy install command',
+    nativeLink: 'Use React Native',
     featuresTitle: 'From the first word to the whole experience.',
     featuresDescription: 'Smooth each arrival. Keep unfinished Markdown readable.',
     features: [
@@ -100,14 +102,14 @@ export const COPY = {
       {
         title: 'Make it yours',
         description:
-          'Shape the experience with semantic slots, HTML rendering, themes, smoothing algorithms, and animations. Let every detail fit your product.',
+          'Shape the experience with semantic slots, platform components, themes, smoothing algorithms, and animations. Let every detail fit your product.',
         link: 'Start customizing',
         path: '/guide/react/customization',
       },
       {
         title: 'Free to choose a framework',
         description:
-          'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React integration.',
+          'A framework-independent Core handles parsing and reactive updates. Use the ready-made React and React Native components, or build your own renderer.',
         link: 'Meet Fluxdown Core',
         path: '/guide/core/quick-start',
       },
@@ -123,7 +125,7 @@ export const COPY = {
     quickDescription:
       'Give Fluxdown the words as they arrive. This example uses the React component.',
     codeComment: '// text is the full message received so far',
-    quickLink: 'Read the quick start',
+    quickLink: 'React quick start',
     organizationsTitle: 'In good company',
     organizationsNote: 'Using Fluxdown at your organization?',
     organizationsLink: 'Get in touch to add your logo.',

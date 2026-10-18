@@ -1,0 +1,88 @@
+{
+  "name": "@fluxdown/react-base",
+  "version": "0.1.0",
+  "description": "Platform-independent React integration for Fluxdown Core.",
+  "keywords": [
+    "markdown",
+    "react",
+    "streaming"
+  ],
+  "homepage": "https://github.com/hexmora/fluxdown/tree/main/packages/react-base#readme",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/react-base"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.tsx",
+  "module": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "publishConfig": {
+    "main": "./dist/cjs/index.cjs",
+    "module": "./dist/esm/index.js",
+    "types": "./dist/esm/index.d.ts",
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/esm/index.d.ts",
+          "default": "./dist/esm/index.js"
+        },
+        "require": {
+          "types": "./dist/cjs/index.d.cts",
+          "default": "./dist/cjs/index.cjs"
+        }
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rslib build",
+    "lint": "oxlint .",
+    "test": "jest --config ../../jest.config.ts --selectProjects react-base --runInBand",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-presets": "workspace:^",
+    "@fluxdown/react-base-presets": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@types/hast": "catalog:",
+    "lodash-es": "catalog:",
+    "shallow-equal": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@rslib/core": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "expect-type": "catalog:",
+    "oxlint": "catalog:",
+    "react": "catalog:web",
+    "react-dom": "catalog:web",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:react-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

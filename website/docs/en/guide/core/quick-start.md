@@ -4,6 +4,8 @@
 
 Use it to build a framework integration, a custom renderer, or a reactive Markdown pipeline.
 
+For a ready-to-use component, start with [React](../react/quick-start.md) or [React Native](../react-native/quick-start.md).
+
 ## Install
 
 ```sh
