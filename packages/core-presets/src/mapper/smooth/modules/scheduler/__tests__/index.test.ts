@@ -1,5 +1,5 @@
 import { SpringSmoothScheduler } from '..';
-import { TargetScheduler } from './utils';
+import { StepSmoothScheduler, TargetScheduler } from './utils';
 
 describe('BaseSmoothScheduler', () => {
   test('provides defaults and retains an explicitly supplied tuple', () => {
@@ -14,6 +14,31 @@ describe('BaseSmoothScheduler', () => {
     const scheduler = new TargetScheduler([3]);
 
     expect(() => scheduler.tuple).toThrow();
+  });
+
+  test('resumes timing from the previous target before accepting new content', () => {
+    const scheduler = new StepSmoothScheduler();
+
+    scheduler.start(0, 3);
+
+    scheduler.push(2);
+
+    expect([16, 32].map((timestamp) => scheduler.tick(timestamp))).toEqual([1, 1]);
+
+    scheduler.resume(10_000);
+
+    expect(scheduler.startCalls).toEqual([
+      { timestamp: 0, index: 3 },
+      { timestamp: 10_000, index: 5 },
+    ]);
+
+    expect(scheduler.tick(10_016)).toBe(0);
+
+    scheduler.push(2);
+
+    expect([10_032, 10_048, 10_064].map((timestamp) => scheduler.tick(timestamp))).toEqual([
+      1, 1, 0,
+    ]);
   });
 
   test('adds pushed lengths and resets to the requested target', () => {
@@ -98,9 +123,64 @@ describe('SpringSmoothScheduler', () => {
 
   test('exposes the chosen default tuple and constructor name', () => {
     expect(SpringSmoothScheduler.name).toBe('spring');
-    // The target deliberately raises the source default maximum speed by one.
 
-    expect(new SpringSmoothScheduler().tuple).toEqual([20, 15, 1 / 700 / 1000, 2, 100_001]);
+    expect(new SpringSmoothScheduler().tuple).toEqual([20, 15, 1 / 700 / 1000, 2, 100_000]);
+  });
+
+  test('settles idle momentum before resuming without a cold start', () => {
+    const scheduler = new SpringSmoothScheduler([1000, 0, 0, 100, 1000]);
+
+    scheduler.start(0);
+
+    scheduler.push(1);
+
+    expect(scheduler.tick(1)).toBe(1);
+
+    expect(scheduler.idle).toBe(false);
+
+    for (let frame = 1; frame <= 22; frame += 1) {
+      expect(scheduler.tick(1 + frame * 16)).toBe(0);
+    }
+
+    expect(scheduler.idle).toBe(true);
+
+    scheduler.resume(10_000);
+
+    scheduler.push(1);
+
+    expect(scheduler.idle).toBe(false);
+
+    expect(scheduler.tick(10_005)).toBe(0);
+
+    expect(scheduler.tick(10_010)).toBe(1);
+  });
+
+  test('retains buffered progress and fractional distance through resume', () => {
+    const scheduler = new SpringSmoothScheduler([1000, 0, 0, 1000, 1000]);
+
+    scheduler.start(0);
+
+    scheduler.push(2);
+
+    expect(scheduler.tick(0.5)).toBe(0);
+
+    scheduler.resume(10_000);
+
+    expect(scheduler.tick(10_000.5)).toBe(1);
+
+    expect(scheduler.tick(10_001.5)).toBe(1);
+  });
+
+  test('settles subthreshold idle momentum when the resume speed is zero', () => {
+    const scheduler = new SpringSmoothScheduler([20, 0, 0, 0, 1000]);
+
+    scheduler.start(0);
+
+    for (let frame = 1; frame <= 36; frame += 1) {
+      expect(scheduler.tick(frame * 16)).toBe(0);
+    }
+
+    expect(scheduler.idle).toBe(true);
   });
 
   test('requires start before ticking', () => {

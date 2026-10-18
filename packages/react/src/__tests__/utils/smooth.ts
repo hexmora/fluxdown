@@ -65,6 +65,10 @@ export const createStepScheduler = (step: number) => {
 
     private cursor = 0;
 
+    override get idle() {
+      return true;
+    }
+
     override reset(index = 0) {
       super.reset(index);
 

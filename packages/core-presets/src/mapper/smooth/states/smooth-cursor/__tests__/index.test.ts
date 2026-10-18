@@ -18,7 +18,8 @@ import type { SmoothPosition } from '../states';
 import { SmoothCursor } from '..';
 import { ArrayBlock, createArrayBlock } from '../../../__tests__/block';
 import { latest, PrimarySmoothTicker, resetSmoothTests } from '../../../__tests__/utils';
-import { StepSmoothScheduler } from '../../../modules/scheduler/__tests__/utils';
+import { SpringSmoothScheduler } from '../../../modules';
+import { StepSmoothScheduler, TargetScheduler } from '../../../modules/scheduler/__tests__/utils';
 
 const setupCursor = (
   initial: IBlockState<number[]>[] = [],
@@ -207,5 +208,135 @@ describe('SmoothCursor', () => {
     cursor.destroy();
 
     derived.destroy();
+  });
+
+  test('keeps a scheduler with the default idle behavior running until disabled', () => {
+    const block = createArrayBlock<number>([]);
+
+    const { cursor, enabled } = setupCursor([block.block], true, TargetScheduler);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    block.source.next([1]);
+
+    const ticker = latest(PrimarySmoothTicker.instances);
+
+    ticker.tick(16);
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    expect(ticker.running).toBe(true);
+
+    ticker.tick(32);
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    expect(ticker.running).toBe(true);
+
+    enabled.next(false);
+
+    expect(ticker.running).toBe(false);
+
+    expect(ticker.destroyCalls).toBe(1);
+
+    cursor.destroy();
+  });
+
+  test('preserves momentum across short gaps and resumes a settled spring without restarting', () => {
+    class Scheduler extends SpringSmoothScheduler {
+      protected override readonly defaultTuple = [1000, 0, 0, 100, 1000];
+    }
+
+    const block = createArrayBlock<number>([]);
+
+    const { cursor } = setupCursor([block.block], true, Scheduler);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    expect(PrimarySmoothTicker.instances).toHaveLength(0);
+
+    block.source.next([1]);
+
+    const ticker = latest(PrimarySmoothTicker.instances);
+
+    ticker.tick(1);
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    expect(ticker.running).toBe(true);
+
+    ticker.tick(17);
+
+    block.source.next([1, 2]);
+
+    ticker.tick(18);
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    ticker.tick(19);
+
+    expect(cursor.value.value.charIndex).toBe(2);
+
+    for (let frame = 1; frame <= 30 && ticker.running; frame += 1) {
+      ticker.tick(19 + frame * 16);
+    }
+
+    expect(ticker.running).toBe(false);
+
+    ticker.advanceTo(10_000);
+
+    block.source.next([1, 2, 3]);
+
+    expect(ticker.running).toBe(true);
+
+    ticker.tick(10_005);
+
+    expect(cursor.value.value.charIndex).toBe(2);
+
+    ticker.tick(10_010);
+
+    expect(cursor.value.value.charIndex).toBe(3);
+
+    expect(ticker.running).toBe(false);
+
+    cursor.destroy();
+  });
+
+  test('stops immediately on completion even while a spring still has idle momentum', () => {
+    class Scheduler extends SpringSmoothScheduler {
+      protected override readonly defaultTuple = [1000, 0, 0, 100, 1000];
+    }
+
+    const block = createArrayBlock<number>([]);
+
+    const { cursor, source, enabled } = setupCursor([block.block], true, Scheduler);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    block.source.next([1]);
+
+    const ticker = latest(PrimarySmoothTicker.instances);
+
+    ticker.tick(1);
+
+    expect(ticker.running).toBe(true);
+
+    batch(() => {
+      block.source.complete();
+
+      source.complete();
+
+      enabled.complete();
+    });
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    expect(cursor.value.closed).toBe(true);
+
+    expect(ticker.running).toBe(false);
+
+    expect(ticker.destroyCalls).toBe(1);
+
+    cursor.destroy();
   });
 });

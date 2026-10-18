@@ -32,7 +32,7 @@ export interface ShadConfig {
 
   /**
    * Maximum number of visible characters in the shaded tail.
-   * @default 2
+   * @default 10
    */
   length?: number;
 }

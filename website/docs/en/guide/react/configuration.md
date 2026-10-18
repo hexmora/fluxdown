@@ -117,7 +117,7 @@ Enable the trailing fade.
 
 **Type:** `number`
 
-**Default:** `2`
+**Default:** `10`
 
 Number of trailing characters included in the fade. Fractions round down; negative and non-finite values become `0`.
 

@@ -64,16 +64,15 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
 
         const timestamp = resumed ? frame.ticker.start() : frame.timestamp;
 
-        if (
-          scheduler !== previousScheduler ||
-          frame.ticker !== previousFrame?.ticker ||
-          resumed ||
-          reset
-        ) {
+        if (scheduler !== previousScheduler || frame.ticker !== previousFrame?.ticker || reset) {
           scheduler.start(timestamp, index);
 
           scheduler.push(total - index);
         } else {
+          if (resumed) {
+            scheduler.resume(timestamp);
+          }
+
           if (total < previousTotal) {
             scheduler.reset(index);
 
@@ -82,13 +81,13 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
             scheduler.push(total - previousTotal);
           }
 
-          if (frame !== previousFrame) {
+          if (!resumed && frame !== previousFrame) {
             index = Math.min(total, index + Math.max(0, scheduler.tick(frame.timestamp)));
           }
         }
       }
 
-      if (index === total && frame?.ticker.running) {
+      if (index === total && frame?.ticker.running && (completed || !scheduler || scheduler.idle)) {
         frame.ticker.stop();
       }
 

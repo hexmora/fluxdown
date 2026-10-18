@@ -57,7 +57,7 @@ export const getSchedulerByType = (
 };
 
 export const toShadConfig = (config: boolean | ShadConfig): BaseShadConfig => {
-  const { enabled = true, length = 2 } = isBoolean(config) ? { enabled: config } : config;
+  const { enabled = true, length = 10 } = isBoolean(config) ? { enabled: config } : config;
 
   return {
     enabled,

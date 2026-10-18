@@ -30,7 +30,7 @@ export const Shad = /*#__PURE__*/ withKey(
   }: ShadInputs): IReadableClosure<IBlockState<HastRoot>[]> {
     const enabled = useDefaults(_enabled, false);
 
-    const length = useDefaults(_length, 2);
+    const length = useDefaults(_length, 10);
 
     return useSwitchMap(enabled, (active) =>
       active ? (

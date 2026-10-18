@@ -5,6 +5,12 @@ export interface IScheduler {
   readonly tuple: number[];
 
   /**
+   * Whether ticking can stop after the visible cursor reaches the target.
+   * Return false while idle frames still change the state used by later appends.
+   */
+  readonly idle: boolean;
+
+  /**
    * Add newly available visible units to the target position.
    */
   push(length: number): void;
@@ -20,6 +26,12 @@ export interface IScheduler {
    * @default index 0
    */
   start(timestamp: number, index?: number): void;
+
+  /**
+   * Resume timing after an idle pause at the current target.
+   * Implementations may retain momentum or restart timing from that position.
+   */
+  resume(timestamp: number): void;
 
   /**
    * Return the nonnegative number of visible units to advance at this timestamp.
