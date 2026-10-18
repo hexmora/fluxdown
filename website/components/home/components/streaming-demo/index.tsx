@@ -6,7 +6,7 @@ import { DEMO_BUILD, DEMO_PLUGINS, getDemoTheme, getStreamSample } from '../../.
 import { useLocale, useStream } from '../../../hooks';
 import { PauseIcon, PlayIcon, ReplayIcon, SidebarIcon } from '../../../icons';
 import { COPY } from './consts';
-import { useReducedMotion, useSourcePanel } from './hooks';
+import { useBottomScroll, useReducedMotion, useSourcePanel } from './hooks';
 import styles from './index.module.scss';
 
 export const StreamingDemo = () => {
@@ -16,6 +16,8 @@ export const StreamingDemo = () => {
   const reducedMotion = useReducedMotion();
   const stream = useStream(getStreamSample(lang), reducedMotion);
   const { expanded, toggleExpanded } = useSourcePanel();
+  const preview = useBottomScroll(reducedMotion);
+  const source = useBottomScroll(reducedMotion);
   const sourceId = useId();
 
   return (
@@ -59,9 +61,10 @@ export const StreamingDemo = () => {
           <section
             aria-label={labels.source}
             className={styles.scroll}
+            ref={source.viewportRef}
             tabIndex={expanded ? 0 : -1}
           >
-            <div className={styles.sourceContent}>
+            <div className={styles.sourceContent} ref={source.contentRef}>
               <span className={styles.sourceTitle}>{labels.source}</span>
               <pre>
                 {stream.text}
@@ -73,8 +76,13 @@ export const StreamingDemo = () => {
         </div>
         <div className={styles.preview}>
           {/* oxlint-disable jsx-a11y/no-noninteractive-tabindex -- Make the scrollable pane keyboard accessible. */}
-          <section aria-label={labels.preview} className={styles.scroll} tabIndex={0}>
-            <div className={styles.previewContent}>
+          <section
+            aria-label={labels.preview}
+            className={styles.scroll}
+            ref={preview.viewportRef}
+            tabIndex={0}
+          >
+            <div className={styles.previewContent} ref={preview.contentRef}>
               <Fluxdown
                 build={DEMO_BUILD}
                 plugins={DEMO_PLUGINS}
