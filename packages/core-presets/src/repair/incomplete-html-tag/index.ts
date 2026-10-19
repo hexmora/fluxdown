@@ -8,7 +8,7 @@ import { getIncompleteTagStart } from './utils';
 
 declare global {
   interface RepairConfigs {
-    'repair-incomplete-html-tag'?: IPluggableConfig<void>;
+    'repair-incomplete-html-tag': IPluggableConfig<void>;
   }
 }
 

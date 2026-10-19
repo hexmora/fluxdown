@@ -10,7 +10,7 @@ import { getShadConfig, isShadNode } from './utils';
 
 declare global {
   interface RenderConfigs {
-    'render-shad'?: IPluggableConfig<void>;
+    'render-shad': IPluggableConfig<void>;
   }
 }
 

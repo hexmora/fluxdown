@@ -16,6 +16,9 @@ export const COPY = {
     noEffect: 'None',
     shadEffect: 'Trailing fade',
     scaleEffect: 'Scale',
+    chunkEffect: 'Chunk entrance',
+    suffixCursorEffect: 'Suffix · Cursor',
+    suffixDotEffect: 'Suffix · Dot',
     speed: 'Speed',
     tune: 'Tune',
     frequency: 'Spring frequency',
@@ -50,6 +53,9 @@ export const COPY = {
     noEffect: '关闭',
     shadEffect: '末尾渐变',
     scaleEffect: '逐字缩放',
+    chunkEffect: '分块入场',
+    suffixCursorEffect: '末尾标记 · 方块',
+    suffixDotEffect: '末尾标记 · 圆点',
     speed: '速度',
     tune: '调参',
     frequency: '弹簧频率',
@@ -80,6 +86,11 @@ export const ANIMATION_SPEEDS = [0.1, 0.25, 0.5, 1] as const;
  * Default trailing-fade hide delay and scale duration, in milliseconds at 1×.
  */
 export const EFFECT_DURATION = 200;
+
+/**
+ * Default chunk entrance duration, in milliseconds at 1×.
+ */
+export const CHUNK_DURATION = 400;
 
 /**
  * Delay multipliers for simulated chunk arrivals.

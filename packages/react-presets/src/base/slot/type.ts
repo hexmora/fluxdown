@@ -96,6 +96,8 @@ export type CodeBlockProps = SlotBaseProps<
     onCopy?: CodeBlockHandleCopyFunction;
 
     showHeader?: boolean;
+
+    suffix?: ReactNode;
   }
 >;
 
@@ -109,7 +111,11 @@ export type CodeHeaderProps = SlotBaseProps<
   }
 >;
 
-export type CodeHighlighterProps = SlotBaseProps<CodeBlockBaseContent>;
+export type CodeHighlighterProps = SlotBaseProps<
+  CodeBlockBaseContent & {
+    suffix?: ReactNode;
+  }
+>;
 
 export type EmphasisProps = SlotBaseProps<{}, true, true>;
 

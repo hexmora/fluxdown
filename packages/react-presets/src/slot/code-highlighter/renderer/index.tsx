@@ -6,7 +6,7 @@ import { useHighlighted } from './hooks';
 import styles from './index.module.scss';
 
 export const CodeHighlighterRenderer = ({ Raw: _Raw, ...props }: CodeHighlighterProps) => {
-  const { className, code, language = 'plaintext', meta: _meta, ...elementProps } = props;
+  const { className, code, language = 'plaintext', meta: _meta, suffix, ...elementProps } = props;
   const tokens = useHighlighted(code, language);
 
   return (
@@ -32,6 +32,7 @@ export const CodeHighlighterRenderer = ({ Raw: _Raw, ...props }: CodeHighlighter
               )),
             ])
           : code}
+        {suffix}
       </code>
     </pre>
   );

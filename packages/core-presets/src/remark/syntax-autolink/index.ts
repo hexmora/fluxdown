@@ -13,7 +13,7 @@ import { BaseRemarkPlugin } from '../base';
 
 declare global {
   interface RemarkConfigs {
-    'remark-syntax-autolink'?: IPluggableConfig<void>;
+    'remark-syntax-autolink': IPluggableConfig<void>;
   }
 }
 

@@ -5,7 +5,7 @@ import { BreakLineRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-break-line'?: IPluggableConfig<void>;
+    'slot-break-line': IPluggableConfig<void>;
   }
 }
 

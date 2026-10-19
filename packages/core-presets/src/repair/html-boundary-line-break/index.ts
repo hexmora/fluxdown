@@ -8,7 +8,7 @@ import { BaseRepairPlugin } from '../base';
 
 declare global {
   interface RepairConfigs {
-    'repair-html-boundary-line-break'?: IPluggableConfig<void>;
+    'repair-html-boundary-line-break': IPluggableConfig<void>;
   }
 }
 

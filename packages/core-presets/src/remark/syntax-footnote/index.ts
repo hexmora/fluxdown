@@ -10,7 +10,7 @@ import { BaseRemarkPlugin } from '../base';
 
 declare global {
   interface RemarkConfigs {
-    'remark-syntax-footnote'?: IPluggableConfig<void>;
+    'remark-syntax-footnote': IPluggableConfig<void>;
   }
 }
 

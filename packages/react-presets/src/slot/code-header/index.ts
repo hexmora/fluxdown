@@ -5,7 +5,7 @@ import { CodeHeaderRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-code-header'?: IPluggableConfig<void>;
+    'slot-code-header': IPluggableConfig<void>;
   }
 }
 

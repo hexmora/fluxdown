@@ -1,7 +1,14 @@
 import type { IPluggable, IRemarkPlugin, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { IReadableClosure } from 'stative';
 
-import { PRESET_MAPPER_PLUGINS, Scale, Shad, Smooth } from '@fluxdown/core-presets/mapper';
+import {
+  Chunk,
+  PRESET_MAPPER_PLUGINS,
+  Scale,
+  Shad,
+  Smooth,
+  Suffix,
+} from '@fluxdown/core-presets/mapper';
 import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-presets/remark';
 import { PluginPriority } from '@fluxdown/types';
 import { expectTypeOf } from 'expect-type';
@@ -20,27 +27,33 @@ describe('plugin sets', () => {
 
     const configs: PluggableConfigs<MapperConfigs> = { shad: { enabled: render(true) } };
 
-    expect(toPluggable(plugins, PRESET_MAPPER_PLUGINS)).toEqual([Smooth, Shad, Scale]);
+    expect(toPluggable(plugins, PRESET_MAPPER_PLUGINS)).toEqual([
+      Smooth,
+      Shad,
+      Scale,
+      Chunk,
+      Suffix,
+    ]);
 
     expect(
       toPluggable<MapperPluggable, PluggableConfigs<MapperConfigs>>(configs, PRESET_MAPPER_PLUGINS),
-    ).toEqual([Smooth, [Shad, configs.shad], Scale]);
+    ).toEqual([Smooth, [Shad, configs.shad], Scale, Chunk, Suffix]);
 
     expect(
       toPluggable<MapperPluggable, PluggableConfigs<MapperConfigs>>(
         [plugins, configs],
         PRESET_MAPPER_PLUGINS,
       ),
-    ).toEqual([Smooth, [Shad, configs.shad], Scale]);
+    ).toEqual([Smooth, [Shad, configs.shad], Scale, Chunk, Suffix]);
 
-    expect(toPluggable([], PRESET_MAPPER_PLUGINS)).toEqual([Smooth, Shad, Scale]);
+    expect(toPluggable([], PRESET_MAPPER_PLUGINS)).toEqual([Smooth, Shad, Scale, Chunk, Suffix]);
 
     expect(
       toPluggable<MapperPluggable, PluggableConfigs<MapperConfigs>>(
         [[], configs],
         PRESET_MAPPER_PLUGINS,
       ),
-    ).toEqual([Smooth, [Shad, configs.shad], Scale]);
+    ).toEqual([Smooth, [Shad, configs.shad], Scale, Chunk, Suffix]);
   });
 
   test('distinguishes list/configuration tuples from two configured or mixed plugin entries', () => {
@@ -150,7 +163,7 @@ describe('plugin sets', () => {
   test('matches class configuration by static key and leaves absent plugins out', () => {
     const plugins: IPluggable<IRemarkPlugin, unknown>[] = [SyntaxPolicyRemarkPlugin];
 
-    const configs: RemarkConfigs = {
+    const configs: Partial<RemarkConfigs> = {
       'remark-syntax-policy': { indentedCode: true },
       'remark-syntax-footnote': { priority: PluginPriority.Low },
     };

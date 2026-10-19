@@ -26,7 +26,10 @@ import {
 import type { EffectItem, FluxdownRef, StreamingConfig } from '../types';
 
 import { Fluxdown } from '..';
+import { restoreGlobals } from '../../../../scripts/testing/globals';
+import scaleStyles from '../../../react-presets/src/render/scale/renderer/index.module.scss';
 import styles from '../../../react-presets/src/render/shad/renderer/index.module.scss';
+import { createRafClock } from './utils/raf';
 
 declare global {
   interface EffectConfigs {
@@ -47,23 +50,26 @@ afterEach(async () => {
 
   await act(async () => {});
 
+  jest.restoreAllMocks();
+
+  restoreGlobals();
+
   jest.useRealTimers();
 });
 
 describe('Fluxdown streaming effects', () => {
-  test.each<{ effect: StreamingConfig['effect'] }>([
-    { effect: undefined },
-    { effect: false },
-    { effect: [] },
-  ])('leaves effects disabled with effect=$effect', ({ effect }) => {
-    const view = render(<Fluxdown streaming={{ smooth: false, effect }} text="a" />);
+  test.each<{ effect: StreamingConfig['effect'] }>([{ effect: false }, { effect: [] }])(
+    'leaves effects disabled with effect=$effect',
+    ({ effect }) => {
+      const view = render(<Fluxdown streaming={{ smooth: false, effect }} text="a" />);
 
-    view.rerender(<Fluxdown streaming={{ smooth: false, effect }} text="abc" />);
+      view.rerender(<Fluxdown streaming={{ smooth: false, effect }} text="abc" />);
 
-    expect(view.container.textContent).toBe('abc');
+      expect(view.container.textContent).toBe('abc');
 
-    expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
-  });
+      expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
+    },
+  );
 
   test('updates shorthand and tuple effects while preserving the core and the active tail', () => {
     jest.useFakeTimers();
@@ -120,18 +126,51 @@ describe('Fluxdown streaming effects', () => {
     expect(ref.current).toBe(core);
   });
 
-  test('enables the default effect with true and disables it with false', async () => {
-    const view = render(<Fluxdown streaming={{ smooth: false, effect: true }} text="abc" />);
+  test.each([undefined, true])(
+    'uses scale by default with effect=%s and disables it with false',
+    (effect) => {
+      jest.spyOn(performance, 'now').mockReturnValue(0);
 
-    expect(view.container.querySelector(`.${styles.active}`)).not.toBeNull();
+      const view = render(<Fluxdown streaming={{ smooth: false, effect }} text="a" />);
 
-    view.rerender(<Fluxdown streaming={{ smooth: false, effect: false }} text="abc" />);
+      expect(view.container.querySelector(`.${scaleStyles.glyph}`)).toBeNull();
 
-    expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
+      view.rerender(<Fluxdown streaming={{ smooth: false, effect }} text="abc" />);
 
-    view.rerender(<Fluxdown streaming={{ smooth: false, effect: true }} text="abc" />);
+      expect(
+        Array.from(
+          view.container.querySelectorAll(`.${scaleStyles.active} .${scaleStyles.glyph}`),
+          (node) => node.textContent,
+        ),
+      ).toEqual(['b', 'c']);
 
-    await waitFor(() => expect(view.container.querySelector(`.${styles.active}`)).not.toBeNull());
+      expect(view.container.querySelector(`.${scaleStyles.active}`)).not.toBeNull();
+
+      view.rerender(<Fluxdown streaming={{ smooth: false, effect: false }} text="abc" />);
+
+      expect(view.container.querySelector(`.${scaleStyles.glyph}`)).toBeNull();
+
+      view.rerender(<Fluxdown streaming={{ smooth: false, effect }} text="abc" />);
+
+      expect(view.container.querySelector(`.${scaleStyles.glyph}`)).toBeNull();
+    },
+  );
+
+  test('enables scale for streaming=true and keeps omitted streaming disabled', async () => {
+    const clock = createRafClock();
+    const view = render(<Fluxdown text="a" />);
+
+    view.rerender(<Fluxdown text="ab" />);
+    expect(view.container.querySelector(`.${scaleStyles.glyph}`)).toBeNull();
+
+    view.rerender(<Fluxdown streaming text="ab" />);
+    view.rerender(<Fluxdown streaming text="abc" />);
+
+    await clock.advanceUntil(() => view.container.textContent === 'abc');
+
+    expect(
+      view.container.querySelector(`.${scaleStyles.active} .${scaleStyles.glyph}`),
+    ).toHaveTextContent('c');
   });
 
   test('enables named effects when their optional enabled value is undefined', () => {

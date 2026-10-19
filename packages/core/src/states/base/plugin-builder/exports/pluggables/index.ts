@@ -85,7 +85,7 @@ export const mergePluginPluggables = <T>(presets: readonly T[], extras: readonly
 
 export const isPluginSetTuple = <T, C extends object>(
   pluginSet: PluginSet<T, C>,
-): pluginSet is [T[], C] => {
+): pluginSet is [T[], Partial<C>] => {
   return (
     isArray(pluginSet) &&
     pluginSet.length === 2 &&

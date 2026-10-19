@@ -5,7 +5,7 @@ import { LinkRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-link'?: IPluggableConfig<void>;
+    'slot-link': IPluggableConfig<void>;
   }
 }
 

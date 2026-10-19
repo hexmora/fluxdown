@@ -10,7 +10,7 @@ import { isPatchNode } from './utils';
 
 declare global {
   interface RenderConfigs {
-    'render-patch'?: IPluggableConfig<void>;
+    'render-patch': IPluggableConfig<void>;
   }
 }
 

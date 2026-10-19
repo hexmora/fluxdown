@@ -8,7 +8,7 @@ import { BaseRemarkPlugin } from '../base';
 
 declare global {
   interface RemarkConfigs {
-    'remark-syntax-soft-endline'?: IPluggableConfig<void>;
+    'remark-syntax-soft-endline': IPluggableConfig<void>;
   }
 }
 

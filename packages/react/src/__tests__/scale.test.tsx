@@ -15,13 +15,15 @@ import { createManualTicker, createStepScheduler } from './utils/smooth';
 beforeEach(() => {
   jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
 
-  jest.setSystemTime(1000);
+  jest.spyOn(performance, 'now').mockReturnValue(1000);
 });
 
 afterEach(async () => {
   cleanup();
 
   await act(async () => {});
+
+  jest.restoreAllMocks();
 
   jest.useRealTimers();
 });
@@ -44,7 +46,7 @@ describe('Fluxdown scale streaming', () => {
       [`--${PREFIX}-scale-blur`]: '0.08em',
     });
 
-    jest.setSystemTime(1050);
+    jest.mocked(performance.now).mockReturnValue(1050);
 
     view.rerender(<Fluxdown streaming={{ smooth: false, effect: 'scale' }} text="Hello worlds" />);
 
@@ -84,7 +86,7 @@ describe('Fluxdown scale streaming', () => {
 
     const character = view.container.querySelector(`.${styles.active}`);
 
-    jest.setSystemTime(1016);
+    jest.mocked(performance.now).mockReturnValue(1016);
 
     act(() => ticker.current().tick(32));
 

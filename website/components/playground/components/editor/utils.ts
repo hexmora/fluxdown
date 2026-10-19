@@ -10,7 +10,7 @@ import {
 
 import type { AnimationSpeed, EditorEffect, EditorTuning } from './type';
 
-import { EFFECT_DURATION } from './consts';
+import { CHUNK_DURATION, EFFECT_DURATION } from './consts';
 
 /**
  * Virtual time that advances at an adjustable rate. Changing the rate keeps the current reading,
@@ -133,13 +133,24 @@ export const createTunableSpring = (initial: PerceptualSpring): TunableSpring =>
  * Streaming effect configuration with wall-clock durations stretched for `speed`.
  */
 export const getEffectConfig = (
-  effect: Exclude<EditorEffect, 'none'>,
+  effect: EditorEffect,
   speed: AnimationSpeed,
   tuning: EditorTuning,
-): EffectItem =>
-  effect === 'shad'
-    ? ['shad', { length: tuning.fadeLength, hideDelay: EFFECT_DURATION / speed }]
-    : ['scale', { duration: tuning.entranceDuration / speed }];
+): false | EffectItem => {
+  switch (effect) {
+    case 'none':
+      return false;
+    case 'shad':
+      return ['shad', { length: tuning.fadeLength, hideDelay: EFFECT_DURATION / speed }];
+    case 'scale':
+      return ['scale', { duration: tuning.entranceDuration / speed }];
+    case 'chunk':
+      return ['chunk', { duration: CHUNK_DURATION / speed }];
+    case 'suffix-cursor':
+    case 'suffix-dot':
+      return ['suffix', { type: effect === 'suffix-cursor' ? 'cursor' : 'dot' }];
+  }
+};
 
 export const getDampingKind = (dampingRatio: number) => {
   if (Math.abs(dampingRatio - 1) < 1e-6) {

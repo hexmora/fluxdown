@@ -20,13 +20,15 @@ import { SpringDemo } from '../../../../../components';
 
 ## 在应用中使用
 
-React 中开启 `streaming` 就会使用默认的弹簧平滑化：
+以下以 React 版组件为例，开启 `streaming` 就会使用默认的弹簧平滑化：
 
 ```tsx
 <Fluxdown streaming={isStreaming} text={text} />
 ```
 
-也可以显式指定调度器，并配合[动画效果](./animation.mdx)使用：
+也可以显式指定调度器，并配合[动画效果](./animation/index.mdx)使用：
+
+以下以 React 版组件为例：
 
 ```tsx
 <Fluxdown

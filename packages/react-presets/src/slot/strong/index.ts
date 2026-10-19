@@ -5,7 +5,7 @@ import { StrongRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-strong'?: IPluggableConfig<void>;
+    'slot-strong': IPluggableConfig<void>;
   }
 }
 

@@ -4,6 +4,8 @@ import { pluginSvgr } from '@rsbuild/plugin-svgr';
 import { defineConfig, normalizeHref } from '@rspress/core';
 import { fileURLToPath } from 'node:url';
 
+import { sessionAppearance } from './theme/appearance/plugin';
+
 export default defineConfig({
   root: 'docs',
   base: '/fluxdown/',
@@ -50,14 +52,14 @@ export default defineConfig({
     link: { checkDeadLinks: true, checkAnchors: true },
   },
   themeConfig: {
-    darkMode: 'light',
+    darkMode: 'auto',
     editLink: {
       docRepoBaseUrl: 'https://github.com/hexmora/fluxdown/tree/main/website/docs',
     },
     socialLinks: [{ icon: 'github', mode: 'link', content: 'https://github.com/hexmora/fluxdown' }],
   },
   builderConfig: {
-    plugins: [pluginLess(), pluginSass(), pluginSvgr()],
+    plugins: [pluginLess(), pluginSass(), pluginSvgr(), sessionAppearance()],
     resolve: {
       alias: {
         // Workspace demos share the same React instance as the documentation theme.

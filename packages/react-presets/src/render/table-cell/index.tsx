@@ -10,7 +10,7 @@ import { BaseReactRenderPlugin, isElementWithTag } from '../../base';
 
 declare global {
   interface RenderConfigs {
-    'render-table-cell'?: IPluggableConfig<void>;
+    'render-table-cell': IPluggableConfig<void>;
   }
 }
 

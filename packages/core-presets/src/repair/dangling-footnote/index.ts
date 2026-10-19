@@ -8,7 +8,7 @@ import { isStructuralTail, removeCompleteReferences, removeIncompleteReference }
 
 declare global {
   interface RepairConfigs {
-    'repair-dangling-footnote'?: IPluggableConfig<void>;
+    'repair-dangling-footnote': IPluggableConfig<void>;
   }
 }
 

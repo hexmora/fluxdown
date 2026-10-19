@@ -5,7 +5,7 @@ import { ListRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-list'?: IPluggableConfig<void>;
+    'slot-list': IPluggableConfig<void>;
   }
 }
 

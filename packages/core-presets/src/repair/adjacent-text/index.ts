@@ -8,7 +8,7 @@ import { BaseRepairPlugin } from '../base';
 
 declare global {
   interface RepairConfigs {
-    'repair-adjacent-text'?: IPluggableConfig<void>;
+    'repair-adjacent-text': IPluggableConfig<void>;
   }
 }
 

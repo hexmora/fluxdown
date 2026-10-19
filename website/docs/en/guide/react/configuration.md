@@ -18,14 +18,14 @@ The complete Markdown received so far. When a new chunk arrives, pass the accumu
 
 **Default:** `false`
 
-`true` enables trailing syntax repair and smooth output; `false` disables streaming behavior. Pass an object to choose visual effects and control each feature. `repairEnding` and `smooth` default to `true`, while `effect` defaults to `false`.
+`true` enables trailing syntax repair and smooth output; `false` disables streaming behavior. Pass an object to choose visual effects and control each feature. `repairEnding` and `smooth` default to `true`, while `effect` defaults to `'scale'`.
 
 ```tsx
 <Fluxdown
   streaming={{
     repairEnding: true,
     smooth: true,
-    effect: 'shad',
+    effect: 'scale',
   }}
   text={text}
 />
@@ -88,95 +88,9 @@ Determine how much content to reveal on each update. Use `'spring'` for the buil
 
 **Type:** `boolean | EffectItem | EffectItem[]`
 
-**Default:** `false`
+**Default:** `'scale'` (when streaming is enabled)
 
-Choose a built-in effect, pass a mapper plugin directly, or combine effects in an array:
-
-| Value                                                       | Behavior                                                           |
-| ----------------------------------------------------------- | ------------------------------------------------------------------ |
-| Omitted or `false`                                          | No visual effect.                                                  |
-| `true` or `'shad'`                                          | Fade newly revealed trailing characters with the default settings. |
-| `['shad', ShadPluginConfig]`                                | Configure the trailing fade.                                       |
-| `'scale'`                                                   | Grow and fade in newly revealed characters as their blur clears.   |
-| `['scale', ScalePluginConfig]`                              | Configure the per-character entrance.                              |
-| `Mapper`                                                    | Use a mapper with its default options.                             |
-| `[Mapper, options]`                                         | Configure a mapper with the same options as `plugins.mappers`.     |
-| `['shad', ['scale', ScalePluginConfig], [Mapper, options]]` | Combine built-in and custom effects.                               |
-
-Custom effects use the same configuration as [mapper plugins](../core/plugins/mapper.md). Fields accept plain values or readable closures; `priority` controls ordering and `disabled` excludes an effect. Effects run after smooth output. Import `EffectItem` from `fluxdown` and effect configuration types from `@fluxdown/core-presets/mapper`.
-
-```tsx
-<Fluxdown
-  streaming={{
-    effect: ['shad', { length: 3, maskWidth: 18 }],
-  }}
-  text={text}
-/>
-```
-
-### shad.enabled <span className="field-tag">Optional</span> {#shadenabled}
-
-**Type:** `boolean`
-
-**Default:** `true`
-
-Enable the trailing fade.
-
-### shad.length <span className="field-tag">Optional</span> {#shadlength}
-
-**Type:** `number`
-
-**Default:** `10`
-
-Number of trailing characters included in the fade. Fractions round down; negative and non-finite values become `0`.
-
-### shad.maskWidth <span className="field-tag">Optional</span> {#shadmaskwidth}
-
-**Type:** `number`
-
-**Default:** `15`
-
-Fade mask width in pixels. `0` hides the mask, negative values become `0`, and non-finite values use the default width.
-
-### shad.hideDelay <span className="field-tag">Optional</span> {#shadhidedelay}
-
-**Type:** `number`
-
-**Default:** `200`
-
-Milliseconds the fade stays on the trailing characters after visible content stops growing. Negative values become `0`, and non-finite values use the default delay.
-
-### scale.enabled <span className="field-tag">Optional</span> {#scaleenabled}
-
-**Type:** `boolean`
-
-**Default:** `true`
-
-Enable the per-character entrance when using `effect: ['scale', config]`. Existing content remains still. The animation respects `prefers-reduced-motion` and leaves code, formulas, and replacement content unchanged.
-
-### scale.duration <span className="field-tag">Optional</span> {#scaleduration}
-
-**Type:** `number`
-
-**Default:** `200`
-
-Entrance duration in milliseconds. `0` shows characters immediately. Negative values become `0`, and non-finite values use the default duration.
-
-### scale.from <span className="field-tag">Optional</span> {#scalefrom}
-
-**Type:** `number`
-
-**Default:** `0`
-
-Initial character scale, between `0` and `1`. Characters grow to their full size from the bottom center without changing the space reserved for them. Values outside the range are clamped; non-finite values use `0`.
-
-### scale.blur <span className="field-tag">Optional</span> {#scaleblur}
-
-**Type:** `number`
-
-**Default:** `0.08`
-
-Initial blur radius in `em`, relative to the text's font size. For example, `0.08` produces a 1.6-pixel blur at a 20-pixel font size. Blur clears during the entrance; set `0` to disable it. Negative values become `0`, and non-finite values use the default radius.
+Choose an animation effect or combine multiple effects. See [Animation](../common/streaming-effects/animation/index.mdx) for the supported input forms, available effects, live demos, and their configuration fields. Import `EffectItem` from `fluxdown` and effect configuration types from `@fluxdown/core-presets/mapper`.
 
 ## build <span className="field-tag">Optional</span> {#build}
 

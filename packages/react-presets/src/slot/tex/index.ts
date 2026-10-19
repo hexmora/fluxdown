@@ -5,7 +5,7 @@ import { TexRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-tex'?: IPluggableConfig<void>;
+    'slot-tex': IPluggableConfig<void>;
   }
 }
 

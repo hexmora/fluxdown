@@ -1,0 +1,112 @@
+import { SuffixDemo } from '../../../../../../components';
+
+# 末尾标记
+
+`suffix` 在当前可见内容的末尾追加一个小标记。可以选择终端风格的方块光标，或柔和呼吸的圆点。标记跟随文字，适用于段落、列表、行内格式、表格和代码块。
+
+<SuffixDemo />
+
+切换内容类型，可以查看不同结尾的表现；暂停或重播，可以观察标记的位置；选择自定义类型，可以体验 renderer 的扩展方式。演示播放完成后仍保留标记，方便检查间距。
+
+## 使用方式
+
+以下以 React 版组件为例：
+
+```tsx
+<Fluxdown streaming={{ effect: ['suffix', { type: 'cursor' }] }} text={text} />
+```
+
+将 `type` 设为 `'dot'` 即可使用圆点。`effect: 'suffix'` 默认使用方块光标。两种形状都继承当前文字颜色，随文字缩放，呼吸动画遵循系统的 `prefers-reduced-motion` 设置。
+
+只要 effect 启用，标记就会保持显示。响应完成后，将 `streaming` 设为 `false`；如果需要继续保留其他流式行为，也可以只把 suffix 的 `enabled` 设为 `false`：
+
+以下以 React 版组件为例：
+
+```tsx
+<Fluxdown
+  streaming={{
+    smooth: true,
+    effect: ['suffix', { type: 'dot', enabled: isStreaming }],
+  }}
+  text={text}
+/>
+```
+
+以下以 React 版组件为例，将标记和入场效果一起使用：
+
+```tsx
+<Fluxdown
+  streaming={{ effect: ['scale', ['suffix', { type: 'dot' }]] }}
+  text={text}
+/>
+```
+
+## 渲染自定义类型
+
+`type` 的类型是 `'cursor' | 'dot' | (string & {})`。所有值都会生成相同结构的 HAST 节点：一个 `span`，其 `dataFluxdownSuffix` 属性保存类型。默认 renderer 只识别 `cursor` 和 `dot`，遇到其他值直接返回 `null`。未知类型是提供给 renderer 的信息，不会作为文字显示。
+
+以下以 React 版组件为例，通过[渲染插件](../../../react/plugins/render.md)显示一个笑脸。`SuffixRenderer` 复用内置标记的布局与呼吸动画：
+
+```tsx
+import type {
+  ReactRenderMatchParams,
+  ReactRenderParams,
+} from '@fluxdown/react-presets/base';
+
+import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/mapper';
+import { BaseReactRenderPlugin } from '@fluxdown/react-presets/base';
+import { SuffixRenderer } from '@fluxdown/react-presets/render';
+import { Fluxdown } from 'fluxdown';
+
+class SmileRenderPlugin extends BaseReactRenderPlugin {
+  static readonly key = 'render-smile';
+
+  readonly config = { priority: -1 };
+
+  match({ node }: ReactRenderMatchParams) {
+    return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
+  }
+
+  render({ node }: ReactRenderParams) {
+    if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
+      return null;
+    }
+
+    return <SuffixRenderer type="smile">🙂</SuffixRenderer>;
+  }
+}
+
+<Fluxdown
+  plugins={{ renders: [SmileRenderPlugin] }}
+  streaming={{ effect: ['suffix', { type: 'smile' }] }}
+  text={text}
+/>;
+```
+
+较低的优先级使这个 renderer 先于内置 suffix renderer 处理 `smile`，其他类型仍由预设处理。上面的演示使用了相同的插件与动画。
+
+## 代码块与 Core
+
+代码块中的标记跟在可见代码之后，与最后一个字符保持在同一行。代码末尾如果包含显式空行，标记会出现在该空行上。标记独立于代码内容，复制代码时不会被带入。自定义代码 slot 需要在高亮后的代码内容之后渲染 `suffix` 属性，才能保留这个行为。
+
+Core 从 `@fluxdown/core-presets/mapper` 导出 `Suffix` mapper、`SuffixConfig`、`SuffixType`、`SUFFIX_DATA_ATTR` 和 `isSuffixNode`。Mapper 将标记插入当前可见 HAST 的末尾，不增加文本长度，具体外观由 renderer 决定。
+
+## 配置
+
+以下字段属于 `['suffix', config]` 中的 `suffix` 配置对象。
+
+### enabled <span className="field-tag">可选</span> {#enabled}
+
+**类型：** `boolean`
+
+**默认值：** `true`
+
+在当前可见内容的末尾显示标记。生成完成后可以单独禁用，也可以将 `streaming` 设为 `false` 关闭所有流式行为。
+
+### type <span className="field-tag">可选</span> {#type}
+
+**类型：** `'cursor' | 'dot' | (string & {})`
+
+**默认值：** `'cursor'`
+
+选择方块光标或圆点。所有类型都保存在相同的 HAST 标记节点上；默认 renderer 对未知类型返回 `null`。

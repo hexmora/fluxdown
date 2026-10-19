@@ -1,0 +1,60 @@
+import { AnimationDemo } from '../../../../../../components';
+
+# 末尾渐变
+
+`shad` 使用移动渐变，让末尾文字逐渐显现。已经显示的内容保持不变，最后几个字符随着流式输出慢慢变得清晰。
+
+<AnimationDemo effect="shad" />
+
+## 使用方式
+
+以下以 React 版组件为例：
+
+```tsx
+<Fluxdown streaming={{ effect: 'shad' }} text={text} />
+```
+
+平滑化默认启用。以下以 React 版组件为例，按排版需要调整末尾字符数与渐变宽度：
+
+```tsx
+<Fluxdown
+  streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+  text={text}
+/>
+```
+
+## 配置
+
+以下字段属于 `['shad', config]` 中的 `shad` 配置对象。
+
+### enabled <span className="field-tag">可选</span> {#enabled}
+
+**类型：** `boolean`
+
+**默认值：** `true`
+
+是否开启末尾渐变。
+
+### length <span className="field-tag">可选</span> {#length}
+
+**类型：** `number`
+
+**默认值：** `10`
+
+参与渐变的末尾字符数。小数向下取整，负数和非有限值按 `0` 处理。
+
+### maskWidth <span className="field-tag">可选</span> {#maskwidth}
+
+**类型：** `number`
+
+**默认值：** `15`
+
+渐变遮罩宽度，单位为像素。`0` 隐藏遮罩，负数按 `0` 处理，非有限值使用默认宽度。
+
+### hideDelay <span className="field-tag">可选</span> {#hidedelay}
+
+**类型：** `number`
+
+**默认值：** `200`
+
+可见内容停止增长后，末尾渐变继续保留的毫秒数。负数按 `0` 处理，非有限值使用默认时长。

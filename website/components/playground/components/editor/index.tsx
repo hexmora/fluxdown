@@ -90,6 +90,9 @@ export const Editor = ({ lang }: EditorProps) => {
                   <option value="none">{copy.noEffect}</option>
                   <option value="shad">{copy.shadEffect}</option>
                   <option value="scale">{copy.scaleEffect}</option>
+                  <option value="chunk">{copy.chunkEffect}</option>
+                  <option value="suffix-cursor">{copy.suffixCursorEffect}</option>
+                  <option value="suffix-dot">{copy.suffixDotEffect}</option>
                 </select>
               </span>
             </label>
@@ -265,7 +268,7 @@ export const Editor = ({ lang }: EditorProps) => {
 
                   return {
                     smooth: smooth && { enabled: true, ticker, scheduler },
-                    effect: effect === 'none' ? false : getEffectConfig(effect, speed, tuning),
+                    effect: getEffectConfig(effect, speed, tuning),
                     repairEnding: repair,
                   };
                 })}

@@ -11,7 +11,7 @@ const Tex = /*#__PURE__*/ createTypeOfSlot('Tex');
 
 declare global {
   interface RenderConfigs {
-    'render-tex'?: IPluggableConfig<void>;
+    'render-tex': IPluggableConfig<void>;
   }
 }
 

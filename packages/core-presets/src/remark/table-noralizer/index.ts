@@ -9,7 +9,7 @@ import { normalizeTableColumns } from './utils';
 
 declare global {
   interface RemarkConfigs {
-    'remark-table-noralizer'?: IPluggableConfig<void>;
+    'remark-table-noralizer': IPluggableConfig<void>;
   }
 }
 

@@ -15,7 +15,13 @@ import {
 } from '@fluxdown/core-presets/mapper';
 import { expectTypeOf } from 'expect-type';
 
-import { getSchedulerByType, getTickerByType, isEnableRAF, toSmoothConfig } from '..';
+import {
+  getSchedulerByType,
+  getTickerByType,
+  isEnableRAF,
+  toSmoothConfig,
+  toStreamingConfig,
+} from '..';
 import { restoreGlobals, stubGlobal } from '../../../../../scripts/testing/globals';
 import { ALL_SCHEDULERS, ALL_TICKERS } from '../../consts';
 
@@ -24,6 +30,16 @@ afterEach(() => {
 });
 
 describe('smooth configuration', () => {
+  test('defaults enabled streaming to scale and retains explicit effect overrides', () => {
+    expect(toStreamingConfig()).toEqual({ repairEnding: false, smooth: false, effect: false });
+    expect(toStreamingConfig(false)).toEqual(toStreamingConfig());
+    expect(toStreamingConfig(true)).toEqual({ repairEnding: true, smooth: true, effect: 'scale' });
+    expect(toStreamingConfig({})).toEqual(toStreamingConfig(true));
+    expect(toStreamingConfig({ smooth: false }).effect).toBe('scale');
+    expect(toStreamingConfig({ effect: false }).effect).toBe(false);
+    expect(toStreamingConfig({ effect: 'shad' }).effect).toBe('shad');
+  });
+
   test('exports runtime registries and their public constructor types', () => {
     expect(ALL_TICKERS).toEqual([RafSmoothTicker, IntervalSmoothTicker]);
 

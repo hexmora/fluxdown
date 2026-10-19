@@ -5,7 +5,7 @@ import { EmphasisRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-emphasis'?: IPluggableConfig<void>;
+    'slot-emphasis': IPluggableConfig<void>;
   }
 }
 

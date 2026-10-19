@@ -22,7 +22,7 @@ export const ScaleValue = /*#__PURE__*/ once(function ScaleValue({
   return useMap([previous.value, _duration, _from, _blur], ([root, duration, from, blur]) => {
     const result = createScaleRoot(root, characters, {
       initial: first && initial,
-      start: Date.now(),
+      start: performance.now(),
       duration,
       from,
       blur,

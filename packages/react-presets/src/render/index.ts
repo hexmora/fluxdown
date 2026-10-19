@@ -4,6 +4,7 @@ import type { IReactRenderPlugin } from '../base';
 
 import { BlockquoteRenderPlugin } from './blockquote';
 import { BreakLineRenderPlugin } from './break-line';
+import { ChunkRenderPlugin } from './chunk';
 import { CodeRenderPlugin } from './code';
 import { EmphasisRenderPlugin } from './emphasis';
 import { FallbackRenderPlugin } from './fallback';
@@ -16,12 +17,14 @@ import { PatchRenderPlugin } from './patch';
 import { ScaleRenderPlugin } from './scale';
 import { ShadRenderPlugin } from './shad';
 import { StrongRenderPlugin } from './strong';
+import { SuffixRenderPlugin } from './suffix';
 import { TableRenderPlugin } from './table';
 import { TableCellRenderPlugin } from './table-cell';
 import { TexRenderPlugin } from './tex';
 
 export * from './blockquote';
 export * from './break-line';
+export * from './chunk';
 export * from './code';
 export * from './emphasis';
 export * from './fallback';
@@ -34,6 +37,7 @@ export * from './patch';
 export * from './scale';
 export * from './shad';
 export * from './strong';
+export * from './suffix';
 export * from './table';
 export * from './table-cell';
 export * from './tex';
@@ -42,6 +46,8 @@ export const PRESET_RENDER_PLUGINS: PluginClass<IReactRenderPlugin>[] = [
   PatchRenderPlugin,
   ShadRenderPlugin,
   ScaleRenderPlugin,
+  ChunkRenderPlugin,
+  SuffixRenderPlugin,
   CodeRenderPlugin,
   EmphasisRenderPlugin,
   ImageRenderPlugin,
