@@ -1,5 +1,18 @@
 # @fluxdown/website
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [a8c6013]
+- Updated dependencies [4828c8c]
+- Updated dependencies [4828c8c]
+  - fluxdown@0.10.0
+  - @fluxdown/core@0.12.0
+  - @fluxdown/core-presets@0.9.0
+  - @fluxdown/react-presets@0.7.0
+  - stative@2.1.0
+
 ## 0.0.2
 
 ### Patch Changes
