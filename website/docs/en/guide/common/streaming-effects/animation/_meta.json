@@ -13,5 +13,10 @@
     "type": "file",
     "name": "chunk",
     "label": "Chunk entrance"
+  },
+  {
+    "type": "file",
+    "name": "suffix",
+    "label": "Suffix"
   }
 ]

@@ -9,6 +9,7 @@ import { PauseIcon, PlayIcon, ReplayIcon, ResetIcon } from '../../../icons';
 import { COPY } from './consts';
 import { useEditor } from './hooks';
 import styles from './index.module.scss';
+import { getEditorEffect } from './utils';
 
 export const Editor = ({ lang }: EditorProps) => {
   const copy = COPY[lang];
@@ -73,6 +74,8 @@ export const Editor = ({ lang }: EditorProps) => {
                   <option value="shad">{copy.shadEffect}</option>
                   <option value="scale">{copy.scaleEffect}</option>
                   <option value="chunk">{copy.chunkEffect}</option>
+                  <option value="suffix-cursor">{copy.suffixCursorEffect}</option>
+                  <option value="suffix-dot">{copy.suffixDotEffect}</option>
                 </select>
               </span>
             </label>
@@ -131,7 +134,7 @@ export const Editor = ({ lang }: EditorProps) => {
 
                   return {
                     smooth,
-                    effect: effect === 'none' ? false : effect,
+                    effect: getEditorEffect(effect),
                     repairEnding: repair,
                   };
                 })}

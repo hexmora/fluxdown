@@ -1,5 +1,6 @@
 import type { Element } from 'hast';
 
+import { isSuffixNode } from '@fluxdown/core-presets/mapper';
 import { isString } from 'lodash-es';
 
 import { getStringProperty, getTextContent, isElementWithTag } from '../../base';
@@ -62,3 +63,22 @@ export const getMeta = (pre: Element, code: Element | undefined) => {
 
 export const getCode = (pre: Element, code: Element | undefined) =>
   getTextContent(code ?? pre).replace(/\r?\n$/, '');
+
+/** Code slots render highlighted text independently; retain its tail decoration. */
+export const getCodeSuffix = (node: Element): Element | undefined => {
+  if (isSuffixNode(node)) {
+    return node;
+  }
+
+  for (const child of node.children) {
+    if (child.type === 'element') {
+      const suffix = getCodeSuffix(child);
+
+      if (suffix) {
+        return suffix;
+      }
+    }
+  }
+
+  return undefined;
+};

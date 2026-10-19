@@ -13,5 +13,10 @@
     "type": "file",
     "name": "chunk",
     "label": "分块入场"
+  },
+  {
+    "type": "file",
+    "name": "suffix",
+    "label": "末尾标记"
   }
 ]

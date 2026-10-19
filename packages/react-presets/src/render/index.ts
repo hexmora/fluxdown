@@ -17,6 +17,7 @@ import { PatchRenderPlugin } from './patch';
 import { ScaleRenderPlugin } from './scale';
 import { ShadRenderPlugin } from './shad';
 import { StrongRenderPlugin } from './strong';
+import { SuffixRenderPlugin } from './suffix';
 import { TableRenderPlugin } from './table';
 import { TableCellRenderPlugin } from './table-cell';
 import { TexRenderPlugin } from './tex';
@@ -36,6 +37,7 @@ export * from './patch';
 export * from './scale';
 export * from './shad';
 export * from './strong';
+export * from './suffix';
 export * from './table';
 export * from './table-cell';
 export * from './tex';
@@ -45,6 +47,7 @@ export const PRESET_RENDER_PLUGINS: PluginClass<IReactRenderPlugin>[] = [
   ShadRenderPlugin,
   ScaleRenderPlugin,
   ChunkRenderPlugin,
+  SuffixRenderPlugin,
   CodeRenderPlugin,
   EmphasisRenderPlugin,
   ImageRenderPlugin,
