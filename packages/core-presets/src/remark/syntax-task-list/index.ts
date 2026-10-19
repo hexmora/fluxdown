@@ -13,7 +13,7 @@ import { BaseRemarkPlugin } from '../base';
 
 declare global {
   interface RemarkConfigs {
-    'remark-syntax-task-list'?: IPluggableConfig<void>;
+    'remark-syntax-task-list': IPluggableConfig<void>;
   }
 }
 

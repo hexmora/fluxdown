@@ -11,7 +11,7 @@ import { getScaleConfig, isScaleNode } from './utils';
 
 declare global {
   interface RenderConfigs {
-    'render-scale'?: IPluggableConfig<void>;
+    'render-scale': IPluggableConfig<void>;
   }
 }
 

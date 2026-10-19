@@ -5,8 +5,9 @@
     "label": "平滑化"
   },
   {
-    "type": "file",
+    "type": "dir",
     "name": "animation",
-    "label": "动画效果"
+    "label": "动画效果",
+    "collapsed": false
   }
 ]

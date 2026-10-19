@@ -11,22 +11,18 @@ afterEach(() => {
 });
 
 describe('ticker timestamps', () => {
-  test('uses performance.now when available', () => {
+  test('uses performance.now without consulting the wall clock', () => {
     const now = jest.fn(() => 42);
 
     stubGlobal('performance', { now });
 
+    const wallClock = jest.spyOn(Date, 'now').mockReturnValue(-1);
+
     expect(getNow()).toBe(42);
 
     expect(now).toHaveBeenCalledTimes(1);
-  });
 
-  test('uses Date.now when performance is unavailable', () => {
-    stubGlobal('performance', undefined);
-
-    jest.spyOn(Date, 'now').mockReturnValue(42);
-
-    expect(getNow()).toBe(42);
+    expect(wallClock).not.toHaveBeenCalled();
   });
 });
 
@@ -124,16 +120,20 @@ describe('RafSmoothTicker', () => {
     ticker.destroy();
   });
 
-  test('starts with the Date timestamp when performance is unavailable', () => {
+  test('starts with the same monotonic clock used by animation frames', () => {
     mockAnimationFrames();
 
-    stubGlobal('performance', undefined);
+    const now = jest.spyOn(performance, 'now').mockReturnValue(42);
 
-    jest.spyOn(Date, 'now').mockReturnValue(42);
+    const wallClock = jest.spyOn(Date, 'now').mockReturnValue(-1);
 
     const ticker = new RafSmoothTicker();
 
     expect(ticker.start()).toBe(42);
+
+    expect(now).toHaveBeenCalledTimes(1);
+
+    expect(wallClock).not.toHaveBeenCalled();
 
     ticker.destroy();
   });

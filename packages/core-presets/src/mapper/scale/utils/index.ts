@@ -103,7 +103,7 @@ const toScaleCharacters = (
       return existing;
     }
 
-    return { text, start: initial ? 0 : start };
+    return { text, start: initial ? -1 : start };
   });
 };
 
@@ -113,7 +113,7 @@ const createScaleText = (
   config: ScaleRootConfig,
 ): ElementContent[] => {
   const isSettled = ({ start }: ScaleCharacter) =>
-    start === 0 || start + config.duration <= config.start;
+    start < 0 || start + config.duration <= config.start;
 
   if (characters.every(isSettled)) {
     return [node];

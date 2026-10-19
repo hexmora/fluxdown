@@ -46,7 +46,7 @@ test('keeps initial content untouched and only timestamps appended graphemes', (
 
   expect(readCharacters(appended.root)).toHaveLength(5);
 
-  expect(appended.characters.slice(0, 5).every(({ start }) => start === 0)).toBe(true);
+  expect(appended.characters.slice(0, 5).every(({ start }) => start === -1)).toBe(true);
 
   expect(
     readCharacters(appended.root).every((node) => node.properties.dataScaleStart === 1000),

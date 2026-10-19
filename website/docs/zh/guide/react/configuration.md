@@ -18,14 +18,14 @@
 
 **默认值：** `false`
 
-`true` 开启末尾语法修复和平滑输出，`false` 关闭流式行为。传对象可以选择视觉特效并分别控制各项。`repairEnding` 和 `smooth` 默认为 `true`，`effect` 默认为 `false`。
+`true` 开启末尾语法修复和平滑输出，`false` 关闭流式行为。传对象可以选择视觉特效并分别控制各项。`repairEnding` 和 `smooth` 默认为 `true`，`effect` 默认为 `'scale'`。
 
 ```tsx
 <Fluxdown
   streaming={{
     repairEnding: true,
     smooth: true,
-    effect: 'shad',
+    effect: 'scale',
   }}
   text={text}
 />
@@ -88,87 +88,9 @@
 
 **类型：** `boolean | EffectItem | EffectItem[]`
 
-**默认值：** `false`
+**默认值：** `'scale'`（启用流式输出时）
 
-选择内置特效、直接传入 mapper 插件，或用数组组合多个特效：
-
-| 值                                                          | 效果                                               |
-| ----------------------------------------------------------- | -------------------------------------------------- |
-| 不传或 `false`                                              | 不启用视觉特效。                                   |
-| `true` 或 `'shad'`                                          | 使用默认配置，让新出现的末尾文字渐变显示。         |
-| `['shad', ShadPluginConfig]`                                | 配置末尾渐变。                                     |
-| `'scale'`                                                   | 新出现的字符逐字放大、淡入，并逐渐消除模糊。       |
-| `['scale', ScalePluginConfig]`                              | 配置逐字入场效果。                                 |
-| `Mapper`                                                    | 使用 mapper 的默认配置。                           |
-| `[Mapper, options]`                                         | 使用与 `plugins.mappers` 相同的配置来设置 mapper。 |
-| `['shad', ['scale', ScalePluginConfig], [Mapper, options]]` | 组合内置特效与自定义特效。                         |
-
-自定义特效与 [mapper 插件](../core/plugins/mapper.md) 使用相同的配置。字段支持普通值或可读闭包；`priority` 控制顺序，`disabled` 排除某项特效。特效在平滑输出之后执行。`EffectItem` 从 `fluxdown` 导入，特效配置类型从 `@fluxdown/core-presets/mapper` 导入。
-
-```tsx
-<Fluxdown
-  streaming={{
-    effect: ['shad', { length: 3, maskWidth: 18 }],
-  }}
-  text={text}
-/>
-```
-
-### shad.enabled <span className="field-tag">可选</span> {#shadenabled}
-
-**类型：** `boolean`
-
-**默认值：** `true`
-
-是否开启末尾渐变。
-
-### shad.length <span className="field-tag">可选</span> {#shadlength}
-
-**类型：** `number`
-
-**默认值：** `10`
-
-参与渐变的末尾字符数。小数向下取整，负数和非有限值按 `0` 处理。
-
-### shad.maskWidth <span className="field-tag">可选</span> {#shadmaskwidth}
-
-**类型：** `number`
-
-**默认值：** `15`
-
-渐变遮罩宽度，单位为像素。`0` 隐藏遮罩，负数按 `0` 处理，非有限值使用默认宽度。
-
-### scale.enabled <span className="field-tag">可选</span> {#scaleenabled}
-
-**类型：** `boolean`
-
-**默认值：** `true`
-
-在 `effect: ['scale', config]` 中开启逐字入场效果。已有内容保持静止。动画遵循 `prefers-reduced-motion`，代码、公式和替换内容沿用原有渲染。
-
-### scale.duration <span className="field-tag">可选</span> {#scaleduration}
-
-**类型：** `number`
-
-**默认值：** `200`
-
-入场时长，单位为毫秒。`0` 立即显示字符。负数按 `0` 处理，非有限值使用默认时长。
-
-### scale.from <span className="field-tag">可选</span> {#scalefrom}
-
-**类型：** `number`
-
-**默认值：** `0`
-
-字符的初始缩放比例，范围为 `0` 到 `1`。字符以底部中心为原点放大到完整尺寸，保留原有排版占位。超出范围的值会被限制在范围内，非有限值使用 `0`。
-
-### scale.blur <span className="field-tag">可选</span> {#scaleblur}
-
-**类型：** `number`
-
-**默认值：** `0.08`
-
-初始模糊半径，单位为随字号变化的 `em`。例如字号为 20 像素时，`0.08` 对应 1.6 像素。模糊会在入场过程中逐渐消退，设为 `0` 可以关闭。负数按 `0` 处理，非有限值使用默认半径。
+选择动画效果，也可以组合多个效果。支持的输入形式、内置效果、实时演示与配置字段见[动画效果](../common/streaming-effects/animation/index.mdx)。`EffectItem` 从 `fluxdown` 导入，效果配置类型从 `@fluxdown/core-presets/mapper` 导入。
 
 ## build <span className="field-tag">可选</span> {#build}
 

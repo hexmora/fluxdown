@@ -14,7 +14,7 @@ export type { ParserPatch, ParserPatchData, ParserPatchProperties } from '../../
 
 declare global {
   interface RemarkConfigs {
-    'remark-patches'?: IPluggableConfig<void>;
+    'remark-patches': IPluggableConfig<void>;
   }
 }
 

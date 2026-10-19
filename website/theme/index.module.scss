@@ -46,6 +46,12 @@
     --site-accent-line: rgb(101 200 190 / 25%);
   }
 
+  :focus,
+  :focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   body {
     background: var(--site-paper);
   }

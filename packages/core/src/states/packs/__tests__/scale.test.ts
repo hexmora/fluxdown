@@ -102,13 +102,15 @@ const setup = (initialText: string, initialScale = config) => {
 beforeEach(() => {
   jest.useFakeTimers();
 
-  jest.setSystemTime(1000);
+  jest.spyOn(performance, 'now').mockReturnValue(1000);
 });
 
 afterEach(() => {
   cleanups.forEach((cleanup) => cleanup());
 
   cleanups.clear();
+
+  jest.restoreAllMocks();
 
   jest.useRealTimers();
 });
@@ -129,7 +131,7 @@ describe('Core scale pipeline', () => {
 
     expect(view.characters()[0]?.properties.dataScaleStart).toBe(1000);
 
-    jest.setSystemTime(1050);
+    jest.mocked(performance.now).mockReturnValue(1050);
 
     view.text.next('start ab');
 
@@ -196,14 +198,14 @@ describe('Core scale pipeline', () => {
 
     expect(view.characters()).toEqual([]);
 
-    jest.setSystemTime(1100);
+    jest.mocked(performance.now).mockReturnValue(1100);
 
     view.text.next('abcde');
 
     expect(
       view
         .characters()
-        .filter((node) => node.properties.dataScaleStart !== 0)
+        .filter((node) => node.properties.dataScaleStart !== -1)
         .map(collectText),
     ).toEqual(['e']);
   });
@@ -219,7 +221,7 @@ describe('Core scale pipeline', () => {
       1000, 1000, 1000,
     ]);
 
-    jest.setSystemTime(1050);
+    jest.mocked(performance.now).mockReturnValue(1050);
 
     view.text.next('ax');
 
@@ -231,7 +233,7 @@ describe('Core scale pipeline', () => {
 
     expect(view.read()).toEqual([]);
 
-    jest.setSystemTime(1100);
+    jest.mocked(performance.now).mockReturnValue(1100);
 
     view.text.next('a');
 

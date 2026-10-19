@@ -11,7 +11,7 @@ const Image = /*#__PURE__*/ createTypeOfSlot('Image');
 
 declare global {
   interface RenderConfigs {
-    'render-image'?: IPluggableConfig<void>;
+    'render-image': IPluggableConfig<void>;
   }
 }
 

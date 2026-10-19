@@ -17,7 +17,7 @@ type ApplyRepairsRemarkPluginInnerConfig = Required<ApplyRepairsRemarkPluginConf
 
 declare global {
   interface RemarkConfigs {
-    'remark-apply-repairs'?: IPluggableConfig<Pick<ApplyRepairsRemarkPluginConfig, 'safe'>>;
+    'remark-apply-repairs': IPluggableConfig<Pick<ApplyRepairsRemarkPluginConfig, 'safe'>>;
   }
 }
 

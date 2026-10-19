@@ -1,4 +1,13 @@
 [
-  { "type": "file", "name": "smoothing", "label": "Smoothing" },
-  { "type": "file", "name": "animation", "label": "Animation" }
+  {
+    "type": "file",
+    "name": "smoothing",
+    "label": "Smoothing"
+  },
+  {
+    "type": "dir",
+    "name": "animation",
+    "label": "Animation",
+    "collapsed": false
+  }
 ]

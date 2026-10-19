@@ -1,0 +1,62 @@
+import { AnimationDemo } from '../../../../../../components';
+
+# 逐字入场
+
+`scale` 让新字符从较小尺寸放大，同时淡入并消退模糊。字符始终占据自己的排版空间，因此前面的内容保持原位。
+
+<AnimationDemo effect="scale" />
+
+## 使用方式
+
+以下以 React 版组件为例：
+
+```tsx
+<Fluxdown streaming={{ effect: 'scale' }} text={text} />
+```
+
+以下以 React 版组件为例，缩小变化幅度，让入场更柔和：
+
+```tsx
+<Fluxdown
+  streaming={{ effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }] }}
+  text={text}
+/>
+```
+
+只有新出现的文字参与动画。代码、公式和替换内容保持原有渲染方式。动画遵循系统的减少动态效果设置。
+
+## 配置
+
+以下字段属于 `['scale', config]` 中的 `scale` 配置对象。
+
+### enabled <span className="field-tag">可选</span> {#enabled}
+
+**类型：** `boolean`
+
+**默认值：** `true`
+
+在 `effect: ['scale', config]` 中开启逐字入场效果。已有内容保持静止。动画遵循 `prefers-reduced-motion`，代码、公式和替换内容沿用原有渲染。
+
+### duration <span className="field-tag">可选</span> {#duration}
+
+**类型：** `number`
+
+**默认值：** `200`
+
+入场时长，单位为毫秒。`0` 立即显示字符。负数按 `0` 处理，非有限值使用默认时长。
+
+### from <span className="field-tag">可选</span> {#from}
+
+**类型：** `number`
+
+**默认值：** `0`
+
+字符的初始缩放比例，范围为 `0` 到 `1`。字符以底部中心为原点放大到完整尺寸，保留原有排版占位。超出范围的值会被限制在范围内，非有限值使用 `0`。
+
+### blur <span className="field-tag">可选</span> {#blur}
+
+**类型：** `number`
+
+**默认值：** `0.08`
+
+初始模糊半径，单位为随字号变化的 `em`。例如字号为 20 像素时，`0.08` 对应 1.6 像素。模糊会在入场过程中逐渐消退，设为 `0` 可以关闭。负数按 `0` 处理，非有限值使用默认半径。

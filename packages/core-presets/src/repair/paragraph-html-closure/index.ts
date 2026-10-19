@@ -8,7 +8,7 @@ import { closeParagraphTags, isRightmostNode } from './utils';
 
 declare global {
   interface RepairConfigs {
-    'repair-paragraph-html-closure'?: IPluggableConfig<void>;
+    'repair-paragraph-html-closure': IPluggableConfig<void>;
   }
 }
 

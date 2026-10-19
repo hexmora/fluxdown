@@ -5,7 +5,7 @@ import { TableRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-table'?: IPluggableConfig<void>;
+    'slot-table': IPluggableConfig<void>;
   }
 }
 

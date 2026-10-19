@@ -9,7 +9,7 @@ import { VOID_TAG_NAMES } from './consts';
 
 declare global {
   interface RenderConfigs {
-    'render-fallback'?: IPluggableConfig<void>;
+    'render-fallback': IPluggableConfig<void>;
   }
 }
 

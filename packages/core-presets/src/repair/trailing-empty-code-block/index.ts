@@ -9,7 +9,7 @@ import { BaseRepairPlugin } from '../base';
 
 declare global {
   interface RepairConfigs {
-    'repair-trailing-empty-code-block'?: IPluggableConfig<void>;
+    'repair-trailing-empty-code-block': IPluggableConfig<void>;
   }
 }
 

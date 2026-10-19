@@ -5,7 +5,7 @@ import { HeadingRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-heading'?: IPluggableConfig<void>;
+    'slot-heading': IPluggableConfig<void>;
   }
 }
 

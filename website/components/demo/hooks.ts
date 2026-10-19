@@ -1,13 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import type { DemoPlayback } from './type';
+import type { DemoPlayback, DemoTiming } from './type';
 
-const CHUNKS = [12, 26, 8, 34, 16, 22];
+import { createDemoFrames } from './timing';
 
-const DELAYS = [520, 760, 340, 980, 460, 680];
+const DEFAULT_TIMING: DemoTiming = {
+  chunks: [12, 26, 8, 34, 16, 22],
+  delays: [520, 760, 340, 980, 460, 680],
+};
 
-export const useDemoStream = (source: string) => {
+export const useDemoStream = (source: string, timing: DemoTiming = DEFAULT_TIMING) => {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const frames = useMemo(() => createDemoFrames(source, timing), [source, timing]);
 
   const [reducedMotion, setReducedMotion] = useState<boolean | null>(null);
 
@@ -78,23 +83,22 @@ export const useDemoStream = (source: string) => {
   }, [source]);
 
   useEffect(() => {
-    if (!active || complete || stream.source !== source) {
+    const frame = frames[stream.step];
+
+    if (!active || complete || stream.source !== source || !frame) {
       return;
     }
 
-    const timer = window.setTimeout(
-      () => {
-        setStream((current) => ({
-          ...current,
-          cursor: Math.min(source.length, current.cursor + CHUNKS[current.step % CHUNKS.length]),
-          step: current.step + 1,
-        }));
-      },
-      DELAYS[stream.step % DELAYS.length],
-    );
+    const timer = window.setTimeout(() => {
+      setStream((current) => ({
+        ...current,
+        cursor: frame.end,
+        step: current.step + 1,
+      }));
+    }, frame.delay);
 
     return () => window.clearTimeout(timer);
-  }, [active, complete, source, stream]);
+  }, [active, complete, frames, source, stream]);
 
   return {
     containerRef,

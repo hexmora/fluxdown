@@ -3,11 +3,12 @@ import { useDark } from '@rspress/core/runtime';
 import { Fluxdown } from 'fluxdown';
 import { useId } from 'react';
 
+import { useBottomScroll } from '../../../bottom-scroll';
 import { DEMO_BUILD, DEMO_PLUGINS, getDemoTheme, getStreamSample } from '../../../demo';
 import { useLocale, useStream } from '../../../hooks';
 import { PauseIcon, PlayIcon, ReplayIcon, SidebarIcon } from '../../../icons';
 import { COPY } from './consts';
-import { useBottomScroll, useReducedMotion, useSourcePanel } from './hooks';
+import { useReducedMotion, useSourcePanel } from './hooks';
 import styles from './index.module.scss';
 
 export const StreamingDemo = () => {

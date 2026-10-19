@@ -10,7 +10,7 @@ const Paragraph = /*#__PURE__*/ createTypeOfSlot('Paragraph');
 
 declare global {
   interface RenderConfigs {
-    'render-paragraph'?: IPluggableConfig<void>;
+    'render-paragraph': IPluggableConfig<void>;
   }
 }
 

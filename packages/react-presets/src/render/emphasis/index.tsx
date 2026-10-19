@@ -10,7 +10,7 @@ const Emphasis = /*#__PURE__*/ createTypeOfSlot('Emphasis');
 
 declare global {
   interface RenderConfigs {
-    'render-emphasis'?: IPluggableConfig<void>;
+    'render-emphasis': IPluggableConfig<void>;
   }
 }
 

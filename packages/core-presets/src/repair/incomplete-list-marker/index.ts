@@ -7,7 +7,7 @@ import { BaseRepairPlugin } from '../base';
 
 declare global {
   interface RepairConfigs {
-    'repair-incomplete-list-marker'?: IPluggableConfig<void>;
+    'repair-incomplete-list-marker': IPluggableConfig<void>;
   }
 }
 

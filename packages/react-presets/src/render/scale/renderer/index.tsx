@@ -13,9 +13,9 @@ export const ScaleWordRenderer = ({ children }: ScaleWordRendererProps) => {
 };
 
 export const ScaleRenderer = ({ children, start, duration, from, blur }: ScaleRendererProps) => {
-  const delay = useMemo(() => (start > 0 ? Math.min(0, start - Date.now()) : 0), [start]);
+  const delay = useMemo(() => (start >= 0 ? Math.min(0, start - performance.now()) : 0), [start]);
 
-  const active = start > 0 && delay > -duration;
+  const active = start >= 0 && delay > -duration;
 
   const style = {
     [`--${PREFIX}-scale-duration`]: `${duration}ms`,

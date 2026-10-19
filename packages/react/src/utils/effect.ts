@@ -13,7 +13,7 @@ export const toEffects = (effect: StreamingConfig['effect'] = false): EffectItem
   }
 
   if (effect === true) {
-    return ['shad'];
+    return ['scale'];
   }
 
   if (!isArray(effect)) {

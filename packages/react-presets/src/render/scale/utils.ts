@@ -26,7 +26,7 @@ const getNumber = (value: unknown, fallback: number) => {
 
 export const getScaleConfig = ({ properties }: Element) => {
   return {
-    start: Math.max(0, getNumber(properties.dataScaleStart, 0)),
+    start: Math.max(-1, getNumber(properties.dataScaleStart, -1)),
     duration: Math.max(0, getNumber(properties.dataScaleDuration, 200)),
     from: Math.max(0, Math.min(1, getNumber(properties.dataScaleFrom, 0))),
     blur: Math.max(0, getNumber(properties.dataScaleBlur, 0.08)),

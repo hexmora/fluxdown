@@ -1,0 +1,62 @@
+import { AnimationDemo } from '../../../../../../components';
+
+# Character entrance
+
+`scale` grows new characters from a smaller size while fading them in and clearing their blur. Characters keep their layout space, so earlier text stays in place.
+
+<AnimationDemo effect="scale" />
+
+## Usage
+
+The following examples use the React component:
+
+```tsx
+<Fluxdown streaming={{ effect: 'scale' }} text={text} />
+```
+
+The following React component example reduces the amount of change for a gentler entrance:
+
+```tsx
+<Fluxdown
+  streaming={{ effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }] }}
+  text={text}
+/>
+```
+
+Only newly visible text is animated. Code, formulas, and replacement content keep their existing rendering. The animation respects the system's reduced-motion preference.
+
+## Configuration
+
+These fields belong to the `scale` configuration object in `['scale', config]`.
+
+### enabled <span className="field-tag">Optional</span> {#enabled}
+
+**Type:** `boolean`
+
+**Default:** `true`
+
+Enable the per-character entrance when using `effect: ['scale', config]`. Existing content remains still. The animation respects `prefers-reduced-motion` and leaves code, formulas, and replacement content unchanged.
+
+### duration <span className="field-tag">Optional</span> {#duration}
+
+**Type:** `number`
+
+**Default:** `200`
+
+Entrance duration in milliseconds. `0` shows characters immediately. Negative values become `0`, and non-finite values use the default duration.
+
+### from <span className="field-tag">Optional</span> {#from}
+
+**Type:** `number`
+
+**Default:** `0`
+
+Initial character scale, between `0` and `1`. Characters grow to their full size from the bottom center without changing the space reserved for them. Values outside the range are clamped; non-finite values use `0`.
+
+### blur <span className="field-tag">Optional</span> {#blur}
+
+**Type:** `number`
+
+**Default:** `0.08`
+
+Initial blur radius in `em`, relative to the text's font size. For example, `0.08` produces a 1.6-pixel blur at a 20-pixel font size. Blur clears during the entrance; set `0` to disable it. Negative values become `0`, and non-finite values use the default radius.

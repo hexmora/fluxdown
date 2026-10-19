@@ -10,7 +10,7 @@ import { BaseRemarkPlugin } from '../base';
 
 declare global {
   interface RemarkConfigs {
-    'remark-syntax-table'?: IPluggableConfig<void>;
+    'remark-syntax-table': IPluggableConfig<void>;
   }
 }
 

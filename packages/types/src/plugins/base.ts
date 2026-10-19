@@ -20,7 +20,7 @@ export type PluggableConfigs<C> = {
 };
 
 /** A plugin list, preset configuration, or a list with configuration overrides. */
-export type PluginSet<T, C> = [T[], C] | C | T[];
+export type PluginSet<T, C> = [T[], Partial<C>] | Partial<C> | T[];
 
 /**
  * Priority buckets used to order plugins.

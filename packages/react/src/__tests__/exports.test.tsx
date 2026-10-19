@@ -5,7 +5,7 @@ import { expectTypeOf } from 'expect-type';
 import { keys, sortBy } from 'lodash-es';
 
 import type { BaseBuildConfig, EffectItem, StreamingConfig } from '..';
-import type { FluxdownProps } from '../types';
+import type { FluxdownProps, PluginConfigs } from '../types';
 
 import * as ReactEntry from '..';
 
@@ -43,5 +43,31 @@ describe('package exports', () => {
     expectTypeOf<'shad' extends keyof PublicProps ? true : false>().toEqualTypeOf<false>();
 
     expectTypeOf<'config' extends keyof PublicProps ? true : false>().toEqualTypeOf<false>();
+  });
+
+  test('keeps registries required while public plugin configuration remains optional', () => {
+    type OptionalKeys<T> = {
+      [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
+    }[keyof T];
+
+    type OptionalRegistryKeys =
+      | OptionalKeys<MapperConfigs>
+      | OptionalKeys<EffectConfigs>
+      | OptionalKeys<RemarkConfigs>
+      | OptionalKeys<RehypeConfigs>
+      | OptionalKeys<RepairConfigs>
+      | OptionalKeys<RenderConfigs>
+      | OptionalKeys<SlotConfigs>;
+
+    expectTypeOf<OptionalRegistryKeys>().toEqualTypeOf<never>();
+    expectTypeOf<{}>().toMatchTypeOf<PluginConfigs>();
+
+    const config: PluginConfigs = {
+      scale: { duration: 250 },
+      'render-scale': { disabled: true },
+      'slot-paragraph': { disabled: true },
+    };
+
+    expect(config.scale?.duration).toBe(250);
   });
 });

@@ -10,7 +10,7 @@ const Strong = /*#__PURE__*/ createTypeOfSlot('Strong');
 
 declare global {
   interface RenderConfigs {
-    'render-strong'?: IPluggableConfig<void>;
+    'render-strong': IPluggableConfig<void>;
   }
 }
 
