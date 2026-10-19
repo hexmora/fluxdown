@@ -2,13 +2,14 @@ import { compute } from '@fluxdown/utils';
 import { useDark } from '@rspress/core/runtime';
 import { Fluxdown } from 'fluxdown';
 
-import type { EditorEffect, EditorProps } from './type';
+import type { AnimationSpeed, EditorEffect, EditorProps } from './type';
 
 import { DEMO_BUILD, DEMO_PLUGINS, getDemoTheme } from '../../../demo';
 import { PauseIcon, PlayIcon, ReplayIcon, ResetIcon } from '../../../icons';
-import { COPY } from './consts';
+import { ANIMATION_SPEEDS, COPY } from './consts';
 import { useEditor } from './hooks';
 import styles from './index.module.scss';
+import { getEffectConfig } from './utils';
 
 export const Editor = ({ lang }: EditorProps) => {
   const copy = COPY[lang];
@@ -23,6 +24,9 @@ export const Editor = ({ lang }: EditorProps) => {
     setRepair,
     effect,
     setEffect,
+    speed,
+    changeSpeed,
+    ticker,
     playback,
     stream,
     previewText,
@@ -63,7 +67,7 @@ export const Editor = ({ lang }: EditorProps) => {
             </label>
             <label className={styles.effect}>
               {copy.effect}
-              <span className={styles.effectSelect}>
+              <span className={styles.select}>
                 <select
                   aria-label={copy.effect}
                   onChange={(event) => setEffect(event.currentTarget.value as EditorEffect)}
@@ -72,6 +76,24 @@ export const Editor = ({ lang }: EditorProps) => {
                   <option value="none">{copy.noEffect}</option>
                   <option value="shad">{copy.shadEffect}</option>
                   <option value="scale">{copy.scaleEffect}</option>
+                </select>
+              </span>
+            </label>
+            <label className={styles.effect}>
+              {copy.speed}
+              <span className={styles.select}>
+                <select
+                  aria-label={copy.speed}
+                  onChange={(event) =>
+                    changeSpeed(Number(event.currentTarget.value) as AnimationSpeed)
+                  }
+                  value={speed}
+                >
+                  {ANIMATION_SPEEDS.map((value) => (
+                    <option key={value} value={value}>
+                      {value}×
+                    </option>
+                  ))}
                 </select>
               </span>
             </label>
@@ -129,8 +151,8 @@ export const Editor = ({ lang }: EditorProps) => {
                   }
 
                   return {
-                    smooth,
-                    effect: effect === 'none' ? false : effect,
+                    smooth: smooth && { enabled: true, ticker, scheduler: 'spring' },
+                    effect: effect === 'none' ? false : getEffectConfig(effect, speed),
                     repairEnding: repair,
                   };
                 })}
