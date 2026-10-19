@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import type { SmoothStreamingProps } from './type';
 
+import { useResolvedTheme } from '../../../.storybook/theme-addon';
 import { Fluxdown } from '../../../src';
 import { SMOOTH_MARKDOWN } from './consts';
 import '../playground/style.scss';
@@ -17,6 +18,8 @@ export const SmoothStreaming = ({ initialText = SMOOTH_MARKDOWN }: SmoothStreami
   const [shadLength, setShadLength] = useState(10);
 
   const [maskWidth, setMaskWidth] = useState(15);
+
+  const theme = useResolvedTheme();
 
   const complete = cursor >= initialText.length;
 
@@ -64,35 +67,15 @@ export const SmoothStreaming = ({ initialText = SMOOTH_MARKDOWN }: SmoothStreami
   };
 
   return (
-    <main className="playground-shell">
-      <header className="playground-header">
-        <div>
-          <p className="playground-eyebrow">Fluxdown workshop</p>
-
-          <h1>Smooth Streaming</h1>
-        </div>
+    <main className="playground">
+      <header className="playground-toolbar">
+        <h1>Smooth streaming</h1>
 
         <span aria-live="polite" className="playground-status">
           {status}
         </span>
-      </header>
 
-      <section aria-label="Streaming controls" className="playground-deck">
-        <fieldset className="playground-settings">
-          <legend>Randomized chunks</legend>
-
-          <span>1–24 characters arrive every 50–350 ms.</span>
-
-          <label>
-            <input
-              aria-label="Shad"
-              checked={shad}
-              onChange={(event) => setShad(event.currentTarget.checked)}
-              type="checkbox"
-            />
-            Shad
-          </label>
-        </fieldset>
+        <span className="playground-meta">1–24 characters every 50–350 ms</span>
 
         <div className="playground-actions">
           <button
@@ -112,64 +95,77 @@ export const SmoothStreaming = ({ initialText = SMOOTH_MARKDOWN }: SmoothStreami
             Reset
           </button>
         </div>
+      </header>
 
-        <div className="playground-transport">
-          <label>
-            Shad length
-            <input
-              aria-label="Shad length"
-              max={12}
-              min={0}
-              onChange={(event) => setShadLength(Number(event.currentTarget.value))}
-              type="range"
-              value={shadLength}
-            />
-            <output>{shadLength} chars</output>
-          </label>
+      <fieldset className="playground-transport">
+        <legend>Shad controls</legend>
 
-          <label>
-            Mask width
-            <input
-              aria-label="Mask width"
-              max={40}
-              min={0}
-              onChange={(event) => setMaskWidth(Number(event.currentTarget.value))}
-              type="range"
-              value={maskWidth}
-            />
-            <output>{maskWidth} px</output>
-          </label>
-        </div>
-      </section>
+        <label>
+          <input
+            aria-label="Shad"
+            checked={shad}
+            onChange={(event) => setShad(event.currentTarget.checked)}
+            type="checkbox"
+          />
+          Shad
+        </label>
+
+        <label>
+          Shad length
+          <input
+            aria-label="Shad length"
+            max={12}
+            min={0}
+            onChange={(event) => setShadLength(Number(event.currentTarget.value))}
+            type="range"
+            value={shadLength}
+          />
+          <output>{shadLength} chars</output>
+        </label>
+
+        <label>
+          Mask width
+          <input
+            aria-label="Mask width"
+            max={40}
+            min={0}
+            onChange={(event) => setMaskWidth(Number(event.currentTarget.value))}
+            type="range"
+            value={maskWidth}
+          />
+          <output>{maskWidth} px</output>
+        </label>
+      </fieldset>
 
       <div className="playground-workspace">
-        <section aria-label="Incoming Markdown" className="playground-panel playground-editor">
-          <div className="playground-panel-heading">
+        <section aria-label="Incoming Markdown" className="playground-pane">
+          <div className="playground-pane-heading">
             <h2>Incoming chunks</h2>
 
-            <span>
+            <span className="playground-meta">
               {cursor}/{initialText.length} chars received
             </span>
           </div>
 
-          <pre aria-label="Markdown stream" className="playground-playback-source">
+          <pre aria-label="Markdown stream" className="playground-source">
             <span>{text}</span>
 
             <span className="playground-unplayed">{initialText.slice(cursor)}</span>
           </pre>
         </section>
 
-        <section aria-label="Smooth preview" className="playground-panel playground-preview">
-          <div className="playground-panel-heading">
+        <section aria-label="Smooth preview" className="playground-pane">
+          <div className="playground-pane-heading">
             <h2>Smoothed render</h2>
 
-            <span>Gradual reveal</span>
+            <span className="playground-meta">Gradual reveal</span>
           </div>
 
           <div className="playground-preview-content">
             <Fluxdown
               streaming={{ effect: ['shad', { enabled: shad, length: shadLength, maskWidth }] }}
               text={text}
+              theme={theme}
             />
           </div>
         </section>

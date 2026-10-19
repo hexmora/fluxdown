@@ -36,19 +36,14 @@ export const Playground = ({ actions, patches, ...props }: PlaygroundProps) => {
   } = usePlayground(props);
 
   return (
-    <main className="playground-shell">
-      <header className="playground-header">
-        <div>
-          <p className="playground-eyebrow">Fluxdown workshop</p>
-          <h1>Markdown Playground</h1>
-        </div>
+    <main className="playground">
+      <header className="playground-toolbar">
+        <h1>Markdown playground</h1>
 
         <span aria-live="polite" className="playground-status">
           {status}
         </span>
-      </header>
 
-      <section aria-label="Playground controls" className="playground-deck">
         <fieldset className="playground-settings">
           <legend>Compiler settings</legend>
 
@@ -117,110 +112,104 @@ export const Playground = ({ actions, patches, ...props }: PlaygroundProps) => {
             </button>
           )}
         </div>
+      </header>
 
-        {playbackMode ? (
-          <div className="playground-transport">
-            <label>
-              Speed
-              <input
-                aria-label="Speed"
-                max={100}
-                min={1}
-                onChange={(event) => setSpeed(Number(event.currentTarget.value))}
-                type="range"
-                value={speed}
-              />
-              <output>{speed} ticks/s</output>
-            </label>
+      {playbackMode ? (
+        <fieldset className="playground-transport">
+          <legend>Playback controls</legend>
 
-            <label>
-              Chunk size
-              <input
-                aria-label="Chunk size"
-                max={20}
-                min={1}
-                onChange={(event) => setChunkSize(Number(event.currentTarget.value))}
-                type="range"
-                value={chunkSize}
-              />
-              <output>{chunkSize} chars</output>
-            </label>
+          <label>
+            Speed
+            <input
+              aria-label="Speed"
+              max={100}
+              min={1}
+              onChange={(event) => setSpeed(Number(event.currentTarget.value))}
+              type="range"
+              value={speed}
+            />
+            <output>{speed} ticks/s</output>
+          </label>
 
-            <label className="playground-progress">
-              Progress
-              <input
-                aria-label="Progress"
-                max={100}
-                min={0}
-                onChange={(event) => handleProgress(Number(event.currentTarget.value))}
-                type="range"
-                value={progress}
-              />
-              <output>{Math.round(progress)}%</output>
-            </label>
+          <label>
+            Chunk size
+            <input
+              aria-label="Chunk size"
+              max={20}
+              min={1}
+              onChange={(event) => setChunkSize(Number(event.currentTarget.value))}
+              type="range"
+              value={chunkSize}
+            />
+            <output>{chunkSize} chars</output>
+          </label>
 
-            <div className="playground-transport-actions">
-              <button disabled={cursor === 0} onClick={handleStepBackward} type="button">
-                Step backward
-              </button>
+          <label>
+            Progress
+            <input
+              aria-label="Progress"
+              max={100}
+              min={0}
+              onChange={(event) => handleProgress(Number(event.currentTarget.value))}
+              type="range"
+              value={progress}
+            />
+            <output>{Math.round(progress)}%</output>
+          </label>
 
-              <button disabled={complete} onClick={handlePause} type="button">
-                {stopped ? 'Resume' : 'Pause'}
-              </button>
+          <div className="playground-actions">
+            <button disabled={cursor === 0} onClick={handleStepBackward} type="button">
+              Step backward
+            </button>
 
-              <button disabled={complete} onClick={handleStepForward} type="button">
-                Step forward
-              </button>
+            <button disabled={complete} onClick={handlePause} type="button">
+              {stopped ? 'Resume' : 'Pause'}
+            </button>
 
-              <button disabled={playbackText.length === 0} onClick={handleReplay} type="button">
-                Replay
-              </button>
-            </div>
+            <button disabled={complete} onClick={handleStepForward} type="button">
+              Step forward
+            </button>
+
+            <button disabled={playbackText.length === 0} onClick={handleReplay} type="button">
+              Replay
+            </button>
           </div>
-        ) : null}
-      </section>
+        </fieldset>
+      ) : null}
 
       <div className="playground-workspace">
-        <section aria-label="Markdown editor" className="playground-panel playground-editor">
-          <div className="playground-panel-heading">
+        <section aria-label="Markdown editor" className="playground-pane">
+          <div className="playground-pane-heading">
             <h2>Source</h2>
-            <span>
+
+            <span className="playground-meta">
               {playbackMode ? `${cursor}/${playbackText.length}` : `${text.length} chars`}
             </span>
           </div>
 
           {playbackMode ? (
-            <pre aria-label="Markdown playback" className="playground-playback-source">
+            <pre aria-label="Markdown playback" className="playground-source">
               <span>{playbackText.slice(0, cursor)}</span>
               <span className="playground-unplayed">{playbackText.slice(cursor)}</span>
             </pre>
           ) : (
-            <label className="playground-textarea-label">
-              <span>Markdown</span>
-              <textarea
-                aria-label="Markdown"
-                onChange={(event) => setText(event.currentTarget.value)}
-                spellCheck={false}
-                value={text}
-              />
-            </label>
+            <textarea
+              aria-label="Markdown"
+              className="playground-source"
+              onChange={(event) => setText(event.currentTarget.value)}
+              spellCheck={false}
+              value={text}
+            />
           )}
         </section>
 
-        <section className="playground-panel playground-preview">
-          <div className="playground-panel-heading">
-            <h2>Preview</h2>
-            <span>Reactive output</span>
-          </div>
-
-          <TrackedPreview
-            actions={actions}
-            ariaLabel={playbackMode ? 'Playback preview' : 'Preview'}
-            config={config}
-            patches={patches}
-            text={previewText}
-          />
-        </section>
+        <TrackedPreview
+          actions={actions}
+          ariaLabel={playbackMode ? 'Playback preview' : 'Preview'}
+          config={config}
+          patches={patches}
+          text={previewText}
+        />
       </div>
     </main>
   );
