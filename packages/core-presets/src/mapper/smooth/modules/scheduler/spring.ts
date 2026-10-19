@@ -1,99 +1,155 @@
-import { clamp, isUndefined } from 'lodash-es';
+import { assert } from '@fluxdown/utils';
+import { isUndefined } from 'lodash-es';
+
+import type { PerceptualSpring } from './type';
 
 import { BaseSmoothScheduler } from './base';
+import { getSpringMotion } from './utils';
+
+interface SpringOrigin {
+  /**
+   * Timestamp in milliseconds where the current trajectory begins.
+   */
+  time: number;
+
+  /**
+   * Absolute position at that time.
+   */
+  position: number;
+
+  /**
+   * Velocity at that time, in units per second.
+   */
+  velocity: number;
+}
 
 export class SpringSmoothScheduler extends BaseSmoothScheduler {
   /**
-   * Initial speed, buffer size, elasticity, resume speed, and maximum speed.
-   * @default [20, 15, 1 / 700 / 1000, 2, 100_000]
+   * Angular frequency ω in rad/s and damping ratio ζ.
+   * Use `toPerceptualSpring` to derive them from stiffness, damping, and mass.
+   * @default [5, 1]
    */
-  protected readonly defaultTuple = [20, 15, 1 / 700 / 1000, 2, 100_000];
+  protected readonly defaultTuple = [5, 1];
 
+  /**
+   * Latest timestamp received by `start`, `resume`, or `tick`.
+   */
   private timestamp?: number;
 
-  private position = 0;
+  /**
+   * Where the spring starts pulling toward the current target. Positions are sampled from this
+   * point in closed form, so frame timing never accumulates integration or rounding error.
+   */
+  private origin: SpringOrigin = { time: 0, position: 0, velocity: 0 };
 
-  private speed = 0;
-
-  private remainder = 0;
+  /**
+   * Integer position already reported by `tick`.
+   */
+  private cursor = 0;
 
   static get name() {
     return 'spring';
   }
 
-  override get idle() {
-    const [, , , resumeSpeed] = this.tuple;
+  get spring(): PerceptualSpring {
+    const [frequency = 0, dampingRatio = 0] = this.tuple;
 
-    return this.position >= this.fullIndex && this.speed <= resumeSpeed / 1000;
+    assert(
+      [frequency, dampingRatio].every((value) => Number.isFinite(value) && value > 0),
+      'Expected a positive spring frequency and damping ratio',
+    );
+
+    return { frequency, dampingRatio };
   }
 
+  // The trajectory is a function of time, so frames skipped while paused leave nothing to catch up.
+  override get idle() {
+    return this.cursor >= this.fullIndex;
+  }
+
+  override push(length: number) {
+    // Pin the motion toward the previous target before the target moves.
+    if (!isUndefined(this.timestamp)) {
+      this.rebase(this.timestamp);
+    }
+
+    super.push(length);
+  }
+
+  /**
+   * Move progress and the target to `index`, keeping the current velocity.
+   */
   override reset(index = 0) {
+    const velocity = isUndefined(this.timestamp) ? 0 : this.sample(this.timestamp).velocity;
+
     super.reset(index);
 
-    const [initialSpeed] = this.tuple;
+    this.cursor = index;
 
-    this.position = index;
-
-    this.speed = initialSpeed / 1000;
+    this.origin = { time: this.timestamp ?? 0, position: index, velocity };
   }
 
+  /**
+   * Start at rest at `index`.
+   */
   start(timestamp: number, index = 0) {
-    this.reset(index);
+    super.reset(index);
 
     this.timestamp = timestamp;
+
+    this.cursor = index;
+
+    this.origin = { time: timestamp, position: index, velocity: 0 };
   }
 
   override resume(timestamp: number) {
-    this.timestamp = timestamp;
+    this.assertStarted(this.timestamp);
+
+    // The paused interval is evaluated in closed form when the trajectory is next sampled.
+    this.timestamp = Math.max(this.timestamp, timestamp);
   }
 
   tick(timestamp: number) {
-    if (isUndefined(this.timestamp)) {
-      throw new Error('Cannot tick without call start');
-    }
+    this.assertStarted(this.timestamp);
 
-    const elapsed = timestamp - this.timestamp;
-
-    if (elapsed <= 0) {
+    if (timestamp <= this.timestamp) {
       return 0;
     }
 
     this.timestamp = timestamp;
 
-    const [, buffer, elasticity, resumeSpeed, maximumSpeed] = this.tuple;
+    // Rounding reveals the final unit once the spring is within half a unit of the target,
+    // instead of waiting on an asymptote that never arrives.
+    const position = Math.min(this.fullIndex, Math.round(this.sample(timestamp).position));
 
-    if (this.position >= this.fullIndex) {
-      this.speed = Math.max(this.speed * 0.9, resumeSpeed / 1000);
+    const distance = Math.max(0, position - this.cursor);
 
-      if (this.speed < 0.5 / 1000) {
-        this.speed = 0;
-      }
-
-      return 0;
-    }
-
-    const destination = Math.max(buffer, this.fullIndex - buffer);
-
-    this.speed = clamp(
-      this.speed + (destination - this.position) * elasticity * elapsed,
-      resumeSpeed / 1000,
-      maximumSpeed / 1000,
-    );
-
-    if (this.speed < 0.5 / 1000) {
-      this.speed = 0;
-    }
-
-    const nextPosition = Math.min(this.fullIndex, this.position + this.speed * elapsed);
-
-    const progress = this.remainder + Math.max(0, nextPosition - this.position);
-
-    const distance = Math.floor(progress);
-
-    this.remainder = progress - distance;
-
-    this.position = nextPosition;
+    this.cursor += distance;
 
     return distance;
+  }
+
+  private assertStarted(timestamp?: number): asserts timestamp is number {
+    if (isUndefined(timestamp)) {
+      throw new Error('Cannot tick without call start');
+    }
+  }
+
+  private sample(time: number): Omit<SpringOrigin, 'time'> {
+    const { time: start, position, velocity } = this.origin;
+
+    const motion = getSpringMotion(
+      this.spring,
+      { displacement: position - this.fullIndex, velocity },
+      (time - start) / 1000,
+    );
+
+    return { position: this.fullIndex + motion.displacement, velocity: motion.velocity };
+  }
+
+  private rebase(time: number) {
+    if (time !== this.origin.time) {
+      this.origin = { time, ...this.sample(time) };
+    }
   }
 }

@@ -38,3 +38,53 @@ export interface IScheduler {
    */
   tick(timestamp: number): number;
 }
+
+/**
+ * Spring described by how it feels: speed and bounciness.
+ */
+export interface PerceptualSpring {
+  /**
+   * Undamped angular frequency ω = √(k / m) in rad/s. Higher values move faster.
+   */
+  frequency: number;
+
+  /**
+   * Damping ratio ζ = c / (2√(km)): below 1 overshoots, 1 is critical, above 1 settles without overshoot.
+   */
+  dampingRatio: number;
+}
+
+/**
+ * Spring described by its physical coefficients.
+ */
+export interface PhysicalSpring {
+  /**
+   * Stiffness k in N/m.
+   */
+  stiffness: number;
+
+  /**
+   * Damping coefficient c in N·s/m.
+   */
+  damping: number;
+
+  /**
+   * Mass m in kg.
+   */
+  mass: number;
+}
+
+/**
+ * State of a spring relative to its rest position.
+ */
+export interface SpringMotion {
+  /**
+   * Signed distance from the rest position.
+   */
+  displacement: number;
+
+  /**
+   * Rate of change of the displacement per second.
+   */
+  velocity: number;
+}

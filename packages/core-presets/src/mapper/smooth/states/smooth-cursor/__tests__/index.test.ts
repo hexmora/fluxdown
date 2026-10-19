@@ -242,14 +242,10 @@ describe('SmoothCursor', () => {
     cursor.destroy();
   });
 
-  test('preserves momentum across short gaps and resumes a settled spring without restarting', () => {
-    class Scheduler extends SpringSmoothScheduler {
-      protected override readonly defaultTuple = [1000, 0, 0, 100, 1000];
-    }
-
+  test('stops once the spring reveals everything and resumes from the paused timestamp', () => {
     const block = createArrayBlock<number>([]);
 
-    const { cursor } = setupCursor([block.block], true, Scheduler);
+    const { cursor } = setupCursor([block.block], true, SpringSmoothScheduler);
 
     expect(cursor.value.value.charIndex).toBe(0);
 
@@ -259,27 +255,15 @@ describe('SmoothCursor', () => {
 
     const ticker = latest(PrimarySmoothTicker.instances);
 
-    ticker.tick(1);
+    let timestamp = 0;
 
-    expect(cursor.value.value.charIndex).toBe(1);
+    while (ticker.running && timestamp < 1000) {
+      timestamp += 16;
 
-    expect(ticker.running).toBe(true);
-
-    ticker.tick(17);
-
-    block.source.next([1, 2]);
-
-    ticker.tick(18);
-
-    expect(cursor.value.value.charIndex).toBe(1);
-
-    ticker.tick(19);
-
-    expect(cursor.value.value.charIndex).toBe(2);
-
-    for (let frame = 1; frame <= 30 && ticker.running; frame += 1) {
-      ticker.tick(19 + frame * 16);
+      ticker.tick(timestamp);
     }
+
+    expect(cursor.value.value.charIndex).toBe(1);
 
     expect(ticker.running).toBe(false);
 
@@ -289,11 +273,18 @@ describe('SmoothCursor', () => {
 
     expect(ticker.running).toBe(true);
 
-    ticker.tick(10_005);
+    // A trajectory still anchored before the pause would reveal everything on this frame.
+    ticker.tick(10_016);
 
-    expect(cursor.value.value.charIndex).toBe(2);
+    expect(cursor.value.value.charIndex).toBe(1);
 
-    ticker.tick(10_010);
+    timestamp = 10_016;
+
+    while (ticker.running && timestamp < 11_000) {
+      timestamp += 16;
+
+      ticker.tick(timestamp);
+    }
 
     expect(cursor.value.value.charIndex).toBe(3);
 
@@ -302,14 +293,10 @@ describe('SmoothCursor', () => {
     cursor.destroy();
   });
 
-  test('stops immediately on completion even while a spring still has idle momentum', () => {
-    class Scheduler extends SpringSmoothScheduler {
-      protected override readonly defaultTuple = [1000, 0, 0, 100, 1000];
-    }
-
+  test('stops immediately on completion even while the scheduler is busy', () => {
     const block = createArrayBlock<number>([]);
 
-    const { cursor, source, enabled } = setupCursor([block.block], true, Scheduler);
+    const { cursor, source, enabled } = setupCursor([block.block], true, TargetScheduler);
 
     expect(cursor.value.value.charIndex).toBe(0);
 
