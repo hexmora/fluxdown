@@ -217,7 +217,7 @@ const repairs: RepairOptions = [
 
 **默认值：** `undefined`
 
-响应式映射 HAST。默认包含 `Smooth` 和 `Shad`，但需要配置后才会启用。声明与响应式选项见 [mapper](./plugins/mapper.md)。
+响应式映射 HAST。默认包含 `Smooth`、`Shad` 和 `Scale`，但需要配置后才会启用。声明与响应式选项见 [mapper](./plugins/mapper.md)。
 
 ```ts
 import { toClosure } from 'stative';

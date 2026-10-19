@@ -76,6 +76,7 @@ These plugins are included in `PRESET_RENDER_PLUGINS` and exported from `@fluxdo
 | ------------------------ | ----------------------------------------------------------------------------------------- |
 | `PatchRenderPlugin`      | Renders app-provided replacement content at specified text ranges.                        |
 | `ShadRenderPlugin`       | Displays the fade at the end of streaming output.                                         |
+| `ScaleRenderPlugin`      | Animates each newly revealed character with scale, opacity, and blur.                     |
 | `CodeRenderPlugin`       | Passes code, language, and metadata to the code block slot.                               |
 | `EmphasisRenderPlugin`   | Sends italic content to the `Emphasis` slot.                                              |
 | `ImageRenderPlugin`      | Sends image URLs, descriptions, and dimensions to the `Image` slot.                       |

@@ -95,7 +95,7 @@ export const StreamingDemo = () => {
                   return {
                     smooth: true,
                     repairEnding: true,
-                    effect: reducedMotion ? false : 'shad',
+                    effect: reducedMotion ? false : 'scale',
                   };
                 })}
                 text={stream.text}

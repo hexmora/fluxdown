@@ -58,9 +58,10 @@ Core includes these plugins by default; no registration is needed.
 
 `PRESET_MAPPER_PLUGINS`, exported from `@fluxdown/core-presets/mapper`.
 
-| Plugin   | Purpose                                                                       |
-| -------- | ----------------------------------------------------------------------------- |
-| `Smooth` | Releases new content over time so incoming bursts appear smoothly.            |
-| `Shad`   | Marks newly visible trailing text for a fade effect supplied by the renderer. |
+| Plugin   | Purpose                                                                               |
+| -------- | ------------------------------------------------------------------------------------- |
+| `Smooth` | Releases new content over time so incoming bursts appear smoothly.                    |
+| `Shad`   | Marks newly visible trailing text for a fade effect supplied by the renderer.         |
+| `Scale`  | Marks new characters for scale, opacity, and blur animation supplied by the renderer. |
 
-Both are disabled by default in Core. To enable them in your renderer, see [Enable smooth output](../streaming.md#enable-smooth-output).
+All three are disabled by default in Core. To enable them in your renderer, see [Enable smooth output](../streaming.md#enable-smooth-output).

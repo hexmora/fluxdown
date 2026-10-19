@@ -101,6 +101,8 @@ smoothEnabled.next(false);
 
 `Shad` 可为末尾内容增加渐变标记。`enabled`、`length` 和 `maskWidth` 配置支持普通值或可读闭包；`maskWidth` 控制渐变宽度，单位为像素，默认为 `15`。需要渲染器支持相应节点才能表现为视觉效果，React 预设已包含 `ShadRenderPlugin`。
 
+`Scale` 为逐字入场效果生成字符和词标记。与 `Smooth` 一样，`enabled`、`duration`、`from` 和 `blur` 配置支持普通值或可读闭包。自定义渲染器需要处理这些标记；React 预设已包含 `ScaleRenderPlugin`。在 React 中可以直接使用更简洁的 [`streaming.effect`](../react/streaming.md#逐字展示新内容) 配置。
+
 ## 清理资源
 
 一个 Core 实例对应一个独立的内容生命周期。完成使用后，先取消你建立的订阅，再销毁 Core 与外部输入：

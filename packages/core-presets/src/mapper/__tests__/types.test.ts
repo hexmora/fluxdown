@@ -4,6 +4,9 @@ import type { IReadableClosure } from 'stative';
 import { expectTypeOf } from 'expect-type';
 
 import type {
+  ScaleConfig,
+  ScaleInputs,
+  ScalePluginConfig,
   ShadConfig,
   ShadInputs,
   ShadPluginConfig,
@@ -35,11 +38,17 @@ test('preset mappers export config, inputs and public plugin config from the map
 
   expectTypeOf<ShadPluginConfig>().toEqualTypeOf<MapperPluginConfig<ShadConfig>>();
 
+  expectTypeOf<ScalePluginConfig>().toEqualTypeOf<MapperPluginConfig<ScaleConfig>>();
+
   expectTypeOf<SmoothInputs<string>['enabled']>().toEqualTypeOf<
     IReadableClosure<boolean | undefined> | undefined
   >();
 
   expectTypeOf<ShadInputs['length']>().toEqualTypeOf<
+    IReadableClosure<number | undefined> | undefined
+  >();
+
+  expectTypeOf<ScaleInputs['duration']>().toEqualTypeOf<
     IReadableClosure<number | undefined> | undefined
   >();
 });
@@ -49,5 +58,9 @@ test('mapper and effect registries describe unwrapped public plugin config', () 
 
   expectTypeOf<MapperConfigs['shad']>().toEqualTypeOf<ShadPluginConfig>();
 
+  expectTypeOf<MapperConfigs['scale']>().toEqualTypeOf<ScalePluginConfig>();
+
   expectTypeOf<EffectConfigs['shad']>().toEqualTypeOf<ShadPluginConfig>();
+
+  expectTypeOf<EffectConfigs['scale']>().toEqualTypeOf<ScalePluginConfig>();
 });

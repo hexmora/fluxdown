@@ -63,7 +63,17 @@ async function readMarkdown(
 
 `length` 是参与渐变的末尾字符数，`maskWidth` 是渐变遮罩的宽度，单位为像素。默认效果通常已足够；只在需要配合字体或整体动效时调整。
 
-`effect` 也支持 [mapper 插件](../core/plugins/mapper.md)、配置元组，或 `['shad', [Mapper, options]]` 这样的组合数组。设为 `false` 即可关闭视觉特效，同时保留平滑输出。
+## 逐字展示新内容
+
+使用 `effect: 'scale'`，让新出现的字符逐字放大、淡入，并逐渐消除模糊：
+
+```tsx
+<Fluxdown streaming={isStreaming && { effect: 'scale' }} text={text} />
+```
+
+已有内容保持静止，动画遵循系统的减少动态效果偏好。时长、缩放和模糊参数见[特效配置](./configuration.md#scaleduration)。
+
+`effect` 也支持 [mapper 插件](../core/plugins/mapper.md)、配置元组，或 `['shad', 'scale']` 这样的组合数组。设为 `false` 即可关闭视觉特效，同时保留平滑输出。
 
 ## 完成与替换
 

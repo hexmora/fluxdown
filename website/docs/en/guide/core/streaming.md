@@ -101,6 +101,8 @@ smoothEnabled.next(false);
 
 `Shad` adds fade markers to trailing content. Its `enabled`, `length`, and `maskWidth` options accept plain values or readable closures; `maskWidth` controls the fade width in pixels and defaults to `15`. Your renderer must support those nodes to produce a visual fade. The React presets include `ShadRenderPlugin`.
 
+`Scale` adds character and word markers for a per-character entrance. Like `Smooth`, its `enabled`, `duration`, `from`, and `blur` options accept plain values or readable closures. Your renderer must handle the markers; the React presets include `ScaleRenderPlugin`. In React, use [`streaming.effect`](../react/streaming.md#animate-each-new-character) for the simpler configuration.
+
 ## Clean up
 
 Keep each Core instance tied to one content lifecycle. When you are done, cancel your subscriptions, then destroy Core and any externally created inputs:
