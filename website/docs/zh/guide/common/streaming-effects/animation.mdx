@@ -1,0 +1,53 @@
+import { AnimationDemo } from '../../../../../components';
+
+# 动画效果
+
+[平滑化](./smoothing.mdx)决定内容什么时候显示，动画效果决定新内容如何出现。两者可以一起使用，也可以分别开启。
+
+## 末尾渐变
+
+`shad` 让新出现的末尾文字逐渐清晰，已经显示的内容保持原样。它适合希望保留自然阅读节奏、只给末尾增加轻微过渡的界面。
+
+<AnimationDemo effect="shad" />
+
+```tsx
+<Fluxdown streaming={{ effect: 'shad' }} text={text} />
+```
+
+需要配合字体调整时，可以设置参与渐变的字符数和遮罩宽度：
+
+```tsx
+<Fluxdown
+  streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+  text={text}
+/>
+```
+
+`length` 控制末尾字符数，`maskWidth` 的单位是像素。默认值分别为 `10` 和 `15`。
+
+## 逐字入场
+
+`scale` 让新字符从较小的尺寸放大，同时淡入并消除模糊。字符仍然保留原有排版占位，已经显示的文字不会跟着移动。
+
+<AnimationDemo effect="scale" />
+
+```tsx
+<Fluxdown streaming={{ effect: 'scale' }} text={text} />
+```
+
+默认入场时长为 `200` 毫秒，初始缩放比例为 `0`，模糊半径为 `0.08em`。可以缩小变化幅度，让效果更轻：
+
+```tsx
+<Fluxdown
+  streaming={{ effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }] }}
+  text={text}
+/>
+```
+
+动画只作用于新显示的普通文字，代码、公式和替换内容沿用原有渲染。`scale` 会遵循系统的减少动态效果偏好。
+
+## 与流式输出配合
+
+上面的演示同时开启了平滑化。使用 `smooth: false` 可以直接观察文本片段到达时的动画；使用 `effect: false` 可以保留平滑输出并关闭视觉特效。
+
+React 已包含两种效果所需的 mapper 和渲染器。在 Core 中，`Shad` 和 `Scale` 负责生成标记，自定义渲染器需要支持相应节点。更多配置见 [React 配置](../../react/configuration.md#streamingeffect)，扩展方式见 [Mapper 插件](../../core/plugins/mapper.md)。

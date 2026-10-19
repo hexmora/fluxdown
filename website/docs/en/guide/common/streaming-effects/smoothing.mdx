@@ -1,0 +1,43 @@
+import { SpringDemo } from '../../../../../components';
+
+# Smoothing
+
+Streaming text usually arrives in bursts: a few characters in one update, a whole paragraph in the next. Smoothing separates receiving content from displaying it, so those updates appear at a steadier pace.
+
+## See the buffer
+
+This demo receives text in chunks of different sizes. The normal text color marks content already displayed; the other color marks received content still waiting in the buffer. In an application, the buffered text is not visible yet.
+
+<SpringDemo />
+
+When a chunk arrives, the buffer grows first and the visible boundary follows. Pause to inspect their positions, or replay to watch how each incoming chunk changes the pace.
+
+## How the spring sets the pace
+
+The built-in `spring` scheduler adjusts speed using the distance between the visible position and the waiting content. A larger backlog speeds up output; as the visible position approaches the end, the speed settles. Each frame keeps the previous frame's velocity so updates flow into one another.
+
+The scheduler calculates progress from elapsed time and carries fractional characters into the next update. Text can advance between network updates, without a fixed delay for every character. The demo uses the same `SpringSmoothScheduler` as the `Smooth` mapper.
+
+## Use it in your application
+
+In React, enabling `streaming` uses spring smoothing by default:
+
+```tsx
+<Fluxdown streaming={isStreaming} text={text} />
+```
+
+You can also select the scheduler explicitly and add an [animation effect](./animation.mdx):
+
+```tsx
+<Fluxdown
+  streaming={{
+    smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+    effect: 'shad',
+  }}
+  text={text}
+/>
+```
+
+Always pass the complete text received so far to `text`. Setting `streaming` to `false` reveals the remaining buffer immediately. Keep smoothing enabled if you want the remaining content to finish appearing gradually.
+
+Core uses the same `Smooth` mapper to produce trimmed content blocks, so the renderer does not need to schedule character updates. See [Core state and updates](../../core/streaming.md#enable-smooth-output) for integration and [React configuration](../../react/configuration.md#streamingsmooth) for all options.

@@ -6,6 +6,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "common",
+    "label": "通用"
+  },
+  {
+    "type": "dir-section-header",
     "name": "react",
     "label": "React"
   },

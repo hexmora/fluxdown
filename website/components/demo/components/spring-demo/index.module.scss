@@ -1,0 +1,69 @@
+.spring {
+  --buffer-color: var(--site-muted);
+
+  .buffered {
+    color: var(--buffer-color);
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+    color: var(--site-ink);
+
+    > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+
+      &::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+    }
+  }
+
+  .text {
+    padding: 28px 30px 32px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  .pending {
+    visibility: hidden;
+  }
+
+  .progress {
+    display: flex;
+    height: 2px;
+    background: var(--site-inset);
+
+    > span {
+      height: 100%;
+      background: var(--site-ink);
+      opacity: 0.55;
+    }
+
+    .buffered {
+      background: var(--buffer-color);
+      opacity: 0.8;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .text {
+      padding: 24px 20px 28px;
+      font-size: 14px;
+    }
+
+    .legend {
+      gap: 6px 12px;
+    }
+  }
+}
