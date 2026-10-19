@@ -2,6 +2,8 @@
 
 Headless preset mapper, remark, rehype, and repair plugins for Fluxdown.
 
+[简体中文](./docs/README.zh-CN.md)
+
 Import each plugin type through its own entry point:
 
 ```ts

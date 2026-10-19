@@ -1,21 +1,45 @@
 import type { ComponentProps } from 'react';
 
-import { PRESET_RENDER_PLUGINS, ShadRenderPlugin } from '@fluxdown/react-presets/render';
+import { PRESET_FULL_PLUGINS } from '@fluxdown/react-presets/full';
+import { EffectShadRenderPlugin } from '@fluxdown/react-presets/plugins/effect-shad';
 import { expectTypeOf } from 'expect-type';
+import * as ReactEntry from 'fluxdown';
+import * as FullEntry from 'fluxdown/full';
+import * as LiteEntry from 'fluxdown/lite';
+import * as RawEntry from 'fluxdown/raw';
 import { keys, sortBy } from 'lodash-es';
 
-import type { BaseBuildConfig, EffectItem, StreamingConfig } from '..';
-import type { FluxdownProps, PluginConfigs } from '../types';
-
-import * as ReactEntry from '..';
+import type { BaseBuildConfig, EffectItem, StreamingConfig } from '../packs/full';
+import type { FluxdownProps, PluginConfigs } from '../packs/full';
+import type { FluxdownLiteProps } from '../packs/lite';
+import type { FluxdownRawProps } from '../packs/raw';
 
 describe('package exports', () => {
   test('exports Fluxdown', () => {
     expect(sortBy(keys(ReactEntry))).toEqual(['Fluxdown']);
   });
 
-  test('exports Shad rendering from the render preset package', () => {
-    expect(PRESET_RENDER_PLUGINS).toContain(ShadRenderPlugin);
+  test('resolves the full, lite, and raw subpath entries', () => {
+    expect(FullEntry.Fluxdown).toBe(ReactEntry.Fluxdown);
+    expect(sortBy(keys(LiteEntry))).toEqual(['FluxdownLite']);
+    expect(sortBy(keys(RawEntry))).toEqual(['FluxdownRaw', 'isPropsEqual']);
+  });
+
+  test('includes Shad rendering in the full preset', () => {
+    expect(PRESET_FULL_PLUGINS.flatMap((item) => item.renders ?? [])).toContain(
+      EffectShadRenderPlugin,
+    );
+  });
+
+  test('requires plugins only on the raw component', () => {
+    type RawProps = ComponentProps<typeof RawEntry.FluxdownRaw>;
+    type LiteProps = ComponentProps<typeof LiteEntry.FluxdownLite>;
+
+    expectTypeOf<RawProps>().toMatchTypeOf<FluxdownRawProps>();
+    expectTypeOf<LiteProps>().toMatchTypeOf<FluxdownLiteProps>();
+    expectTypeOf<{ text: string }>().not.toMatchTypeOf<RawProps>();
+    expectTypeOf<{ text: string }>().toMatchTypeOf<LiteProps>();
+    expectTypeOf<{ text: string }>().toMatchTypeOf<ComponentProps<typeof ReactEntry.Fluxdown>>();
   });
 
   test('exposes Fluxdown with its public prop contract', () => {

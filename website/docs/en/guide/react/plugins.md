@@ -17,6 +17,8 @@ For a streaming visual effect, you can pass a mapper directly through [`streamin
 
 `plugins` accepts an `IPluginItem` or an array of them. A plugin pack can contain several lists: `slots`, `renders`, `remarks`, `rehypes`, `repairs`, and `mappers`.
 
+> Import the `IPluginItem` type from `@fluxdown/react-presets/typings`.
+
 ```tsx
 import { Fluxdown } from 'fluxdown';
 
@@ -31,11 +33,11 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
-`HighlightedPlugin` is a plugin pack object exported by your app. See [Slot plugins](./plugins/slot.md#declare-and-use-a-plugin) and [Render plugins](./plugins/render.md#declare-and-use-a-plugin) to declare one.
+`HighlightedPlugin` is an [aggregate plugin](./plugins/aggregate.md) exported by your app. It combines slot, render, and Core plugins into one feature.
 
 ## Combine plugin packs
 
-Pass the plugin packs you need directly to `Fluxdown` in an array:
+Pass plugin packs to `Fluxdown` in an array. At the same priority, later render plugins match first, and later slot plugins wrap earlier components through `Raw`:
 
 ```tsx
 import { Fluxdown } from 'fluxdown';
@@ -82,4 +84,4 @@ export function Message({ text }: MessageProps) {
 
 > This example requires `pnpm add @fluxdown/core-presets`. The default image strategy is `placeholder`, which displays placeholder content.
 
-`config` applies to the plugins listed in the same pack. Other presets remain in place. Each plugin guide ends with its built-in plugins: [Slot](./plugins/slot.md#built-in-plugins), [Render](./plugins/render.md#built-in-plugins), and the [Core plugin guides](../core/plugins.md). See [Configuration](./configuration.md#plugins) for the full prop.
+`config` applies to the plugins listed in the same pack. Other presets remain in place. See [Aggregate plugins](./plugins/aggregate.md#built-in-plugins) for built-in React plugins, and the [Core plugin guides](../core/plugins.md) for parsing and mapping presets. See [Configuration](./configuration.md#plugins) for the full prop.

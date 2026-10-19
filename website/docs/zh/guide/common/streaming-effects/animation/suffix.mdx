@@ -55,13 +55,11 @@ import type {
 
 import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/mapper';
 import { BaseReactRenderPlugin } from '@fluxdown/react-presets/base';
-import { SuffixRenderer } from '@fluxdown/react-presets/render';
+import { SuffixRenderer } from '@fluxdown/react-presets/plugins/effect-suffix';
 import { Fluxdown } from 'fluxdown';
 
 class SmileRenderPlugin extends BaseReactRenderPlugin {
   static readonly key = 'render-smile';
-
-  readonly config = { priority: -1 };
 
   match({ node }: ReactRenderMatchParams) {
     return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
@@ -83,13 +81,15 @@ class SmileRenderPlugin extends BaseReactRenderPlugin {
 />;
 ```
 
-较低的优先级使这个 renderer 先于内置 suffix renderer 处理 `smile`，其他类型仍由预设处理。上面的演示使用了相同的插件与动画。
+相同优先级下，传入的 renderer 先于预设处理 `smile`，其他类型仍由预设处理。上面的演示使用了相同的插件与动画。
 
 ## 代码块与 Core
 
 代码块中的标记跟在可见代码之后，与最后一个字符保持在同一行。代码末尾如果包含显式空行，标记会出现在该空行上。标记独立于代码内容，复制代码时不会被带入。自定义代码 slot 需要在高亮后的代码内容之后渲染 `suffix` 属性，才能保留这个行为。
 
-Core 从 `@fluxdown/core-presets/mapper` 导出 `Suffix` mapper、`SuffixConfig`、`SuffixType`、`SUFFIX_DATA_ATTR` 和 `isSuffixNode`。Mapper 将标记插入当前可见 HAST 的末尾，不增加文本长度，具体外观由 renderer 决定。
+Core 的 `Suffix` mapper 将标记插入当前可见 HAST 的末尾，不增加文本长度，具体外观由 renderer 决定。
+
+> `Suffix` mapper、`SuffixConfig`、`SuffixType`、`SUFFIX_DATA_ATTR` 和 `isSuffixNode` 从 `@fluxdown/core-presets/mapper` 导出。
 
 ## 配置
 

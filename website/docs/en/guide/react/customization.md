@@ -58,7 +58,9 @@ See [Configuration](./configuration.md#theme) for all theme options. Formulas, f
 
 ## Style fields
 
-All fields below live under `theme.tokens` and support partial overrides. Colors, dimensions, and spacing accept CSS values; line heights and font weights also accept numbers. Omitted fields inherit from the selected theme. Import `ThemeTokens` from `fluxdown` for the full type.
+All fields below live under `theme.tokens` and support partial overrides. Colors, dimensions, and spacing accept CSS values; line heights and font weights also accept numbers. Omitted fields inherit from the selected theme.
+
+> Import `ThemeTokens` from `fluxdown` for the full type.
 
 ### Colors
 

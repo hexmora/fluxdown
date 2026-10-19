@@ -32,8 +32,51 @@ export function exportTargets(value: ExportTarget | undefined): string[] {
   return Object.values(value).flatMap(exportTargets);
 }
 
-export function publicEntries(manifest: PackageManifest): [string, ExportTarget][] {
-  return Object.entries(manifest.exports ?? {}).filter(
+function replaceExportPattern(target: ExportTarget, name: string): ExportTarget {
+  if (typeof target === 'string') return target.replaceAll('*', name);
+  if (target === null) return null;
+
+  return Object.fromEntries(
+    Object.entries(target).map(([condition, nested]) => [
+      condition,
+      replaceExportPattern(nested, name),
+    ]),
+  );
+}
+
+function expandExports(manifest: PackageManifest, files: string[]) {
+  return Object.entries(manifest.exports ?? {}).flatMap(
+    ([key, value]): [string, ExportTarget][] => {
+      if (!key.includes('*')) return [[key, value]];
+
+      // Declarations preserve internal directories too; enumerate public runtime wrappers.
+      const targets = exportTargets(value);
+      const pattern =
+        targets.find((target) => target.includes('*') && /\.[cm]?js$/.test(target)) ??
+        targets.find((target) => target.includes('*'));
+
+      assert(pattern, `${manifest.name}: export pattern has no matching target: ${key}`);
+
+      const [prefix, suffix] = pattern.slice(2).split('*');
+
+      const matches = files.filter((file) => file.startsWith(prefix) && file.endsWith(suffix));
+
+      assert(matches.length, `${manifest.name}: export pattern matches no files: ${key}`);
+
+      return matches.map((file) => {
+        const name = file.slice(prefix.length, file.length - suffix.length);
+
+        return [key.replaceAll('*', name), replaceExportPattern(value, name)];
+      });
+    },
+  );
+}
+
+export function publicEntries(
+  manifest: PackageManifest,
+  files: string[] = [],
+): [string, ExportTarget][] {
+  return expandExports(manifest, files).filter(
     ([key, value]) =>
       key.startsWith('.') &&
       exportTargets(value).some((target) => /\.(?:mjs|cjs|js)$/.test(target)),
@@ -75,18 +118,21 @@ async function checkExports(directory: string, source = false): Promise<PackageM
 
   const label = `${manifest.name}@${manifest.version}`;
 
+  const files = (await filesUnder(path.join(directory, 'dist'))).map((file) => `dist/${file}`);
+  const entries = expandExports(manifest, files);
+
   assert(
     manifest.name && manifest.version && !manifest.private,
     `Invalid public manifest: ${label}`,
   );
 
   assert(
-    manifest.exports && publicEntries(manifest).length,
+    manifest.exports && publicEntries(manifest, files).length,
     `${label}: missing dual-format exports`,
   );
 
   const targets = new Set([
-    ...exportTargets(manifest.exports),
+    ...entries.flatMap(([, target]) => exportTargets(target)),
     ...[manifest.main, manifest.module, manifest.types].filter((target): target is string =>
       Boolean(target),
     ),
@@ -113,7 +159,7 @@ async function checkExports(directory: string, source = false): Promise<PackageM
     );
   }
 
-  for (const [entry, value] of publicEntries(manifest)) {
+  for (const [entry, value] of publicEntries(manifest, files)) {
     for (const environment of ['node', 'browser']) {
       for (const [format, extension, declaration] of [
         ['import', '.js', '.d.ts'],

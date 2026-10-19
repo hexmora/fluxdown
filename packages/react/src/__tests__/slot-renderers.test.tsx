@@ -1,16 +1,16 @@
 import type { Element } from 'hast';
 
 import { SlotProvider } from '@fluxdown/react-presets/base';
-import {
-  CodeBlockSlotPlugin,
-  HeadingSlotPlugin,
-  ImageSlotPlugin,
-  LinkSlotPlugin,
-  PRESET_SLOT_PLUGINS,
-} from '@fluxdown/react-presets/slot';
+import { PRESET_FULL_PLUGINS } from '@fluxdown/react-presets/full';
+import { CodeBlockSlotPlugin } from '@fluxdown/react-presets/plugins/code';
+import { HeadingSlotPlugin } from '@fluxdown/react-presets/plugins/heading';
+import { ImageSlotPlugin } from '@fluxdown/react-presets/plugins/image';
+import { LinkSlotPlugin } from '@fluxdown/react-presets/plugins/link';
 import { render, screen } from '@testing-library/react';
 
-import { Fluxdown } from '..';
+import { Fluxdown } from '../packs/full';
+
+const PRESET_SLOT_PLUGINS = PRESET_FULL_PLUGINS.flatMap((item) => item.slots ?? []);
 
 const CodeBlockRenderer = new CodeBlockSlotPlugin().Component;
 const HeadingRenderer = new HeadingSlotPlugin().Component;

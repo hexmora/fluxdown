@@ -55,13 +55,11 @@ import type {
 
 import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/mapper';
 import { BaseReactRenderPlugin } from '@fluxdown/react-presets/base';
-import { SuffixRenderer } from '@fluxdown/react-presets/render';
+import { SuffixRenderer } from '@fluxdown/react-presets/plugins/effect-suffix';
 import { Fluxdown } from 'fluxdown';
 
 class SmileRenderPlugin extends BaseReactRenderPlugin {
   static readonly key = 'render-smile';
-
-  readonly config = { priority: -1 };
 
   match({ node }: ReactRenderMatchParams) {
     return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
@@ -83,13 +81,15 @@ class SmileRenderPlugin extends BaseReactRenderPlugin {
 />;
 ```
 
-The lower priority lets this renderer handle `smile` before the built-in suffix renderer. Other types continue to use the presets. The custom type in the demo uses this same plugin and animation.
+At the same priority, the supplied renderer handles `smile` before the preset renderer. Other types continue to use the presets. The demo uses this same plugin and animation.
 
 ## Code blocks and Core
 
 Inside a code block, the marker follows the visible code, on the same line as its last character. An explicit trailing blank line is preserved, so its marker appears on that blank line. It stays separate from the source code, so copying the block does not include the marker. Custom code slots should render their `suffix` prop after the highlighted code content to preserve this behavior.
 
-Core exports the `Suffix` mapper, `SuffixConfig`, `SuffixType`, `SUFFIX_DATA_ATTR`, and `isSuffixNode` from `@fluxdown/core-presets/mapper`. The mapper inserts the marker at the tail of the visible HAST, without adding text length. Your renderer decides how to display it.
+Core's `Suffix` mapper inserts the marker at the tail of the visible HAST, without adding text length. Your renderer decides how to display it.
+
+> The `Suffix` mapper, `SuffixConfig`, `SuffixType`, `SUFFIX_DATA_ATTR`, and `isSuffixNode` are exported from `@fluxdown/core-presets/mapper`.
 
 ## Configuration
 

@@ -8,5 +8,10 @@
     "type": "file",
     "name": "render",
     "label": "Render plugins"
+  },
+  {
+    "type": "file",
+    "name": "aggregate",
+    "label": "Aggregate plugins"
   }
 ]

@@ -1,6 +1,8 @@
 # 自定义配置
 
-本页列出 `Fluxdown` 的公开属性。除 `text` 外，顶层属性均可省略；类型 `BaseBuildConfig`、`StreamingConfig`、`Theme`、`IPluginItem` 和 `FluxdownRef` 都可从 `fluxdown` 导入。
+本页列出 `Fluxdown` 的公开属性。除 `text` 外，顶层属性均可省略。
+
+> 类型 `BaseBuildConfig`、`StreamingConfig`、`Theme`、`IPluginItem` 和 `FluxdownRef` 都可从 `fluxdown` 导入。
 
 ## text <span className="field-tag">必选</span> {#text}
 
@@ -90,7 +92,9 @@
 
 **默认值：** `'scale'`（启用流式输出时）
 
-选择动画效果，也可以组合多个效果。支持的输入形式、内置效果、实时演示与配置字段见[动画效果](../common/streaming-effects/animation/index.mdx)。`EffectItem` 从 `fluxdown` 导入，效果配置类型从 `@fluxdown/core-presets/mapper` 导入。
+选择动画效果，也可以组合多个效果。支持的输入形式、内置效果、实时演示与配置字段见[动画效果](../common/streaming-effects/animation/index.mdx)。
+
+> `EffectItem` 从 `fluxdown` 导入，效果配置类型从 `@fluxdown/core-presets/mapper` 导入。
 
 ## build <span className="field-tag">可选</span> {#build}
 
@@ -202,13 +206,15 @@ Markdown 内的 HTML 会经过标签检查与清理，默认允许 `span`、`u`�
 | `syntax`               | 注释、关键字、字符串等代码高亮颜色。         |
 | `radius`、`spacing`    | 共用圆角和间距。                             |
 
-完整 token 类型为 `ThemeTokens`，同样从 `fluxdown` 导入。搭配产品主题的例子见[样式指南](./customization.md)。
+> 完整 token 类型为 `ThemeTokens`，同样从 `fluxdown` 导入。搭配产品主题的例子见[样式指南](./customization.md)。
 
 ## plugins <span className="field-tag">可选</span> {#plugins}
 
 **类型：** `IPluginItem | IPluginItem[]`
 
 **默认值：** `[]`
+
+> `IPluginItem` 从 `@fluxdown/react-presets/typings` 导出。Lite 和 Full 会合并预设与传入的插件，传入的优先级更高。`FluxdownRaw` 的此参数必填，入口区别见[体积优化](./bundle-size.mdx)。
 
 一个对象表示一个插件包；数组组合多个插件包。每个包可以提供以下列表：
 
@@ -225,7 +231,7 @@ Markdown 内的 HTML 会经过标签检查与清理，默认允许 `span`、`u`�
 列表项可以是插件本身，也可以是 `[插件, 选项]`。使用 `config` 时，不需要把选项重复写进各个列表项：
 
 ```tsx
-import { CodeHeaderSlotPlugin } from '@fluxdown/react-presets/slot';
+import { CodeHeaderSlotPlugin } from '@fluxdown/react-presets/plugins/code';
 import { Fluxdown } from 'fluxdown';
 
 <Fluxdown
@@ -239,7 +245,7 @@ import { Fluxdown } from 'fluxdown';
 />;
 ```
 
-这个例子关闭默认代码工具栏。插件选项中的 `disabled: true` 可停用插件；`priority` 设置执行顺序，数值越小越早执行。
+这个例子关闭默认代码工具栏。`disabled: true` 可停用插件；`priority` 数值越小越早执行。相同优先级下，后面的 render 先匹配，后面的 slot 通过 `Raw` 包裹前面的组件。
 
 > `config` 属于插件包，作用于同一个包里明确列出的插件。其他预设会继续保留。
 

@@ -8,7 +8,7 @@ import {
 } from '@fluxdown/react-presets/base';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
 
-import { Fluxdown, type IPluginItem } from '..';
+import { Fluxdown, type IPluginItem } from '../packs/full';
 import { createManualTicker, createStepScheduler } from './utils/smooth';
 
 afterEach(async () => {
