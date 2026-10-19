@@ -1,5 +1,5 @@
 import type { BaseSmoothConfig } from '@fluxdown/core-presets/mapper';
-import type { IBlockState, PluginSet } from '@fluxdown/types';
+import type { IBlockState, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { ElementContent, Parent, RootContent } from 'hast';
 import type { Plugin } from 'unified';
 
@@ -85,7 +85,7 @@ const ConfiguredCore = once(
         ...inputs,
         Renderer: D(inputs.Renderer),
         mappers: smooth
-          ? ReactiveState.of<PluginSet<MapperPluggable, MapperConfigs>>({
+          ? ReactiveState.of<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>>({
               smooth: useFlatten(smooth),
             })
           : undefined,

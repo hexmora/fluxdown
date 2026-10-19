@@ -8,20 +8,24 @@ Mapper 接收响应式的 HAST 内容块，返回另一份响应式内容块列�
 
 ```ts
 import type { MapperInputs, MapperPluggable } from '@fluxdown/core';
+import type { MapperConfigInputs, MapperPluginConfig } from '@fluxdown/types';
 
 import { once, useMap } from 'stative';
 
-type PreviewOptions = { count: number };
-type PreviewInputs = MapperInputs<PreviewOptions>;
+export type PreviewConfig = { count: number };
+
+export type PreviewInputs = MapperInputs<MapperConfigInputs<PreviewConfig>>;
+
+export type PreviewPluginConfig = MapperPluginConfig<PreviewConfig>;
 
 const Preview = once(function Preview({ source, count }: PreviewInputs) {
-  return useMap(source, (blocks) => blocks.slice(0, count));
+  return useMap([source, count], ([blocks, size]) => blocks.slice(0, size));
 });
 
-const mappers: MapperPluggable<PreviewOptions>[] = [[Preview, { count: 3 }]];
+const mappers: MapperPluggable<PreviewConfig>[] = [[Preview, { count: 3 }]];
 ```
 
-在[快速开始](../quick-start.md)的 Core 输入中加入 `mappers` 即可。返回的列表会跟随源列表变化，每个内容块仍保留独立的内容订阅。这个 mapper 的 `count` 是普通的构造选项。
+在[快速开始](../quick-start.md)的 Core 输入中加入 `mappers` 即可。配置支持普通值或可读闭包。mapper 接收引用稳定的只读输入，修改 `count` 会更新同一个 mapper；可选值通过 `useDefaults` 设置默认值。
 
 `once` 只构建一次状态流，`useMap` 描述后续如何更新。mapper 可以返回可读闭包，也可以返回 Stative 描述符。
 
@@ -33,7 +37,7 @@ const mappers: MapperPluggable<PreviewOptions>[] = [[Preview, { count: 3 }]];
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
-import type { SmoothBaseInputs } from '@fluxdown/core-presets/mapper';
+import type { SmoothConfig } from '@fluxdown/core-presets/mapper';
 
 import { Smooth } from '@fluxdown/core-presets/mapper';
 import { MutableState, toClosure } from 'stative';
@@ -41,7 +45,7 @@ import { MutableState, toClosure } from 'stative';
 const enabled = MutableState.of(true);
 const active = toClosure(enabled);
 
-const mappers: MapperPluggable<SmoothBaseInputs>[] = [
+const mappers: MapperPluggable<SmoothConfig>[] = [
   [Smooth, { enabled: active }],
 ];
 ```

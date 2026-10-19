@@ -6,4 +6,6 @@ export interface ShadRendererProps {
   active: ReactNode;
 
   isActive: boolean;
+
+  maskWidth: number;
 }

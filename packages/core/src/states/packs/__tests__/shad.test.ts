@@ -1,5 +1,5 @@
 import type { BaseShadConfig, BaseSmoothConfig } from '@fluxdown/core-presets/mapper';
-import type { IBlockState, PluginSet } from '@fluxdown/types';
+import type { IBlockState, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { ElementContent, Parent } from 'hast';
 
 import { Shad } from '@fluxdown/core-presets/mapper';
@@ -21,7 +21,7 @@ import type { HastRoot } from '../../../typings';
 import type { MapperPluggable } from '../../base';
 import type { CoreInputs } from '../type';
 
-import { readParts } from '../../../__tests__/shad/utils';
+import { findHost, readParts } from '../../../__tests__/shad/utils';
 import { collectText, firstBlock } from '../../../__tests__/smooth/utils';
 import { FakeSmoothTicker, StepSmoothScheduler } from '../../../__tests__/utils/smooth';
 import { BaseRenderer } from '../../../externals';
@@ -60,7 +60,7 @@ const smooth: BaseSmoothConfig = {
   scheduler: StepSmoothScheduler,
 };
 
-const enabled: BaseShadConfig = { enabled: true, length: 2 };
+const enabled: BaseShadConfig = { enabled: true, length: 2, maskWidth: 15 };
 
 const disabled: BaseShadConfig = { ...enabled, enabled: false };
 
@@ -74,7 +74,7 @@ type ConfiguredCoreInputs = Omit<CoreInputs<Block>, 'mappers'> & {
 
 const ConfiguredCore = once(
   ({ shad, smooth: smoothSource, mappers, ...inputs }: ConfiguredCoreInputs) => {
-    const configs: MapperConfigs = {
+    const configs: PluggableConfigs<MapperConfigs> = {
       shad: shad ? useFlatten(shad) : undefined,
       smooth: smoothSource ? useFlatten(smoothSource) : undefined,
     };
@@ -85,8 +85,12 @@ const ConfiguredCore = once(
         ...inputs,
         Renderer: D(inputs.Renderer),
         mappers: mappers
-          ? useMap(mappers, (items): PluginSet<MapperPluggable, MapperConfigs> => items ?? configs)
-          : ReactiveState.of<PluginSet<MapperPluggable, MapperConfigs>>(configs),
+          ? useMap(
+              mappers,
+              (items): PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>> =>
+                items ?? configs,
+            )
+          : ReactiveState.of<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>>(configs),
       },
     ]);
   },
@@ -167,6 +171,10 @@ describe('Core shad pipeline', () => {
       active: '',
     });
 
+    expect(
+      findHost(firstBlock(view.core.value.value).value.value)?.properties.dataShadMaskWidth,
+    ).toBe(15);
+
     view.text.next('abcdefghijklm');
 
     expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
@@ -198,7 +206,7 @@ describe('Core shad pipeline', () => {
     expect(readParts(firstBlock(view.core.value.value).value.value)?.active).toBe('f');
   });
 
-  test.each([undefined, disabled, { enabled: false, length: 4 }])(
+  test.each([undefined, disabled, { ...disabled, length: 4 }])(
     'keeps shading disabled for %j',
     (config) => {
       const view = setup('abcd', config);
@@ -249,6 +257,42 @@ describe('Core shad pipeline', () => {
     expect(Object.is(fork, previous)).toBe(false);
 
     expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
+  });
+
+  test('updates mask width without replacing blocks or restarting the active tail', () => {
+    const view = setup('abcd', { ...enabled, maskWidth: 24 });
+
+    const fork = firstBlock(view.core.value.value);
+
+    expect(findHost(fork.value.value)?.properties.dataShadMaskWidth).toBe(24);
+
+    view.text.next('abcde');
+
+    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+
+    jest.advanceTimersByTime(100);
+
+    view.shad.next({ ...enabled, maskWidth: 6.5 });
+
+    expect(firstBlock(view.core.value.value)).toBe(fork);
+
+    expect(findHost(fork.value.value)?.properties.dataShadMaskWidth).toBe(6.5);
+
+    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+
+    jest.advanceTimersByTime(100);
+
+    expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
+
+    view.shad.next({ ...enabled, maskWidth: 0 });
+
+    expect(firstBlock(view.core.value.value)).toBe(fork);
+
+    expect(findHost(fork.value.value)?.properties.dataShadMaskWidth).toBe(0);
+
+    expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
+
+    expect(jest.getTimerCount()).toBe(0);
   });
 
   test('shades newly visible Smooth output only after its ticks and keeps lengths consistent', () => {

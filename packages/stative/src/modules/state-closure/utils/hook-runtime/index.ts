@@ -11,7 +11,7 @@ import {
   releaseReadableClosure,
 } from '../../../__internal__';
 import { clearByTarget } from '../../../destructible';
-import { isReadableClosure } from '../descriptor';
+import { isReadableClosure } from '../../exports/predicates';
 import { hookOrderError } from './utils';
 
 export * from './type';
@@ -33,9 +33,14 @@ export class StateClosureHookRuntime {
 
   static require(hook: string, kind?: 'mapper' | 'once'): StateClosureHookRuntime {
     if (!this.active || (kind && this.active.kind !== kind)) {
-      const usage = kind ? `${kind} functions` : 'mapper or once functions';
+      const usage =
+        kind === 'mapper' ? 'mapper functions' : 'once functions or renderHooks callbacks';
 
-      throw new TypeError(`${hook} can only be used in ${usage}; hooks cannot be used in classes.`);
+      const context = kind ? usage : `mapper or ${usage}`;
+
+      throw new TypeError(
+        `${hook} can only be used in ${context}; hooks cannot be used in classes.`,
+      );
     }
 
     return this.active;

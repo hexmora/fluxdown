@@ -10,4 +10,6 @@ export interface ShadBlockInputs {
   tail: IReadableClosure<IBlockState<HastRoot> | undefined>;
 
   progress: IReadableClosure<ShadPosition>;
+
+  maskWidth: IReadableClosure<number>;
 }

@@ -61,6 +61,30 @@ When the quantity changes, the `once` body does not run again. The computations 
 
 Call these helpers synchronously inside the `once` body. They belong to Stative's runtime and are not React Hooks.
 
+## Run hooks directly
+
+Use `renderHooks` to compose hooks without declaring a reusable state component:
+
+```ts
+import { MutableState, renderHooks, useFlatten } from 'stative';
+
+const config = MutableState.of({ count: 1 });
+
+const scope = renderHooks(() => useFlatten(config));
+
+const fields = scope.value.value;
+
+config.next({ count: 2 });
+
+console.log(fields.count.value.value); // 2
+
+scope.destroy();
+
+config.destroy();
+```
+
+The callback runs once when the result is first accessed. It supports the same hooks as `once`, while preserving the returned value as-is, including closures and descriptors. `scope.destroy()` releases the resources managed by the scope; borrowed sources such as `config` keep their own lifecycle.
+
 ## Class: organize a computation around an instance
 
 Extend `BaseStateClosure` and connect the inputs to the output in `render()`:

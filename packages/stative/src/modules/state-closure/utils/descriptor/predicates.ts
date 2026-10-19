@@ -5,14 +5,13 @@ import type {
   RuntimeSlottedDescriptor,
   StateClosureDescriptor,
 } from '../../exports';
-import type { IReadableClosure } from '../../type';
 
 import {
   immediateDescriptor,
   isClass,
   isMarkedStateClosureDescriptor,
-  isReactiveStateLike,
 } from '../../../__internal__';
+import { isReadableClosure } from '../../exports/predicates';
 import { isOnceFunction } from '../once';
 
 export const isImmediateDescriptor = <T = unknown>(
@@ -23,16 +22,6 @@ export const isImmediateDescriptor = <T = unknown>(
 
 export const unwrapImmediateDescriptor = <T>(descriptor: ImmediateDescriptor<T>): T => {
   return descriptor[immediateDescriptor];
-};
-
-export const isReadableClosure = <T = unknown>(value: unknown): value is IReadableClosure<T> => {
-  return (
-    isObject(value) &&
-    !isReactiveStateLike(value) &&
-    'value' in value &&
-    'destroy' in value &&
-    isFunction(value.destroy)
-  );
 };
 
 export const isSlottedDescriptor = (value: unknown): value is RuntimeSlottedDescriptor => {

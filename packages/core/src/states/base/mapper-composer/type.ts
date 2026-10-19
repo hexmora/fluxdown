@@ -1,4 +1,10 @@
-import type { IBlockState, IPluggableConfig, MapperInputs } from '@fluxdown/types';
+import type {
+  IBlockState,
+  IPluggableConfig,
+  MapperConfigInputs,
+  MapperInputs,
+  MapperPluginConfig,
+} from '@fluxdown/types';
 import type { IReadableClosure, JSXDescriptor, OnceFunction } from 'stative';
 
 import type { HastRoot } from '../../../typings';
@@ -10,7 +16,7 @@ export type MapperResult =
   | JSXDescriptor<IBlockState<HastRoot>[]>;
 
 export type Mapper<C extends object = {}> = OnceFunction<
-  (inputs: MapperInputs<C>) => MapperResult
+  (inputs: MapperInputs<MapperConfigInputs<C>>) => MapperResult
 > & {
   readonly key?: string;
 };
@@ -26,7 +32,9 @@ type ConfiguredMapper = OnceFunction<
 
 export type MapperPluggable<C extends object = never> =
   | Mapper
-  | ([C] extends [never] ? [ConfiguredMapper, IPluggableConfig] : [Mapper<C>, IPluggableConfig<C>]);
+  | ([C] extends [never]
+      ? [ConfiguredMapper, IPluggableConfig]
+      : [Mapper<C>, IPluggableConfig<MapperPluginConfig<C>>]);
 
 export interface MapperComposerInputs extends MapperInputs {
   mappers: IReadableClosure<MapperPluggable[]>;

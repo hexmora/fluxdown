@@ -168,7 +168,7 @@ export const SmoothStreaming = ({ initialText = SMOOTH_MARKDOWN }: SmoothStreami
 
           <div className="playground-preview-content">
             <Fluxdown
-              streaming={{ shad: { enabled: shad, length: shadLength, maskWidth } }}
+              streaming={{ effect: ['shad', { enabled: shad, length: shadLength, maskWidth }] }}
               text={text}
             />
           </div>

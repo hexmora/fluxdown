@@ -25,12 +25,8 @@ import { MutableState } from '../../../mutable-state';
 import { ReactiveState, toState } from '../../../reactive-state';
 import { batch } from '../../../state-graph';
 import { FactoryReadableClosure, toClosure } from '../../main';
-import {
-  isFreshDescriptor,
-  isImmediateDescriptor,
-  isReadableClosure,
-  StateClosureHookRuntime,
-} from '../../utils';
+import { isFreshDescriptor, isImmediateDescriptor, StateClosureHookRuntime } from '../../utils';
+import { isReadableClosure } from '../predicates';
 import { render } from '../render';
 
 type CollectionEntry<T, R> = Omit<ListEntry<T, R>, 'subscription'> & {

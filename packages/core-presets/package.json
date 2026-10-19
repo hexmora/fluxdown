@@ -31,7 +31,8 @@
     "./mapper": "./src/mapper/index.ts",
     "./rehype": "./src/rehype/index.ts",
     "./remark": "./src/remark/index.ts",
-    "./repair": "./src/repair/index.ts"
+    "./repair": "./src/repair/index.ts",
+    "./typings": "./src/typings/index.ts"
   },
   "publishConfig": {
     "exports": {
@@ -73,6 +74,14 @@
         "require": {
           "types": "./dist/cjs/repair/index.d.cts",
           "default": "./dist/cjs/repair.cjs"
+        }
+      },
+      "./typings": {
+        "import": {
+          "types": "./dist/esm/typings/index.d.ts"
+        },
+        "require": {
+          "types": "./dist/cjs/typings/index.d.cts"
         }
       }
     },

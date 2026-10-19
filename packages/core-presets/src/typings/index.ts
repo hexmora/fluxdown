@@ -1,2 +1,2 @@
-export * from './mdast';
-export * from './unist';
+export type * from './mdast';
+export type * from './unist';

@@ -11,7 +11,7 @@ import { D, type IReadableClosure, once, useMap, useSwitchMap } from 'stative';
 import type { HastRoot } from '../../../typings';
 import type { Mapper, MapperComposerInputs } from './type';
 
-import { isPluggableEnabled, isPluggableEqual, isPluggablesEqual } from '../plugin-builder';
+import { isPluggableEnabled, isPluggablesEqual } from '../plugin-builder';
 import { MapperItem } from './states';
 
 export * from './type';
@@ -29,16 +29,16 @@ export const MapperComposer = /*#__PURE__*/ once(function MapperComposer({
     isPluggablesEqual,
   );
 
-  const current = useMap(mappers, (items) => first(items), isPluggableEqual);
+  const current = useMap(mappers, (items): Mapper | undefined => {
+    const pluggable = first(items);
 
-  return useSwitchMap(current, (pluggable) => {
-    if (!pluggable) {
+    return isArray(pluggable) ? pluggable[0] : pluggable;
+  });
+
+  return useSwitchMap(current, (mapper) => {
+    if (!mapper) {
       return source;
     }
-
-    const mapper: [Mapper, object | undefined] = isArray(pluggable)
-      ? pluggable
-      : [pluggable, undefined];
 
     return <MapperItem mapper={D(mapper)} mappers={mappers} source={source} />;
   });

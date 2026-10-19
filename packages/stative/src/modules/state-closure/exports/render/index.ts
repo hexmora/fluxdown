@@ -27,7 +27,7 @@ import {
   immediateDescriptor,
   markStateClosureDescriptor,
 } from '../../../__internal__';
-import { buildStateClosure } from '../../utils';
+import { buildStateClosure, createMappedStateClosure } from '../../utils';
 
 export * from './type';
 
@@ -117,3 +117,13 @@ export function render(descriptor: StateClosureResult<unknown>): IReadableClosur
     throw error;
   }
 }
+
+/** Runs once hooks lazily and preserves their result without descriptor resolution. */
+export const renderHooks = <T>(callback: () => T): IReadableClosure<T> => {
+  return createMappedStateClosure<T>(
+    () => D(callback()),
+    () => undefined,
+    [],
+    'once',
+  );
+};

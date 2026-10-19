@@ -1,4 +1,4 @@
-import type { IPluggable, IRemarkPlugin, PluginSet } from '@fluxdown/types';
+import type { IPluggable, IRemarkPlugin, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { IReadableClosure } from 'stative';
 
 import { PRESET_MAPPER_PLUGINS, Shad, Smooth } from '@fluxdown/core-presets/mapper';
@@ -12,29 +12,34 @@ import type { MapperInputs, MapperPluggable } from '../../mapper-composer';
 
 import { isPluginSetEqual, isPluginSetTuple, toPluggable } from '..';
 
-const acceptMappers = (_plugins: PluginSet<MapperPluggable, MapperConfigs>) => {};
+const acceptMappers = (_plugins: PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>) => {};
 
 describe('plugin sets', () => {
   test('merges default plugins for lists, configuration maps, and list/configuration tuples', () => {
     const plugins: MapperPluggable[] = [Shad];
 
-    const configs: MapperConfigs = { shad: { enabled: render(true) } };
+    const configs: PluggableConfigs<MapperConfigs> = { shad: { enabled: render(true) } };
 
     expect(toPluggable(plugins, PRESET_MAPPER_PLUGINS)).toEqual([Smooth, Shad]);
 
-    expect(toPluggable<MapperPluggable, MapperConfigs>(configs, PRESET_MAPPER_PLUGINS)).toEqual([
-      Smooth,
-      [Shad, configs.shad],
-    ]);
+    expect(
+      toPluggable<MapperPluggable, PluggableConfigs<MapperConfigs>>(configs, PRESET_MAPPER_PLUGINS),
+    ).toEqual([Smooth, [Shad, configs.shad]]);
 
     expect(
-      toPluggable<MapperPluggable, MapperConfigs>([plugins, configs], PRESET_MAPPER_PLUGINS),
+      toPluggable<MapperPluggable, PluggableConfigs<MapperConfigs>>(
+        [plugins, configs],
+        PRESET_MAPPER_PLUGINS,
+      ),
     ).toEqual([Smooth, [Shad, configs.shad]]);
 
     expect(toPluggable([], PRESET_MAPPER_PLUGINS)).toEqual([Smooth, Shad]);
 
     expect(
-      toPluggable<MapperPluggable, MapperConfigs>([[], configs], PRESET_MAPPER_PLUGINS),
+      toPluggable<MapperPluggable, PluggableConfigs<MapperConfigs>>(
+        [[], configs],
+        PRESET_MAPPER_PLUGINS,
+      ),
     ).toEqual([Smooth, [Shad, configs.shad]]);
   });
 
@@ -50,12 +55,16 @@ describe('plugin sets', () => {
     ];
 
     for (const plugins of lists) {
-      expect(isPluginSetTuple<MapperPluggable, MapperConfigs>(plugins)).toBe(false);
+      expect(isPluginSetTuple<MapperPluggable, PluggableConfigs<MapperConfigs>>(plugins)).toBe(
+        false,
+      );
 
       expect(toPluggable(plugins)).toEqual(plugins);
     }
 
-    expect(isPluginSetTuple<MapperPluggable, MapperConfigs>([[Shad], {}])).toBe(true);
+    expect(isPluginSetTuple<MapperPluggable, PluggableConfigs<MapperConfigs>>([[Shad], {}])).toBe(
+      true,
+    );
   });
 
   test('replaces default entries, deduplicates extras, then applies configuration overrides', () => {
@@ -69,7 +78,7 @@ describe('plugin sets', () => {
 
     const plugins: MapperPluggable[] = [Shad, Observe, replacement, Observe];
 
-    const configs: MapperConfigs = { shad: { length: render(2) } };
+    const configs: PluggableConfigs<MapperConfigs> = { shad: { length: render(2) } };
 
     const defaults: MapperPluggable[] = [Smooth, Shad];
 
@@ -79,7 +88,10 @@ describe('plugin sets', () => {
 
     Object.freeze(replacement);
 
-    const result = toPluggable<MapperPluggable, MapperConfigs>([plugins, configs], defaults);
+    const result = toPluggable<MapperPluggable, PluggableConfigs<MapperConfigs>>(
+      [plugins, configs],
+      defaults,
+    );
 
     expect(result).toEqual([Smooth, [Shad, { ...options, ...configs.shad }], Observe]);
 
@@ -109,7 +121,7 @@ describe('plugin sets', () => {
 
     const plugins: MapperPluggable[] = [Smooth, configured];
 
-    const configs: MapperConfigs = { shad: { enabled: render(false) } };
+    const configs: PluggableConfigs<MapperConfigs> = { shad: { enabled: render(false) } };
 
     Object.freeze(configured);
 
@@ -117,7 +129,10 @@ describe('plugin sets', () => {
 
     Object.freeze(configs);
 
-    const result = toPluggable<MapperPluggable, MapperConfigs>([plugins, configs]);
+    const result = toPluggable<MapperPluggable, PluggableConfigs<MapperConfigs>>([
+      plugins,
+      configs,
+    ]);
 
     expect(result).toEqual([Smooth, [Shad, { ...options, ...configs.shad }]]);
 
@@ -205,14 +220,14 @@ describe('plugin sets', () => {
     const enabled = render(true);
 
     expect(
-      isPluginSetEqual<MapperPluggable, MapperConfigs>(
+      isPluginSetEqual<MapperPluggable, PluggableConfigs<MapperConfigs>>(
         { shad: { enabled } },
         { shad: { enabled } },
       ),
     ).toBe(true);
 
     expect(
-      isPluginSetEqual<MapperPluggable, MapperConfigs>(
+      isPluginSetEqual<MapperPluggable, PluggableConfigs<MapperConfigs>>(
         [[Shad], { shad: { enabled } }],
         [[Shad], { shad: { enabled: render(true) } }],
       ),
@@ -220,19 +235,24 @@ describe('plugin sets', () => {
   });
 
   test('keeps the public forms and distributed configuration types strict', () => {
-    expectTypeOf<PluginSet<MapperPluggable, MapperConfigs>>().toEqualTypeOf<
-      [MapperPluggable[], MapperConfigs] | MapperConfigs | MapperPluggable[]
+    expectTypeOf<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>>().toEqualTypeOf<
+      | [MapperPluggable[], PluggableConfigs<MapperConfigs>]
+      | PluggableConfigs<MapperConfigs>
+      | MapperPluggable[]
     >();
 
     expectTypeOf<CoreInputs<string>['mappers']>().toEqualTypeOf<
-      IReadableClosure<PluginSet<MapperPluggable, MapperConfigs>> | undefined
+      IReadableClosure<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>> | undefined
     >();
 
     const plugins: MapperPluggable[] = [Shad];
 
-    const configs: MapperConfigs = { shad: { enabled: render(true) } };
+    const configs: PluggableConfigs<MapperConfigs> = { shad: { enabled: render(true) } };
 
-    const result = toPluggable<MapperPluggable, MapperConfigs>([plugins, configs]);
+    const result = toPluggable<MapperPluggable, PluggableConfigs<MapperConfigs>>([
+      plugins,
+      configs,
+    ]);
 
     expectTypeOf(result).toEqualTypeOf<MapperPluggable[]>();
 
@@ -245,8 +265,10 @@ describe('plugin sets', () => {
     // @ts-expect-error Mapper configuration uses declared lowercase plugin names.
     acceptMappers({ Smooth: {} });
 
-    // @ts-expect-error Core mapper options require reactive values.
-    acceptMappers({ smooth: { enabled: true } });
+    acceptMappers({ smooth: { enabled: true, disabled: false, priority: PluginPriority.High } });
+
+    // @ts-expect-error Mapper values retain the declared configuration type.
+    acceptMappers({ smooth: { enabled: 1 } });
 
     // @ts-expect-error A list/configuration pair cannot omit its explicit plugin list.
     acceptMappers([undefined, configs]);

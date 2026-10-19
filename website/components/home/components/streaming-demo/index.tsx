@@ -1,3 +1,4 @@
+import { compute } from '@fluxdown/utils';
 import { useDark } from '@rspress/core/runtime';
 import { Fluxdown } from 'fluxdown';
 import { useId } from 'react';
@@ -86,15 +87,17 @@ export const StreamingDemo = () => {
               <Fluxdown
                 build={DEMO_BUILD}
                 plugins={DEMO_PLUGINS}
-                streaming={
-                  stream.complete
-                    ? false
-                    : {
-                        smooth: true,
-                        repairEnding: true,
-                        shad: !reducedMotion,
-                      }
-                }
+                streaming={compute(() => {
+                  if (stream.complete) {
+                    return false;
+                  }
+
+                  return {
+                    smooth: true,
+                    repairEnding: true,
+                    effect: reducedMotion ? false : 'shad',
+                  };
+                })}
                 text={stream.text}
                 theme={getDemoTheme(dark)}
               />

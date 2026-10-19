@@ -17,6 +17,7 @@ async function readMarkdown(
 
   for await (const chunk of chunks) {
     text += chunk;
+
     onText(text);
   }
 }
@@ -26,30 +27,27 @@ async function readMarkdown(
 
 ## 开启流式效果
 
-`streaming={true}` 会同时开启三项能力：
+`streaming={true}` 会开启末尾语法修复和平滑输出，视觉特效需要显式启用：
 
-| 选项           | 读者看到的效果                                   |
-| -------------- | ------------------------------------------------ |
-| `repairEnding` | 正在生成的末尾语法先以可读的形式呈现。           |
-| `smooth`       | 一次到达的一大段文本逐步显示，减轻跳动感。       |
-| `shad`         | 新出现的末尾文字带有轻微渐变，让出现过程更柔和。 |
+| 选项           | 读者看到的效果                              |
+| -------------- | ------------------------------------------- |
+| `repairEnding` | 正在生成的末尾语法先以可读的形式呈现。      |
+| `smooth`       | 一次到达的一大段文本逐步显示，减轻跳动感。  |
+| `effect`       | 为新出现的内容应用内置特效或自定义 mapper。 |
 
-也可以分别设置。比如保留语法修复和平滑输出，关闭渐变：
+也可以分别设置。比如在语法修复和平滑输出的基础上添加末尾渐变：
 
 ```tsx
 <Fluxdown
-  streaming={{ repairEnding: true, smooth: true, shad: false }}
+  streaming={{ repairEnding: true, smooth: true, effect: 'shad' }}
   text={text}
 />
 ```
 
-对象中没有填写的选项默认为 `true`。如果只需要语法修复，可以把另外两项设为 `false`：
+`repairEnding` 和 `smooth` 默认为 `true`，`effect` 默认为 `false`，设为 `true` 等价于 `'shad'`。如果只需要语法修复，关闭平滑输出即可：
 
 ```tsx
-<Fluxdown
-  streaming={{ repairEnding: true, smooth: false, shad: false }}
-  text={text}
-/>
+<Fluxdown streaming={{ repairEnding: true, smooth: false }} text={text} />
 ```
 
 ## 调整末尾渐变
@@ -57,7 +55,7 @@ async function readMarkdown(
 ```tsx
 <Fluxdown
   streaming={{
-    shad: { enabled: true, length: 3, maskWidth: 18 },
+    effect: ['shad', { length: 3, maskWidth: 18 }],
   }}
   text={text}
 />
@@ -65,8 +63,10 @@ async function readMarkdown(
 
 `length` 是参与渐变的末尾字符数，`maskWidth` 是渐变遮罩的宽度，单位为像素。默认效果通常已足够；只在需要配合字体或整体动效时调整。
 
+`effect` 也支持 [mapper 插件](../core/plugins/mapper.md)、配置元组，或 `['shad', [Mapper, options]]` 这样的组合数组。设为 `false` 即可关闭视觉特效，同时保留平滑输出。
+
 ## 完成与替换
 
 正常接收时，持续追加到同一个 `text`。开始一条新的回复时，清空文本；在消息列表里，用稳定的消息 ID 作为组件的 `key`，让各条回复拥有独立状态。
 
-生成结束时设为 `streaming={false}`。这会立即显示已收到的完整文本，并停止末尾修复和渐变。语法修复只影响展示，不会改写你保存的原始 Markdown。
+生成结束时设为 `streaming={false}`。这会立即显示已收到的完整文本，并停止末尾修复和特效。语法修复只影响展示，不会改写你保存的原始 Markdown。

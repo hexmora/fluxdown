@@ -1,32 +1,15 @@
-import type { IBlockState, MapperInputs } from '@fluxdown/types';
+import type {
+  IBlockState,
+  MapperConfigInputs,
+  MapperInputs,
+  MapperPluginConfig,
+} from '@fluxdown/types';
 import type { Root as HastRoot } from 'hast';
-import type { IReadableClosure } from 'stative';
-
-export interface ShadBaseInputs {
-  /**
-   * Whether newly visible text receives the tail shading.
-   * Disabled mappers return the source blocks without constructing shading state.
-   */
-  enabled?: IReadableClosure<boolean>;
-
-  /**
-   * Maximum number of visible characters in the shaded tail.
-   */
-  length?: IReadableClosure<number>;
-}
-
-export type ShadInputs = MapperInputs<ShadBaseInputs, IBlockState<HastRoot>[]>;
-
-export interface BaseShadConfig {
-  enabled: boolean;
-
-  length: number;
-}
 
 export interface ShadConfig {
   /**
-   * Shade the tail of newly visible content.
-   * @default true
+   * Shade the tail of newly visible content. React effects enable this by default.
+   * @default false
    */
   enabled?: boolean;
 
@@ -35,4 +18,18 @@ export interface ShadConfig {
    * @default 10
    */
   length?: number;
+
+  /**
+   * Width of the trailing gradient in pixels.
+   * @default 15
+   */
+  maskWidth?: number;
 }
+
+export type BaseShadConfig = Required<ShadConfig>;
+
+export type ShadBaseInputs = MapperConfigInputs<ShadConfig>;
+
+export type ShadInputs = MapperInputs<ShadBaseInputs, IBlockState<HastRoot>[]>;
+
+export type ShadPluginConfig = MapperPluginConfig<ShadConfig>;

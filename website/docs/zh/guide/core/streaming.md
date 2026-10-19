@@ -99,7 +99,7 @@ const mappers: MapperPluggable[] = [[Smooth, { enabled: active }]];
 smoothEnabled.next(false);
 ```
 
-`Shad` 可为末尾内容增加渐变标记，需要渲染器支持相应节点才能表现为视觉效果。
+`Shad` 可为末尾内容增加渐变标记。`enabled`、`length` 和 `maskWidth` 配置支持普通值或可读闭包；`maskWidth` 控制渐变宽度，单位为像素，默认为 `15`。需要渲染器支持相应节点才能表现为视觉效果，React 预设已包含 `ShadRenderPlugin`。
 
 ## 清理资源
 

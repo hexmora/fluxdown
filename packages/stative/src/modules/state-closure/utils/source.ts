@@ -2,10 +2,9 @@ import type { StateClosureResult } from '../exports';
 import type { IReadableClosure, StateClosureDirectSource, StateClosureSource } from '../type';
 
 import { isReactiveStateLike } from '../../__internal__';
-import { render } from '../exports';
+import { isReadableClosure, render } from '../exports';
 import {
   isImmediateDescriptor,
-  isReadableClosure,
   isStateClosureDescriptor,
   unwrapImmediateDescriptor,
 } from './descriptor';

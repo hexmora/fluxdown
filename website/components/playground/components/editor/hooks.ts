@@ -1,31 +1,42 @@
 import { useState } from 'react';
 
 import type { Locale } from '../../../type';
+import type { EditorEffect } from './type';
 
 import { getStreamSample } from '../../../demo';
 import { useStream } from '../../../hooks';
 
 export const useEditor = (lang: Locale) => {
   const [text, setText] = useState(() => getStreamSample(lang));
+
   const [smooth, setSmooth] = useState(true);
+
   const [repair, setRepair] = useState(true);
+
+  const [effect, setEffect] = useState<EditorEffect>('shad');
+
   const [playback, setPlayback] = useState(false);
+
   const stream = useStream(playback ? text : '', false);
+
   const previewText = playback ? stream.text : text;
 
   const updateText = (value: string) => {
     setPlayback(false);
+
     setText(value);
   };
 
   const togglePlayback = () => {
     if (!playback) {
       setPlayback(true);
+
       return;
     }
 
     if (stream.complete) {
       stream.replay();
+
       return;
     }
 
@@ -40,6 +51,8 @@ export const useEditor = (lang: Locale) => {
     setSmooth,
     repair,
     setRepair,
+    effect,
+    setEffect,
     playback,
     stream,
     previewText,

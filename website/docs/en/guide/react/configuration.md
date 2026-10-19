@@ -18,14 +18,14 @@ The complete Markdown received so far. When a new chunk arrives, pass the accumu
 
 **Default:** `false`
 
-`true` enables trailing syntax repair, smooth output, and a trailing fade together; `false` disables all three. Pass an object to control them separately. Fields omitted from that object default to `true`.
+`true` enables trailing syntax repair and smooth output; `false` disables streaming behavior. Pass an object to choose visual effects and control each feature. `repairEnding` and `smooth` default to `true`, while `effect` defaults to `false`.
 
 ```tsx
 <Fluxdown
   streaming={{
     repairEnding: true,
     smooth: true,
-    shad: false,
+    effect: 'shad',
   }}
   text={text}
 />
@@ -82,24 +82,31 @@ Choose the clock that drives output: `'raf'` follows animation frames, `'interva
 
 Determine how much content to reveal on each update. Use `'spring'` for the built-in spring scheduler, or pass a custom scheduler class.
 
-> Usually, `smooth: true` is enough. Import `SmoothConfig`, `SmoothTickerClass`, and `SmoothSchedulerClass` from `@fluxdown/core-presets/mapper`.
+> Usually, `smooth: true` is enough. Import `SmoothConfig` from `fluxdown`, and `SmoothTickerClass` and `SmoothSchedulerClass` from `@fluxdown/core-presets/mapper`.
 
-### streaming.shad <span className="field-tag">Optional</span> {#streamingshad}
+### streaming.effect <span className="field-tag">Optional</span> {#streamingeffect}
 
-**Type:** `boolean | ShadConfig`
+**Type:** `boolean | EffectItem | EffectItem[]`
 
-**Default:** `true` (when `streaming` is an object)
+**Default:** `false`
 
-Add a fade to newly revealed trailing text. `true` uses the default effect and `false` disables it. Pass an object to adjust the number of faded characters and the mask width:
+Choose a built-in effect, pass a mapper plugin directly, or combine effects in an array:
+
+| Value                         | Behavior                                                           |
+| ----------------------------- | ------------------------------------------------------------------ |
+| Omitted or `false`            | No visual effect.                                                  |
+| `true` or `'shad'`            | Fade newly revealed trailing characters with the default settings. |
+| `['shad', ShadPluginConfig]`  | Configure the trailing fade.                                       |
+| `Mapper`                      | Use a mapper with its default options.                             |
+| `[Mapper, options]`           | Configure a mapper with the same options as `plugins.mappers`.     |
+| `['shad', [Mapper, options]]` | Combine built-in and custom effects.                               |
+
+Custom effects use the same configuration as [mapper plugins](../core/plugins/mapper.md). Fields accept plain values or readable closures; `priority` controls ordering and `disabled` excludes an effect. Effects run after smooth output. Import `EffectItem` from `fluxdown` and effect configuration types from `@fluxdown/core-presets/mapper`.
 
 ```tsx
 <Fluxdown
   streaming={{
-    shad: {
-      enabled: true,
-      length: 3,
-      maskWidth: 18,
-    },
+    effect: ['shad', { length: 3, maskWidth: 18 }],
   }}
   text={text}
 />

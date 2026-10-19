@@ -1,4 +1,3 @@
-import type { BlockRevisionsInputs, CursorPositionInputs } from './states';
+import type { BlockRevisionsInputs, SmoothSchedulerInputs } from './states';
 
-export interface SmoothCursorInputs<T>
-  extends BlockRevisionsInputs<T>, Omit<CursorPositionInputs, 'revisions' | 'ticks'> {}
+export interface SmoothCursorInputs<T> extends BlockRevisionsInputs<T>, SmoothSchedulerInputs {}

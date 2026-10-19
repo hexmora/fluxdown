@@ -38,7 +38,7 @@ export const TrackedPreview = ({
           <Fluxdown
             build={build}
             patches={patches}
-            streaming={{ repairEnding, smooth: false, shad: false }}
+            streaming={{ repairEnding, smooth: false }}
             text={text}
           />
         ) : null}

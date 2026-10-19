@@ -210,7 +210,7 @@ describe('comparison utilities', () => {
     expect(
       isPropsEqual(base, {
         ...base,
-        streaming: { repairEnding: true, smooth: true, shad: true },
+        streaming: { repairEnding: true, smooth: true, effect: false },
       }),
     ).toBe(true);
 
@@ -220,14 +220,25 @@ describe('comparison utilities', () => {
 
     expect(isPropsEqual(base, { ...base, streaming: { repairEnding: false } })).toBe(false);
 
-    expect(isPropsEqual(base, { ...base, streaming: { shad: false } })).toBe(false);
+    expect(isPropsEqual(base, { ...base, streaming: { effect: false } })).toBe(true);
 
-    expect(isPropsEqual(base, { ...base, streaming: { shad: { maskWidth: 24 } } })).toBe(false);
+    expect(isPropsEqual(base, { ...base, streaming: { effect: 'shad' } })).toBe(false);
+
+    expect(
+      isPropsEqual(
+        { ...base, streaming: { effect: true } },
+        { ...base, streaming: { effect: 'shad' } },
+      ),
+    ).toBe(true);
+
+    expect(
+      isPropsEqual(base, { ...base, streaming: { effect: ['shad', { maskWidth: 24 }] } }),
+    ).toBe(false);
 
     expect(
       isPropsEqual(
         { text: 'content' },
-        { text: 'content', streaming: { repairEnding: false, smooth: false, shad: false } },
+        { text: 'content', streaming: { repairEnding: false, smooth: false, effect: false } },
       ),
     ).toBe(true);
   });

@@ -43,19 +43,16 @@ import "fluxdown/styles.css";
 
 | 选项                 | 用途                                         |
 | -------------------- | -------------------------------------------- |
-| `streaming`          | 启用或配置尾部语法修复、平滑输出和尾部淡入。 |
+| `streaming`          | 配置尾部语法修复、平滑输出和可选的视觉特效。 |
 | `theme`              | 使用浅色或深色预设，或覆盖颜色、字体和间距。 |
 | `build`              | 启用公式、脚注等语法。                       |
 | `plugins`            | 定制解析、渲染、语义化插槽和交互。           |
 | `className`、`style` | 设置容器布局和样式。                         |
 
-`streaming={true}` 会启用全部三种效果。传入对象可以分别控制各项，省略的字段默认为 `true`。例如，保留尾部修复和平滑输出，关闭尾部淡入：
+`streaming={true}` 启用末尾语法修复和平滑输出。可以额外指定视觉特效：
 
 ```tsx
-<Fluxdown
-  text={text}
-  streaming={isStreaming && { repairEnding: true, smooth: true, shad: false }}
-/>
+<Fluxdown text={text} streaming={isStreaming && { effect: "shad" }} />
 ```
 
 ## 文档

@@ -382,7 +382,7 @@ describe('state closure hooks', () => {
     source.complete();
   });
 
-  test('defaults select optional closure references without reading values or constructing unused fallbacks', () => {
+  test('defaults keep values lazy without constructing unused fallbacks', () => {
     const started = jest.fn(() => undefined);
     const constructed = jest.fn();
     const source = new ReactiveState({ initial: 0, emitter: started });
@@ -403,7 +403,7 @@ describe('state closure hooks', () => {
       const selected = useDefaults(value, Fallback);
       const truthy = useDefaultsFalsy(value, Fallback);
 
-      expect(selected).toBe(value);
+      expect(selected).not.toBe(value);
       expect(truthy).toBe(value);
       expect(started).not.toHaveBeenCalled();
       expect(constructed).not.toHaveBeenCalled();
@@ -418,6 +418,108 @@ describe('state closure hooks', () => {
 
     closure.destroy();
     source.destroy();
+  });
+
+  test('defaults follow undefined values and preserve defined falsy values', () => {
+    const source = MutableState.of<number | undefined>(undefined);
+
+    const Build = once(({ value }: { value: IReadableClosure<number | undefined> }) => {
+      const selected = useDefaults(value, 9);
+
+      expectTypeOf(selected).toEqualTypeOf<IReadableClosure<number>>();
+
+      return selected;
+    });
+
+    const closure = render(S([Build, { value: source }]));
+
+    expect(closure.value.value).toBe(9);
+
+    source.next(0);
+
+    expect(closure.value.value).toBe(0);
+
+    source.next(undefined);
+
+    expect(closure.value.value).toBe(9);
+
+    source.next(2);
+
+    expect(closure.value.value).toBe(2);
+
+    closure.destroy();
+
+    expect(source.closed).toBe(false);
+
+    source.destroy();
+  });
+
+  test('defaults preserve plain callback values without interpreting them as descriptors', () => {
+    const callback = jest.fn();
+
+    const source = MutableState.of<(() => void) | undefined>(callback);
+
+    const fallback = jest.fn();
+
+    const Build = once(({ value }: { value: IReadableClosure<(() => void) | undefined> }) =>
+      useDefaults(value, D(fallback)),
+    );
+
+    const closure = render(S([Build, { value: source }]));
+
+    expect(closure.value.value).toBe(callback);
+
+    source.next(undefined);
+
+    expect(closure.value.value).toBe(fallback);
+
+    expect(callback).not.toHaveBeenCalled();
+
+    expect(fallback).not.toHaveBeenCalled();
+
+    closure.destroy();
+
+    source.destroy();
+  });
+
+  test('defaults reuse a reactive fallback across repeated undefined values', () => {
+    const source = MutableState.of<number | undefined>(undefined);
+
+    const fallback = MutableState.of(9);
+
+    const defaults = render(fallback);
+
+    const Build = once(({ value }: { value: IReadableClosure<number | undefined> }) =>
+      useDefaults(value, defaults),
+    );
+
+    const closure = render(S([Build, { value: source }]));
+
+    expect(closure.value.value).toBe(9);
+
+    source.next(1);
+
+    expect(closure.value.value).toBe(1);
+
+    fallback.next(7);
+
+    expect(closure.value.value).toBe(1);
+
+    source.next(undefined);
+
+    expect(closure.value.value).toBe(7);
+
+    fallback.next(5);
+
+    expect(closure.value.value).toBe(5);
+
+    closure.destroy();
+
+    expect(fallback.closed).toBe(false);
+
+    source.destroy();
+
+    fallback.destroy();
   });
 
   test('defaults construct only the selected fallback and keep its render lazy', () => {

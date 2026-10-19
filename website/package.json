@@ -16,6 +16,7 @@
     "@fluxdown/core": "workspace:^",
     "@fluxdown/core-presets": "workspace:^",
     "@fluxdown/react-presets": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
     "fluxdown": "workspace:^",
     "react": "catalog:",
     "react-dom": "catalog:",

@@ -8,20 +8,24 @@ This mapper limits a preview to its first few blocks:
 
 ```ts
 import type { MapperInputs, MapperPluggable } from '@fluxdown/core';
+import type { MapperConfigInputs, MapperPluginConfig } from '@fluxdown/types';
 
 import { once, useMap } from 'stative';
 
-type PreviewOptions = { count: number };
-type PreviewInputs = MapperInputs<PreviewOptions>;
+export type PreviewConfig = { count: number };
+
+export type PreviewInputs = MapperInputs<MapperConfigInputs<PreviewConfig>>;
+
+export type PreviewPluginConfig = MapperPluginConfig<PreviewConfig>;
 
 const Preview = once(function Preview({ source, count }: PreviewInputs) {
-  return useMap(source, (blocks) => blocks.slice(0, count));
+  return useMap([source, count], ([blocks, size]) => blocks.slice(0, size));
 });
 
-const mappers: MapperPluggable<PreviewOptions>[] = [[Preview, { count: 3 }]];
+const mappers: MapperPluggable<PreviewConfig>[] = [[Preview, { count: 3 }]];
 ```
 
-Add `mappers` to the Core inputs from the [quick start](../quick-start.md). The returned list follows source changes, and its blocks retain their individual content subscriptions. `count` is a plain constructor option for this mapper.
+Add `mappers` to the Core inputs from the [quick start](../quick-start.md). Configuration accepts plain values or readable closures. The mapper receives stable readable inputs, so changing `count` updates the same mapper. Use `useDefaults` for optional values.
 
 `once` builds the state flow once; `useMap` describes how it changes. A mapper may return a readable closure or a Stative descriptor.
 
@@ -33,7 +37,7 @@ The preset `Smooth` accepts reactive options. Convert an external state to a rea
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
-import type { SmoothBaseInputs } from '@fluxdown/core-presets/mapper';
+import type { SmoothConfig } from '@fluxdown/core-presets/mapper';
 
 import { Smooth } from '@fluxdown/core-presets/mapper';
 import { MutableState, toClosure } from 'stative';
@@ -41,7 +45,7 @@ import { MutableState, toClosure } from 'stative';
 const enabled = MutableState.of(true);
 const active = toClosure(enabled);
 
-const mappers: MapperPluggable<SmoothBaseInputs>[] = [
+const mappers: MapperPluggable<SmoothConfig>[] = [
   [Smooth, { enabled: active }],
 ];
 ```

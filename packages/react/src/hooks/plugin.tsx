@@ -1,13 +1,9 @@
 import type { MapperPluggable } from '@fluxdown/core';
 import type { IPluggable, IPluginWithConfig } from '@fluxdown/types';
-import type { FlattenedState } from 'stative';
 
 import { isPluggableEnabled, toPluggable } from '@fluxdown/core';
-import { useDeferredUnmount, useStateOf, useStatic } from '@fluxdown/react-presets/base';
-import { forEach, isArray } from 'lodash-es';
+import { isArray } from 'lodash-es';
 import { useMemo } from 'react';
-import { shallowEqual } from 'shallow-equal';
-import { flattenClosure } from 'stative';
 
 import type { IPluginItem, PluginConfigs } from '../types';
 
@@ -18,16 +14,6 @@ type PluginChannel = Exclude<keyof IPluginItem, 'config'>;
 type PluginList<T extends PluginChannel> = NonNullable<IPluginItem[T]>;
 
 type PackPluggable = IPluggable<IPluginWithConfig, unknown> | MapperPluggable;
-
-export const usePluginConfig = <T extends object>(config: T): FlattenedState<T> => {
-  const source = useStateOf(config, shallowEqual);
-
-  const fields = useStatic(() => flattenClosure(source));
-
-  useDeferredUnmount(() => forEach(fields, (field) => field.destroy()));
-
-  return fields;
-};
 
 export function usePlugins<T extends PluginChannel>(
   items: readonly IPluginItem[],

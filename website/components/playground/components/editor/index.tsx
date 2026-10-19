@@ -1,7 +1,8 @@
+import { compute } from '@fluxdown/utils';
 import { useDark } from '@rspress/core/runtime';
 import { Fluxdown } from 'fluxdown';
 
-import type { EditorProps } from './type';
+import type { EditorEffect, EditorProps } from './type';
 
 import { DEMO_BUILD, DEMO_PLUGINS, getDemoTheme } from '../../../demo';
 import { PauseIcon, PlayIcon, ReplayIcon, ResetIcon } from '../../../icons';
@@ -11,13 +12,17 @@ import styles from './index.module.scss';
 
 export const Editor = ({ lang }: EditorProps) => {
   const copy = COPY[lang];
+
   const dark = useDark();
+
   const {
     text,
     smooth,
     setSmooth,
     repair,
     setRepair,
+    effect,
+    setEffect,
     playback,
     stream,
     previewText,
@@ -25,6 +30,7 @@ export const Editor = ({ lang }: EditorProps) => {
     togglePlayback,
     resetContent,
   } = useEditor(lang);
+
   const playLabel = stream.playing ? copy.pause : copy.play;
 
   return (
@@ -54,6 +60,19 @@ export const Editor = ({ lang }: EditorProps) => {
                 type="checkbox"
               />
               {copy.repair}
+            </label>
+            <label className={styles.effect}>
+              {copy.effect}
+              <span className={styles.effectSelect}>
+                <select
+                  aria-label={copy.effect}
+                  onChange={(event) => setEffect(event.currentTarget.value as EditorEffect)}
+                  value={effect}
+                >
+                  <option value="none">{copy.noEffect}</option>
+                  <option value="shad">{copy.shadEffect}</option>
+                </select>
+              </span>
             </label>
           </div>
           <div className={styles.actions}>
@@ -103,7 +122,17 @@ export const Editor = ({ lang }: EditorProps) => {
               <Fluxdown
                 build={DEMO_BUILD}
                 plugins={DEMO_PLUGINS}
-                streaming={stream.playing ? { smooth, shad: smooth, repairEnding: repair } : false}
+                streaming={compute(() => {
+                  if (!stream.playing) {
+                    return false;
+                  }
+
+                  return {
+                    smooth,
+                    effect: effect === 'none' ? false : effect,
+                    repairEnding: repair,
+                  };
+                })}
                 text={previewText}
                 theme={getDemoTheme(dark)}
               />

@@ -4,7 +4,7 @@ import { PRESET_RENDER_PLUGINS, ShadRenderPlugin } from '@fluxdown/react-presets
 import { expectTypeOf } from 'expect-type';
 import { keys, sortBy } from 'lodash-es';
 
-import type { BaseBuildConfig, StreamingConfig } from '..';
+import type { BaseBuildConfig, EffectItem, StreamingConfig } from '..';
 import type { FluxdownProps } from '../types';
 
 import * as ReactEntry from '..';
@@ -31,6 +31,12 @@ describe('package exports', () => {
     expectTypeOf<PublicProps['build']>().toEqualTypeOf<BaseBuildConfig | undefined>();
 
     expectTypeOf<PublicProps['streaming']>().toEqualTypeOf<boolean | StreamingConfig | undefined>();
+
+    expectTypeOf<StreamingConfig['effect']>().toEqualTypeOf<
+      boolean | EffectItem | EffectItem[] | undefined
+    >();
+
+    expectTypeOf<'shad' extends keyof StreamingConfig ? true : false>().toEqualTypeOf<false>();
 
     expectTypeOf<'smooth' extends keyof PublicProps ? true : false>().toEqualTypeOf<false>();
 

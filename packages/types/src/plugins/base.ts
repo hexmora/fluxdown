@@ -3,6 +3,8 @@ import type { Newable } from '@fluxdown/utils';
 declare global {
   interface MapperConfigs {}
 
+  interface EffectConfigs {}
+
   interface RemarkConfigs {}
 
   interface RehypeConfigs {}
@@ -11,6 +13,11 @@ declare global {
 
   interface RenderConfigs {}
 }
+
+/** Optional plugin entries with the shared options consumed by plugin composition. */
+export type PluggableConfigs<C> = {
+  [K in keyof C]?: IPluggableConfig<C[K]>;
+};
 
 /** A plugin list, preset configuration, or a list with configuration overrides. */
 export type PluginSet<T, C> = [T[], C] | C | T[];
