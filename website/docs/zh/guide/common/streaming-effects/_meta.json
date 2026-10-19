@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "smoothing",
+    "label": "平滑化"
+  },
+  {
+    "type": "file",
+    "name": "animation",
+    "label": "动画效果"
+  }
+]

@@ -1,0 +1,22 @@
+.animation {
+  .preview {
+    min-height: 270px;
+    padding: 26px 30px 30px;
+
+    > div {
+      font-size: 15px;
+      line-height: 1.9;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .preview {
+      min-height: 310px;
+      padding: 24px 20px 28px;
+
+      > div {
+        font-size: 14px;
+      }
+    }
+  }
+}
