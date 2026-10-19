@@ -138,6 +138,14 @@
 
 渐变遮罩宽度，单位为像素。`0` 隐藏遮罩，负数按 `0` 处理，非有限值使用默认宽度。
 
+### shad.hideDelay <span className="field-tag">可选</span> {#shadhidedelay}
+
+**类型：** `number`
+
+**默认值：** `200`
+
+可见内容停止增长后，末尾渐变继续保留的毫秒数。负数按 `0` 处理，非有限值使用默认时长。
+
 ### scale.enabled <span className="field-tag">可选</span> {#scaleenabled}
 
 **类型：** `boolean`

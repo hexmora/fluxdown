@@ -138,6 +138,14 @@ Number of trailing characters included in the fade. Fractions round down; negati
 
 Fade mask width in pixels. `0` hides the mask, negative values become `0`, and non-finite values use the default width.
 
+### shad.hideDelay <span className="field-tag">Optional</span> {#shadhidedelay}
+
+**Type:** `number`
+
+**Default:** `200`
+
+Milliseconds the fade stays on the trailing characters after visible content stops growing. Negative values become `0`, and non-finite values use the default delay.
+
 ### scale.enabled <span className="field-tag">Optional</span> {#scaleenabled}
 
 **Type:** `boolean`

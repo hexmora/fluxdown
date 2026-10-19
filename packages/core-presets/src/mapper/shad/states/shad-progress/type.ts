@@ -8,6 +8,8 @@ export interface ShadProgressInputs {
   enabled: IReadableClosure<boolean>;
 
   length: IReadableClosure<number>;
+
+  hideDelay: IReadableClosure<number>;
 }
 
 export interface ShadPosition {

@@ -11,6 +11,7 @@ import type { ShadInputs, ShadPluginConfig } from './type';
 
 import { withKey } from '../../utils';
 import { ShadBlocks, ShadProgress } from './states';
+import { SHAD_AUTO_HIDE_TIMEOUT } from './states/shad-progress/consts';
 
 export * from './type';
 export { SHAD_DATA_ATTR, SHAD_HOST_VALUE, SHAD_TAG_NAME } from './utils';
@@ -32,6 +33,7 @@ export const Shad = /*#__PURE__*/ withKey(
     enabled: _enabled,
     length: _length,
     maskWidth: _maskWidth,
+    hideDelay: _hideDelay,
   }: ShadInputs): IReadableClosure<IBlockState<HastRoot>[]> {
     const enabled = useDefaults(_enabled, false);
 
@@ -39,11 +41,15 @@ export const Shad = /*#__PURE__*/ withKey(
 
     const maskWidth = useDefaults(_maskWidth, 15);
 
+    const hideDelay = useDefaults(_hideDelay, SHAD_AUTO_HIDE_TIMEOUT);
+
     return useSwitchMap(enabled, (active) =>
       active ? (
         <ShadBlocks
           source={source}
-          progress={<ShadProgress source={source} enabled={enabled} length={length} />}
+          progress={
+            <ShadProgress source={source} enabled={enabled} length={length} hideDelay={hideDelay} />
+          }
           maskWidth={maskWidth}
         />
       ) : (

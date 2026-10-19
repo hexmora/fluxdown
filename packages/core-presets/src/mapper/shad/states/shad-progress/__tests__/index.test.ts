@@ -12,6 +12,7 @@ import {
 } from 'stative';
 
 import { ShadProgress } from '..';
+import { SHAD_AUTO_HIDE_TIMEOUT } from '../consts';
 
 const createBlock = (size: number) => {
   const length = MutableState.of(size);
@@ -40,7 +41,15 @@ const createProgress = (
   source: IReactiveState<IBlockState<HastRoot>[]> | IReadableClosure<IBlockState<HastRoot>[]>,
 ) => {
   return render(
-    S([ShadProgress, { source, enabled: ReactiveState.of(true), length: ReactiveState.of(2) }]),
+    S([
+      ShadProgress,
+      {
+        source,
+        enabled: ReactiveState.of(true),
+        length: ReactiveState.of(2),
+        hideDelay: ReactiveState.of(SHAD_AUTO_HIDE_TIMEOUT),
+      },
+    ]),
   );
 };
 
@@ -361,5 +370,51 @@ describe('ShadProgress tail lifecycle', () => {
     first.block.destroy();
 
     second.block.destroy();
+  });
+});
+
+describe('ShadProgress hide delay', () => {
+  test.each([
+    { hideDelay: 1000, expected: 1000 },
+    { hideDelay: -5, expected: 0 },
+    { hideDelay: Number.NaN, expected: SHAD_AUTO_HIDE_TIMEOUT },
+  ])('hides the tail $expected ms after growth for $hideDelay', ({ hideDelay, expected }) => {
+    const tail = createBlock(1);
+
+    const source = MutableState.of([tail.block]);
+
+    const state = render(
+      S([
+        ShadProgress,
+        {
+          source,
+          enabled: ReactiveState.of(true),
+          length: ReactiveState.of(2),
+          hideDelay: ReactiveState.of(hideDelay),
+        },
+      ]),
+    );
+
+    expect(state.value.value).toEqual({ length: 2, activeLength: 0 });
+
+    tail.length.next(2);
+
+    expect(state.value.value).toEqual({ length: 2, activeLength: 1 });
+
+    if (expected > 0) {
+      jest.advanceTimersByTime(expected - 1);
+
+      expect(state.value.value).toEqual({ length: 2, activeLength: 1 });
+    }
+
+    jest.advanceTimersByTime(1);
+
+    expect(state.value.value).toEqual({ length: 2, activeLength: 0 });
+
+    state.destroy();
+
+    source.destroy();
+
+    tail.block.destroy();
   });
 });

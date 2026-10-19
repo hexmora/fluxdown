@@ -12,6 +12,7 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
   source,
   enabled: _enabled,
   length: _length,
+  hideDelay: _hideDelay,
 }: ShadProgressInputs) {
   const emptyLength = ReactiveState.of(0);
 
@@ -22,10 +23,11 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
   );
 
   const configuration = useMap(
-    [visibleLength, _enabled, _length],
-    ([total, enabled, length]) => ({
+    [visibleLength, _enabled, _length, _hideDelay],
+    ([total, enabled, length, hideDelay]) => ({
       total,
       length: enabled && Number.isFinite(length) ? Math.max(0, Math.floor(length)) : 0,
+      hideDelay: Number.isFinite(hideDelay) ? Math.max(0, hideDelay) : SHAD_AUTO_HIDE_TIMEOUT,
     }),
     shallowEqual,
   );
@@ -70,7 +72,7 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
         };
 
         const subscription = input.subscribe({
-          next: ({ total, length }) => {
+          next: ({ total, length, hideDelay }) => {
             if (length <= 0) {
               clearTimeoutHandle();
             } else if (total > previousTotal) {
@@ -80,7 +82,7 @@ export const ShadProgress = /*#__PURE__*/ once(function ShadProgress({
                 timeout = null;
 
                 publish();
-              }, SHAD_AUTO_HIDE_TIMEOUT);
+              }, hideDelay);
             }
 
             committed = Math.min(committed, total);

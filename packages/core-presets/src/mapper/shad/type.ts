@@ -24,6 +24,12 @@ export interface ShadConfig {
    * @default 15
    */
   maskWidth?: number;
+
+  /**
+   * Milliseconds the shaded tail remains after visible content stops growing.
+   * @default 200
+   */
+  hideDelay?: number;
 }
 
 export type BaseShadConfig = Required<ShadConfig>;

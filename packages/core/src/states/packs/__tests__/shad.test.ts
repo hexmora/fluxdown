@@ -60,7 +60,7 @@ const smooth: BaseSmoothConfig = {
   scheduler: StepSmoothScheduler,
 };
 
-const enabled: BaseShadConfig = { enabled: true, length: 2, maskWidth: 15 };
+const enabled: BaseShadConfig = { enabled: true, length: 2, maskWidth: 15, hideDelay: 200 };
 
 const disabled: BaseShadConfig = { ...enabled, enabled: false };
 
