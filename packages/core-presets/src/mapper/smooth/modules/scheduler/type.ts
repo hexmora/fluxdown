@@ -88,3 +88,28 @@ export interface SpringMotion {
    */
   velocity: number;
 }
+
+/**
+ * Snapshot of a spring scheduler for inspection.
+ */
+export interface SpringSchedulerMotion {
+  /**
+   * Unrounded spring position in visible units.
+   */
+  position: number;
+
+  /**
+   * Spring velocity in visible units per second.
+   */
+  velocity: number;
+
+  /**
+   * Absolute position the spring is pulling toward.
+   */
+  target: number;
+
+  /**
+   * Integer position already reported by `tick`.
+   */
+  cursor: number;
+}

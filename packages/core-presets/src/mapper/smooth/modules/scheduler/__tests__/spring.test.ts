@@ -291,4 +291,40 @@ describe('SpringSmoothScheduler', () => {
       ...tickAll(reference, [58]),
     ]);
   });
+
+  test('reports the closed-form motion without changing the trajectory', () => {
+    const inspected = new SpringSmoothScheduler();
+
+    const reference = new SpringSmoothScheduler();
+
+    for (const scheduler of [inspected, reference]) {
+      scheduler.start(0, 10);
+
+      scheduler.push(40);
+    }
+
+    expect(inspected.getMotion()).toEqual({ position: 10, velocity: 0, target: 50, cursor: 10 });
+
+    const cursor = 10 + sum(tickAll(inspected, frames(5)));
+
+    const { displacement, velocity } = getSpringMotion(
+      DEFAULT_SPRING,
+      { displacement: -40, velocity: 0 },
+      0.08,
+    );
+
+    const motion = inspected.getMotion();
+
+    expect(motion.position).toBeCloseTo(50 + displacement, 10);
+
+    expect(motion.velocity).toBeCloseTo(velocity, 10);
+
+    expect(motion).toMatchObject({ target: 50, cursor });
+
+    expect(inspected.getMotion(200).position).toBeGreaterThan(motion.position);
+
+    tickAll(reference, frames(5));
+
+    expect(tickAll(inspected, frames(10, 16, 80))).toEqual(tickAll(reference, frames(10, 16, 80)));
+  });
 });

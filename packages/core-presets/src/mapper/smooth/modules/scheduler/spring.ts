@@ -1,7 +1,7 @@
 import { assert } from '@fluxdown/utils';
 import { isUndefined } from 'lodash-es';
 
-import type { PerceptualSpring } from './type';
+import type { PerceptualSpring, SpringSchedulerMotion } from './type';
 
 import { BaseSmoothScheduler } from './base';
 import { getSpringMotion } from './utils';
@@ -127,6 +127,14 @@ export class SpringSmoothScheduler extends BaseSmoothScheduler {
     this.cursor += distance;
 
     return distance;
+  }
+
+  /**
+   * Inspect the spring at `time`, which defaults to the latest timestamp. Sampling has no side
+   * effects, so debugging tools can read it on every frame.
+   */
+  getMotion(time = this.timestamp ?? this.origin.time): SpringSchedulerMotion {
+    return { ...this.sample(time), target: this.fullIndex, cursor: this.cursor };
   }
 
   private assertStarted(timestamp?: number): asserts timestamp is number {
