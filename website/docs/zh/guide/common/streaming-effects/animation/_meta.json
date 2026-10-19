@@ -8,5 +8,10 @@
     "type": "file",
     "name": "scale",
     "label": "逐字入场"
+  },
+  {
+    "type": "file",
+    "name": "chunk",
+    "label": "分块入场"
   }
 ]

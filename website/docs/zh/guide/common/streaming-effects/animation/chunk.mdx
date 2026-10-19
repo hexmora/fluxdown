@@ -1,0 +1,57 @@
+import { ChunkDemo } from '../../../../../../components';
+
+# 分块入场
+
+`chunk` 将每次可见更新中的新文字作为一组淡入，不移动、不缩放，也不添加模糊。已经出现的内容保持清晰可见。
+
+<ChunkDemo />
+
+## 使用方式
+
+以下以 React 版组件为例：
+
+```tsx
+<Fluxdown streaming={{ smooth: false, effect: 'chunk' }} text={text} />
+```
+
+始终传入目前收到的完整 Markdown。每一组新文字使用 `ease-out` 曲线从透明变为不透明。下一批文字到达时，前一批尚未完成的动画会继续播放。
+
+以下以 React 版组件为例：
+
+```tsx
+<Fluxdown
+  streaming={{
+    smooth: false,
+    effect: ['chunk', { duration: 300 }],
+  }}
+  text={text}
+/>
+```
+
+## 分组与平滑化
+
+`smooth: false` 时，可见更新跟随应用收到的数据块。开启[平滑化](../smoothing.mdx)后，可见内容以更小的步幅更新，入场也会更加连续。演示关闭了平滑化，便于观察每一组的变化。
+
+效果保留行内格式与 Markdown 布局。行内代码、代码块、公式与替换内容使用各自的渲染方式。字体、换行位置和数据到达时间由应用决定。
+
+## 配置
+
+以下字段属于 `['chunk', config]` 中的 `chunk` 配置对象。
+
+### enabled <span className="field-tag">可选</span> {#enabled}
+
+**类型：** `boolean`
+
+**默认值：** `true`
+
+启用分块文字入场。同一组新出现的文字一起淡入，前面的内容保持可见。
+
+### duration <span className="field-tag">可选</span> {#duration}
+
+**类型：** `number`
+
+**默认值：** `400`
+
+淡入时长，单位为毫秒，使用 `ease-out` 曲线。`0` 表示立即显示，负数按 `0` 处理，非有限值使用默认时长。动画遵循系统的减少动态效果设置。
+
+修改时长只影响后续新文字，已有分组保持原来的节奏。

@@ -4,6 +4,7 @@ import type { IReactRenderPlugin } from '../base';
 
 import { BlockquoteRenderPlugin } from './blockquote';
 import { BreakLineRenderPlugin } from './break-line';
+import { ChunkRenderPlugin } from './chunk';
 import { CodeRenderPlugin } from './code';
 import { EmphasisRenderPlugin } from './emphasis';
 import { FallbackRenderPlugin } from './fallback';
@@ -22,6 +23,7 @@ import { TexRenderPlugin } from './tex';
 
 export * from './blockquote';
 export * from './break-line';
+export * from './chunk';
 export * from './code';
 export * from './emphasis';
 export * from './fallback';
@@ -42,6 +44,7 @@ export const PRESET_RENDER_PLUGINS: PluginClass<IReactRenderPlugin>[] = [
   PatchRenderPlugin,
   ShadRenderPlugin,
   ScaleRenderPlugin,
+  ChunkRenderPlugin,
   CodeRenderPlugin,
   EmphasisRenderPlugin,
   ImageRenderPlugin,

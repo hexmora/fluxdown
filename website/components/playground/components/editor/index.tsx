@@ -72,6 +72,7 @@ export const Editor = ({ lang }: EditorProps) => {
                   <option value="none">{copy.noEffect}</option>
                   <option value="shad">{copy.shadEffect}</option>
                   <option value="scale">{copy.scaleEffect}</option>
+                  <option value="chunk">{copy.chunkEffect}</option>
                 </select>
               </span>
             </label>
