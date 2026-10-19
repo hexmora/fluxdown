@@ -2,6 +2,8 @@
 
 Plugins work at different stages of content processing. Start with slots to change components and interactions, or use render plugins to choose which slots nodes use. Core plugins handle parsing, repairs, and streaming transformations.
 
+For a streaming visual effect, you can pass a mapper directly through [`streaming.effect`](./configuration.md#streamingeffect). It accepts the same mapper and options as `plugins.mappers`, without requiring a plugin pack.
+
 | Type     | Purpose                                                        | Guide                                       |
 | -------- | -------------------------------------------------------------- | ------------------------------------------- |
 | `slot`   | Render slots with components and interactions.                 | [Slot plugins](./plugins/slot.md)           |

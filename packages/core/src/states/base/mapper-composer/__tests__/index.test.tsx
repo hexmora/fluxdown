@@ -16,6 +16,7 @@ import {
   render,
   toClosure,
   useClearable,
+  useDefaults,
   useMap,
 } from 'stative';
 
@@ -63,8 +64,8 @@ const Reverse = once(({ source }: MapperInputs) =>
   useMap(source, (blocks) => reverse([...blocks])),
 );
 
-const Take = once(({ source, count }: MapperInputs & { count: number }) =>
-  useMap(source, (blocks) => blocks.slice(0, count)),
+const Take = once(({ source, count }: MapperInputs & { count: IReadableClosure<number> }) =>
+  useMap([source, count], ([blocks, limit]) => blocks.slice(0, limit)),
 );
 
 const ReverseJSX = once(({ source }: MapperInputs): JSXDescriptor<IBlockState<HastRoot>[]> => {
@@ -72,7 +73,12 @@ const ReverseJSX = once(({ source }: MapperInputs): JSXDescriptor<IBlockState<Ha
 });
 
 const TakeJSX = once(
-  ({ source, count }: MapperInputs & { count: number }): JSXDescriptor<IBlockState<HastRoot>[]> => {
+  ({
+    source,
+    count,
+  }: MapperInputs & { count: IReadableClosure<number> }): JSXDescriptor<
+    IBlockState<HastRoot>[]
+  > => {
     return <Take source={source} count={count} />;
   },
 );
@@ -252,18 +258,20 @@ describe('MapperComposer', () => {
     destroy();
   });
 
-  test('keeps equivalent tuple configs and rebuilds the changed suffix', () => {
+  test('keeps mapper construction stable when plain configuration changes', () => {
     const construct = jest.fn();
 
     const cleanup = jest.fn();
 
-    const Configured = once(({ source, count }: MapperInputs & { count: number }) => {
-      construct(count);
+    const Configured = once(
+      ({ source, count }: MapperInputs & { count: IReadableClosure<number> }) => {
+        construct(count);
 
-      useClearable(cleanup);
+        useClearable(cleanup);
 
-      return useMap(source, (blocks) => blocks.slice(0, count));
-    });
+        return useMap([source, count], ([blocks, limit]) => blocks.slice(0, limit));
+      },
+    );
 
     const { closure, mappers, first, second, destroy } = setup([[Configured, { count: 1 }]]);
 
@@ -279,13 +287,13 @@ describe('MapperComposer', () => {
 
     expect(closure.value.value).toEqual([first, second]);
 
-    expect(construct.mock.calls).toEqual([[1], [2]]);
+    expect(construct).toHaveBeenCalledTimes(1);
 
-    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(cleanup).not.toHaveBeenCalled();
 
     destroy();
 
-    expect(cleanup).toHaveBeenCalledTimes(2);
+    expect(cleanup).toHaveBeenCalledTimes(1);
   });
 
   test('updates reactive configuration without rebuilding the mapper', () => {
@@ -317,7 +325,9 @@ describe('MapperComposer', () => {
 
     expect(construct).toHaveBeenCalledTimes(1);
 
-    expect(construct).toHaveBeenCalledWith(indexClosure);
+    expect(construct.mock.calls[0]?.[0]).not.toBe(indexClosure);
+
+    expect(construct.mock.calls[0]?.[0].value.value).toBe(1);
 
     destroy();
 
@@ -328,7 +338,7 @@ describe('MapperComposer', () => {
     index.destroy();
   });
 
-  test('passes array, object, and callback configuration fields unchanged', () => {
+  test('preserves array, object, and callback values inside readonly inputs', () => {
     const labels = ['first'];
 
     const options = { count: 1 };
@@ -342,14 +352,17 @@ describe('MapperComposer', () => {
     const Configured = once(
       (
         inputs: MapperInputs & {
-          labels: string[];
-          options: { count: number };
-          select: typeof select;
+          labels: IReadableClosure<string[]>;
+          options: IReadableClosure<{ count: number }>;
+          select: IReadableClosure<typeof select>;
         },
       ) => {
-        construct(inputs.labels, inputs.options, inputs.select);
+        construct(inputs.labels.value.value, inputs.options.value.value, inputs.select.value.value);
 
-        return useMap(inputs.source, (blocks) => inputs.select(blocks, inputs.options.count));
+        return useMap(
+          [inputs.source, inputs.options, inputs.select],
+          ([blocks, currentOptions, currentSelect]) => currentSelect(blocks, currentOptions.count),
+        );
       },
     );
 
@@ -366,6 +379,284 @@ describe('MapperComposer', () => {
     expect(select).toHaveBeenCalled();
 
     destroy();
+  });
+
+  test('keeps optional inputs stable across plain values, closure replacement, and removal', () => {
+    const construct = jest.fn();
+
+    const initial = MutableState.of<number | undefined>(1);
+
+    const replacement = MutableState.of<number | undefined>(1);
+
+    const initialClosure = toClosure(initial);
+
+    const replacementClosure = toClosure(replacement);
+
+    const TakeOptional = once(
+      (inputs: MapperInputs & { count?: IReadableClosure<number | undefined> }) => {
+        construct(inputs.count);
+
+        const count = useDefaults(inputs.count, 2);
+
+        return useMap([inputs.source, count], ([blocks, limit]) => blocks.slice(0, limit));
+      },
+    );
+
+    const { closure, mappers, first, second, destroy } = setup([TakeOptional]);
+
+    expect(closure.value.value).toEqual([first, second]);
+
+    const input = construct.mock.calls[0]?.[0] as IReadableClosure<number | undefined>;
+
+    expect(input.value.value).toBeUndefined();
+
+    expect('next' in input.value).toBe(false);
+
+    mappers.next([[TakeOptional, { count: 1 }]]);
+
+    expect(closure.value.value).toEqual([first]);
+
+    mappers.next([[TakeOptional, { count: initialClosure }]]);
+
+    expect(countStateObservers(initial)).toBeGreaterThan(0);
+
+    initial.next(2);
+
+    expect(closure.value.value).toEqual([first, second]);
+
+    mappers.next([[TakeOptional, { count: replacementClosure }]]);
+
+    expect(closure.value.value).toEqual([first]);
+
+    expect(countStateObservers(initial)).toBe(0);
+
+    initial.next(0);
+
+    expect(closure.value.value).toEqual([first]);
+
+    replacement.next(undefined);
+
+    expect(closure.value.value).toEqual([first, second]);
+
+    replacement.next(0);
+
+    expect(closure.value.value).toEqual([]);
+
+    mappers.next([[TakeOptional, { count: 1 }]]);
+
+    expect(closure.value.value).toEqual([first]);
+
+    expect(countStateObservers(replacement)).toBe(0);
+
+    mappers.next([[TakeOptional, {}]]);
+
+    expect(closure.value.value).toEqual([first, second]);
+
+    mappers.next([[TakeOptional, { count: replacementClosure }]]);
+
+    expect(closure.value.value).toEqual([]);
+
+    expect(construct).toHaveBeenCalledTimes(1);
+
+    expect(construct).toHaveBeenCalledWith(input);
+
+    destroy();
+
+    expect(countStateObservers(initial)).toBe(0);
+
+    expect(countStateObservers(replacement)).toBe(0);
+
+    replacement.next(2);
+
+    expect(replacementClosure.value.value).toBe(2);
+
+    expect(initialClosure.value.value).toBe(0);
+
+    initialClosure.destroy();
+
+    replacementClosure.destroy();
+
+    initial.destroy();
+
+    replacement.destroy();
+  });
+
+  test('compares plain object fields without rebuilding or emitting equivalent values', () => {
+    const construct = jest.fn();
+
+    const select = jest.fn((blocks: IBlockState<HastRoot>[], count: number) =>
+      blocks.slice(0, count),
+    );
+
+    const Select = once(
+      ({ source, options }: MapperInputs & { options: IReadableClosure<{ count: number }> }) => {
+        construct(options);
+
+        return useMap([source, options], ([blocks, value]) => select(blocks, value.count));
+      },
+    );
+
+    const { closure, mappers, first, second, destroy } = setup([
+      [Select, { options: { count: 1 } }],
+    ]);
+
+    expect(closure.value.value).toEqual([first]);
+
+    mappers.next([[Select, { options: { count: 1 }, priority: PluginPriority.High }]]);
+
+    expect(select).toHaveBeenCalledTimes(1);
+
+    mappers.next([[Select, { options: { count: 2 } }]]);
+
+    expect(closure.value.value).toEqual([first, second]);
+
+    expect(select).toHaveBeenCalledTimes(2);
+
+    expect(construct).toHaveBeenCalledTimes(1);
+
+    destroy();
+  });
+
+  test('keeps plugin metadata outside mapper inputs and leaves unused closures lazy', () => {
+    const read = jest.fn(() => {
+      throw new Error('Unused configuration must remain lazy.');
+    });
+
+    const unused = {
+      destroy: jest.fn(),
+      get value() {
+        return read();
+      },
+    };
+
+    const Observe = once((inputs: MapperInputs) => {
+      expect(Object.keys(inputs)).toEqual(['source', 'unused']);
+
+      expect(Object.hasOwn(inputs, 'missing')).toBe(false);
+
+      expect(Reflect.get(inputs, 'priority')).toBeUndefined();
+
+      expect(Reflect.get(inputs, 'disabled')).toBeUndefined();
+
+      return inputs.source;
+    });
+
+    const { closure, source, destroy } = setup([
+      [Observe, { priority: PluginPriority.High, disabled: false, unused }],
+    ]);
+
+    expect(closure.value.value).toBe(source.value);
+
+    expect(read).not.toHaveBeenCalled();
+
+    destroy();
+
+    expect(unused.destroy).not.toHaveBeenCalled();
+  });
+
+  test('settles multiple configuration fields and source updates without intermediate output', () => {
+    const Observe = once(
+      ({
+        source,
+        start,
+        end,
+      }: MapperInputs & {
+        start: IReadableClosure<number>;
+        end: IReadableClosure<number>;
+      }) => useMap([source, start, end], ([blocks, from, to]) => blocks.slice(from, to)),
+    );
+
+    const start = MutableState.of(1);
+
+    const { closure, source, mappers, first, second, destroy } = setup([
+      [Observe, { start: 0, end: 2 }],
+    ]);
+
+    const next = jest.fn();
+
+    closure.value.subscribe(next);
+
+    next.mockClear();
+
+    batch(() => {
+      mappers.next([[Observe, { start: toClosure(start), end: 1 }]]);
+
+      start.next(0);
+
+      source.next([second, first]);
+    });
+
+    expect(next).toHaveBeenCalledTimes(1);
+
+    expect(next).toHaveBeenCalledWith([second]);
+
+    destroy();
+
+    expect(countStateObservers(start)).toBe(0);
+
+    start.destroy();
+  });
+
+  test('normalizes symbol and prototype-named configuration fields', () => {
+    const count = Symbol('count');
+
+    const Observe = once(
+      (
+        inputs: MapperInputs & {
+          [count]: IReadableClosure<number>;
+          constructor: IReadableClosure<number>;
+          toString: IReadableClosure<number>;
+        },
+      ) => {
+        expect(count in inputs).toBe(true);
+
+        expect('constructor' in inputs).toBe(true);
+
+        expect(Object.getOwnPropertyDescriptor(inputs, count)?.get?.()).toBe(inputs[count]);
+
+        expect(Reflect.ownKeys(inputs)).toEqual(['source', 'constructor', 'toString', count]);
+
+        return useMap(
+          [inputs.source, inputs[count], inputs.constructor, inputs.toString],
+          ([blocks, offset, first, second]) => blocks.slice(offset, first + second),
+        );
+      },
+    );
+
+    const options = { [count]: 0, constructor: 1, toString: 0 };
+
+    const { closure, mappers, first, second, destroy } = setup([[Observe, options]]);
+
+    expect(closure.value.value).toEqual([first]);
+
+    const updated = { [count]: 1, constructor: 1, toString: 1 };
+
+    mappers.next([[Observe, updated]]);
+
+    expect(closure.value.value).toEqual([second]);
+
+    destroy();
+  });
+
+  test('preserves ordinary objects with value and destroy fields', () => {
+    const payload = { value: 1, destroy: jest.fn() };
+
+    const Observe = once(
+      ({ source, options }: MapperInputs & { options: IReadableClosure<typeof payload> }) =>
+        useMap([source, options], ([blocks, current]) => {
+          expect(current).toBe(payload);
+
+          return blocks.slice(0, current.value);
+        }),
+    );
+
+    const { closure, first, destroy } = setup([[Observe, { options: payload }]]);
+
+    expect(closure.value.value).toEqual([first]);
+
+    destroy();
+
+    expect(payload.destroy).not.toHaveBeenCalled();
   });
 
   test('releases constructed mappers if a later mapper throws', () => {

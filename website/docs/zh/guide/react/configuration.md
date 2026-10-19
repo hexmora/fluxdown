@@ -18,14 +18,14 @@
 
 **默认值：** `false`
 
-`true` 同时开启末尾修复、平滑输出和末尾渐变；`false` 关闭这三项。传对象可以分别控制，对象中省略的字段默认为 `true`。
+`true` 开启末尾语法修复和平滑输出，`false` 关闭流式行为。传对象可以选择视觉特效并分别控制各项。`repairEnding` 和 `smooth` 默认为 `true`，`effect` 默认为 `false`。
 
 ```tsx
 <Fluxdown
   streaming={{
     repairEnding: true,
     smooth: true,
-    shad: false,
+    effect: 'shad',
   }}
   text={text}
 />
@@ -82,24 +82,31 @@
 
 决定每次更新显示多少内容。`'spring'` 使用内置弹簧调度，也可以传自定义调度类。
 
-> 通常直接使用 `smooth: true` 即可。`SmoothConfig`、`SmoothTickerClass` 和 `SmoothSchedulerClass` 从 `@fluxdown/core-presets/mapper` 导入。
+> 通常直接使用 `smooth: true` 即可。`SmoothConfig` 从 `fluxdown` 导入；`SmoothTickerClass` 和 `SmoothSchedulerClass` 从 `@fluxdown/core-presets/mapper` 导入。
 
-### streaming.shad <span className="field-tag">可选</span> {#streamingshad}
+### streaming.effect <span className="field-tag">可选</span> {#streamingeffect}
 
-**类型：** `boolean | ShadConfig`
+**类型：** `boolean | EffectItem | EffectItem[]`
 
-**默认值：** `true`（`streaming` 为对象时）
+**默认值：** `false`
 
-为新出现的末尾文字添加渐变。`true` 使用默认效果，`false` 关闭效果；传对象可以调整参与渐变的字符数和遮罩宽度：
+选择内置特效、直接传入 mapper 插件，或用数组组合多个特效：
+
+| 值                            | 效果                                               |
+| ----------------------------- | -------------------------------------------------- |
+| 不传或 `false`                | 不启用视觉特效。                                   |
+| `true` 或 `'shad'`            | 使用默认配置，让新出现的末尾文字渐变显示。         |
+| `['shad', ShadPluginConfig]`  | 配置末尾渐变。                                     |
+| `Mapper`                      | 使用 mapper 的默认配置。                           |
+| `[Mapper, options]`           | 使用与 `plugins.mappers` 相同的配置来设置 mapper。 |
+| `['shad', [Mapper, options]]` | 组合内置特效与自定义特效。                         |
+
+自定义特效与 [mapper 插件](../core/plugins/mapper.md) 使用相同的配置。字段支持普通值或可读闭包；`priority` 控制顺序，`disabled` 排除某项特效。特效在平滑输出之后执行。`EffectItem` 从 `fluxdown` 导入，特效配置类型从 `@fluxdown/core-presets/mapper` 导入。
 
 ```tsx
 <Fluxdown
   streaming={{
-    shad: {
-      enabled: true,
-      length: 3,
-      maskWidth: 18,
-    },
+    effect: ['shad', { length: 3, maskWidth: 18 }],
   }}
   text={text}
 />

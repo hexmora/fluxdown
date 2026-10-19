@@ -21,7 +21,7 @@ describe('Fluxdown smooth server rendering', () => {
 
     try {
       const markup = renderToStaticMarkup(
-        <Fluxdown streaming={{ smooth: true, shad: false }} text="# Smooth server heading" />,
+        <Fluxdown streaming={{ smooth: true, effect: false }} text="# Smooth server heading" />,
       );
 
       expect(markup).toMatch(/<h1\b[^>]*>Smooth server heading<\/h1>/);

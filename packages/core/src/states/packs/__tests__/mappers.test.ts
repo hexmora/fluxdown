@@ -1,4 +1,4 @@
-import type { IBlockState, PluginSet } from '@fluxdown/types';
+import type { IBlockState, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { ElementContent, Parent, RootContent } from 'hast';
 
 import { Smooth } from '@fluxdown/core-presets/mapper';
@@ -62,9 +62,9 @@ const build = {
 const enabled: MapperPluggable = [
   Smooth,
   {
-    enabled: ReactiveState.of(true),
-    ticker: ReactiveState.of(ManualTicker),
-    scheduler: ReactiveState.of(StepSmoothScheduler),
+    enabled: true,
+    ticker: ManualTicker,
+    scheduler: StepSmoothScheduler,
   },
 ];
 
@@ -78,7 +78,10 @@ const collectText = (node: HastRoot | RootContent): string => {
       : '';
 };
 
-const setup = (initialText: string, initialMappers: PluginSet<MapperPluggable, MapperConfigs>) => {
+const setup = (
+  initialText: string,
+  initialMappers: PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>,
+) => {
   const text = MutableState.of(initialText);
 
   const mappers = MutableState.of(initialMappers);
@@ -130,9 +133,9 @@ describe('Core mapper pipeline', () => {
       [
         Smooth,
         {
-          enabled: ReactiveState.of(false),
-          ticker: ReactiveState.of(ManualTicker),
-          scheduler: ReactiveState.of(StepSmoothScheduler),
+          enabled: false,
+          ticker: ManualTicker,
+          scheduler: StepSmoothScheduler,
         },
       ],
     ]);
@@ -147,7 +150,7 @@ describe('Core mapper pipeline', () => {
   });
 
   test('configures default Smooth with empty mapper extras and preserves its progress', () => {
-    const configs: MapperConfigs = {
+    const configs: PluggableConfigs<MapperConfigs> = {
       smooth: {
         enabled: render(true),
         ticker: render(ReactiveState.of(ManualTicker)),
@@ -197,10 +200,10 @@ describe('Core mapper pipeline', () => {
   test('preserves equivalent configurations and replaces changed mapper options', () => {
     const construct = jest.fn();
 
-    const Take = once(({ source, count }: MapperInputs & { count: number }) => {
+    const Take = once(({ source, count }: MapperInputs & { count: IReadableClosure<number> }) => {
       construct(count);
 
-      return useMap(source, (blocks) => take(blocks, count));
+      return useMap([source, count], ([blocks, limit]) => take(blocks, limit));
     });
 
     const view = setup('first\n\nsecond\n\nthird', [
@@ -212,7 +215,7 @@ describe('Core mapper pipeline', () => {
     expect(view.read()).toEqual(['second', 'first']);
 
     expect(construct).toHaveBeenCalledTimes(1);
-    expect(construct).toHaveBeenCalledWith(2);
+    expect(construct.mock.calls[0]?.[0].value.value).toBe(2);
 
     view.mappers.next([[Take, { count: 2 }], Reverse]);
 
@@ -224,7 +227,7 @@ describe('Core mapper pipeline', () => {
 
     expect(view.read()).toEqual(['first']);
 
-    expect(construct).toHaveBeenCalledTimes(2);
+    expect(construct).toHaveBeenCalledTimes(1);
   });
 
   test('orders mapper tuples by priority and follows list and source updates', () => {
@@ -302,9 +305,9 @@ describe('Core mapper pipeline', () => {
       [
         Smooth,
         {
-          enabled: ReactiveState.of(false),
-          ticker: ReactiveState.of(ManualTicker),
-          scheduler: ReactiveState.of(StepSmoothScheduler),
+          enabled: false,
+          ticker: ManualTicker,
+          scheduler: StepSmoothScheduler,
         },
       ],
     ]);

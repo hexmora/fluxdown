@@ -1,5 +1,5 @@
 import type { MapperInputs, MapperPluggable } from '@fluxdown/core';
-import type { IPluggableConfig } from '@fluxdown/types';
+import type { MapperConfigInputs as ConfigInputs, MapperPluginConfig } from '@fluxdown/types';
 
 import { Shad, Smooth } from '@fluxdown/core-presets/mapper';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
@@ -10,6 +10,7 @@ import {
   MutableState,
   once,
   ReactiveState,
+  toClosure,
   useClearable,
   useDefaults,
   useMap,
@@ -23,7 +24,7 @@ import { createManualTicker, createStepScheduler } from './utils/smooth';
 
 declare global {
   interface MapperConfigs {
-    configured?: IPluggableConfig<{ count?: IReadableClosure<number> }>;
+    configured: MapperPluginConfig<{ count?: number }>;
   }
 }
 
@@ -31,8 +32,8 @@ const Reverse = once(({ source }: MapperInputs) =>
   useMap(source, (blocks) => reverse([...blocks])),
 );
 
-const Limit = once(({ source, count }: MapperInputs & { count: number }) =>
-  useMap(source, (blocks) => blocks.slice(0, count)),
+const Limit = once(({ source, count }: MapperInputs<ConfigInputs<{ count: number }>>) =>
+  useMap([source, count], ([blocks, limit]) => blocks.slice(0, limit)),
 );
 
 afterEach(async () => {
@@ -44,7 +45,7 @@ afterEach(async () => {
 });
 
 describe('Fluxdown mapper plugins', () => {
-  test('overrides mapper tuples with the streaming Smooth and Shad configuration', () => {
+  test('overrides Smooth tuples while retaining explicit mapper effects', () => {
     const ticker = createManualTicker();
 
     const scheduler = createStepScheduler(1);
@@ -53,12 +54,15 @@ describe('Fluxdown mapper plugins', () => {
       [
         Smooth,
         {
-          enabled: ReactiveState.of(true),
-          ticker: ReactiveState.of(ticker.Ticker),
-          scheduler: ReactiveState.of(scheduler),
+          enabled: toClosure(ReactiveState.of(true)),
+          ticker: toClosure(ReactiveState.of(ticker.Ticker)),
+          scheduler: toClosure(ReactiveState.of(scheduler)),
         },
       ],
-      [Shad, { enabled: ReactiveState.of(true), length: ReactiveState.of(2) }],
+      [
+        Shad,
+        { enabled: toClosure(ReactiveState.of(true)), length: toClosure(ReactiveState.of(2)) },
+      ],
     ];
 
     const content = (text: string) => <Fluxdown text={text} plugins={[{ mappers }]} />;
@@ -69,7 +73,7 @@ describe('Fluxdown mapper plugins', () => {
 
     expect(view.container.textContent).toBe('abc');
 
-    expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
+    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('bc');
 
     expect(ticker.instances).toHaveLength(0);
   });
@@ -86,10 +90,7 @@ describe('Fluxdown mapper plugins', () => {
     const received = jest.fn();
 
     const Configured = Object.assign(
-      once(function Configured({
-        source,
-        count,
-      }: MapperInputs & { count?: IReadableClosure<number> }) {
+      once(function Configured({ source, count }: MapperInputs<ConfigInputs<{ count?: number }>>) {
         received(count);
 
         const limit = useDefaults(count, 1);
@@ -110,11 +111,15 @@ describe('Fluxdown mapper plugins', () => {
 
     expect(view.container.textContent).toBe('first');
 
-    expect(received).toHaveBeenLastCalledWith(left);
+    expect(received).toHaveBeenCalledTimes(1);
+
+    const input = received.mock.calls[0]?.[0];
+
+    expect(input).not.toBe(left);
 
     view.rerender(content(right));
 
-    await waitFor(() => expect(received).toHaveBeenLastCalledWith(right));
+    expect(received).toHaveBeenCalledTimes(1);
 
     act(() => state.next(2));
 
@@ -165,12 +170,12 @@ describe('Fluxdown mapper plugins', () => {
 
     const destroyed = jest.fn();
 
-    const Tracked = once(({ source, count }: MapperInputs & { count: number }) => {
+    const Tracked = once(({ source, count }: MapperInputs<ConfigInputs<{ count: number }>>) => {
       created(count);
 
       useClearable(() => destroyed(count));
 
-      return useMap(source, (blocks) => blocks.slice(0, count));
+      return useMap([source, count], ([blocks, limit]) => blocks.slice(0, limit));
     });
 
     const content = (count: number) => (
@@ -228,7 +233,7 @@ describe('Fluxdown mapper plugins', () => {
     const smooth = { enabled: true, ticker: ticker.Ticker, scheduler };
 
     const renderContent = (text: string, mappers: MapperPluggable[] = []) => (
-      <Fluxdown streaming={{ smooth, shad: false }} text={text} plugins={[{ mappers }]} />
+      <Fluxdown streaming={{ smooth, effect: false }} text={text} plugins={[{ mappers }]} />
     );
 
     const view = render(renderContent('a'));

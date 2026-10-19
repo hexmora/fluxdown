@@ -1,4 +1,4 @@
-import type { IBlockState, MapperInputs } from '@fluxdown/types';
+import type { IBlockState, MapperConfigInputs, MapperInputs } from '@fluxdown/types';
 
 import { expectTypeOf } from 'expect-type';
 import {
@@ -11,7 +11,7 @@ import {
   toClosure,
 } from 'stative';
 
-import type { SmoothBaseInputs, SmoothInputs } from '..';
+import type { BaseSmoothConfig, SmoothBaseInputs } from '..';
 import type { CutoffBlocksInputs, SmoothCursorInputs } from '../states';
 import type { SmoothPosition } from '../states/smooth-cursor/states';
 
@@ -39,7 +39,9 @@ test('parent inputs preserve the contracts owned by their child states', () => {
     .toHaveProperty('count')
     .toEqualTypeOf<number>();
 
-  expectTypeOf<Required<SmoothInputs<string>>>().toEqualTypeOf<SmoothCursorInputs<string>>();
+  expectTypeOf<
+    Required<MapperInputs<MapperConfigInputs<BaseSmoothConfig>, IBlockState<string>[]>>
+  >().toEqualTypeOf<SmoothCursorInputs<string>>();
 
   expectTypeOf<CutoffBlocksInputs<string>>()
     .toHaveProperty('items')

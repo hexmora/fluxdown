@@ -5,6 +5,7 @@ import type {
   IRehypePlugin,
   IRemarkPlugin,
   IRepairPlugin,
+  PluggableConfigs,
   PluginSet,
 } from '@fluxdown/types';
 /** @jsxImportSource stative */
@@ -19,6 +20,7 @@ import {
   type IReadableClosure,
   type JSXDescriptor,
   MutableState,
+  once,
   render,
   S,
 } from 'stative';
@@ -29,7 +31,7 @@ import type {
   IRenderPlugin,
   IRenderPluginRenderParams,
 } from '../../../../externals';
-import type { MapperPluggable } from '../../../base';
+import type { MapperInputs, MapperPluggable } from '../../../base';
 import type { BlockCompilerConfig, BlockRemarksConfig } from '../../../hast';
 
 import {
@@ -70,7 +72,7 @@ const getPluggableClass = <T extends IPluginWithConfig>(pluggable: IPluggable<T,
 
 describe('pack state mappers', () => {
   test('combines mapper configurations reactively and reuses equivalent outputs', () => {
-    const extras = MutableState.of<PluginSet<MapperPluggable, MapperConfigs>>([]);
+    const extras = MutableState.of<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>>([]);
 
     const state = render(S([MapperPluggables, { extras }]));
 
@@ -105,6 +107,39 @@ describe('pack state mappers', () => {
     extras.destroy();
 
     enabled.destroy();
+  });
+
+  test('keeps explicit mapper order and uses the last configuration for duplicate mappers', () => {
+    const Identity = once(({ source }: MapperInputs) => source);
+
+    const enabled = render(true);
+
+    const length = render(2);
+
+    const extras = MutableState.of<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>>([
+      [Identity, Shad],
+      { shad: { enabled } },
+    ]);
+
+    const state = render(S([MapperPluggables, { extras }]));
+
+    expect(state.value.value).toEqual([Smooth, Identity, [Shad, { enabled }]]);
+
+    extras.next([Shad, Identity, [Shad, { length }]]);
+
+    expect(state.value.value).toEqual([Smooth, [Shad, { length }], Identity]);
+
+    extras.next([Identity, Shad, Smooth, [Identity, { priority: 1 }]]);
+
+    expect(state.value.value).toEqual([[Identity, { priority: 1 }], Shad, Smooth]);
+
+    state.destroy();
+
+    extras.destroy();
+
+    enabled.destroy();
+
+    length.destroy();
   });
 
   test('combines render configurations reactively without constructing plugin instances', () => {

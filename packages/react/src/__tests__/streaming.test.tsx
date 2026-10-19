@@ -28,7 +28,7 @@ describe('Fluxdown streaming options', () => {
     { streaming: true, repaired: true },
     { streaming: {}, repaired: true },
     { streaming: { repairEnding: false }, repaired: false },
-    { streaming: { smooth: false, shad: false }, repaired: true },
+    { streaming: { smooth: false, effect: false }, repaired: true },
   ])('repairs incomplete endings with streaming=$streaming', ({ streaming, repaired }) => {
     const view = render(<Fluxdown streaming={streaming} text="**ending" />);
 
@@ -37,7 +37,7 @@ describe('Fluxdown streaming options', () => {
     expect(view.container.textContent).toBe(repaired ? 'ending' : '**ending');
   });
 
-  test('enables smoothing, fading, and ending repairs together with boolean streaming', async () => {
+  test('enables smoothing and ending repairs without an effect with boolean streaming', async () => {
     const clock = createRafClock();
 
     const view = render(<Fluxdown streaming text="" />);
@@ -50,9 +50,9 @@ describe('Fluxdown streaming options', () => {
 
     expect(view.container.querySelector('strong')).not.toBeNull();
 
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent(/\S/);
+    expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
 
-    expect(view.container.querySelector(`.${styles.mask}`)).not.toBeNull();
+    expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
 
     view.rerender(<Fluxdown streaming={false} text="**ending" />);
 
@@ -68,7 +68,7 @@ describe('Fluxdown streaming options', () => {
   test('updates ending repairs for existing text without replacing the core', () => {
     const ref = createRef<FluxdownRef>();
 
-    const streaming = { smooth: false, shad: false };
+    const streaming = { smooth: false, effect: false };
 
     const view = render(<Fluxdown ref={ref} streaming={streaming} text="**ending" />);
 
@@ -103,7 +103,7 @@ describe('Fluxdown streaming options', () => {
     }
 
     const plugins = [{ remarks: [CompileCounterRemarkPlugin] }];
-    const streaming = { smooth: false, shad: false };
+    const streaming = { smooth: false, effect: false };
     const text = 'first<img\n\nsecond\n\n**ending';
 
     const view = render(<Fluxdown plugins={plugins} streaming={streaming} text={text} />);
@@ -141,7 +141,7 @@ describe('Fluxdown streaming options', () => {
 
   test.each<{ streaming: FluxdownProps['streaming']; repairedEnding: boolean }>([
     { streaming: false, repairedEnding: false },
-    { streaming: { smooth: false, shad: false }, repairedEnding: true },
+    { streaming: { smooth: false, effect: false }, repairedEnding: true },
   ])(
     'honors and removes an explicit repair override with streaming=$streaming',
     ({ streaming, repairedEnding }) => {

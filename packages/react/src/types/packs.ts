@@ -1,7 +1,18 @@
 import type { BlockCompilerConfig, IPatchItem, MapperPluggable } from '@fluxdown/core';
-import type { ShadConfig as CoreShadConfig, SmoothConfig } from '@fluxdown/core-presets/mapper';
+import type {
+  SchedulerType,
+  SmoothSchedulerClass,
+  SmoothTickerClass,
+  TickerType,
+} from '@fluxdown/core-presets/mapper';
 import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-presets/base';
-import type { IPluggable, IRehypePlugin, IRemarkPlugin, IRepairPlugin } from '@fluxdown/types';
+import type {
+  IPluggable,
+  IPluggableConfig,
+  IRehypePlugin,
+  IRemarkPlugin,
+  IRepairPlugin,
+} from '@fluxdown/types';
 import type { CSSProperties, ReactNode } from 'react';
 import type { IReadableClosure } from 'stative';
 
@@ -26,12 +37,27 @@ export interface IPluginItem {
 
 export type BaseBuildConfig = Partial<Omit<BlockCompilerConfig, 'repairEnding'>>;
 
-export interface ShadConfig extends CoreShadConfig {
+export type EffectItem =
+  | keyof EffectConfigs
+  | { [K in keyof EffectConfigs]: [K, IPluggableConfig<EffectConfigs[K]>] }[keyof EffectConfigs]
+  | MapperPluggable;
+
+export interface SmoothConfig {
   /**
-   * Width of the trailing mask in pixels. Set to 0 to hide it.
-   * @default 15
+   * Reveal newly compiled content over successive ticks.
+   * @default false
    */
-  maskWidth?: number;
+  enabled?: boolean;
+
+  /**
+   * Built-in timestamp source name or a custom ticker constructor.
+   */
+  ticker: TickerType | SmoothTickerClass;
+
+  /**
+   * Built-in progress scheduler name or a custom scheduler constructor.
+   */
+  scheduler: SchedulerType | SmoothSchedulerClass;
 }
 
 export interface StreamingConfig {
@@ -48,10 +74,11 @@ export interface StreamingConfig {
   smooth?: boolean | SmoothConfig;
 
   /**
-   * Fade the trailing characters of newly revealed content.
-   * @default true
+   * One effect or an ordered list of effects applied to newly revealed content.
+   * Set to true to enable the default trailing fade.
+   * @default false
    */
-  shad?: boolean | ShadConfig;
+  effect?: boolean | EffectItem | EffectItem[];
 }
 
 export interface FluxdownProps {

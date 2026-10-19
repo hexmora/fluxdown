@@ -15,12 +15,19 @@ export const ShadBlock = /*#__PURE__*/ once(function ShadBlock({
   source,
   tail,
   progress,
+  maskWidth,
 }: ShadBlockInputs): IReactiveState<IBlockState<HastRoot>> {
   const fork = useClearable(
     source.fork({
       mapper: (_value, current) =>
         render(
-          <ShadValue source={D(source)} current={D(current)} tail={tail} progress={progress} />,
+          <ShadValue
+            source={D(source)}
+            current={D(current)}
+            tail={tail}
+            progress={progress}
+            maskWidth={maskWidth}
+          />,
         ),
     }),
   );

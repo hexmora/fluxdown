@@ -6,6 +6,7 @@ import type { IReadableClosure } from '../../../../..';
 import {
   BaseStateClosure,
   D,
+  isReadableClosure,
   MutableState,
   once,
   ReactiveState,
@@ -15,7 +16,6 @@ import {
   useCreate,
   useMap,
 } from '../../../../..';
-import { isReadableClosure } from '../predicates';
 
 const power = (value: number) => value ** 2;
 

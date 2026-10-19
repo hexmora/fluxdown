@@ -61,6 +61,30 @@ const PriceLabel = once(({ quantity, price }: PriceInputs) => {
 
 这些辅助函数在 `once` 函数体内同步调用，属于 Stative 的运行环境，不是 React Hooks。
 
+## 直接组合 hooks
+
+使用 `renderHooks` 可以直接组合 hooks，无需声明可复用的状态组件：
+
+```ts
+import { MutableState, renderHooks, useFlatten } from 'stative';
+
+const config = MutableState.of({ count: 1 });
+
+const scope = renderHooks(() => useFlatten(config));
+
+const fields = scope.value.value;
+
+config.next({ count: 2 });
+
+console.log(fields.count.value.value); // 2
+
+scope.destroy();
+
+config.destroy();
+```
+
+回调在首次访问结果时执行一次，支持与 `once` 相同的 hooks。返回值原样保留，包括其中的闭包和 descriptor。`scope.destroy()` 释放作用域管理的资源；`config` 等借用的数据源仍保留自己的生命周期。
+
 ## class 式：通过实例组织计算
 
 继承 `BaseStateClosure`，在 `render()` 中连接输入与输出：

@@ -43,19 +43,16 @@ import "fluxdown/styles.css";
 
 | Option               | Purpose                                                                       |
 | -------------------- | ----------------------------------------------------------------------------- |
-| `streaming`          | Enable or configure trailing syntax repair, smooth output, and trailing fade. |
+| `streaming`          | Configure trailing syntax repair, smooth output, and optional visual effects. |
 | `theme`              | Use the light or dark preset, or override colors, typography, and spacing.    |
 | `build`              | Enable syntax such as formulas and footnotes.                                 |
 | `plugins`            | Customize parsing, rendering, semantic slots, and interactions.               |
 | `className`, `style` | Set container layout and styling.                                             |
 
-`streaming={true}` enables all three effects. An object lets you choose them separately; omitted fields default to `true`. For example, keep trailing repair and smooth output while disabling the trailing fade:
+`streaming={true}` enables trailing repair and smooth output. Add an optional visual effect:
 
 ```tsx
-<Fluxdown
-  text={text}
-  streaming={isStreaming && { repairEnding: true, smooth: true, shad: false }}
-/>
+<Fluxdown text={text} streaming={isStreaming && { effect: "shad" }} />
 ```
 
 ## Documentation

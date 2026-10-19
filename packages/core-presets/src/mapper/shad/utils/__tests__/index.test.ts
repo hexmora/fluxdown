@@ -50,10 +50,32 @@ const getParts = (output: Root) => {
 };
 
 describe('createShadRoot', () => {
+  test.each([
+    { maskWidth: undefined, expected: 15 },
+    { maskWidth: 0, expected: 0 },
+    { maskWidth: 6.5, expected: 6.5 },
+    { maskWidth: -1, expected: 0 },
+    { maskWidth: Number.NaN, expected: 15 },
+    { maskWidth: Number.POSITIVE_INFINITY, expected: 15 },
+    { maskWidth: Number.NEGATIVE_INFINITY, expected: 15 },
+  ])('carries mask width $maskWidth on the host', ({ maskWidth, expected }) => {
+    const source = root([element('p', [text('abcdef')])]);
+
+    const output = createShadRoot({ root: source, length: 3, activeLength: 2, maskWidth });
+
+    expect(getHost(output)?.properties.dataShadMaskWidth).toBe(expected);
+
+    expect(getParts(output)).toEqual(['d', 'ef']);
+
+    expect(getText(output)).toBe(getText(source));
+
+    expect(sizeOfHast(output)).toBe(sizeOfHast(source));
+  });
+
   test.each([0, -1, 0.5, Number.NaN])('returns the source when length is %s', (length) => {
     const source = root([element('p', [text('abc')])]);
 
-    expect(createShadRoot(source, { length, activeLength: 1 })).toBe(source);
+    expect(createShadRoot({ root: source, length, activeLength: 1 })).toBe(source);
   });
 
   test.each([
@@ -66,7 +88,7 @@ describe('createShadRoot', () => {
     { activeLength: Number.NaN, expected: ['def', ''] },
   ])('keeps a stable host with activeLength $activeLength', ({ activeLength, expected }) => {
     const source = root([element('p', [text('abcdef')])]);
-    const output = createShadRoot(source, { length: 3, activeLength });
+    const output = createShadRoot({ root: source, length: 3, activeLength });
 
     expect(getParts(output)).toEqual(expected);
     expect(output.children[0]).toMatchObject({
@@ -78,7 +100,7 @@ describe('createShadRoot', () => {
 
   test('splits emoji and combining characters as complete graphemes', () => {
     const source = root([text('A👨‍👩‍👧‍👦e\u0301🇨🇳')]);
-    const output = createShadRoot(source, { length: 3, activeLength: 2 });
+    const output = createShadRoot({ root: source, length: 3, activeLength: 2 });
 
     expect(output.children[0]).toEqual(text('A'));
     expect(getParts(output)).toEqual(['👨‍👩‍👧‍👦', 'e\u0301🇨🇳']);
@@ -90,7 +112,7 @@ describe('createShadRoot', () => {
     const strong = element('strong', [text('bc')], { className: ['bold'] });
     const source = root([untouched, element('p', [text('a'), strong, text('def')])]);
     const snapshot = structuredClone(source);
-    const output = createShadRoot(source, { length: 5, activeLength: 3 });
+    const output = createShadRoot({ root: source, length: 5, activeLength: 3 });
     const host = getHost(output);
 
     expect(source).toEqual(snapshot);
@@ -106,7 +128,7 @@ describe('createShadRoot', () => {
   test('keeps the host inside the deepest parent that can provide the configured tail', () => {
     const prefix = text('prefix ');
     const source = root([element('p', [prefix, element('em', [text('abcdef')])])]);
-    const output = createShadRoot(source, { length: 3, activeLength: 2 });
+    const output = createShadRoot({ root: source, length: 3, activeLength: 2 });
     const paragraph = output.children[0] as Element;
     const emphasis = paragraph.children[1] as Element;
 
@@ -120,7 +142,7 @@ describe('createShadRoot', () => {
     (tagName) => {
       const source = root([text('safe'), element(tagName, [text('opaque')])]);
 
-      expect(createShadRoot(source, { length: 3, activeLength: 2 })).toBe(source);
+      expect(createShadRoot({ root: source, length: 3, activeLength: 2 })).toBe(source);
     },
   );
 
@@ -129,7 +151,7 @@ describe('createShadRoot', () => {
     (tagName) => {
       const trailing = element(tagName);
       const source = root([element('p', [text('abc'), trailing])]);
-      const output = createShadRoot(source, { length: 2, activeLength: 1 });
+      const output = createShadRoot({ root: source, length: 2, activeLength: 1 });
 
       expect(getParts(output)).toEqual(['b', 'c']);
       expect((output.children[0] as Element).children[2]).toBe(trailing);
@@ -140,7 +162,7 @@ describe('createShadRoot', () => {
   test('skips a forbidden subtree containing only formatting whitespace', () => {
     const trailing = element('code', [text('\n')]);
     const source = root([element('p', [text('abc'), trailing])]);
-    const output = createShadRoot(source, { length: 2, activeLength: 1 });
+    const output = createShadRoot({ root: source, length: 2, activeLength: 1 });
 
     expect(getParts(output)).toEqual(['b', 'c']);
     expect((output.children[0] as Element).children[2]).toBe(trailing);
@@ -150,7 +172,7 @@ describe('createShadRoot', () => {
     'includes an ordinary %s element in the inline suffix',
     (tagName) => {
       const source = root([element('p', [text('ab'), element(tagName, [text('cd')])])]);
-      const output = createShadRoot(source, { length: 4, activeLength: 2 });
+      const output = createShadRoot({ root: source, length: 4, activeLength: 2 });
 
       expect(getParts(output)).toEqual(['ab', 'cd']);
       expect(getHost(output)?.children[1]).toMatchObject({
@@ -163,7 +185,7 @@ describe('createShadRoot', () => {
   test.each(['inline-math', 'block-math'])('does not split a %s placeholder', (dataType) => {
     const source = root([text('safe'), element('span', [text('x+y')], { dataType })]);
 
-    expect(createShadRoot(source, { length: 3, activeLength: 2 })).toBe(source);
+    expect(createShadRoot({ root: source, length: 3, activeLength: 2 })).toBe(source);
   });
 
   test.each([
@@ -173,13 +195,13 @@ describe('createShadRoot', () => {
   ])('does not animate a patch or its adjacent text', (...children) => {
     const source = root(children);
 
-    expect(createShadRoot(source, { length: 3, activeLength: 2 })).toBe(source);
+    expect(createShadRoot({ root: source, length: 3, activeLength: 2 })).toBe(source);
   });
 
   test.each(['a', 'code'])('does not extend through a preceding %s subtree', (tagName) => {
     const opaque = element(tagName, [text('opaque')]);
     const source = root([element('p', [text('prefix'), opaque, text('tail')])]);
-    const output = createShadRoot(source, { length: 20, activeLength: 20 });
+    const output = createShadRoot({ root: source, length: 20, activeLength: 20 });
 
     expect((output.children[0] as Element).children[1]).toBe(opaque);
     expect(getParts(output)).toEqual(['', 'tail']);
@@ -189,7 +211,7 @@ describe('createShadRoot', () => {
   test.each(['p', 'h2', 'div', 'li'])('does not cross %s block siblings', (tagName) => {
     const preceding = element('p', [text('earlier')]);
     const source = root([preceding, element(tagName, [element('em', [text('T')])])]);
-    const output = createShadRoot(source, { length: 20, activeLength: 20 });
+    const output = createShadRoot({ root: source, length: 20, activeLength: 20 });
 
     expect(output.children[0]).toBe(preceding);
     expect(getParts(output)).toEqual(['', 'T']);
@@ -201,7 +223,7 @@ describe('createShadRoot', () => {
     [text('abc'), element('p', [text('d')])],
   ])('stops at a direct block and inline sibling boundary', (...children) => {
     const source = root(children);
-    const output = createShadRoot(source, { length: 4, activeLength: 4 });
+    const output = createShadRoot({ root: source, length: 4, activeLength: 4 });
 
     expect(getParts(output)).toEqual(['', 'd']);
     expect(getText(output)).toBe('abcd');
@@ -209,7 +231,7 @@ describe('createShadRoot', () => {
 
   test('extends past a block inside an inline wrapper when its outer siblings remain inline', () => {
     const source = root([text('abc'), element('x-box', [element('p', [text('d')])])]);
-    const output = createShadRoot(source, { length: 4, activeLength: 1 });
+    const output = createShadRoot({ root: source, length: 4, activeLength: 1 });
 
     expect(output.children[0]).toBe(getHost(output));
     expect(getParts(output)).toEqual(['abc', 'd']);
@@ -221,7 +243,7 @@ describe('createShadRoot', () => {
 
   test('includes a preceding inline wrapper even when its first child is a block', () => {
     const source = root([text('a'), element('x-box', [element('p', [text('b')])]), text('c')]);
-    const output = createShadRoot(source, { length: 4, activeLength: 2 });
+    const output = createShadRoot({ root: source, length: 4, activeLength: 2 });
 
     expect(output.children[0]).toBe(getHost(output));
     expect(getParts(output)).toEqual(['a', 'bc']);
@@ -236,7 +258,7 @@ describe('createShadRoot', () => {
 
   test.each(['\n', '\r\n'])('limits the suffix to the last line after %j', (newline) => {
     const source = root([element('p', [text(`before${newline}tail`)])]);
-    const output = createShadRoot(source, { length: 20, activeLength: 2 });
+    const output = createShadRoot({ root: source, length: 20, activeLength: 2 });
 
     expect(getParts(output)).toEqual(['ta', 'il']);
     expect(getText(output)).toBe(getText(source));
@@ -248,7 +270,7 @@ describe('createShadRoot', () => {
     { value: 'abc\r', expected: ['ab', 'c\r'] },
   ])('keeps a standalone carriage return in the suffix for $value', ({ value, expected }) => {
     const source = root([element('p', [text(value)])]);
-    const output = createShadRoot(source, { length: 20, activeLength: 2 });
+    const output = createShadRoot({ root: source, length: 20, activeLength: 2 });
 
     expect(getParts(output)).toEqual(expected);
     expect(sizeOfHast(output)).toBe(sizeOfHast(source));
@@ -261,7 +283,7 @@ describe('createShadRoot', () => {
   ])('does not skip an empty trailing text to shade earlier content', (...children) => {
     const source = root(children);
 
-    expect(createShadRoot(source, { length: 3, activeLength: 2 })).toBe(source);
+    expect(createShadRoot({ root: source, length: 3, activeLength: 2 })).toBe(source);
   });
 
   test.each([
@@ -271,13 +293,13 @@ describe('createShadRoot', () => {
   ])('returns the source when the last line is empty', (...children) => {
     const source = root([element('p', children)]);
 
-    expect(createShadRoot(source, { length: 3, activeLength: 2 })).toBe(source);
+    expect(createShadRoot({ root: source, length: 3, activeLength: 2 })).toBe(source);
   });
 
   test('stops at br and visible leaf siblings', () => {
     for (const tagName of ['br', 'img']) {
       const source = root([element('p', [text('before'), element(tagName), text('tail')])]);
-      const output = createShadRoot(source, { length: 20, activeLength: 20 });
+      const output = createShadRoot({ root: source, length: 20, activeLength: 20 });
 
       expect(getParts(output)).toEqual(['', 'tail']);
       expect(sizeOfHast(output)).toBe(sizeOfHast(source));
@@ -288,7 +310,7 @@ describe('createShadRoot', () => {
     const image = element('img', [], { src: 'image.png' });
     const formatting = text('\n');
     const source = root([element('p', [text('tail'), image]), formatting]);
-    const output = createShadRoot(source, { length: 3, activeLength: 2 });
+    const output = createShadRoot({ root: source, length: 3, activeLength: 2 });
 
     expect(getParts(output)).toEqual(['a', 'il']);
     expect((output.children[0] as Element).children[2]).toBe(image);
@@ -300,7 +322,7 @@ describe('createShadRoot', () => {
     const hidden = element('script', [text('hidden')]);
     const comment: RootContent = { type: 'comment', value: 'comment' };
     const source = root([element('p', [text('AB'), hidden, comment, text('CD')])]);
-    const output = createShadRoot(source, { length: 4, activeLength: 2 });
+    const output = createShadRoot({ root: source, length: 4, activeLength: 2 });
     const host = getHost(output);
     const leading = host?.children[0] as Element;
 
@@ -313,7 +335,7 @@ describe('createShadRoot', () => {
   test('retains descendants after the last text when the effect spans inline siblings', () => {
     const image = element('img');
     const source = root([element('p', [text('AB'), element('em', [text('CD'), image])])]);
-    const output = createShadRoot(source, { length: 3, activeLength: 2 });
+    const output = createShadRoot({ root: source, length: 3, activeLength: 2 });
     const paragraph = output.children[0] as Element;
 
     expect(getParts(output)).toEqual(['B', 'CD']);
@@ -337,7 +359,7 @@ describe('createShadRoot', () => {
       ]),
       text('\n'),
     ]);
-    const output = createShadRoot(source, { length: 20, activeLength: 20 });
+    const output = createShadRoot({ root: source, length: 20, activeLength: 20 });
     const table = output.children[0] as Element;
     const body = table.children[1] as Element;
     const row = body.children[1] as Element;

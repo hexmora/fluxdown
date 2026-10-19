@@ -9,6 +9,7 @@ export const ShadValue = /*#__PURE__*/ once(function ShadValue({
   current,
   tail,
   progress,
+  maskWidth,
 }: ShadValueInputs) {
   // Reapply the preceding mapper with this fork's range and keep its inputs alive independently.
   const previous = useClearable(source.fork({ range: current.range, meta: current.meta }));
@@ -17,8 +18,8 @@ export const ShadValue = /*#__PURE__*/ once(function ShadValue({
 
   return useSwitchMap(active, (isTail) =>
     isTail
-      ? mapClosure([previous.value, progress], ([root, position]) =>
-          position.length > 0 ? createShadRoot(root, position) : root,
+      ? mapClosure([previous.value, progress, maskWidth], ([root, position, width]) =>
+          position.length > 0 ? createShadRoot({ root, ...position, maskWidth: width }) : root,
         )
       : previous.value,
   );

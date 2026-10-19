@@ -23,11 +23,17 @@ import type {
 import type { StateClosureRef } from './type';
 
 import { getReadableClosureScope, ownReadableClosure } from '../../../__internal__';
-import { flattenClosure, mapClosure, selectClosure, toClosure } from '../../main';
+import {
+  FactoryReadableClosure,
+  flattenClosure,
+  mapClosure,
+  selectClosure,
+  toClosure,
+} from '../../main';
 import { isStateClosureDescriptor, StateClosureHookRuntime } from '../../utils';
 import { mapKeyedClosure } from '../keyed';
 import { mapEachClosure, switchMapClosure } from '../operator';
-import { render } from '../render';
+import { D, render } from '../render';
 
 export * from './type';
 
@@ -168,12 +174,20 @@ export function useCreate<T>(source: StateClosureSource<T>): IReadableClosure<T>
 }
 
 export const useDefaults = <T>(
-  source: IReadableClosure<T> | null | undefined,
+  source: IReadableClosure<T | undefined> | null | undefined,
   fallback: StateClosureSource<T>,
 ): IReadableClosure<T> => {
   StateClosureHookRuntime.require('useDefaults', 'once');
 
-  return useCreate(source ?? fallback);
+  if (!source) {
+    return useCreate(fallback);
+  }
+
+  const defaults = useCreate(FactoryReadableClosure.create(() => toClosure(fallback)));
+
+  return useSwitchMap<IReadableClosure<T | undefined>, T>(source, (value) =>
+    value === undefined ? defaults.value : D(value),
+  );
 };
 
 export const useDefaultsFalsy = <T>(

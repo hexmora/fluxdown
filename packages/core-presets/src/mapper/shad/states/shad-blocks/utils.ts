@@ -19,12 +19,25 @@ export const clearShadBlocks = (entries: Map<IBlockState<HastRoot>, ShadBlockEnt
   cleanup.unsubscribe();
 };
 
-export const toShadBlocks = (
-  entries: Map<IBlockState<HastRoot>, ShadBlockEntry>,
-  items: IBlockState<HastRoot>[],
-  tail: IReadableClosure<IBlockState<HastRoot> | undefined>,
-  progress: IReadableClosure<ShadPosition>,
-): IBlockState<HastRoot>[] => {
+export interface ToShadBlocksParams {
+  entries: Map<IBlockState<HastRoot>, ShadBlockEntry>;
+
+  items: IBlockState<HastRoot>[];
+
+  tail: IReadableClosure<IBlockState<HastRoot> | undefined>;
+
+  progress: IReadableClosure<ShadPosition>;
+
+  maskWidth: IReadableClosure<number>;
+}
+
+export const toShadBlocks = ({
+  entries,
+  items,
+  tail,
+  progress,
+  maskWidth,
+}: ToShadBlocksParams): IBlockState<HastRoot>[] => {
   const retained = new Set(items);
 
   for (const [source, entry] of entries) {
@@ -42,7 +55,7 @@ export const toShadBlocks = (
       return existing.block;
     }
 
-    const closure = render(S([ShadBlock, { source: D(source), tail, progress }]));
+    const closure = render(S([ShadBlock, { source: D(source), tail, progress, maskWidth }]));
 
     try {
       const block = closure.value.value;

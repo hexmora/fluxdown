@@ -24,13 +24,13 @@ import {
   isReactiveStateLike,
   ownReadableClosure,
 } from '../../../__internal__';
+import { isReadableClosure } from '../../exports/predicates';
 import { toClosure } from '../../main';
 import { StateClosureHookRuntime } from '../hook-runtime';
 import { isOnceFunction } from '../once';
 import { createMappedStateClosure } from './mapped';
 import {
   isImmediateDescriptor,
-  isReadableClosure,
   isReadableSourceDescriptor,
   isSlottedDescriptor,
   unwrapImmediateDescriptor,

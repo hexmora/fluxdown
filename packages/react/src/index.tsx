@@ -1,9 +1,10 @@
 import type { MapperPluggable } from '@fluxdown/core';
 import type { ReactRenderExtraParams } from '@fluxdown/react-presets/base';
-import type { PluginSet } from '@fluxdown/types';
+import type { PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { ReactNode } from 'react';
 
 import { Core, isPluggablesEqual, isPluginSetEqual } from '@fluxdown/core';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/mapper';
 import {
   SlotProvider,
   useDeferredUnmount,
@@ -22,7 +23,7 @@ import type { FluxdownProps, FluxdownRef } from './types';
 
 import { RootReconciler } from './components';
 import { EL, EO } from './consts';
-import { usePluginConfig, usePlugins, useShadStyles } from './hooks';
+import { usePlugins } from './hooks';
 import { ReactRenderer } from './modules';
 import styles from './styles/index.module.scss';
 import { useThemeStyles } from './theme';
@@ -30,7 +31,8 @@ import {
   isPatchesEqual,
   isPropsEqual,
   toBuildConfig,
-  toShadConfig,
+  toEffectMappers,
+  toEffects,
   toSmoothConfig,
   toStreamingConfig,
 } from './utils';
@@ -51,19 +53,17 @@ export const Fluxdown = /*#__PURE__*/ memo(
     },
     ref,
   ) {
-    const { repairEnding, smooth: _smooth, shad: _shad } = toStreamingConfig(streaming);
+    const { repairEnding, smooth: _smooth, effect } = toStreamingConfig(streaming);
 
     const themeStyles = useThemeStyles(theme);
 
-    const shadStyles = useShadStyles(_shad);
+    const effects = toEffectMappers(toEffects(effect), PRESET_MAPPER_PLUGINS);
 
     const idPrefix = useId();
 
     const build = useStateOf(toBuildConfig({ base: _build, repairEnding, idPrefix }), shallowEqual);
 
-    const smooth = usePluginConfig(toSmoothConfig(_smooth));
-
-    const shad = usePluginConfig(toShadConfig(_shad));
+    const smooth = toSmoothConfig(_smooth);
 
     const patches = useStateOf(_patches, isPatchesEqual);
 
@@ -89,8 +89,8 @@ export const Fluxdown = /*#__PURE__*/ memo(
 
     const repairs = useStateOf(_repairs, isPluggablesEqual);
 
-    const mappers = useStateOf<PluginSet<MapperPluggable, MapperConfigs>>(
-      [_mappers, { smooth, shad }],
+    const mappers = useStateOf<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>>(
+      [[..._mappers, ...effects], { smooth }],
       isPluginSetEqual,
     );
 
@@ -121,10 +121,7 @@ export const Fluxdown = /*#__PURE__*/ memo(
 
     return (
       <SlotProvider plugins={slots}>
-        <RootReconciler
-          className={cn(styles.root, className)}
-          style={{ ...themeStyles, ...shadStyles, ...style }}
-        >
+        <RootReconciler className={cn(styles.root, className)} style={{ ...themeStyles, ...style }}>
           {core.value}
         </RootReconciler>
       </SlotProvider>

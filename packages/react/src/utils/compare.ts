@@ -6,6 +6,7 @@ import type { FluxdownProps, IPluginItem } from '../types';
 
 import { EL, EO } from '../consts';
 import { toStreamingConfig } from './config';
+import { toEffects } from './effect';
 import { isPatchesEqual } from './patches';
 
 const isPluginItemEqual = (left: IPluginItem, right: IPluginItem): boolean => {
@@ -60,7 +61,9 @@ export const isPropsEqual = (
     shallowEqual(left.style ?? EO, right.style ?? EO),
     isEqual(left.theme ?? 'light', right.theme ?? 'light'),
     shallowEqual(left.build ?? EO, right.build ?? EO),
-    isEqual(leftStreaming, rightStreaming),
+    leftStreaming.repairEnding === rightStreaming.repairEnding,
+    isPluginConfigEqual(leftStreaming.smooth, rightStreaming.smooth),
+    isPluggablesEqual(toEffects(leftStreaming.effect), toEffects(rightStreaming.effect)),
     isPatchesEqual(left.patches ?? EL, right.patches ?? EL),
     isPluginItemsEqual(left.plugins, right.plugins),
   ].every((item) => item);

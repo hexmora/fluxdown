@@ -12,6 +12,7 @@ import { clearShadBlocks, toShadBlocks } from './utils';
 export const ShadBlocks = /*#__PURE__*/ once(function ShadBlocks({
   source,
   progress,
+  maskWidth,
 }: ShadBlocksInputs) {
   const entries = new Map<IBlockState<HastRoot>, ShadBlockEntry>();
 
@@ -24,7 +25,7 @@ export const ShadBlocks = /*#__PURE__*/ once(function ShadBlocks({
 
   const blocks = useMap(
     source,
-    (items) => toShadBlocks(entries, items, tail, progress),
+    (items) => toShadBlocks({ entries, items, tail, progress, maskWidth }),
     shallowEqual,
   );
 

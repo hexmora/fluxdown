@@ -46,9 +46,9 @@ import { MutableState } from '../mutable-state';
 import { mapState, ReactiveState, selectState, toState } from '../reactive-state';
 import { mapKeyedClosure } from './exports';
 import { mapEachClosure, switchMapClosure } from './exports';
-import { render } from './exports';
+import { isReadableClosure, render } from './exports';
 import { StateClosureHookRuntime } from './utils';
-import { isReadableClosure, isStateClosureDescriptor } from './utils';
+import { isStateClosureDescriptor } from './utils';
 import {
   isResolvedClosureSource,
   isResolvedImmediateSource,

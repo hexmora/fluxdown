@@ -1,18 +1,16 @@
 import type { BlockCompilerConfig } from '@fluxdown/core';
 import type {
-  BaseShadConfig,
   BaseSmoothConfig,
   SchedulerType,
-  SmoothConfig,
   SmoothSchedulerClass,
   SmoothTickerClass,
   TickerType,
 } from '@fluxdown/core-presets/mapper';
 
 import { assert, defaultsBy } from '@fluxdown/utils';
-import { isBoolean, isFinite, isFunction, isString } from 'lodash-es';
+import { isBoolean, isFunction, isString } from 'lodash-es';
 
-import type { BaseBuildConfig, ShadConfig, StreamingConfig } from '../types';
+import type { BaseBuildConfig, SmoothConfig, StreamingConfig } from '../types';
 
 import { ALL_SCHEDULERS, ALL_TICKERS, DEFAULT_CONFIG } from '../consts';
 
@@ -56,15 +54,6 @@ export const getSchedulerByType = (
   return scheduler;
 };
 
-export const toShadConfig = (config: boolean | ShadConfig): BaseShadConfig => {
-  const { enabled = true, length = 10 } = isBoolean(config) ? { enabled: config } : config;
-
-  return {
-    enabled,
-    length: isFinite(length) ? Math.max(0, Math.floor(length)) : 0,
-  };
-};
-
 export const toSmoothConfig = (config: boolean | SmoothConfig): BaseSmoothConfig => {
   const options: SmoothConfig = isBoolean(config)
     ? {
@@ -87,12 +76,12 @@ export const toStreamingConfig = (
   config: boolean | StreamingConfig = false,
 ): Required<StreamingConfig> => {
   if (isBoolean(config)) {
-    return { repairEnding: config, smooth: config, shad: config };
+    return { repairEnding: config, smooth: config, effect: false };
   }
 
-  const { repairEnding = true, smooth = true, shad = true } = config;
+  const { repairEnding = true, smooth = true, effect = false } = config;
 
-  return { repairEnding, smooth, shad };
+  return { repairEnding, smooth, effect };
 };
 
 export const toBuildConfig = ({

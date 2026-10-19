@@ -8,6 +8,8 @@ export interface ShadBlocksInputs {
   source: IReadableClosure<IBlockState<HastRoot>[]>;
 
   progress: IReadableClosure<ShadPosition>;
+
+  maskWidth: IReadableClosure<number>;
 }
 
 export interface ShadBlockEntry {

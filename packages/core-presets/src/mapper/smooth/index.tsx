@@ -2,11 +2,11 @@
  * @jsxImportSource stative
  */
 
-import type { IBlockState, IPluggableConfig } from '@fluxdown/types';
+import type { IBlockState } from '@fluxdown/types';
 
 import { D, type IReadableClosure, once, useDefaults, useSwitchMap } from 'stative';
 
-import type { SmoothBaseInputs, SmoothInputs } from './type';
+import type { SmoothInputs, SmoothPluginConfig } from './type';
 
 import { withKey } from '../../utils';
 import { IntervalSmoothTicker, RafSmoothTicker, SpringSmoothScheduler } from './modules';
@@ -18,7 +18,7 @@ export * from './type';
 
 declare global {
   interface MapperConfigs {
-    smooth?: IPluggableConfig<SmoothBaseInputs>;
+    smooth: SmoothPluginConfig;
   }
 }
 

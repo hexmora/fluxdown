@@ -6,7 +6,7 @@ import type { ReactRenderMatchParams, ReactRenderParams } from '../../base';
 
 import { BaseReactRenderPlugin, getTextContent, isElementWithTag } from '../../base';
 import { ShadRenderer } from './renderer';
-import { isShadNode } from './utils';
+import { getShadConfig, isShadNode } from './utils';
 
 declare global {
   interface RenderConfigs {
@@ -32,6 +32,7 @@ export class ShadRenderPlugin extends BaseReactRenderPlugin {
 
     return (
       <ShadRenderer
+        {...getShadConfig(node)}
         active={renderChildren(active)}
         isActive={getTextContent(active).length > 0}
         leading={renderChildren(leading)}

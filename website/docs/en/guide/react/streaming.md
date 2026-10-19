@@ -17,6 +17,7 @@ async function readMarkdown(
 
   for await (const chunk of chunks) {
     text += chunk;
+
     onText(text);
   }
 }
@@ -26,30 +27,27 @@ Call `await readMarkdown(chunks, setText)` from your request handler and pass th
 
 ## Enable streaming effects
 
-`streaming={true}` enables three features together:
+`streaming={true}` enables trailing syntax repair and smooth output. Visual effects are opt-in:
 
 | Option         | What readers see                                                          |
 | -------------- | ------------------------------------------------------------------------- |
 | `repairEnding` | Unfinished syntax at the end of the message gets a readable presentation. |
 | `smooth`       | Large bursts of text appear gradually, reducing abrupt jumps.             |
-| `shad`         | Newly revealed trailing characters fade in gently.                        |
+| `effect`       | Apply a built-in effect or a custom mapper to newly revealed content.     |
 
-You can also control them separately. For example, keep syntax repair and smooth output while turning off the fade:
+You can also control them separately. For example, add the trailing fade:
 
 ```tsx
 <Fluxdown
-  streaming={{ repairEnding: true, smooth: true, shad: false }}
+  streaming={{ repairEnding: true, smooth: true, effect: 'shad' }}
   text={text}
 />
 ```
 
-Options omitted from this object default to `true`. To keep only syntax repair, set the other two to `false`:
+`repairEnding` and `smooth` default to `true`; `effect` defaults to `false`, and `true` is equivalent to `'shad'`. To keep only syntax repair, disable smooth output:
 
 ```tsx
-<Fluxdown
-  streaming={{ repairEnding: true, smooth: false, shad: false }}
-  text={text}
-/>
+<Fluxdown streaming={{ repairEnding: true, smooth: false }} text={text} />
 ```
 
 ## Adjust the trailing fade
@@ -57,7 +55,7 @@ Options omitted from this object default to `true`. To keep only syntax repair, 
 ```tsx
 <Fluxdown
   streaming={{
-    shad: { enabled: true, length: 3, maskWidth: 18 },
+    effect: ['shad', { length: 3, maskWidth: 18 }],
   }}
   text={text}
 />
@@ -65,8 +63,10 @@ Options omitted from this object default to `true`. To keep only syntax repair, 
 
 `length` is the number of trailing characters included in the fade. `maskWidth` is the fade mask's width in pixels. The defaults work well for most interfaces; adjust them when you need to match your typography or motion style.
 
+`effect` also accepts a [mapper plugin](../core/plugins/mapper.md), a configured tuple, or an array such as `['shad', [Mapper, options]]`. Set it to `false` to disable visual effects while keeping smooth output.
+
 ## Finish or replace a message
 
 Keep appending to the same `text` while receiving a response. Clear it when a new response starts. In a message list, use a stable message ID as each component's `key` so that messages have independent state.
 
-Set `streaming={false}` when generation finishes. This immediately shows all received text and stops the trailing repair and fade. Syntax repair only affects presentation; it does not rewrite the original Markdown you store.
+Set `streaming={false}` when generation finishes. This immediately shows all received text and stops the trailing repair and effects. Syntax repair only affects presentation; it does not rewrite the original Markdown you store.

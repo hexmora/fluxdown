@@ -4,6 +4,7 @@ import type {
   IRehypePlugin,
   IRemarkPlugin,
   IRepairPlugin,
+  PluggableConfigs,
   PluginSet,
 } from '@fluxdown/types';
 import type { ElementContent, Parent } from 'hast';
@@ -77,5 +78,5 @@ export type CoreInputs<R, C = {}> = {
   /**
    * Additional block mappers or configuration overrides for the default mappers.
    */
-  mappers?: IReadableClosure<PluginSet<MapperPluggable, MapperConfigs>>;
+  mappers?: IReadableClosure<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>>;
 };

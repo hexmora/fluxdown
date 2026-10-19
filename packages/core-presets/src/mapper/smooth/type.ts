@@ -1,27 +1,12 @@
-import type { IBlockState, MapperInputs } from '@fluxdown/types';
-import type { IReadableClosure, Newable } from 'stative';
+import type {
+  IBlockState,
+  MapperConfigInputs,
+  MapperInputs,
+  MapperPluginConfig,
+} from '@fluxdown/types';
+import type { Newable } from 'stative';
 
 import type { IScheduler, ITicker } from './modules';
-
-export interface SmoothBaseInputs {
-  /**
-   * Whether newly appended content advances on ticker events.
-   * Enabling starts from the currently visible content; disabling returns the source blocks.
-   */
-  enabled?: IReadableClosure<boolean>;
-
-  /**
-   * Constructor used to supply animation timestamps.
-   */
-  ticker?: IReadableClosure<SmoothTickerClass>;
-
-  /**
-   * Constructor used to determine visible progress per tick.
-   */
-  scheduler?: IReadableClosure<SmoothSchedulerClass>;
-}
-
-export type SmoothInputs<T> = MapperInputs<SmoothBaseInputs, IBlockState<T>[]>;
 
 export type TickerParams = [interval?: number];
 
@@ -35,23 +20,6 @@ export type SmoothTickerClass = Newable<ITicker, TickerParams>;
 
 export type SmoothSchedulerClass = Newable<IScheduler, SchedulerParams>;
 
-export interface BaseSmoothConfig {
-  /**
-   * Whether progressive rendering is enabled.
-   */
-  enabled: boolean;
-
-  /**
-   * Resolved timestamp source constructor.
-   */
-  ticker: SmoothTickerClass;
-
-  /**
-   * Resolved progress scheduler constructor.
-   */
-  scheduler: SmoothSchedulerClass;
-}
-
 export interface SmoothConfig {
   /**
    * Reveal newly compiled content over successive ticks.
@@ -60,12 +28,22 @@ export interface SmoothConfig {
   enabled?: boolean;
 
   /**
-   * Built-in timestamp source name or a custom ticker constructor.
+   * Constructor used to supply animation timestamps.
+   * @default RafSmoothTicker when animation frames are available, otherwise IntervalSmoothTicker
    */
-  ticker: TickerType | SmoothTickerClass;
+  ticker?: SmoothTickerClass;
 
   /**
-   * Built-in progress scheduler name or a custom scheduler constructor.
+   * Constructor used to determine visible progress per tick.
+   * @default SpringSmoothScheduler
    */
-  scheduler: SchedulerType | SmoothSchedulerClass;
+  scheduler?: SmoothSchedulerClass;
 }
+
+export type BaseSmoothConfig = Required<SmoothConfig>;
+
+export type SmoothBaseInputs = MapperConfigInputs<SmoothConfig>;
+
+export type SmoothInputs<T> = MapperInputs<SmoothBaseInputs, IBlockState<T>[]>;
+
+export type SmoothPluginConfig = MapperPluginConfig<SmoothConfig>;

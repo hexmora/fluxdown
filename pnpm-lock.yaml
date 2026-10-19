@@ -885,6 +885,9 @@ importers:
       '@fluxdown/react-presets':
         specifier: workspace:^
         version: link:../packages/react-presets
+      '@fluxdown/utils':
+        specifier: workspace:^
+        version: link:../packages/utils
       fluxdown:
         specifier: workspace:^
         version: link:../packages/react
