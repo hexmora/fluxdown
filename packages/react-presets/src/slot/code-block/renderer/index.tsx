@@ -18,6 +18,7 @@ export const CodeBlockRenderer = ({ Raw: _Raw, ...props }: CodeBlockProps) => {
     meta,
     onCopy,
     showHeader = true,
+    suffix,
     ...elementProps
   } = props;
 
@@ -26,7 +27,7 @@ export const CodeBlockRenderer = ({ Raw: _Raw, ...props }: CodeBlockProps) => {
       {showHeader ? (
         <CodeHeader code={code} language={language} meta={meta} onCopy={onCopy} />
       ) : null}
-      <CodeHighlighter code={code} language={language} meta={meta} />
+      <CodeHighlighter code={code} language={language} meta={meta} suffix={suffix} />
     </div>
   );
 };

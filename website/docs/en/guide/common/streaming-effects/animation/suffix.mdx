@@ -1,0 +1,112 @@
+import { SuffixDemo } from '../../../../../../components';
+
+# Suffix
+
+`suffix` places a small marker immediately after the visible content. Choose a terminal-style block cursor or a softly pulsing dot. The marker follows the text through paragraphs, lists, inline formatting, tables, and code blocks.
+
+<SuffixDemo />
+
+Switch the content type to inspect different endings. Pause or replay the stream, or choose a custom type to see how the renderer handles it. The demo keeps its marker visible after playback so you can inspect the spacing.
+
+## Usage
+
+The following examples use the React component:
+
+```tsx
+<Fluxdown streaming={{ effect: ['suffix', { type: 'cursor' }] }} text={text} />
+```
+
+Use `type: 'dot'` for a circular marker. `effect: 'suffix'` uses the block cursor by default. Both shapes inherit the current text color and scale with the text. Their breathing animation respects `prefers-reduced-motion`.
+
+The marker remains visible while the effect is enabled. Set `streaming` to `false` when the response finishes, or set the suffix's `enabled` option to `false` to keep other streaming behavior active:
+
+The following example uses the React component:
+
+```tsx
+<Fluxdown
+  streaming={{
+    smooth: true,
+    effect: ['suffix', { type: 'dot', enabled: isStreaming }],
+  }}
+  text={text}
+/>
+```
+
+The following React component example combines the marker with an entrance effect:
+
+```tsx
+<Fluxdown
+  streaming={{ effect: ['scale', ['suffix', { type: 'dot' }]] }}
+  text={text}
+/>
+```
+
+## Render a custom type
+
+The `type` option is `'cursor' | 'dot' | (string & {})`. Every value uses the same HAST node: a `span` whose `dataFluxdownSuffix` property contains that type. The built-in renderer recognizes only `cursor` and `dot`; it returns `null` for every other value. An unknown type is metadata for your renderer, not text to display.
+
+The following example uses the React component and a [render plugin](../../../react/plugins/render.md) to display a smile. `SuffixRenderer` shares the built-in marker layout and breathing animation:
+
+```tsx
+import type {
+  ReactRenderMatchParams,
+  ReactRenderParams,
+} from '@fluxdown/react-presets/base';
+
+import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/mapper';
+import { BaseReactRenderPlugin } from '@fluxdown/react-presets/base';
+import { SuffixRenderer } from '@fluxdown/react-presets/render';
+import { Fluxdown } from 'fluxdown';
+
+class SmileRenderPlugin extends BaseReactRenderPlugin {
+  static readonly key = 'render-smile';
+
+  readonly config = { priority: -1 };
+
+  match({ node }: ReactRenderMatchParams) {
+    return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
+  }
+
+  render({ node }: ReactRenderParams) {
+    if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
+      return null;
+    }
+
+    return <SuffixRenderer type="smile">🙂</SuffixRenderer>;
+  }
+}
+
+<Fluxdown
+  plugins={{ renders: [SmileRenderPlugin] }}
+  streaming={{ effect: ['suffix', { type: 'smile' }] }}
+  text={text}
+/>;
+```
+
+The lower priority lets this renderer handle `smile` before the built-in suffix renderer. Other types continue to use the presets. The custom type in the demo uses this same plugin and animation.
+
+## Code blocks and Core
+
+Inside a code block, the marker follows the visible code, on the same line as its last character. An explicit trailing blank line is preserved, so its marker appears on that blank line. It stays separate from the source code, so copying the block does not include the marker. Custom code slots should render their `suffix` prop after the highlighted code content to preserve this behavior.
+
+Core exports the `Suffix` mapper, `SuffixConfig`, `SuffixType`, `SUFFIX_DATA_ATTR`, and `isSuffixNode` from `@fluxdown/core-presets/mapper`. The mapper inserts the marker at the tail of the visible HAST, without adding text length. Your renderer decides how to display it.
+
+## Configuration
+
+These fields belong to the `suffix` configuration object in `['suffix', config]`.
+
+### enabled <span className="field-tag">Optional</span> {#enabled}
+
+**Type:** `boolean`
+
+**Default:** `true`
+
+Show the suffix at the end of the current visible content. Disable it when generation finishes, or set `streaming` to `false` to disable all streaming behavior.
+
+### type <span className="field-tag">Optional</span> {#type}
+
+**Type:** `'cursor' | 'dot' | (string & {})`
+
+**Default:** `'cursor'`
+
+Choose a block cursor or circular dot. Every type is stored on the same HAST marker node; the default renderer returns `null` for unrecognized types.
