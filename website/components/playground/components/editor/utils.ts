@@ -1,8 +1,14 @@
 import type { EffectItem } from 'fluxdown';
 
-import { BaseSmoothTicker, type SmoothTickerClass } from '@fluxdown/core-presets/mapper';
+import {
+  BaseSmoothTicker,
+  type PerceptualSpring,
+  type SmoothSchedulerClass,
+  type SmoothTickerClass,
+  SpringSmoothScheduler,
+} from '@fluxdown/core-presets/mapper';
 
-import type { AnimationSpeed, EditorEffect } from './type';
+import type { AnimationSpeed, EditorEffect, EditorTuning } from './type';
 
 import { EFFECT_DURATION } from './consts';
 
@@ -74,13 +80,71 @@ export const createClockTicker = (clock: PlaybackClock): SmoothTickerClass =>
     }
   };
 
+export interface TunableSpring {
+  /**
+   * Scheduler class whose instances read the current spring.
+   */
+  Scheduler: SmoothSchedulerClass;
+
+  /**
+   * Change the spring without a jump: the running trajectory is pinned first, so new parameters
+   * only shape the motion from this moment on.
+   */
+  retune: (spring: PerceptualSpring) => void;
+}
+
+export const createTunableSpring = (initial: PerceptualSpring): TunableSpring => {
+  let spring = initial;
+
+  let current: TunedSpringScheduler | null = null;
+
+  const attach = (scheduler: TunedSpringScheduler) => {
+    current = scheduler;
+  };
+
+  class TunedSpringScheduler extends SpringSmoothScheduler {
+    constructor(tuple?: number[]) {
+      super(tuple);
+
+      attach(this);
+    }
+
+    override get tuple() {
+      return [spring.frequency, spring.dampingRatio];
+    }
+
+    pin() {
+      // An empty push rebases the trajectory at the latest timestamp under the current spring.
+      this.push(0);
+    }
+  }
+
+  return {
+    Scheduler: TunedSpringScheduler,
+    retune: (next) => {
+      current?.pin();
+
+      spring = next;
+    },
+  };
+};
+
 /**
  * Streaming effect configuration with wall-clock durations stretched for `speed`.
  */
 export const getEffectConfig = (
   effect: Exclude<EditorEffect, 'none'>,
   speed: AnimationSpeed,
+  tuning: EditorTuning,
 ): EffectItem =>
   effect === 'shad'
-    ? ['shad', { hideDelay: EFFECT_DURATION / speed }]
-    : ['scale', { duration: EFFECT_DURATION / speed }];
+    ? ['shad', { length: tuning.fadeLength, hideDelay: EFFECT_DURATION / speed }]
+    : ['scale', { duration: tuning.entranceDuration / speed }];
+
+export const getDampingKind = (dampingRatio: number) => {
+  if (Math.abs(dampingRatio - 1) < 1e-6) {
+    return 'critical';
+  }
+
+  return dampingRatio < 1 ? 'underdamped' : 'overdamped';
+};

@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
 import type { Locale } from '../../../type';
-import type { AnimationSpeed, EditorEffect } from './type';
+import type { AnimationSpeed, EditorEffect, EditorTuning } from './type';
 
 import { getStreamSample } from '../../../demo';
 import { useStream } from '../../../hooks';
-import { createClockTicker, PlaybackClock } from './utils';
+import { CHUNK_PACES, DEFAULT_TUNING } from './consts';
+import { createClockTicker, createTunableSpring, PlaybackClock } from './utils';
 
 export const useEditor = (lang: Locale) => {
   const [text, setText] = useState(() => getStreamSample(lang));
@@ -25,7 +26,12 @@ export const useEditor = (lang: Locale) => {
   // One ticker class per editor, so speed changes reach the running spring without replacing it.
   const [ticker] = useState(() => createClockTicker(clock));
 
-  const stream = useStream(playback ? text : '', false, speed);
+  const [tuning, setTuning] = useState(DEFAULT_TUNING);
+
+  const [spring] = useState(() => createTunableSpring(DEFAULT_TUNING));
+
+  // Arrivals follow both the playback speed and the chosen pace.
+  const stream = useStream(playback ? text : '', false, speed / CHUNK_PACES[tuning.pace]);
 
   const previewText = playback ? stream.text : text;
 
@@ -59,6 +65,16 @@ export const useEditor = (lang: Locale) => {
     setSpeed(value);
   };
 
+  const changeTuning = (patch: Partial<EditorTuning>) => {
+    const next = { ...tuning, ...patch };
+
+    if (patch.frequency !== undefined || patch.dampingRatio !== undefined) {
+      spring.retune(next);
+    }
+
+    setTuning(next);
+  };
+
   return {
     text,
     smooth,
@@ -70,6 +86,9 @@ export const useEditor = (lang: Locale) => {
     speed,
     changeSpeed,
     ticker,
+    scheduler: spring.Scheduler,
+    tuning,
+    changeTuning,
     playback,
     stream,
     previewText,
