@@ -1,0 +1,57 @@
+import { ChunkDemo } from '../../../../../../components';
+
+# Chunk entrance
+
+`chunk` fades in the new text from each visible update as one group, without moving, scaling, or blurring the text. Earlier content stays fully visible.
+
+<ChunkDemo />
+
+## Usage
+
+The following examples use the React component:
+
+```tsx
+<Fluxdown streaming={{ smooth: false, effect: 'chunk' }} text={text} />
+```
+
+Always pass the complete Markdown received so far. Each group fades from transparent to opaque with an `ease-out` curve. An existing group's animation continues when another group arrives.
+
+The following example uses the React component:
+
+```tsx
+<Fluxdown
+  streaming={{
+    smooth: false,
+    effect: ['chunk', { duration: 300 }],
+  }}
+  text={text}
+/>
+```
+
+## Grouping and smoothing
+
+With `smooth: false`, visible updates follow the chunks received by your application. Turning [smoothing](../smoothing.mdx) on creates smaller visible updates, making the entrance more continuous. The demo leaves smoothing off so the groups are easy to follow.
+
+Inline formatting and Markdown layout are preserved. Inline code, code blocks, formulas, and replacement content retain their own rendering. Typography, line wrapping, and incoming timing come from your application.
+
+## Configuration
+
+These fields belong to the `chunk` configuration object in `['chunk', config]`.
+
+### enabled <span className="field-tag">Optional</span> {#enabled}
+
+**Type:** `boolean`
+
+**Default:** `true`
+
+Enable the grouped text entrance. Each newly visible group fades in together while earlier content stays visible.
+
+### duration <span className="field-tag">Optional</span> {#duration}
+
+**Type:** `number`
+
+**Default:** `400`
+
+Fade duration in milliseconds, using an `ease-out` curve. `0` reveals text immediately. Negative values become `0`; non-finite values use the default. The animation respects reduced-motion preferences.
+
+Changing the duration applies to new groups; existing groups keep their original timing.

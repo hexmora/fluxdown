@@ -77,6 +77,7 @@ Fluxdown 默认包含这些插件，无需手动添加。
 | `PatchRenderPlugin`      | 在指定文本位置渲染应用提供的替换内容。                 |
 | `ShadRenderPlugin`       | 显示流式输出末尾的渐变效果。                           |
 | `ScaleRenderPlugin`      | 为新出现的字符添加逐字缩放、淡入和模糊消退效果。       |
+| `ChunkRenderPlugin`      | 让每组新出现的文字同时淡入。                           |
 | `CodeRenderPlugin`       | 将代码、语言和附加信息交给代码块 slot。                |
 | `EmphasisRenderPlugin`   | 把斜体内容交给 `Emphasis` slot。                       |
 | `ImageRenderPlugin`      | 把图片地址、说明和尺寸交给 `Image` slot。              |

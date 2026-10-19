@@ -8,5 +8,10 @@
     "type": "file",
     "name": "scale",
     "label": "Character entrance"
+  },
+  {
+    "type": "file",
+    "name": "chunk",
+    "label": "Chunk entrance"
   }
 ]
