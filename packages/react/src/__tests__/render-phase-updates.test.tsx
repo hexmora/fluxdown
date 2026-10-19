@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 import { render, screen, waitFor } from '@testing-library/react';
 
-import { Fluxdown } from '..';
+import { Fluxdown } from '../packs/full';
 
 const isCrossComponentRenderWarning = (value: unknown) =>
   typeof value === 'string' &&

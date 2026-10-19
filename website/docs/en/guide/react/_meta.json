@@ -24,5 +24,10 @@
     "name": "plugins",
     "label": "Using and writing plugins",
     "collapsed": false
+  },
+  {
+    "type": "file",
+    "name": "bundle-size",
+    "label": "Bundle size"
   }
 ]

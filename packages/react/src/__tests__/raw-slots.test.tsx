@@ -10,11 +10,13 @@ import type { Element } from 'hast';
 import type { ComponentType } from 'react';
 
 import { createTypeOfSlot, SlotProvider } from '@fluxdown/react-presets/base';
-import { PRESET_SLOT_PLUGINS } from '@fluxdown/react-presets/slot';
+import { PRESET_FULL_PLUGINS } from '@fluxdown/react-presets/full';
 import { render, screen } from '@testing-library/react';
 import { expectTypeOf } from 'expect-type';
 
-import { Fluxdown } from '..';
+import { Fluxdown } from '../packs/full';
+
+const PRESET_SLOT_PLUGINS = PRESET_FULL_PLUGINS.flatMap((item) => item.slots ?? []);
 
 const node: Element = {
   children: [],
@@ -94,7 +96,8 @@ describe('Raw slots', () => {
   });
 
   test.each(PRESET_SLOT_PLUGINS)('provides the default renderer to an override of %s', (Preset) => {
-    const type = new Preset().type;
+    const Plugin = Array.isArray(Preset) ? Preset[0] : Preset;
+    const type = new Plugin().type;
 
     const capture = jest.fn();
 

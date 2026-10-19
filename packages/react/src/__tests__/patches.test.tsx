@@ -2,9 +2,9 @@ import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
 
 import { render, screen, waitFor } from '@testing-library/react';
 
-import type { IPluginItem } from '../types';
+import type { IPluginItem } from '../packs/full';
 
-import { Fluxdown } from '..';
+import { Fluxdown } from '../packs/full';
 
 type RemarkPluggable = IPluggable<IRemarkPlugin, unknown>;
 

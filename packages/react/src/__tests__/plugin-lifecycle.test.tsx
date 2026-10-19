@@ -2,9 +2,9 @@ import type { IReactRenderPluggable } from '@fluxdown/react-presets/base';
 
 import { render, waitFor } from '@testing-library/react';
 
-import type { IPluginItem } from '../types';
+import type { IPluginItem } from '../packs/full';
 
-import { Fluxdown } from '..';
+import { Fluxdown } from '../packs/full';
 
 interface LifecycleCounts {
   created: number;

@@ -1,4 +1,3 @@
-export type * from './plugins.js';
+export type * from '@fluxdown/react-presets/typings';
 
-export * from './packs';
 export * from './theme';

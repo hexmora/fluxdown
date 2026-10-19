@@ -2,10 +2,10 @@ import { act, cleanup, render } from '@testing-library/react';
 import { createRef } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import type { FluxdownRef, StreamingConfig } from '../types';
+import type { FluxdownRef, StreamingConfig } from '../packs/full';
 
-import styles from '../../../react-presets/src/render/shad/renderer/index.module.scss';
-import { Fluxdown } from '../index';
+import styles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
+import { Fluxdown } from '../packs/full';
 import { createManualTicker, createStepScheduler } from './utils/smooth';
 
 afterEach(async () => {

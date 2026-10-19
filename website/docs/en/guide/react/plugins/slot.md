@@ -41,7 +41,7 @@ export function Message({ text }: MessageProps) {
 
 `Raw` is the component supplied by the previous plugin. Call it to keep the existing highlighting, copying, or link behavior, then adjust the props you want to change.
 
-Several plugins can target the same slot. Later plugins wrap earlier components through `Raw`. To replace a slot entirely, return your own JSX.
+Several plugins can target the same slot. At the same priority, later plugins wrap earlier components through `Raw`. To replace a slot entirely, return your own JSX.
 
 > `Raw` can be `null`; check it before rendering.
 
@@ -60,28 +60,3 @@ Several plugins can target the same slot. Later plugins wrap earlier components 
 Each slot has a corresponding prop type, such as `LinkProps` or `HeadingProps`.
 
 To change which slot a HAST node uses, continue with [Render plugins](./render.md).
-
-## Built-in plugins
-
-Fluxdown includes these plugins by default; no additional setup is needed.
-
-These plugins are included in `PRESET_SLOT_PLUGINS` and exported from `@fluxdown/react-presets/slot`.
-
-| Plugin                      | Purpose                                                                           |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| `BlockquoteSlotPlugin`      | Provides the layout and styling for blockquotes.                                  |
-| `BreakLineSlotPlugin`       | Displays line breaks.                                                             |
-| `CodeBlockSlotPlugin`       | Combines the code toolbar and highlighted code area.                              |
-| `CodeHeaderSlotPlugin`      | Displays the language and copy action, with support for custom actions.           |
-| `CodeHighlighterSlotPlugin` | Highlights code by language and keeps source readable while highlighting loads.   |
-| `EmphasisSlotPlugin`        | Displays italic text.                                                             |
-| `HeadingSlotPlugin`         | Displays headings at each level.                                                  |
-| `ImageSlotPlugin`           | Displays images with alternative text and dimensions, and checks image URLs.      |
-| `LinkSlotPlugin`            | Displays links and handles usable URLs.                                           |
-| `ListSlotPlugin`            | Provides the default layout for ordered, unordered, and task lists.               |
-| `ParagraphSlotPlugin`       | Provides paragraph typography and spacing.                                        |
-| `StrongSlotPlugin`          | Displays bold text.                                                               |
-| `TableSlotPlugin`           | Provides the table container and layout.                                          |
-| `TexSlotPlugin`             | Displays formulas, with a lightweight presentation while the full renderer loads. |
-
-> The formula presets are included, but formula syntax still needs `build={{ tex: true }}`.

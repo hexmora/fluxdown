@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import type { SmoothStreamingProps } from './type';
 
-import { Fluxdown } from '../../../src';
+import { Fluxdown } from '../../../src/packs/full';
 import { SMOOTH_MARKDOWN } from './consts';
 import '../playground/style.scss';
 

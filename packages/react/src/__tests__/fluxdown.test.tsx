@@ -2,16 +2,18 @@ import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-pr
 import type { IPluggable, IPluggableConfig, IRemarkPlugin } from '@fluxdown/types';
 
 import { SyntaxSoftEndlineRemarkPlugin } from '@fluxdown/core-presets/remark';
-import { ParagraphRenderPlugin } from '@fluxdown/react-presets/render';
-import { ParagraphSlotPlugin } from '@fluxdown/react-presets/slot';
+import {
+  ParagraphRenderPlugin,
+  ParagraphSlotPlugin,
+} from '@fluxdown/react-presets/plugins/paragraph';
 import { PluginPriority } from '@fluxdown/types';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { type ComponentType, createRef, type ReactNode, StrictMode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import type { FluxdownRef, IPluginItem } from '../types';
+import type { FluxdownRef, IPluginItem } from '../packs/full';
 
-import { Fluxdown } from '..';
+import { Fluxdown } from '../packs/full';
 
 type RemarkPluggable = IPluggable<IRemarkPlugin, unknown>;
 

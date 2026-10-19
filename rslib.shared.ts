@@ -2,9 +2,11 @@ import { pluginLess } from '@rsbuild/plugin-less';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginSass } from '@rsbuild/plugin-sass';
 import { pluginSvgr } from '@rsbuild/plugin-svgr';
-import { defineConfig, type RsbuildPlugin } from '@rslib/core';
+import { defineConfig } from '@rslib/core';
 import { fileURLToPath } from 'node:url';
 
+import { browserStylesPlugin, styleChunkName } from './scripts/build/browser-styles.ts';
+import { reactCjsPlugin } from './scripts/build/react-cjs.ts';
 import { staticCjsChunksPlugin } from './scripts/build/static-cjs-chunks.ts';
 
 interface PackageOptions {
@@ -13,74 +15,68 @@ interface PackageOptions {
   jsxImportSource?: string;
 }
 
-function browserStylesPlugin(entries: string[], format: 'esm' | 'cjs'): RsbuildPlugin {
-  return {
-    name: `fluxdown:browser-styles-${format}`,
-    setup(api) {
-      api.processAssets({ stage: 'additional' }, ({ compilation, sources }) => {
-        // Keep the original modules shared by browser and Node entry points.
-        // Only browser wrappers import CSS; Node can load the library for SSR.
-        const extension = format === 'esm' ? 'js' : 'cjs';
-
-        for (const entry of entries) {
-          const original = `./${entry}.${extension}`;
-
-          const source =
-            format === 'esm'
-              ? `import './styles.css';\nexport * from '${original}';\n`
-              : `require('./styles.css');\nmodule.exports = require('${original}');\n`;
-
-          compilation.emitAsset(`${entry}.browser.${extension}`, new sources.RawSource(source));
-        }
-      });
-    },
-  };
-}
-
 export function packageConfig({ entry, react, jsxImportSource }: PackageOptions) {
   return defineConfig({
-    source: { entry, tsconfigPath: './tsconfig.build.json' },
+    source: { tsconfigPath: './tsconfig.build.json' },
     lib: [
       {
         format: 'esm',
+        source: { entry },
         // Preserve shared declaration modules: bundling each entry duplicates
         // stative's unique-symbol brands and makes its JSX types incompatible.
         dts: { autoExtension: true },
         output: { distPath: './dist/esm' },
-        plugins: react ? [browserStylesPlugin(Object.keys(entry), 'esm')] : [],
+        plugins: react ? [pluginSvgr(), browserStylesPlugin(Object.keys(entry), 'esm')] : [],
       },
       {
         format: 'cjs',
+        source: { entry },
         dts: { autoExtension: true },
         output: { distPath: './dist/cjs' },
-        plugins: [
-          staticCjsChunksPlugin(),
-          ...(react ? [browserStylesPlugin(Object.keys(entry), 'cjs')] : []),
-        ],
-        ...(Object.keys(entry).length > 1
+        plugins: react
+          ? [pluginSvgr({ query: /react|^$/ }), reactCjsPlugin(entry)]
+          : [staticCjsChunksPlugin()],
+        ...(react
           ? {
-              tools: {
-                rspack: {
-                  optimization: {
-                    // Entry points must share Symbols, classes and React contexts.
-                    runtimeChunk: { name: 'rslib-runtime' },
-                    splitChunks: {
-                      cacheGroups: {
-                        shared: {
-                          name: 'shared',
-                          test: /[\\/]src[\\/].*\.[cm]?[jt]sx?$/,
-                          chunks: 'all',
-                          minChunks: 2,
-                          minSize: 0,
-                          enforce: true,
+              // A shared CJS runtime makes every entry reference every lazy
+              // engine. Native requires retain both isolation and module identity.
+              bundle: false,
+              outBase: './src',
+              source: {
+                entry: {
+                  index: [
+                    'src/**',
+                    '!src/**/__tests__/**',
+                    '!src/**/*.test.*',
+                    '!src/**/*.stories.*',
+                  ],
+                },
+              },
+            }
+          : Object.keys(entry).length > 1
+            ? {
+                tools: {
+                  rspack: {
+                    optimization: {
+                      // Entry points must share Symbols, classes and React contexts.
+                      runtimeChunk: { name: 'rslib-runtime' },
+                      splitChunks: {
+                        cacheGroups: {
+                          shared: {
+                            name: 'shared',
+                            test: /[\\/]src[\\/].*\.[cm]?[jt]sx?$/,
+                            chunks: 'all',
+                            minChunks: 2,
+                            minSize: 0,
+                            enforce: true,
+                          },
                         },
                       },
                     },
                   },
                 },
-              },
-            }
-          : {}),
+              }
+            : {}),
       },
     ],
     syntax: 'es2022',
@@ -89,7 +85,7 @@ export function packageConfig({ entry, react, jsxImportSource }: PackageOptions)
       ...(react || jsxImportSource
         ? [pluginReact({ swcReactOptions: { importSource: jsxImportSource, development: false } })]
         : []),
-      ...(react ? [pluginSass(), pluginLess(), pluginSvgr()] : []),
+      ...(react ? [pluginSass(), pluginLess()] : []),
     ],
     ...(react
       ? {
@@ -108,15 +104,15 @@ export function packageConfig({ entry, react, jsxImportSource }: PackageOptions)
       swc: { jsc: { transform: { useDefineForClassFields: true } } },
       ...(react
         ? {
-            // Browser wrappers statically import all styles, including lazy
-            // components. The shared JavaScript must also load in bare Node.
+            // Browser wrappers import only each entry's reachable styles,
+            // including lazy components. Node entries remain CSS-free for SSR.
             cssExtract: { pluginOptions: { runtime: false } },
             rspack: {
               optimization: {
                 splitChunks: {
                   cacheGroups: {
                     styles: {
-                      name: 'styles',
+                      name: styleChunkName,
                       type: 'css/mini-extract',
                       chunks: 'all',
                       enforce: true,

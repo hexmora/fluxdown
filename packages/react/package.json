@@ -33,33 +33,48 @@
     "./dist/esm/*.browser.js",
     "./dist/cjs/*.browser.cjs"
   ],
-  "main": "./src/index.tsx",
-  "module": "./src/index.tsx",
-  "types": "./src/index.tsx",
+  "main": "./src/packs/full/index.tsx",
+  "module": "./src/packs/full/index.tsx",
+  "types": "./src/packs/full/index.tsx",
   "exports": {
-    ".": "./src/index.tsx",
+    ".": "./src/packs/full/index.tsx",
+    "./*": "./src/packs/*/index.tsx",
     "./styles.css": "./dist/esm/styles.css"
   },
   "publishConfig": {
-    "main": "./dist/cjs/index.cjs",
-    "module": "./dist/esm/index.browser.js",
-    "types": "./dist/esm/index.d.ts",
+    "main": "./dist/cjs/full.cjs",
+    "module": "./dist/esm/full.browser.js",
+    "types": "./dist/esm/packs/full/index.d.ts",
     "exports": {
       ".": {
         "import": {
-          "types": "./dist/esm/index.d.ts",
-          "browser": "./dist/esm/index.browser.js",
-          "node": "./dist/esm/index.js",
-          "default": "./dist/esm/index.browser.js"
+          "types": "./dist/esm/packs/full/index.d.ts",
+          "browser": "./dist/esm/full.browser.js",
+          "node": "./dist/esm/full.js",
+          "default": "./dist/esm/full.browser.js"
         },
         "require": {
-          "types": "./dist/cjs/index.d.cts",
-          "browser": "./dist/cjs/index.browser.cjs",
-          "node": "./dist/cjs/index.cjs",
-          "default": "./dist/cjs/index.browser.cjs"
+          "types": "./dist/cjs/packs/full/index.d.cts",
+          "browser": "./dist/cjs/full.browser.cjs",
+          "node": "./dist/cjs/full.cjs",
+          "default": "./dist/cjs/full.browser.cjs"
         }
       },
-      "./styles.css": "./dist/esm/styles.css"
+      "./styles.css": "./dist/esm/styles.css",
+      "./*": {
+        "import": {
+          "types": "./dist/esm/packs/*/index.d.ts",
+          "browser": "./dist/esm/*.browser.js",
+          "node": "./dist/esm/*.js",
+          "default": "./dist/esm/*.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/*/index.d.cts",
+          "browser": "./dist/cjs/*.browser.cjs",
+          "node": "./dist/cjs/*.cjs",
+          "default": "./dist/cjs/*.browser.cjs"
+        }
+      }
     },
     "access": "public"
   },

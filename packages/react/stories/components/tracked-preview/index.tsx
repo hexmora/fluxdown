@@ -2,7 +2,7 @@ import { useRendersCount, useUpdate } from 'react-use';
 
 import type { TrackedPreviewProps } from './type';
 
-import { Fluxdown } from '../../../src';
+import { Fluxdown } from '../../../src/packs/full';
 
 export const TrackedPreview = ({
   actions,

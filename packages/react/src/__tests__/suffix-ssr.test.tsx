@@ -2,7 +2,7 @@
 
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import { Fluxdown } from '..';
+import { Fluxdown } from '../packs/full';
 
 test('renders suffix server markup with full code content and no timers', () => {
   jest.useFakeTimers();

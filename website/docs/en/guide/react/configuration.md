@@ -1,6 +1,8 @@
 # Configuration
 
-This page lists the public `Fluxdown` props. Only `text` is required at the top level. Import `BaseBuildConfig`, `StreamingConfig`, `Theme`, `IPluginItem`, and `FluxdownRef` from `fluxdown` when you need their types.
+This page lists the public `Fluxdown` props. Only `text` is required at the top level.
+
+> Import `BaseBuildConfig`, `StreamingConfig`, `Theme`, `IPluginItem`, and `FluxdownRef` from `fluxdown` when you need their types.
 
 ## text <span className="field-tag">Required</span> {#text}
 
@@ -90,7 +92,9 @@ Determine how much content to reveal on each update. Use `'spring'` for the buil
 
 **Default:** `'scale'` (when streaming is enabled)
 
-Choose an animation effect or combine multiple effects. See [Animation](../common/streaming-effects/animation/index.mdx) for the supported input forms, available effects, live demos, and their configuration fields. Import `EffectItem` from `fluxdown` and effect configuration types from `@fluxdown/core-presets/mapper`.
+Choose an animation effect or combine multiple effects. See [Animation](../common/streaming-effects/animation/index.mdx) for the supported input forms, available effects, live demos, and their configuration fields.
+
+> Import `EffectItem` from `fluxdown` and effect configuration types from `@fluxdown/core-presets/mapper`.
 
 ## build <span className="field-tag">Optional</span> {#build}
 
@@ -202,13 +206,15 @@ Every group under `tokens` supports partial overrides:
 | `syntax`               | Highlighting colors for comments, keywords, strings, and other tokens.        |
 | `radius`, `spacing`    | Shared corner radii and spacing.                                              |
 
-The full token type is `ThemeTokens`, also exported from `fluxdown`. See the [styling guide](./customization.md) for matching your product's theme.
+> The full token type is `ThemeTokens`, also exported from `fluxdown`. See the [styling guide](./customization.md) for matching your product's theme.
 
 ## plugins <span className="field-tag">Optional</span> {#plugins}
 
 **Type:** `IPluginItem | IPluginItem[]`
 
 **Default:** `[]`
+
+> `IPluginItem` is exported from `@fluxdown/react-presets/typings`. Lite and Full merge supplied plugins with their presets, giving supplied plugins precedence. This prop is required for `FluxdownRaw`; see [Bundle size](./bundle-size.mdx) for entry point differences.
 
 An object provides one plugin pack; an array combines several packs. Each pack can contain these lists:
 
@@ -225,7 +231,7 @@ An object provides one plugin pack; an array combines several packs. Each pack c
 Each list item can be a plugin or `[Plugin, options]`. With `config`, you can keep options out of the individual list entries:
 
 ```tsx
-import { CodeHeaderSlotPlugin } from '@fluxdown/react-presets/slot';
+import { CodeHeaderSlotPlugin } from '@fluxdown/react-presets/plugins/code';
 import { Fluxdown } from 'fluxdown';
 
 <Fluxdown
@@ -239,7 +245,7 @@ import { Fluxdown } from 'fluxdown';
 />;
 ```
 
-This example disables the default code toolbar. Use `disabled: true` to disable a plugin. `priority` controls execution order; lower values run first.
+This example disables the default code toolbar. Use `disabled: true` to disable a plugin. Lower `priority` values run first. At the same priority, later render plugins match first, and later slot plugins wrap earlier components through `Raw`.
 
 > `config` belongs to a plugin pack and applies to plugins explicitly listed in that pack. Other presets remain in place.
 

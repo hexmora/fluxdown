@@ -83,6 +83,14 @@
       letter-spacing: -0.04em;
     }
 
+    .preset-upgrade {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: var(--site-accent-tint);
+      color: var(--site-accent);
+      font-weight: 600;
+    }
+
     .field-tag {
       display: inline-block;
       vertical-align: middle;

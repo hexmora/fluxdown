@@ -5,11 +5,11 @@ import { createRef } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MutableState, toClosure } from 'stative';
 
-import type { FluxdownRef } from '../types';
+import type { FluxdownRef } from '../packs/full';
 
-import { Fluxdown } from '..';
-import styles from '../../../react-presets/src/render/scale/renderer/index.module.scss';
-import shadStyles from '../../../react-presets/src/render/shad/renderer/index.module.scss';
+import styles from '../../../react-presets/src/plugins/effect-scale/render/effect-scale/renderer/index.module.scss';
+import shadStyles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
+import { Fluxdown } from '../packs/full';
 import { createManualTicker, createStepScheduler } from './utils/smooth';
 
 beforeEach(() => {

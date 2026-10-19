@@ -1,10 +1,10 @@
 import { act, cleanup, render } from '@testing-library/react';
 import { createRef, StrictMode } from 'react';
 
-import type { FluxdownRef } from '../types';
+import type { FluxdownRef } from '../packs/full';
 
-import { Fluxdown } from '..';
 import { restoreGlobals } from '../../../../scripts/testing/globals';
+import { Fluxdown } from '../packs/full';
 import { createRafClock } from './utils/raf';
 import { createManualTicker, createStepScheduler } from './utils/smooth';
 
