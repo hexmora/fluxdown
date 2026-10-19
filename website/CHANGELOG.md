@@ -1,5 +1,17 @@
 # @fluxdown/website
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [9867aed]
+- Updated dependencies [aeaa05f]
+- Updated dependencies [ea3f399]
+  - @fluxdown/core-presets@0.10.0
+  - @fluxdown/core@0.12.1
+  - @fluxdown/react-presets@0.8.0
+  - fluxdown@0.11.0
+
 ## 0.0.3
 
 ### Patch Changes
