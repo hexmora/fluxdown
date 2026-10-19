@@ -4,12 +4,14 @@ import type { TrackedPreviewProps } from './type';
 
 import { useResolvedTheme } from '../../../.storybook/theme-addon';
 import { Fluxdown } from '../../../src';
+import { Button } from '../ui';
 
 export const TrackedPreview = ({
   actions,
   ariaLabel,
   config,
   patches,
+  streaming = { smooth: false },
   text,
 }: TrackedPreviewProps) => {
   const { repairEnding, ...build } = config;
@@ -35,9 +37,7 @@ export const TrackedPreview = ({
 
         {actions}
 
-        <button onClick={update} type="button">
-          Re-render
-        </button>
+        <Button onClick={update}>Re-render</Button>
       </div>
 
       <div className="playground-preview-content">
@@ -45,7 +45,7 @@ export const TrackedPreview = ({
           <Fluxdown
             build={build}
             patches={patches}
-            streaming={{ repairEnding, smooth: false }}
+            streaming={{ ...streaming, repairEnding }}
             text={text}
             theme={theme}
           />

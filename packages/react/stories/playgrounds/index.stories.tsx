@@ -30,3 +30,8 @@ export const Patch: Story = {
 export const Smooth: Story = {
   render: () => <SmoothStreaming />,
 };
+
+/** The streaming lab with the per-character scale entrance selected. */
+export const Scale: Story = {
+  render: () => <SmoothStreaming initialSettings={{ effect: 'scale' }} title="Scale typing" />,
+};

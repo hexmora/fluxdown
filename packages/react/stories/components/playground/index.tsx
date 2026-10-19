@@ -1,12 +1,16 @@
 import type { PlaygroundProps } from './type';
 
+import { StreamingLabControls, StreamingLabInspector, useStreamingLab } from '../streaming-lab';
 import { TrackedPreview } from '../tracked-preview';
+import { Button, Slider, Switch } from '../ui';
 import { usePlayground } from './hooks/use-playground';
 import './style.scss';
 
 export type { PlaygroundProps } from './type';
 
 export const Playground = ({ actions, patches, ...props }: PlaygroundProps) => {
+  const lab = useStreamingLab();
+
   const {
     chunkSize,
     complete,
@@ -33,83 +37,62 @@ export const Playground = ({ actions, patches, ...props }: PlaygroundProps) => {
     status,
     stopped,
     text,
-  } = usePlayground(props);
+  } = usePlayground(props, lab.settings.speed);
 
   return (
     <main className="playground">
       <header className="playground-toolbar">
         <h1>Markdown playground</h1>
 
-        <span aria-live="polite" className="playground-status">
+        <span
+          aria-live="polite"
+          className="playground-status"
+          data-state={playbackMode && !stopped ? 'live' : undefined}
+        >
           {status}
         </span>
 
         <fieldset className="playground-settings">
           <legend>Compiler settings</legend>
 
-          <label>
-            <input
-              aria-label="Repair"
-              checked={config.repair}
-              onChange={(event) => handleSetting('repair', event.currentTarget.checked)}
-              type="checkbox"
-            />
-            Repair
-          </label>
+          <Switch
+            checked={config.repair}
+            label="Repair"
+            onChange={(enabled) => handleSetting('repair', enabled)}
+          />
 
-          <label>
-            <input
-              aria-label="Repair ending"
-              checked={config.repairEnding}
-              onChange={(event) => handleSetting('repairEnding', event.currentTarget.checked)}
-              type="checkbox"
-            />
-            Repair ending
-          </label>
+          <Switch
+            checked={config.repairEnding}
+            label="Repair ending"
+            onChange={(enabled) => handleSetting('repairEnding', enabled)}
+          />
 
-          <label>
-            <input
-              aria-label="Footnote"
-              checked={config.footnote}
-              onChange={(event) => handleSetting('footnote', event.currentTarget.checked)}
-              type="checkbox"
-            />
-            Footnote
-          </label>
+          <Switch
+            checked={config.footnote}
+            label="Footnote"
+            onChange={(enabled) => handleSetting('footnote', enabled)}
+          />
 
-          <label>
-            <input
-              aria-label="TeX"
-              checked={config.tex}
-              onChange={(event) => handleSetting('tex', event.currentTarget.checked)}
-              type="checkbox"
-            />
-            TeX
-          </label>
+          <Switch
+            checked={config.tex}
+            label="TeX"
+            onChange={(enabled) => handleSetting('tex', enabled)}
+          />
         </fieldset>
 
         <div className="playground-actions">
-          <button onClick={handleResetSettings} type="button">
-            Reset settings
-          </button>
+          <Button onClick={handleResetSettings}>Reset settings</Button>
 
-          <button onClick={handleResetText} type="button">
-            Reset text
-          </button>
+          <Button onClick={handleResetText}>Reset text</Button>
 
           {playbackMode ? (
-            <button className="playground-primary" onClick={handleBackToEditor} type="button">
+            <Button onClick={handleBackToEditor} primary>
               Back to editor
-            </button>
+            </Button>
           ) : (
-            <button
-              className="playground-primary"
-              disabled={text.length === 0}
-              onClick={handlePlay}
-              type="button"
-            >
+            <Button disabled={text.length === 0} onClick={handlePlay} primary>
               Play
-            </button>
+            </Button>
           )}
         </div>
       </header>
@@ -118,63 +101,62 @@ export const Playground = ({ actions, patches, ...props }: PlaygroundProps) => {
         <fieldset className="playground-transport">
           <legend>Playback controls</legend>
 
-          <label>
-            Speed
-            <input
-              aria-label="Speed"
-              max={100}
-              min={1}
-              onChange={(event) => setSpeed(Number(event.currentTarget.value))}
-              type="range"
-              value={speed}
-            />
-            <output>{speed} ticks/s</output>
-          </label>
+          <Slider
+            format={(value) => `${value} ticks/s`}
+            label="Rate"
+            max={100}
+            min={1}
+            onChange={setSpeed}
+            step={1}
+            value={speed}
+          />
 
-          <label>
-            Chunk size
-            <input
-              aria-label="Chunk size"
-              max={20}
-              min={1}
-              onChange={(event) => setChunkSize(Number(event.currentTarget.value))}
-              type="range"
-              value={chunkSize}
-            />
-            <output>{chunkSize} chars</output>
-          </label>
+          <Slider
+            format={(value) => `${value} chars`}
+            label="Chunk size"
+            max={20}
+            min={1}
+            onChange={setChunkSize}
+            step={1}
+            value={chunkSize}
+          />
 
-          <label>
-            Progress
-            <input
-              aria-label="Progress"
-              max={100}
-              min={0}
-              onChange={(event) => handleProgress(Number(event.currentTarget.value))}
-              type="range"
-              value={progress}
-            />
-            <output>{Math.round(progress)}%</output>
-          </label>
+          <Slider
+            format={(value) => `${Math.round(value)}%`}
+            label="Progress"
+            max={100}
+            min={0}
+            onChange={handleProgress}
+            step={1}
+            value={progress}
+          />
 
           <div className="playground-actions">
-            <button disabled={cursor === 0} onClick={handleStepBackward} type="button">
+            <Button disabled={cursor === 0} onClick={handleStepBackward}>
               Step backward
-            </button>
+            </Button>
 
-            <button disabled={complete} onClick={handlePause} type="button">
+            <Button disabled={complete} onClick={handlePause}>
               {stopped ? 'Resume' : 'Pause'}
-            </button>
+            </Button>
 
-            <button disabled={complete} onClick={handleStepForward} type="button">
+            <Button disabled={complete} onClick={handleStepForward}>
               Step forward
-            </button>
+            </Button>
 
-            <button disabled={playbackText.length === 0} onClick={handleReplay} type="button">
+            <Button disabled={playbackText.length === 0} onClick={handleReplay}>
               Replay
-            </button>
+            </Button>
           </div>
         </fieldset>
+      ) : null}
+
+      {playbackMode ? (
+        <>
+          <StreamingLabControls lab={lab} />
+
+          <StreamingLabInspector lab={lab} />
+        </>
       ) : null}
 
       <div className="playground-workspace">
@@ -208,6 +190,7 @@ export const Playground = ({ actions, patches, ...props }: PlaygroundProps) => {
           ariaLabel={playbackMode ? 'Playback preview' : 'Preview'}
           config={config}
           patches={patches}
+          streaming={playbackMode ? lab.streaming : undefined}
           text={previewText}
         />
       </div>

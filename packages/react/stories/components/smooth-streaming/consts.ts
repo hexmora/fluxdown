@@ -1,3 +1,5 @@
+import type { ChunkPacing } from './type';
+
 export const SMOOTH_MARKDOWN = `# A smoother stream
 
 Incoming Markdown arrives in uneven chunks. **Fluxdown reveals the rendered content gradually**, keeping formatting in place as each phrase grows.
@@ -18,3 +20,11 @@ A few words arrive quickly, then a longer pause, then a burst of text. The previ
 
 The stream is complete. Reset it to watch a different sequence of chunks.
 `;
+
+export const DEFAULT_PACING: ChunkPacing = {
+  seed: 1,
+  minSize: 1,
+  maxSize: 24,
+  minDelay: 50,
+  maxDelay: 350,
+};
