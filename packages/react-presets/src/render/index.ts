@@ -13,6 +13,7 @@ import { LinkRenderPlugin } from './link';
 import { ListRenderPlugin } from './list';
 import { ParagraphRenderPlugin } from './paragraph';
 import { PatchRenderPlugin } from './patch';
+import { ScaleRenderPlugin } from './scale';
 import { ShadRenderPlugin } from './shad';
 import { StrongRenderPlugin } from './strong';
 import { TableRenderPlugin } from './table';
@@ -30,6 +31,7 @@ export * from './link';
 export * from './list';
 export * from './paragraph';
 export * from './patch';
+export * from './scale';
 export * from './shad';
 export * from './strong';
 export * from './table';
@@ -39,6 +41,7 @@ export * from './tex';
 export const PRESET_RENDER_PLUGINS: PluginClass<IReactRenderPlugin>[] = [
   PatchRenderPlugin,
   ShadRenderPlugin,
+  ScaleRenderPlugin,
   CodeRenderPlugin,
   EmphasisRenderPlugin,
   ImageRenderPlugin,

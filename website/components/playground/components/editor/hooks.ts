@@ -13,7 +13,7 @@ export const useEditor = (lang: Locale) => {
 
   const [repair, setRepair] = useState(true);
 
-  const [effect, setEffect] = useState<EditorEffect>('shad');
+  const [effect, setEffect] = useState<EditorEffect>('scale');
 
   const [playback, setPlayback] = useState(false);
 

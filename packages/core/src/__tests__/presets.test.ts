@@ -1,6 +1,6 @@
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
 
-import { PRESET_MAPPER_PLUGINS, Shad, Smooth } from '@fluxdown/core-presets/mapper';
+import { PRESET_MAPPER_PLUGINS, Scale, Shad, Smooth } from '@fluxdown/core-presets/mapper';
 import { PRESET_REHYPE_PLUGINS } from '@fluxdown/core-presets/rehype';
 import { PRESET_REMARK_PLUGINS, SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/remark';
 import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-presets/repair';
@@ -11,7 +11,7 @@ describe('core preset imports', () => {
   test('resolves plugins through their public type entry points', () => {
     expect(typeof Smooth).toBe('function');
 
-    expect(PRESET_MAPPER_PLUGINS).toEqual([Smooth, Shad]);
+    expect(PRESET_MAPPER_PLUGINS).toEqual([Smooth, Shad, Scale]);
 
     expect(PRESET_REHYPE_PLUGINS.length).toBeGreaterThan(0);
 

@@ -10,7 +10,7 @@ import type {
 } from '@fluxdown/types';
 /** @jsxImportSource stative */
 
-import { Shad, Smooth } from '@fluxdown/core-presets/mapper';
+import { Scale, Shad, Smooth } from '@fluxdown/core-presets/mapper';
 import { HoistFootnoteRehypePlugin } from '@fluxdown/core-presets/rehype';
 import { ApplyRepairsRemarkPlugin, SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/remark';
 import { DanglingFootnoteRepairPlugin } from '@fluxdown/core-presets/repair';
@@ -84,9 +84,9 @@ describe('pack state mappers', () => {
 
     next.mockClear();
 
-    expect(initial).toEqual([Smooth, Shad]);
+    expect(initial).toEqual([Smooth, Shad, Scale]);
 
-    extras.next([Shad]);
+    extras.next([Shad, Scale]);
 
     expect(state.value.value).toBe(initial);
 
@@ -96,7 +96,7 @@ describe('pack state mappers', () => {
 
     extras.next([[], { shad: { enabled } }]);
 
-    expect(state.value.value).toEqual([Smooth, [Shad, { enabled }]]);
+    expect(state.value.value).toEqual([Smooth, [Shad, { enabled }], Scale]);
 
     expect(next).toHaveBeenCalledTimes(1);
 
@@ -123,15 +123,15 @@ describe('pack state mappers', () => {
 
     const state = render(S([MapperPluggables, { extras }]));
 
-    expect(state.value.value).toEqual([Smooth, Identity, [Shad, { enabled }]]);
+    expect(state.value.value).toEqual([Smooth, Scale, Identity, [Shad, { enabled }]]);
 
     extras.next([Shad, Identity, [Shad, { length }]]);
 
-    expect(state.value.value).toEqual([Smooth, [Shad, { length }], Identity]);
+    expect(state.value.value).toEqual([Smooth, Scale, [Shad, { length }], Identity]);
 
     extras.next([Identity, Shad, Smooth, [Identity, { priority: 1 }]]);
 
-    expect(state.value.value).toEqual([[Identity, { priority: 1 }], Shad, Smooth]);
+    expect(state.value.value).toEqual([Scale, [Identity, { priority: 1 }], Shad, Smooth]);
 
     state.destroy();
 

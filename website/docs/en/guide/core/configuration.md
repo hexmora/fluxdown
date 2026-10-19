@@ -217,7 +217,7 @@ const repairs: RepairOptions = [
 
 **Default:** `undefined`
 
-Reactive HAST mapping. `Smooth` and `Shad` are included but disabled until configured. See [mapper](./plugins/mapper.md) for declaration and reactive options.
+Reactive HAST mapping. `Smooth`, `Shad`, and `Scale` are included but disabled until configured. See [mapper](./plugins/mapper.md) for declaration and reactive options.
 
 ```ts
 import { toClosure } from 'stative';

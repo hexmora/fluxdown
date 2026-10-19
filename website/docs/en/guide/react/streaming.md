@@ -63,7 +63,17 @@ You can also control them separately. For example, add the trailing fade:
 
 `length` is the number of trailing characters included in the fade. `maskWidth` is the fade mask's width in pixels. The defaults work well for most interfaces; adjust them when you need to match your typography or motion style.
 
-`effect` also accepts a [mapper plugin](../core/plugins/mapper.md), a configured tuple, or an array such as `['shad', [Mapper, options]]`. Set it to `false` to disable visual effects while keeping smooth output.
+## Animate each new character
+
+Use `effect: 'scale'` to grow and fade in newly revealed characters while their blur clears:
+
+```tsx
+<Fluxdown streaming={isStreaming && { effect: 'scale' }} text={text} />
+```
+
+Existing content stays still, and the animation respects reduced-motion preferences. See [effect configuration](./configuration.md#scaleduration) to adjust the timing, scale, and blur.
+
+`effect` also accepts a [mapper plugin](../core/plugins/mapper.md), a configured tuple, or an array such as `['shad', 'scale']`. Set it to `false` to disable visual effects while keeping smooth output.
 
 ## Finish or replace a message
 
