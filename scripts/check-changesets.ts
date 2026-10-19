@@ -60,7 +60,7 @@ export function isChangesetPath(file: string): boolean {
   return (
     !name.startsWith('.') &&
     !/^README\.md$/i.test(name) &&
-    !['AGENTS.md', 'CLAUDE.md', 'GEMINI.md'].includes(name)
+    !['AGENTS.md', 'CLAUDE.md'].includes(name)
   );
 }
 

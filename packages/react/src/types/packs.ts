@@ -75,8 +75,8 @@ export interface StreamingConfig {
 
   /**
    * One effect or an ordered list of effects applied to newly revealed content.
-   * Set to true to enable the default trailing fade.
-   * @default false
+   * Set to true to enable the default scale entrance, or false to disable effects.
+   * @default 'scale'
    */
   effect?: boolean | EffectItem | EffectItem[];
 }

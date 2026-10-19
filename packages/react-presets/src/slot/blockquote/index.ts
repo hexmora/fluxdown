@@ -5,7 +5,7 @@ import { BlockquoteRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-blockquote'?: IPluggableConfig<void>;
+    'slot-blockquote': IPluggableConfig<void>;
   }
 }
 

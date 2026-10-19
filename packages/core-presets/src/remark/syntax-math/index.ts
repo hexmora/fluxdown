@@ -17,7 +17,7 @@ export type { SyntaxMathRemarkPluginConfig } from './type';
 
 declare global {
   interface RemarkConfigs {
-    'remark-syntax-math'?: IPluggableConfig<void>;
+    'remark-syntax-math': IPluggableConfig<void>;
   }
 }
 

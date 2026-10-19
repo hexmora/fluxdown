@@ -1,0 +1,52 @@
+import { AnimationDemo } from '../../../../../../components';
+
+# Trailing fade
+
+`shad` gradually reveals the trailing text with a moving gradient. Content already displayed stays unchanged, while the last few characters become visible as the stream advances.
+
+<AnimationDemo effect="shad" />
+
+## Usage
+
+The following examples use the React component:
+
+```tsx
+<Fluxdown streaming={{ effect: 'shad' }} text={text} />
+```
+
+Smoothing is enabled by default. The following React component example adjusts the tail length and mask width to match your typography:
+
+```tsx
+<Fluxdown
+  streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+  text={text}
+/>
+```
+
+## Configuration
+
+These fields belong to the `shad` configuration object in `['shad', config]`.
+
+### enabled <span className="field-tag">Optional</span> {#enabled}
+
+**Type:** `boolean`
+
+**Default:** `true`
+
+Enable the trailing fade.
+
+### length <span className="field-tag">Optional</span> {#length}
+
+**Type:** `number`
+
+**Default:** `10`
+
+Number of trailing characters included in the fade. Fractions round down; negative and non-finite values become `0`.
+
+### maskWidth <span className="field-tag">Optional</span> {#maskwidth}
+
+**Type:** `number`
+
+**Default:** `15`
+
+Fade mask width in pixels. `0` hides the mask, negative values become `0`, and non-finite values use the default width.

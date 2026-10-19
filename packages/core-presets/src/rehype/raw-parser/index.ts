@@ -11,7 +11,7 @@ export type RawParserRehypePluginConfig = Options;
 
 declare global {
   interface RehypeConfigs {
-    'rehype-raw-parser'?: IPluggableConfig<RawParserRehypePluginConfig>;
+    'rehype-raw-parser': IPluggableConfig<RawParserRehypePluginConfig>;
   }
 }
 

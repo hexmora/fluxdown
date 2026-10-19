@@ -10,7 +10,7 @@ const BreakLine = /*#__PURE__*/ createTypeOfSlot('BreakLine');
 
 declare global {
   interface RenderConfigs {
-    'render-break-line'?: IPluggableConfig<void>;
+    'render-break-line': IPluggableConfig<void>;
   }
 }
 

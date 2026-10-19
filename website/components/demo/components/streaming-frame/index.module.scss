@@ -45,11 +45,6 @@
         color: var(--site-ink);
       }
 
-      &:focus-visible {
-        outline: 2px solid var(--site-accent);
-        outline-offset: 2px;
-      }
-
       @media (hover: none) {
         width: 40px;
         height: 40px;

@@ -1,0 +1,28 @@
+# Animation
+
+Animation controls how new content appears. Effects are active only when `streaming` is enabled; omitting `streaming` or setting it to `false` keeps them off. It can be used with [smoothing](../smoothing.mdx), which controls when received text becomes visible.
+
+## Effect input
+
+The following forms describe the React component's `streaming.effect` option. Custom effects use the same configuration as [mapper plugins](../../../core/plugins/mapper.md).
+
+| Input                                                      | Meaning                                               |
+| ---------------------------------------------------------- | ----------------------------------------------------- |
+| `false`                                                    | Disable visual effects.                               |
+| Omitted or `true`                                          | Use [`scale`](./scale.mdx) with its default settings. |
+| An effect name, such as `'scale'`                          | Use that effect with its default settings.            |
+| `[name, config]`, such as `['scale', { duration: 250 }]`   | Configure a named effect.                             |
+| `Mapper`                                                   | Use a custom mapper with its default options.         |
+| `[Mapper, config]`                                         | Configure a custom mapper.                            |
+| An array, such as `['shad', ['scale', { duration: 250 }]]` | Combine named or custom effects.                      |
+
+## Available effects
+
+Open an effect below for its live demo and configuration. [Effect input](#effect-input) describes how to select or combine them.
+
+| Effect                 | What it does                                                             |
+| ---------------------- | ------------------------------------------------------------------------ |
+| [`shad`](./shad.mdx)   | Fades the trailing characters with a moving gradient.                    |
+| [`scale`](./scale.mdx) | Grows and fades in newly visible characters while clearing a small blur. |
+
+Each effect page includes a live demo, a React component example, and its configuration fields. Fields accept plain values or readable closures. Effects run after smoothing; `priority` controls mapper ordering and `disabled` excludes an effect.

@@ -11,7 +11,7 @@ const List = /*#__PURE__*/ createTypeOfSlot('List');
 
 declare global {
   interface RenderConfigs {
-    'render-list'?: IPluggableConfig<void>;
+    'render-list': IPluggableConfig<void>;
   }
 }
 

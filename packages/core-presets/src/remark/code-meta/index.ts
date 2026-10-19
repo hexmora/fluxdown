@@ -8,7 +8,7 @@ import { BaseRemarkPlugin } from '../base';
 
 declare global {
   interface RemarkConfigs {
-    'remark-code-meta'?: IPluggableConfig<void>;
+    'remark-code-meta': IPluggableConfig<void>;
   }
 }
 

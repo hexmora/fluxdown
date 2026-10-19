@@ -76,10 +76,10 @@ export const toStreamingConfig = (
   config: boolean | StreamingConfig = false,
 ): Required<StreamingConfig> => {
   if (isBoolean(config)) {
-    return { repairEnding: config, smooth: config, effect: false };
+    return { repairEnding: config, smooth: config, effect: config ? 'scale' : false };
   }
 
-  const { repairEnding = true, smooth = true, effect = false } = config;
+  const { repairEnding = true, smooth = true, effect = 'scale' } = config;
 
   return { repairEnding, smooth, effect };
 };

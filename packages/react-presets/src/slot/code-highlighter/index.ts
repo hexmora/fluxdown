@@ -5,7 +5,7 @@ import { CodeHighlighterRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-code-highlighter'?: IPluggableConfig<void>;
+    'slot-code-highlighter': IPluggableConfig<void>;
   }
 }
 

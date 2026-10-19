@@ -87,6 +87,8 @@ export const STREAM_SAMPLES = {
 
 ## 几行代码，让内容动起来
 
+以下以 React 版组件为例：
+
 \`\`\`tsx
 import { Fluxdown } from 'fluxdown';
 
@@ -210,6 +212,8 @@ Use **bold**, *emphasis*, ***both***, or ~~an old idea~~. Keep names like \`stre
 3. End streaming when done.
 
 ## Put words in motion
+
+The following example uses the React component:
 
 \`\`\`tsx
 import { Fluxdown } from 'fluxdown';

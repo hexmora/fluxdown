@@ -100,9 +100,7 @@ test.each([
   ({ request, cancel }) => {
     jest.useFakeTimers();
 
-    jest.setSystemTime(0);
-
-    stubGlobal('performance', undefined);
+    expect(performance.now()).toBe(0);
 
     const frames = mockAnimationFrames();
 

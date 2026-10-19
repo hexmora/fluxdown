@@ -8,7 +8,7 @@ import { BaseRepairPlugin } from '../base';
 
 declare global {
   interface RepairConfigs {
-    'repair-incomplete-emphasis'?: IPluggableConfig<void>;
+    'repair-incomplete-emphasis': IPluggableConfig<void>;
   }
 }
 

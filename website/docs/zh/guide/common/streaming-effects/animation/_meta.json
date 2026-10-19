@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "shad",
+    "label": "末尾渐变"
+  },
+  {
+    "type": "file",
+    "name": "scale",
+    "label": "逐字入场"
+  }
+]

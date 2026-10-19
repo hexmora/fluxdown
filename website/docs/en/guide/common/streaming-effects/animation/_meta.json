@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "shad",
+    "label": "Trailing fade"
+  },
+  {
+    "type": "file",
+    "name": "scale",
+    "label": "Character entrance"
+  }
+]

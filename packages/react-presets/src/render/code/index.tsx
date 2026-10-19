@@ -11,7 +11,7 @@ const CodeBlock = /*#__PURE__*/ createTypeOfSlot('CodeBlock');
 
 declare global {
   interface RenderConfigs {
-    'render-code'?: IPluggableConfig<void>;
+    'render-code': IPluggableConfig<void>;
   }
 }
 

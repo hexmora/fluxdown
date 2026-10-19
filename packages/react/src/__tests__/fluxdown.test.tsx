@@ -17,7 +17,7 @@ type RemarkPluggable = IPluggable<IRemarkPlugin, unknown>;
 
 declare global {
   interface RemarkConfigs {
-    'test-configured-remark'?: IPluggableConfig<{ suffix?: string }>;
+    'test-configured-remark': IPluggableConfig<{ suffix?: string }>;
   }
 }
 

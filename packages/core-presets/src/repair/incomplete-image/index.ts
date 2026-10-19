@@ -14,7 +14,7 @@ type IncompleteImageRepairPluginInnerConfig = Required<IncompleteImageRepairPlug
 
 declare global {
   interface RepairConfigs {
-    'repair-incomplete-image'?: IPluggableConfig<IncompleteImageRepairPluginConfig>;
+    'repair-incomplete-image': IPluggableConfig<IncompleteImageRepairPluginConfig>;
   }
 }
 

@@ -150,7 +150,7 @@ describe('plugin sets', () => {
   test('matches class configuration by static key and leaves absent plugins out', () => {
     const plugins: IPluggable<IRemarkPlugin, unknown>[] = [SyntaxPolicyRemarkPlugin];
 
-    const configs: RemarkConfigs = {
+    const configs: Partial<RemarkConfigs> = {
       'remark-syntax-policy': { indentedCode: true },
       'remark-syntax-footnote': { priority: PluginPriority.Low },
     };

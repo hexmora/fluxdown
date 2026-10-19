@@ -7,7 +7,7 @@ import { BaseRepairPlugin } from '../base';
 
 declare global {
   interface RepairConfigs {
-    'repair-redundant-break-before-html'?: IPluggableConfig<void>;
+    'repair-redundant-break-before-html': IPluggableConfig<void>;
   }
 }
 

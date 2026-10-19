@@ -11,7 +11,7 @@ const Heading = /*#__PURE__*/ createTypeOfSlot('Heading');
 
 declare global {
   interface RenderConfigs {
-    'render-heading'?: IPluggableConfig<void>;
+    'render-heading': IPluggableConfig<void>;
   }
 }
 

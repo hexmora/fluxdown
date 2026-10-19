@@ -14,9 +14,9 @@ type RemarkItem = IPluggable<IRemarkPlugin, unknown>;
 
 declare global {
   interface RemarkConfigs {
-    'configured-remark'?: IPluggableConfig<{ nested: { enabled: boolean }; suffix: string }>;
+    'configured-remark': IPluggableConfig<{ nested: { enabled: boolean }; suffix: string }>;
 
-    'explicitly-configured-remark'?: IPluggableConfig<{ source: string }>;
+    'explicitly-configured-remark': IPluggableConfig<{ source: string }>;
   }
 }
 

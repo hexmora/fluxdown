@@ -19,3 +19,11 @@ export type DemoControls = {
 
   replay: () => void;
 };
+
+export type DemoTiming = {
+  duration?: number;
+
+  chunks: readonly number[];
+
+  delays: readonly number[];
+};

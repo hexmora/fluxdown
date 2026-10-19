@@ -9,7 +9,7 @@ import { BaseRehypePlugin } from '../base';
 
 declare global {
   interface RehypeConfigs {
-    'rehype-hoist-footnote'?: IPluggableConfig<void>;
+    'rehype-hoist-footnote': IPluggableConfig<void>;
   }
 }
 

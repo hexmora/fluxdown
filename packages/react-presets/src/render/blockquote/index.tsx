@@ -10,7 +10,7 @@ const Blockquote = /*#__PURE__*/ createTypeOfSlot('Blockquote');
 
 declare global {
   interface RenderConfigs {
-    'render-blockquote'?: IPluggableConfig<void>;
+    'render-blockquote': IPluggableConfig<void>;
   }
 }
 

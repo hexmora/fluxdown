@@ -17,7 +17,7 @@ type SyntaxPolicyRemarkPluginInnerConfig = Required<SyntaxPolicyRemarkPluginConf
 
 declare global {
   interface RemarkConfigs {
-    'remark-syntax-policy'?: IPluggableConfig<SyntaxPolicyRemarkPluginConfig>;
+    'remark-syntax-policy': IPluggableConfig<SyntaxPolicyRemarkPluginConfig>;
   }
 }
 

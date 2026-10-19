@@ -5,7 +5,7 @@ import { ImageRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-image'?: IPluggableConfig<void>;
+    'slot-image': IPluggableConfig<void>;
   }
 }
 

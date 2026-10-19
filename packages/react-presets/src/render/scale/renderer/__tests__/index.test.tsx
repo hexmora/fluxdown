@@ -9,7 +9,8 @@ describe('ScaleRenderer', () => {
   });
 
   test('continues an in-flight character after remount and skips completed animation', () => {
-    const now = jest.spyOn(Date, 'now').mockReturnValue(1100);
+    const now = jest.spyOn(performance, 'now').mockReturnValue(1100);
+    const wallClock = jest.spyOn(Date, 'now').mockReturnValue(-1);
 
     const first = render(
       <ScaleRenderer blur={0.08} duration={200} from={0} start={1000}>
@@ -44,10 +45,11 @@ describe('ScaleRenderer', () => {
     );
 
     expect(screen.getByText('A').parentElement).not.toHaveClass('active');
+    expect(wallClock).not.toHaveBeenCalled();
   });
 
   test('retains a character during updates and only restarts a new arrival', () => {
-    const now = jest.spyOn(Date, 'now').mockReturnValue(1100);
+    const now = jest.spyOn(performance, 'now').mockReturnValue(1100);
 
     const view = render(
       <ScaleRenderer blur={0.08} duration={200} from={0} start={1000}>
@@ -85,10 +87,10 @@ describe('ScaleRenderer', () => {
   });
 
   test('renders static characters without time-dependent server markup', () => {
-    const now = jest.spyOn(Date, 'now').mockReturnValue(1100);
+    const now = jest.spyOn(performance, 'now').mockReturnValue(1100);
 
     const element = (
-      <ScaleRenderer blur={0.08} duration={200} from={0} start={0}>
+      <ScaleRenderer blur={0.08} duration={200} from={0} start={-1}>
         A
       </ScaleRenderer>
     );

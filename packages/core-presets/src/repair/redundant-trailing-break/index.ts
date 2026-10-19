@@ -8,7 +8,7 @@ import { INLINE_PARENT_TYPES, removeTrailingBreaks } from './utils';
 
 declare global {
   interface RepairConfigs {
-    'repair-redundant-trailing-break'?: IPluggableConfig<void>;
+    'repair-redundant-trailing-break': IPluggableConfig<void>;
   }
 }
 

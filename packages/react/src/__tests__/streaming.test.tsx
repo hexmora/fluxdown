@@ -8,6 +8,7 @@ import type { FluxdownProps, FluxdownRef } from '../types';
 
 import { Fluxdown } from '..';
 import { restoreGlobals } from '../../../../scripts/testing/globals';
+import scaleStyles from '../../../react-presets/src/render/scale/renderer/index.module.scss';
 import styles from '../../../react-presets/src/render/shad/renderer/index.module.scss';
 import { createRafClock } from './utils/raf';
 
@@ -37,7 +38,7 @@ describe('Fluxdown streaming options', () => {
     expect(view.container.textContent).toBe(repaired ? 'ending' : '**ending');
   });
 
-  test('enables smoothing and ending repairs without an effect with boolean streaming', async () => {
+  test('enables smoothing, ending repairs, and scale with boolean streaming', async () => {
     const clock = createRafClock();
 
     const view = render(<Fluxdown streaming text="" />);
@@ -50,7 +51,9 @@ describe('Fluxdown streaming options', () => {
 
     expect(view.container.querySelector('strong')).not.toBeNull();
 
-    expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
+    expect(
+      view.container.querySelector(`.${scaleStyles.active} .${scaleStyles.glyph}`),
+    ).not.toBeNull();
 
     expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
 

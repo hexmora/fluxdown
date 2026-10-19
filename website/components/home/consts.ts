@@ -53,7 +53,7 @@ export const COPY = {
       },
     ],
     quickTitle: '几行代码，就能开始。',
-    quickDescription: '把收到的文字交给 Fluxdown。剩下的，让阅读自然发生。',
+    quickDescription: '把收到的文字交给 Fluxdown。以下以 React 版组件为例。',
     codeComment: '// text 是截至目前收到的完整消息',
     quickLink: '阅读接入指南',
     organizationsTitle: '他们也在用',
@@ -120,7 +120,8 @@ export const COPY = {
       },
     ],
     quickTitle: 'A few lines. A good beginning.',
-    quickDescription: 'Give Fluxdown the words as they arrive. Let the reading follow.',
+    quickDescription:
+      'Give Fluxdown the words as they arrive. This example uses the React component.',
     codeComment: '// text is the full message received so far',
     quickLink: 'Read the quick start',
     organizationsTitle: 'In good company',

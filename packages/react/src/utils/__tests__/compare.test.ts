@@ -15,7 +15,7 @@ import { isPropsEqual } from '..';
 
 declare global {
   interface RemarkConfigs {
-    'test-plugin'?: IPluggableConfig<{ nested: { enabled: boolean } }>;
+    'test-plugin': IPluggableConfig<{ nested: { enabled: boolean } }>;
   }
 }
 
@@ -210,7 +210,7 @@ describe('comparison utilities', () => {
     expect(
       isPropsEqual(base, {
         ...base,
-        streaming: { repairEnding: true, smooth: true, effect: false },
+        streaming: { repairEnding: true, smooth: true, effect: 'scale' },
       }),
     ).toBe(true);
 
@@ -220,14 +220,14 @@ describe('comparison utilities', () => {
 
     expect(isPropsEqual(base, { ...base, streaming: { repairEnding: false } })).toBe(false);
 
-    expect(isPropsEqual(base, { ...base, streaming: { effect: false } })).toBe(true);
+    expect(isPropsEqual(base, { ...base, streaming: { effect: false } })).toBe(false);
 
     expect(isPropsEqual(base, { ...base, streaming: { effect: 'shad' } })).toBe(false);
 
     expect(
       isPropsEqual(
         { ...base, streaming: { effect: true } },
-        { ...base, streaming: { effect: 'shad' } },
+        { ...base, streaming: { effect: 'scale' } },
       ),
     ).toBe(true);
 

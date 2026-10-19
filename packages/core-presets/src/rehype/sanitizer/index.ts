@@ -14,7 +14,7 @@ export type { SanitizerRehypePluginConfig } from './type';
 
 declare global {
   interface RehypeConfigs {
-    'rehype-sanitizer'?: IPluggableConfig<SanitizerRehypePluginConfig>;
+    'rehype-sanitizer': IPluggableConfig<SanitizerRehypePluginConfig>;
   }
 }
 

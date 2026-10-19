@@ -11,7 +11,7 @@ const Link = /*#__PURE__*/ createTypeOfSlot('Link');
 
 declare global {
   interface RenderConfigs {
-    'render-link'?: IPluggableConfig<void>;
+    'render-link': IPluggableConfig<void>;
   }
 }
 

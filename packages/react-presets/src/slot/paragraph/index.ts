@@ -5,7 +5,7 @@ import { ParagraphRenderer } from './renderer';
 
 declare global {
   interface SlotConfigs {
-    'slot-paragraph'?: IPluggableConfig<void>;
+    'slot-paragraph': IPluggableConfig<void>;
   }
 }
 

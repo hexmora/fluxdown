@@ -17,7 +17,7 @@ export interface SyntaxStrikethroughRemarkPluginConfig {
 
 declare global {
   interface RemarkConfigs {
-    'remark-syntax-strikethrough'?: IPluggableConfig<SyntaxStrikethroughRemarkPluginConfig>;
+    'remark-syntax-strikethrough': IPluggableConfig<SyntaxStrikethroughRemarkPluginConfig>;
   }
 }
 

@@ -14,7 +14,7 @@ export type { SyntaxHtmlAllowedRemarkPluginConfig } from './type';
 
 declare global {
   interface RemarkConfigs {
-    'remark-syntax-html-allowed'?: IPluggableConfig<SyntaxHtmlAllowedRemarkPluginConfig>;
+    'remark-syntax-html-allowed': IPluggableConfig<SyntaxHtmlAllowedRemarkPluginConfig>;
   }
 }
 

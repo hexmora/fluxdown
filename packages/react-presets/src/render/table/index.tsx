@@ -10,7 +10,7 @@ const Table = /*#__PURE__*/ createTypeOfSlot('Table');
 
 declare global {
   interface RenderConfigs {
-    'render-table'?: IPluggableConfig<void>;
+    'render-table': IPluggableConfig<void>;
   }
 }
 
