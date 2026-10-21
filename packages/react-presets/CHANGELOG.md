@@ -1,5 +1,11 @@
 # @fluxdown/react-presets
 
+## 0.9.1
+
+### Patch Changes
+
+- b1d3ade: Load Prism highlighting lazily and add the full extended language bundle used by next-raw, including language aliases and embedded template support. Preserve readable source while loading, after failures, and during server rendering, and ignore stale highlighting results when streamed code changes.
+
 ## 0.9.0
 
 ### Minor Changes
