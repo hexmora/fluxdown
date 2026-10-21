@@ -1,17 +1,35 @@
-import type { Token, TokenStream } from 'prismjs';
+import type { hooks, TokenStream } from 'prismjs';
 import type { ReactNode } from 'react';
 
+import { castArray, has, isObjectLike, isString, noop, toLower, trim } from 'lodash-es';
 import Prism from 'prismjs';
 
 // React owns the code DOM; Prism only supplies token trees.
 Prism.manual = true;
 
+let languagesPromise: Promise<void> | undefined;
+
+const loadLanguages = () => {
+  languagesPromise ??= import('./languages').then(noop).catch((error: unknown) => {
+    languagesPromise = undefined;
+    throw error;
+  });
+
+  return languagesPromise;
+};
+
+const getGrammar = (language: string) => {
+  const grammar = has(Prism.languages, [language]) ? Prism.languages[language] : undefined;
+
+  return isObjectLike(grammar) ? grammar : null;
+};
+
 const renderTokens = (tokens: TokenStream): ReactNode => {
-  if (typeof tokens === 'string') {
+  if (isString(tokens)) {
     return tokens;
   }
 
-  const items: (string | Token)[] = Array.isArray(tokens) ? tokens : [tokens];
+  const items = castArray(tokens);
 
   let offset = 0;
 
@@ -19,25 +37,50 @@ const renderTokens = (tokens: TokenStream): ReactNode => {
     const key = offset;
     offset += token.length;
 
-    if (typeof token === 'string') {
+    if (isString(token)) {
       return token;
     }
 
     return (
-      <span className={['token', token.type, ...[token.alias ?? []].flat()].join(' ')} key={key}>
+      <span className={['token', token.type, ...castArray(token.alias ?? [])].join(' ')} key={key}>
         {renderTokens(token.content)}
       </span>
     );
   });
 };
 
-export const highlightCode = (code: string, language: string): ReactNode => {
-  const name = language.toLowerCase();
-  const grammar = Object.hasOwn(Prism.languages, name) ? Prism.languages[name] : undefined;
-
-  if (!grammar || typeof grammar !== 'object') {
-    return code;
+export const highlightCode = async (
+  code: string,
+  language: string,
+  signal?: AbortSignal,
+): Promise<ReactNode> => {
+  if (signal?.aborted) {
+    return null;
   }
 
-  return renderTokens(Prism.tokenize(code, grammar));
+  const name = toLower(trim(language));
+
+  if (!name || getGrammar(name) === Prism.languages.plaintext) {
+    return null;
+  }
+
+  // Extras also extend built-in grammars such as JavaScript and CSS. Initialize
+  // the complete configuration before tokenizing so block order cannot affect it.
+  await loadLanguages();
+
+  const grammar = getGrammar(name);
+
+  if (signal?.aborted || !grammar) {
+    return null;
+  }
+
+  // Match Prism.highlight's tokenizer lifecycle for JSX and embedded templates,
+  // while keeping React in charge of escaping and rendering the source.
+  const environment: hooks.TokenizeEnvironment = { code, grammar, language: name };
+
+  Prism.hooks.run('before-tokenize', environment);
+  environment.tokens = Prism.tokenize(environment.code, environment.grammar);
+  Prism.hooks.run('after-tokenize', environment);
+
+  return renderTokens(environment.tokens);
 };
