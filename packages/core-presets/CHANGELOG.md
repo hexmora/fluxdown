@@ -1,5 +1,14 @@
 # @fluxdown/core-presets
 
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies [134f67b]
+  - @fluxdown/utils@0.7.0
+  - @fluxdown/mdast@0.7.2
+  - @fluxdown/types@0.10.1
+
 ## 0.10.0
 
 ### Minor Changes
