@@ -5,7 +5,7 @@
 // reduced motion at the end of this file.
 
 .ui-label {
-  color: var(--playground-muted);
+  color: var(--playground-secondary);
   white-space: nowrap;
   user-select: none;
 }
@@ -212,6 +212,17 @@
 .ui-select-popup {
   @include tokens.tokens;
 
+  // The popup renders in a portal outside `.playground`, so it misses that border-box reset.
+  // Base UI sizes it with `height: 100%`, and content-box padding would add space below the
+  // last item.
+  box-sizing: border-box;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   min-width: var(--anchor-width);
   padding: 4px;
   border-radius: var(--playground-radius-popup);
@@ -297,9 +308,13 @@
   box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
   transition:
     transform var(--playground-move) var(--playground-ease),
-    width var(--playground-fast) var(--playground-ease);
+    width var(--playground-fast) var(--playground-ease),
+    background-color var(--playground-move) var(--playground-ease);
 
+  // The checked track is ink-colored, so the thumb takes the page color to keep contrast in
+  // both themes.
   [data-checked] > & {
+    background: var(--playground-bg);
     transform: translateX(10px);
   }
 
@@ -329,7 +344,7 @@
   padding: 0 8px;
   border: 0;
   border-radius: 3px;
-  color: var(--playground-muted);
+  color: var(--playground-secondary);
   background: transparent;
   font: inherit;
   font-size: 12px;
@@ -404,6 +419,172 @@
   padding-right: 6px;
   color: var(--playground-muted);
   font-size: 11px;
+}
+
+// Properties panel
+
+.ui-panel {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 256px;
+  min-height: 0;
+  overflow-y: auto;
+  border-right: 1px solid var(--playground-line);
+  background: var(--playground-surface);
+  overscroll-behavior: contain;
+
+  @media (max-width: 48rem) {
+    width: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--playground-line);
+  }
+}
+
+.ui-group {
+  padding: 8px 10px 10px;
+
+  & + & {
+    border-top: 1px solid var(--playground-line);
+  }
+}
+
+.ui-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 20px;
+  margin-bottom: 4px;
+
+  h3 {
+    margin: 0;
+    color: var(--playground-muted);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .ui-button {
+    height: 20px;
+    padding: 0 7px;
+    font-size: 11px;
+  }
+}
+
+// Every row shares the label column; sliders add a fixed value column on the right.
+.ui-group-body {
+  --ui-label-width: 72px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+
+  > .ui-field,
+  > .ui-slider {
+    display: grid;
+    grid-template-columns: var(--ui-label-width) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 8px;
+    min-height: 24px;
+  }
+
+  > .ui-slider {
+    grid-template-columns: var(--ui-label-width) minmax(0, 1fr) 4.5em;
+  }
+
+  // Controls shrink to the row height inside the panel.
+  .ui-select-trigger,
+  .ui-number-group {
+    height: 22px;
+  }
+
+  .ui-segmented {
+    padding: 1px;
+  }
+
+  .ui-segment {
+    height: 20px;
+  }
+
+  .ui-button {
+    height: 22px;
+  }
+
+  .ui-slider-control,
+  .ui-select-trigger,
+  .ui-segmented,
+  .ui-number-group {
+    width: 100%;
+  }
+
+  .ui-select-trigger {
+    justify-content: space-between;
+  }
+
+  .ui-segment {
+    flex: 1;
+    padding: 0 4px;
+  }
+
+  .ui-number-input {
+    flex: 1;
+    width: 0;
+    text-align: left;
+  }
+
+  .ui-switch {
+    justify-self: start;
+  }
+
+  .ui-value {
+    min-width: 0;
+    color: var(--playground-secondary);
+    text-align: right;
+  }
+}
+
+.ui-group-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 4px;
+
+  .ui-button {
+    justify-content: center;
+  }
+}
+
+// Read-only key-value rows, aligned like the controls above them.
+.ui-readouts {
+  display: grid;
+  grid-template-columns: var(--ui-label-width) minmax(0, 1fr);
+  gap: 2px 8px;
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+
+  // Each dt/dd pair is wrapped for valid markup but lays out on the dl's grid.
+  > div {
+    display: contents;
+  }
+
+  dt {
+    color: var(--playground-secondary);
+  }
+
+  dd {
+    min-width: 0;
+    margin: 0;
+    color: var(--playground-ink);
+    overflow: hidden;
+    font-family: var(--playground-mono);
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

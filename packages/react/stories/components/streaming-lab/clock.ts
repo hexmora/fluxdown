@@ -1,8 +1,8 @@
-import { BaseSmoothTicker, type SmoothTickerClass } from '@fluxdown/core-presets/mapper';
+import { BaseSmoothDriver, type SmoothDriverClass } from '@fluxdown/core-presets/mapper';
 
-import type { LabTicker } from './type';
+import type { LabDriver } from './type';
 
-import { INTERVAL_TICKER_PERIOD } from './consts';
+import { INTERVAL_DRIVER_PERIOD } from './consts';
 
 /**
  * Virtual time that advances at an adjustable rate. Changing the rate keeps the current reading,
@@ -27,11 +27,11 @@ export class PlaybackClock {
 }
 
 /**
- * Create a ticker that reports `clock` time on animation frames or on a fixed interval.
- * The class stays the same when the clock rate changes, so the scheduler keeps its motion.
+ * Create a driver that reports `clock` time on animation frames or on a fixed interval.
+ * The class stays the same when the clock rate changes, so the interpolator keeps its motion.
  */
-export const createClockTicker = (clock: PlaybackClock, schedule: LabTicker): SmoothTickerClass =>
-  class ClockSmoothTicker extends BaseSmoothTicker {
+export const createClockDriver = (clock: PlaybackClock, schedule: LabDriver): SmoothDriverClass =>
+  class ClockSmoothDriver extends BaseSmoothDriver {
     private handle: number | null = null;
 
     private generation = 0;
@@ -46,7 +46,7 @@ export const createClockTicker = (clock: PlaybackClock, schedule: LabTicker): Sm
       if (schedule === 'interval') {
         this.handle = window.setInterval(
           () => this.subject.next(clock.now()),
-          INTERVAL_TICKER_PERIOD,
+          INTERVAL_DRIVER_PERIOD,
         );
 
         return clock.now();
@@ -59,7 +59,7 @@ export const createClockTicker = (clock: PlaybackClock, schedule: LabTicker): Sm
 
         this.subject.next(clock.now(time));
 
-        // A subscriber may stop or restart the ticker while handling this frame.
+        // A subscriber may stop or restart the driver while handling this frame.
         if (generation === this.generation) {
           this.handle = requestAnimationFrame(next);
         }

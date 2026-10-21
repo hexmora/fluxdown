@@ -5,7 +5,7 @@ import type { ChunkPacing, SmoothStreamingProps } from './type';
 import { useResolvedTheme } from '../../../.storybook/theme-addon';
 import { Fluxdown } from '../../../src/packs/full';
 import { StreamingLabControls, StreamingLabInspector, useStreamingLab } from '../streaming-lab';
-import { Button, NumberField } from '../ui';
+import { Button, NumberField, Panel, PanelGroup } from '../ui';
 import { DEFAULT_PACING, SMOOTH_MARKDOWN } from './consts';
 import { createChunkPlan } from './utils';
 import '../playground/style.scss';
@@ -59,6 +59,8 @@ export const SmoothStreaming = ({
   }, [delay, playing, speed, step]);
 
   const restart = (next: ChunkPacing) => {
+    lab.inspector.clear();
+
     setPacing(next);
 
     setStep(0);
@@ -70,6 +72,8 @@ export const SmoothStreaming = ({
 
   const handlePlay = () => {
     if (complete) {
+      lab.inspector.clear();
+
       setStep(0);
     }
 
@@ -126,97 +130,103 @@ export const SmoothStreaming = ({
         </div>
       </header>
 
-      <fieldset className="playground-transport">
-        <legend>Chunk pacing</legend>
+      <div className="playground-body">
+        <Panel label="Streaming settings">
+          <PanelGroup
+            actions={
+              <Button
+                onClick={() => updatePacing({ seed: Math.floor(Math.random() * 100_000) })}
+                title="Draw a new random chunk plan"
+              >
+                New seed
+              </Button>
+            }
+            title="Chunks"
+          >
+            <NumberField
+              label="Min size"
+              max={pacing.maxSize}
+              min={1}
+              onChange={(minSize) => updatePacing({ minSize })}
+              unit="chars"
+              value={pacing.minSize}
+            />
 
-        <NumberField
-          label="Min size"
-          max={pacing.maxSize}
-          min={1}
-          onChange={(minSize) => updatePacing({ minSize })}
-          unit="chars"
-          value={pacing.minSize}
-        />
+            <NumberField
+              label="Max size"
+              max={200}
+              min={pacing.minSize}
+              onChange={(maxSize) => updatePacing({ maxSize })}
+              unit="chars"
+              value={pacing.maxSize}
+            />
 
-        <NumberField
-          label="Max size"
-          max={200}
-          min={pacing.minSize}
-          onChange={(maxSize) => updatePacing({ maxSize })}
-          unit="chars"
-          value={pacing.maxSize}
-        />
+            <NumberField
+              label="Min delay"
+              max={pacing.maxDelay}
+              min={0}
+              onChange={(minDelay) => updatePacing({ minDelay })}
+              step={10}
+              unit="ms"
+              value={pacing.minDelay}
+            />
 
-        <NumberField
-          label="Min delay"
-          max={pacing.maxDelay}
-          min={0}
-          onChange={(minDelay) => updatePacing({ minDelay })}
-          step={10}
-          unit="ms"
-          value={pacing.minDelay}
-        />
+            <NumberField
+              label="Max delay"
+              max={5000}
+              min={pacing.minDelay}
+              onChange={(maxDelay) => updatePacing({ maxDelay })}
+              step={10}
+              unit="ms"
+              value={pacing.maxDelay}
+            />
 
-        <NumberField
-          label="Max delay"
-          max={5000}
-          min={pacing.minDelay}
-          onChange={(maxDelay) => updatePacing({ maxDelay })}
-          step={10}
-          unit="ms"
-          value={pacing.maxDelay}
-        />
+            <NumberField
+              label="Seed"
+              min={0}
+              onChange={(seed) => updatePacing({ seed })}
+              value={pacing.seed}
+            />
+          </PanelGroup>
 
-        <NumberField
-          label="Seed"
-          min={0}
-          onChange={(seed) => updatePacing({ seed })}
-          value={pacing.seed}
-        />
+          <StreamingLabControls lab={lab} />
 
-        <div className="playground-actions">
-          <Button onClick={() => updatePacing({ seed: Math.floor(Math.random() * 100_000) })}>
-            New seed
-          </Button>
+          <StreamingLabInspector lab={lab} />
+        </Panel>
+
+        <div className="playground-workspace">
+          <section aria-label="Incoming Markdown" className="playground-pane">
+            <div className="playground-pane-heading">
+              <h2>Incoming chunks</h2>
+
+              <span className="playground-meta">
+                {received}/{initialText.length} chars received
+              </span>
+            </div>
+
+            <pre aria-label="Markdown stream" className="playground-source">
+              <span>{initialText.slice(0, previous)}</span>
+
+              <span className="playground-latest" key={step}>
+                {initialText.slice(previous, received)}
+              </span>
+
+              <span className="playground-unplayed">{initialText.slice(received)}</span>
+            </pre>
+          </section>
+
+          <section aria-label="Smooth preview" className="playground-pane">
+            <div className="playground-pane-heading">
+              <h2>Smoothed render</h2>
+
+              <span className="playground-meta">Visible units follow the spring</span>
+            </div>
+
+            <div className="playground-preview-content">
+              <Fluxdown streaming={lab.streaming} text={text} theme={theme} />
+            </div>
+          </section>
         </div>
-      </fieldset>
-
-      <StreamingLabControls lab={lab} />
-
-      <StreamingLabInspector lab={lab} />
-
-      <div className="playground-workspace">
-        <section aria-label="Incoming Markdown" className="playground-pane">
-          <div className="playground-pane-heading">
-            <h2>Incoming chunks</h2>
-
-            <span className="playground-meta">
-              {received}/{initialText.length} chars received
-            </span>
-          </div>
-
-          <pre aria-label="Markdown stream" className="playground-source">
-            <span>{initialText.slice(0, previous)}</span>
-
-            <span className="playground-latest" key={step}>
-              {initialText.slice(previous, received)}
-            </span>
-
-            <span className="playground-unplayed">{initialText.slice(received)}</span>
-          </pre>
-        </section>
-
-        <section aria-label="Smooth preview" className="playground-pane">
-          <div className="playground-pane-heading">
-            <h2>Smoothed render</h2>
-
-            <span className="playground-meta">Visible units follow the spring</span>
-          </div>
-
-          <div className="playground-preview-content">
-            <Fluxdown streaming={lab.streaming} text={text} theme={theme} />
-          </div>
-        </section>
       </div>
     </main>
   );

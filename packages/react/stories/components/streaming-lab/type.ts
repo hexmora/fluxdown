@@ -1,13 +1,13 @@
 export type AnimationSpeed = 0.1 | 0.25 | 0.5 | 1;
 
-export type LabTicker = 'raf' | 'interval';
+export type LabDriver = 'raf' | 'interval';
 
 export type LabEffect = 'none' | 'shad' | 'scale';
 
 export interface StreamingLabSettings {
   smooth: boolean;
 
-  ticker: LabTicker;
+  driver: LabDriver;
 
   /**
    * Spring angular frequency ω in rad/s.
@@ -26,14 +26,15 @@ export interface StreamingLabSettings {
 
   effect: LabEffect;
 
+  /**
+   * Characters the trailing fade aims to keep fading at once.
+   */
   shadLength: number;
 
-  maskWidth: number;
-
   /**
-   * Trailing-fade hide delay in milliseconds at 1×.
+   * Longest per-character fade in milliseconds at 1×.
    */
-  hideDelay: number;
+  shadDuration: number;
 
   /**
    * Scale entrance duration in milliseconds at 1×.
@@ -45,9 +46,22 @@ export interface StreamingLabSettings {
   scaleBlur: number;
 }
 
+/**
+ * One recorded interpolator state, in playback-clock milliseconds.
+ */
+export interface SpringSample {
+  time: number;
+
+  target: number;
+
+  position: number;
+
+  velocity: number;
+}
+
 export interface SpringSnapshot {
   /**
-   * Whether a scheduler instance has been created for the current preview.
+   * Whether an interpolator instance has been created for the current preview.
    */
   attached: boolean;
 

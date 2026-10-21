@@ -3,15 +3,18 @@
 // Popups render in a portal outside `.playground`, so they include the same tokens.
 @mixin tokens {
   --playground-bg: light-dark(#fff, #212121);
-  --playground-surface: light-dark(#f7f7f8, #2a2a2b);
-  --playground-raised: light-dark(#fff, #2f2f31);
-  --playground-hover: light-dark(#efeff1, #343436);
-  --playground-press: light-dark(#e6e6e9, #3d3d40);
-  --playground-ink: light-dark(#202123, #ececf1);
-  --playground-muted: light-dark(#6e6e80, #a1a1aa);
-  --playground-faint: light-dark(#b4b4bd, #5c5c66);
-  --playground-line: light-dark(#e5e5e8, #3a3a3d);
-  --playground-line-strong: light-dark(#d1d1d6, #4b4b50);
+  --playground-surface: light-dark(#f4f4f5, #1a1a1b);
+  --playground-raised: light-dark(#fff, #2c2c2f);
+  --playground-hover: light-dark(#e9e9ec, #36363a);
+  --playground-press: light-dark(#dedee2, #424247);
+  --playground-ink: light-dark(#18181b, #fafafa);
+  // Labels and values: clearly readable, one step below ink.
+  --playground-secondary: light-dark(#3f3f46, #d4d4d8);
+  // Headings, units, and hints.
+  --playground-muted: light-dark(#5f5f69, #a8a8b2);
+  --playground-faint: light-dark(#a1a1aa, #63636c);
+  --playground-line: light-dark(#dcdce1, #36363b);
+  --playground-line-strong: light-dark(#babac2, #56565e);
   --playground-focus: light-dark(#2563eb, #60a5fa);
   --playground-focus-ring: 0 0 0 2px var(--playground-bg), 0 0 0 4px var(--playground-focus);
   --playground-shadow-popup:

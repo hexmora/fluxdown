@@ -3,9 +3,9 @@ import { useMemo, useRef, useState } from 'react';
 import type { EffectItem, StreamingConfig } from '../../../src/packs/full';
 import type { StreamingLabSettings } from './type';
 
-import { createClockTicker, PlaybackClock } from './clock';
+import { createClockDriver, PlaybackClock } from './clock';
 import { DEFAULT_LAB_SETTINGS } from './consts';
-import { createSpringInspector } from './inspector';
+import { createSpringInspector } from './spring-inspector';
 
 const getEffect = (settings: StreamingLabSettings): EffectItem | false => {
   // Effect durations are wall-clock milliseconds, so they stretch with the playback rate.
@@ -15,8 +15,7 @@ const getEffect = (settings: StreamingLabSettings): EffectItem | false => {
         'shad',
         {
           length: settings.shadLength,
-          maskWidth: settings.maskWidth,
-          hideDelay: settings.hideDelay / settings.speed,
+          duration: settings.shadDuration / settings.speed,
         },
       ];
     case 'scale':
@@ -39,7 +38,7 @@ const getEffect = (settings: StreamingLabSettings): EffectItem | false => {
 export const useStreamingLab = (initial: Partial<StreamingLabSettings> = {}) => {
   const [settings, setSettings] = useState(() => ({ ...DEFAULT_LAB_SETTINGS, ...initial }));
 
-  // Created once so speed and spring changes reach the running scheduler without replacing it.
+  // Created once so speed and spring changes reach the running interpolator without replacing it.
   const [lab] = useState(() => {
     const clock = new PlaybackClock();
 
@@ -47,9 +46,9 @@ export const useStreamingLab = (initial: Partial<StreamingLabSettings> = {}) => 
 
     return {
       clock,
-      tickers: {
-        raf: createClockTicker(clock, 'raf'),
-        interval: createClockTicker(clock, 'interval'),
+      drivers: {
+        raf: createClockDriver(clock, 'raf'),
+        interval: createClockDriver(clock, 'interval'),
       },
       inspector: createSpringInspector(settings),
     };
@@ -79,8 +78,8 @@ export const useStreamingLab = (initial: Partial<StreamingLabSettings> = {}) => 
     (): StreamingConfig => ({
       smooth: settings.smooth && {
         enabled: true,
-        ticker: lab.tickers[settings.ticker],
-        scheduler: lab.inspector.Scheduler,
+        driver: lab.drivers[settings.driver],
+        interpolation: lab.inspector.Interpolator,
       },
       effect: getEffect(settings),
     }),
@@ -93,6 +92,7 @@ export const useStreamingLab = (initial: Partial<StreamingLabSettings> = {}) => 
     reset: () => update(DEFAULT_LAB_SETTINGS),
     streaming,
     inspector: lab.inspector,
+    clock: lab.clock,
   };
 };
 

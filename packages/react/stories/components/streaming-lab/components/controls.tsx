@@ -1,14 +1,10 @@
 import { toPhysicalSpring } from '@fluxdown/core-presets/mapper';
-import { useSyncExternalStore } from 'react';
 
-import type { StreamingLab } from './hooks';
-import type { AnimationSpeed, LabEffect, LabTicker } from './type';
+import type { StreamingLab } from '../hooks';
+import type { AnimationSpeed, LabDriver, LabEffect } from '../type';
 
-import { Button, Segmented, Select, Slider, Switch } from '../ui';
-import { ANIMATION_SPEEDS } from './consts';
-
-export * from './hooks';
-export type * from './type';
+import { Button, PanelGroup, Readouts, Segmented, Select, Slider, Switch } from '../../ui';
+import { ANIMATION_SPEEDS } from '../consts';
 
 const getSpringType = (dampingRatio: number) => {
   if (Math.abs(dampingRatio - 1) < 1e-6) {
@@ -18,7 +14,7 @@ const getSpringType = (dampingRatio: number) => {
   return dampingRatio < 1 ? 'Underdamped' : 'Overdamped';
 };
 
-const TICKER_OPTIONS: { value: LabTicker; label: string }[] = [
+const DRIVER_OPTIONS: { value: LabDriver; label: string }[] = [
   { value: 'raf', label: 'Animation frame' },
   { value: 'interval', label: 'Interval 16 ms' },
 ];
@@ -32,7 +28,7 @@ const EFFECT_OPTIONS: { value: LabEffect; label: string }[] = [
 const SPEED_OPTIONS = ANIMATION_SPEEDS.map((speed) => ({ value: speed, label: `${speed}×` }));
 
 /**
- * Smoothing, spring, playback-rate, and effect controls for a streaming lab.
+ * Clock, spring, and effect groups for a streaming lab's properties panel.
  */
 export const StreamingLabControls = ({ lab }: { lab: StreamingLab }) => {
   const { settings, update, reset } = lab;
@@ -43,29 +39,36 @@ export const StreamingLabControls = ({ lab }: { lab: StreamingLab }) => {
 
   return (
     <>
-      <fieldset className="playground-transport">
-        <legend>Smoothing</legend>
-
+      <PanelGroup
+        actions={
+          <Button onClick={reset} title="Restore every streaming setting">
+            Reset
+          </Button>
+        }
+        title="Clock"
+      >
         <Switch
           checked={settings.smooth}
           label="Smooth"
           onChange={(smooth) => update({ smooth })}
         />
 
-        <Select<LabTicker>
-          label="Ticker"
-          onChange={(ticker) => update({ ticker })}
-          options={TICKER_OPTIONS}
-          value={settings.ticker}
+        <Select<LabDriver>
+          label="Driver"
+          onChange={(driver) => update({ driver })}
+          options={DRIVER_OPTIONS}
+          value={settings.driver}
         />
 
         <Segmented<AnimationSpeed>
-          label="Animation speed"
+          label="Speed"
           onChange={(speed) => update({ speed })}
           options={SPEED_OPTIONS}
           value={settings.speed}
         />
+      </PanelGroup>
 
+      <PanelGroup title="Spring">
         <Slider
           format={(value) => `${value.toFixed(1)} rad/s`}
           label="ω frequency"
@@ -86,19 +89,17 @@ export const StreamingLabControls = ({ lab }: { lab: StreamingLab }) => {
           value={settings.dampingRatio}
         />
 
-        <span className="playground-meta">
-          {getSpringType(settings.dampingRatio)} · k {stiffness.toFixed(1)} · c {damping.toFixed(1)}{' '}
-          · c critical {critical.toFixed(1)}
-        </span>
+        <Readouts
+          label="Physical spring"
+          rows={[
+            ['Type', getSpringType(settings.dampingRatio)],
+            ['Stiffness', `k ${stiffness.toFixed(1)}`],
+            ['Damping', `c ${damping.toFixed(1)} · crit ${critical.toFixed(1)}`],
+          ]}
+        />
+      </PanelGroup>
 
-        <div className="playground-actions">
-          <Button onClick={reset}>Reset streaming</Button>
-        </div>
-      </fieldset>
-
-      <fieldset className="playground-transport">
-        <legend>Effect</legend>
-
+      <PanelGroup title="Effect">
         <Select<LabEffect>
           label="Effect"
           onChange={(effect) => update({ effect })}
@@ -109,8 +110,8 @@ export const StreamingLabControls = ({ lab }: { lab: StreamingLab }) => {
         {settings.effect === 'shad' ? (
           <>
             <Slider
-              format={(value) => `${value} chars`}
-              label="Fade length"
+              format={(value) => `${value} ch`}
+              label="In flight"
               max={30}
               min={0}
               onChange={(shadLength) => update({ shadLength })}
@@ -119,23 +120,13 @@ export const StreamingLabControls = ({ lab }: { lab: StreamingLab }) => {
             />
 
             <Slider
-              format={(value) => `${value} px`}
-              label="Mask width"
-              max={60}
-              min={0}
-              onChange={(maskWidth) => update({ maskWidth })}
-              step={1}
-              value={settings.maskWidth}
-            />
-
-            <Slider
               format={(value) => `${value} ms`}
-              label="Hide delay"
-              max={1000}
+              label="Max fade"
+              max={1500}
               min={0}
-              onChange={(hideDelay) => update({ hideDelay })}
+              onChange={(shadDuration) => update({ shadDuration })}
               step={10}
-              value={settings.hideDelay}
+              value={settings.shadDuration}
             />
           </>
         ) : null}
@@ -173,63 +164,7 @@ export const StreamingLabControls = ({ lab }: { lab: StreamingLab }) => {
             />
           </>
         ) : null}
-      </fieldset>
+      </PanelGroup>
     </>
-  );
-};
-
-/**
- * Live readout of the spring scheduler that drives the preview.
- */
-export const StreamingLabInspector = ({ lab }: { lab: StreamingLab }) => {
-  const snapshot = useSyncExternalStore(lab.inspector.subscribe, lab.inspector.getSnapshot);
-
-  const state = !lab.settings.smooth
-    ? 'Smooth off'
-    : !snapshot.attached
-      ? 'Waiting'
-      : snapshot.idle
-        ? 'Idle'
-        : 'Moving';
-
-  return (
-    <dl aria-label="Spring inspector" className="playground-inspector">
-      <div>
-        <dt>State</dt>
-        <dd>{state}</dd>
-      </div>
-      <div>
-        <dt>Target</dt>
-        <dd>{snapshot.target}</dd>
-      </div>
-      <div>
-        <dt>Visible</dt>
-        <dd>{snapshot.cursor}</dd>
-      </div>
-      <div>
-        <dt>Backlog</dt>
-        <dd>{snapshot.target - snapshot.cursor}</dd>
-      </div>
-      <div>
-        <dt>Position</dt>
-        <dd>{snapshot.position.toFixed(2)}</dd>
-      </div>
-      <div>
-        <dt>Velocity</dt>
-        <dd>{snapshot.velocity.toFixed(1)}/s</dd>
-      </div>
-      <div>
-        <dt>Ticks</dt>
-        <dd>{snapshot.ticks}</dd>
-      </div>
-      <div>
-        <dt>Frame Δ</dt>
-        <dd>{snapshot.frameInterval.toFixed(1)} ms</dd>
-      </div>
-      <div className="playground-inspector-wide">
-        <dt>Last event</dt>
-        <dd title={snapshot.lastEvent}>{snapshot.lastEvent}</dd>
-      </div>
-    </dl>
   );
 };

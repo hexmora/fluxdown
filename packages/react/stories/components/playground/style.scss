@@ -17,33 +17,20 @@
     box-sizing: border-box;
   }
 
-  // Groups keep a legend for assistive technology; the visible labels already name each control.
-  legend {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
   @media (max-width: 48rem) {
     height: auto;
     min-height: 100vh;
   }
 }
 
-.playground-toolbar,
-.playground-transport {
+.playground-toolbar {
   display: flex;
   flex: none;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 16px;
   min-width: 0;
-  margin: 0;
   padding: 7px 12px;
-  border: 0;
   border-bottom: 1px solid var(--playground-line);
 }
 
@@ -98,17 +85,6 @@
   }
 }
 
-.playground-settings {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 14px;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
 .playground-actions {
   display: flex;
   flex-wrap: wrap;
@@ -116,9 +92,21 @@
   margin-left: auto;
 }
 
+// Properties panel on the left, source and preview panes filling the rest.
+.playground-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+
+  @media (max-width: 48rem) {
+    flex-direction: column;
+  }
+}
+
 .playground-workspace {
   display: grid;
   flex: 1;
+  min-width: 0;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 0;
 
@@ -202,45 +190,6 @@
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
-  }
-}
-
-// One row of live scheduler readouts; values keep a fixed width so the row does not jitter.
-.playground-inspector {
-  display: flex;
-  flex: none;
-  flex-wrap: wrap;
-  gap: 4px 20px;
-  margin: 0;
-  padding: 6px 12px;
-  border-bottom: 1px solid var(--playground-line);
-  font-size: 12px;
-
-  > div {
-    display: flex;
-    gap: 6px;
-    min-width: 0;
-  }
-
-  dt {
-    color: var(--playground-muted);
-  }
-
-  dd {
-    min-width: 5ch;
-    margin: 0;
-    font-family: var(--playground-mono);
-    font-variant-numeric: tabular-nums;
-  }
-}
-
-.playground-inspector-wide {
-  flex: 1 1 16rem;
-
-  dd {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 }
 

@@ -1,35 +1,46 @@
 import {
   type PerceptualSpring,
-  type SmoothSchedulerClass,
-  SpringSmoothScheduler,
+  type SmoothInterpolatorClass,
+  SpringSmoothInterpolator,
 } from '@fluxdown/core-presets/mapper';
 
-import type { SpringSnapshot } from './type';
+import type { SpringSample, SpringSnapshot } from './type';
 
-import { EMPTY_SNAPSHOT } from './consts';
+import { EMPTY_SNAPSHOT, HISTORY_LIMIT } from './consts';
 
 export interface SpringInspector {
   /**
-   * Scheduler class to pass to `streaming.smooth.scheduler`. Every instance reports to this
+   * Interpolator class to pass to `streaming.smooth.interpolation`. Every instance reports to this
    * inspector and reads the inspector's current spring.
    */
-  Scheduler: SmoothSchedulerClass;
+  Interpolator: SmoothInterpolatorClass;
 
   subscribe: (listener: () => void) => () => void;
 
   getSnapshot: () => SpringSnapshot;
 
   /**
+   * Recorded states, oldest first. The array is reused, so read it rather than keep it.
+   */
+  getHistory: () => readonly SpringSample[];
+
+  /**
    * Change the spring without a jump: the current trajectory is pinned first, so the new
    * parameters only shape motion from this moment on.
    */
   retune: (spring: PerceptualSpring) => void;
+
+  /**
+   * Forget recorded motion and counters, for a stream that starts over. The interpolator itself
+   * is untouched, so live readouts resume from its current state on the next frame.
+   */
+  clear: () => void;
 }
 
 export const createSpringInspector = (initial: PerceptualSpring): SpringInspector => {
   let spring = initial;
 
-  let scheduler: InspectedSpringScheduler | null = null;
+  let interpolator: InspectedSpringInterpolator | null = null;
 
   let snapshot = EMPTY_SNAPSHOT;
 
@@ -43,8 +54,26 @@ export const createSpringInspector = (initial: PerceptualSpring): SpringInspecto
 
   const listeners = new Set<() => void>();
 
-  const attach = (instance: InspectedSpringScheduler) => {
-    scheduler = instance;
+  const history: SpringSample[] = [];
+
+  const record = () => {
+    if (!interpolator || lastTick === undefined) {
+      return;
+    }
+
+    const { target, position, velocity } = interpolator.getMotion();
+
+    history.push({ time: lastTick, target, position, velocity });
+
+    if (history.length > HISTORY_LIMIT) {
+      history.splice(0, history.length - HISTORY_LIMIT);
+    }
+  };
+
+  const attach = (instance: InspectedSpringInterpolator) => {
+    interpolator = instance;
+
+    history.length = 0;
 
     ticks = 0;
 
@@ -52,7 +81,7 @@ export const createSpringInspector = (initial: PerceptualSpring): SpringInspecto
 
     frameInterval = 0;
 
-    publish('Scheduler created');
+    publish('Interpolator created');
   };
 
   const publish = (event?: string) => {
@@ -60,11 +89,11 @@ export const createSpringInspector = (initial: PerceptualSpring): SpringInspecto
       lastEvent = event;
     }
 
-    snapshot = scheduler
+    snapshot = interpolator
       ? {
           attached: true,
-          ...scheduler.getMotion(),
-          idle: scheduler.idle,
+          ...interpolator.getMotion(),
+          idle: interpolator.idle,
           ticks,
           frameInterval,
           lastEvent,
@@ -76,7 +105,7 @@ export const createSpringInspector = (initial: PerceptualSpring): SpringInspecto
     }
   };
 
-  class InspectedSpringScheduler extends SpringSmoothScheduler {
+  class InspectedSpringInterpolator extends SpringSmoothInterpolator {
     constructor(tuple?: number[]) {
       super(tuple);
 
@@ -91,6 +120,11 @@ export const createSpringInspector = (initial: PerceptualSpring): SpringInspecto
       super.start(timestamp, index);
 
       lastTick = timestamp;
+
+      // A restart begins a new trajectory; drop the old one so the chart does not join them.
+      history.length = 0;
+
+      record();
 
       publish(`Start at ${index}`);
     }
@@ -113,6 +147,8 @@ export const createSpringInspector = (initial: PerceptualSpring): SpringInspecto
       super.push(length);
 
       if (length !== 0) {
+        record();
+
         publish(`Push +${length}`);
       }
     }
@@ -128,6 +164,8 @@ export const createSpringInspector = (initial: PerceptualSpring): SpringInspecto
 
       lastTick = timestamp;
 
+      record();
+
       publish(this.idle ? 'Reached target' : undefined);
 
       return distance;
@@ -142,7 +180,7 @@ export const createSpringInspector = (initial: PerceptualSpring): SpringInspecto
   }
 
   return {
-    Scheduler: InspectedSpringScheduler,
+    Interpolator: InspectedSpringInterpolator,
 
     subscribe: (listener) => {
       listeners.add(listener);
@@ -152,8 +190,20 @@ export const createSpringInspector = (initial: PerceptualSpring): SpringInspecto
 
     getSnapshot: () => snapshot,
 
+    getHistory: () => history,
+
+    clear: () => {
+      history.length = 0;
+
+      ticks = 0;
+
+      frameInterval = 0;
+
+      publish('Cleared for replay');
+    },
+
     retune: (next) => {
-      scheduler?.pin();
+      interpolator?.pin();
 
       spring = next;
 
