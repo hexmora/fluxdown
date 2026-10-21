@@ -27,8 +27,8 @@ export const Editor = ({ lang }: EditorProps) => {
     setEffect,
     speed,
     changeSpeed,
-    ticker,
-    scheduler,
+    driver,
+    interpolation,
     tuning,
     changeTuning,
     playback,
@@ -267,7 +267,7 @@ export const Editor = ({ lang }: EditorProps) => {
                   }
 
                   return {
-                    smooth: smooth && { enabled: true, ticker, scheduler },
+                    smooth: smooth && { enabled: true, driver, interpolation },
                     effect: getEffectConfig(effect, speed, tuning),
                     repairEnding: repair,
                   };

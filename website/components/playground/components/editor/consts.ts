@@ -83,14 +83,19 @@ export const COPY = {
 export const ANIMATION_SPEEDS = [0.1, 0.25, 0.5, 1] as const;
 
 /**
- * Default trailing-fade hide delay and scale duration, in milliseconds at 1×.
+ * Default scale entrance duration, in milliseconds at 1×.
  */
-export const EFFECT_DURATION = 200;
+export const SCALE_DURATION = 200;
 
 /**
  * Default chunk entrance duration, in milliseconds at 1×.
  */
 export const CHUNK_DURATION = 400;
+
+/**
+ * Default longest per-character trailing fade, in milliseconds at 1×.
+ */
+export const SHAD_DURATION = 400;
 
 /**
  * Delay multipliers for simulated chunk arrivals.
@@ -102,5 +107,5 @@ export const DEFAULT_TUNING: EditorTuning = {
   dampingRatio: 1,
   pace: 'steady',
   fadeLength: 10,
-  entranceDuration: EFFECT_DURATION,
+  entranceDuration: SCALE_DURATION,
 };

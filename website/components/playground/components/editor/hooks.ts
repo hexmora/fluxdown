@@ -6,7 +6,7 @@ import type { AnimationSpeed, EditorEffect, EditorTuning } from './type';
 import { getStreamSample } from '../../../demo';
 import { useStream } from '../../../hooks';
 import { CHUNK_PACES, DEFAULT_TUNING } from './consts';
-import { createClockTicker, createTunableSpring, PlaybackClock } from './utils';
+import { createClockDriver, createTunableSpring, PlaybackClock } from './utils';
 
 export const useEditor = (lang: Locale) => {
   const [text, setText] = useState(() => getStreamSample(lang));
@@ -23,8 +23,8 @@ export const useEditor = (lang: Locale) => {
 
   const [clock] = useState(() => new PlaybackClock());
 
-  // One ticker class per editor, so speed changes reach the running spring without replacing it.
-  const [ticker] = useState(() => createClockTicker(clock));
+  // One driver class per editor, so speed changes reach the running spring without replacing it.
+  const [driver] = useState(() => createClockDriver(clock));
 
   const [tuning, setTuning] = useState(DEFAULT_TUNING);
 
@@ -85,8 +85,8 @@ export const useEditor = (lang: Locale) => {
     setEffect,
     speed,
     changeSpeed,
-    ticker,
-    scheduler: spring.Scheduler,
+    driver,
+    interpolation: spring.Interpolator,
     tuning,
     changeTuning,
     playback,
