@@ -1,0 +1,19 @@
+import type { IPluggableConfig } from '@fluxdown/types';
+
+import { BaseSlotPlugin } from '@fluxdown/react-base-presets/base';
+
+import { TableRenderer } from './renderer';
+
+declare global {
+  interface SlotConfigs {
+    'slot-table': IPluggableConfig<void>;
+  }
+}
+
+export class TableSlotPlugin extends BaseSlotPlugin<'Table'> {
+  static readonly key = 'slot-table';
+
+  readonly Component = TableRenderer;
+
+  readonly type = 'Table';
+}

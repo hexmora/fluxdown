@@ -65,12 +65,30 @@ export default defineConfig({
         // Workspace demos share the same React instance as the documentation theme.
         react: fileURLToPath(new URL('./node_modules/react', import.meta.url)),
         'react-dom': fileURLToPath(new URL('./node_modules/react-dom', import.meta.url)),
+        // Native examples use the same renderer in the browser, including SVG formulas.
+        'react-native$': fileURLToPath(new URL('./node_modules/react-native-web', import.meta.url)),
+        'react-native-svg$': fileURLToPath(
+          new URL(
+            './node_modules/react-native-svg/lib/module/ReactNativeSVG.web.js',
+            import.meta.url,
+          ),
+        ),
         '@prefix': fileURLToPath(
           new URL('../packages/react-presets/src/styles/_prefix.scss', import.meta.url),
         ),
       },
     },
     tools: {
+      rspack(config) {
+        config.resolve ??= {};
+        config.resolve.extensions = [
+          '.web.tsx',
+          '.web.ts',
+          '.web.jsx',
+          '.web.js',
+          ...(config.resolve.extensions ?? ['.tsx', '.ts', '.jsx', '.js', '.json']),
+        ];
+      },
       swc: {
         jsc: {
           transform: {

@@ -1,1 +1,1 @@
-export * from './fallback';
+export * from '@fluxdown/react-base-presets/plugins/fallback';

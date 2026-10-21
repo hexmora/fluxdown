@@ -18,7 +18,11 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/types',
   '@fluxdown/core-presets',
   '@fluxdown/core',
+  '@fluxdown/react-base-presets',
+  '@fluxdown/react-base',
   '@fluxdown/react-presets',
+  '@fluxdown/react-native-presets',
+  '@fluxdown/react-native',
   'fluxdown',
 ] as const;
 
@@ -56,7 +60,13 @@ export interface ReleaseArtifactManifest {
   publishable: boolean;
   tools: { node: string; npm: string; pnpm: string; changesets: string };
   candidate?: StableCandidate;
-  verification: { nodeEntries: number; browser: BrowserCheckResult[] };
+  verification: {
+    nodeEntries: number;
+
+    nativeTypeEntries?: number;
+
+    browser: BrowserCheckResult[];
+  };
   packages: ArtifactPackage[];
 }
 
@@ -165,7 +175,19 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
   const verification = record(manifest.verification, 'artifact verification');
 
   assert(
-    Number.isSafeInteger(verification.nodeEntries) && Number(verification.nodeEntries) > 0,
+    Number.isSafeInteger(verification.nodeEntries) && Number(verification.nodeEntries) >= 0,
+    'Invalid Node consumer verification',
+  );
+
+  assert(
+    verification.nativeTypeEntries === undefined ||
+      (Number.isSafeInteger(verification.nativeTypeEntries) &&
+        Number(verification.nativeTypeEntries) > 0),
+    'Invalid native declaration verification',
+  );
+
+  assert(
+    Number(verification.nodeEntries) + Number(verification.nativeTypeEntries ?? 0) > 0,
     'Missing consumer verification',
   );
   assert(Array.isArray(verification.browser), 'Missing browser verification');

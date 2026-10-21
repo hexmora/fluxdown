@@ -1,207 +1,107 @@
+import type {
+  SlotProps as BaseSlotProps,
+  NamedSlotType,
+  SlotBaseProps as SharedSlotBaseProps,
+  SlotPositionType,
+  SlotType,
+} from '@fluxdown/react-base-presets/base';
 import type { IBasePluginConfig, IPluggable } from '@fluxdown/types';
-import type { ElementContent, Parent } from 'hast';
-import type { ComponentType, CSSProperties, MouseEvent, ReactNode } from 'react';
+import type { ComponentType, CSSProperties, MouseEvent, PropsWithChildren } from 'react';
 
-declare global {
-  interface SlotConfigs {}
-}
+import { BaseSlotPlugin as SharedBaseSlotPlugin } from '@fluxdown/react-base-presets/base';
 
-export type SlotType =
-  | 'Blockquote'
-  | 'BreakLine'
-  | 'CodeBlock'
-  | 'CodeHeader'
-  | 'CodeHighlighter'
-  | 'Emphasis'
-  | 'Heading'
-  | 'Image'
-  | 'Link'
-  | 'List'
-  | 'Paragraph'
-  | 'Strong'
-  | 'Table'
-  | 'Tex'
-  | 'Fallback'
-  | 'Wrapper';
+export type {
+  CodeBlockBaseContent,
+  CodeBlockHandleCopyFunction,
+  CodeHeaderAction,
+  CodeHeaderActions,
+  ListType,
+  NamedSlotType,
+  SlotPositionType,
+  SlotType,
+} from '@fluxdown/react-base-presets/base';
 
-type SlotChildrenProps<HasChildren extends boolean> = HasChildren extends true
-  ? { children?: ReactNode }
-  : {};
+export { CodeHeaderInnerActionKey } from '@fluxdown/react-base-presets/base';
 
-type SlotNodeProps<HasNode extends boolean> = HasNode extends true
-  ? {
-      current: ElementContent;
-
-      parents: Parent[];
-
-      render: (node: ElementContent) => ReactNode;
-    }
-  : {};
-
-export type SlotPositionType<P> = ComponentType<P> | null;
-
-type SlotBasePropsWithoutRaw<
-  T extends object,
-  HasChildren extends boolean,
-  HasNode extends boolean,
-> = {
+interface PlatformProps {
   className?: string;
 
   style?: CSSProperties;
-} & SlotChildrenProps<HasChildren> &
-  SlotNodeProps<HasNode> &
-  T;
+}
+
+type InputProps<P, Extra extends object> = Omit<P, 'Raw'> &
+  Omit<PlatformProps, keyof Extra> &
+  Extra;
+
+type PlatformSlot<P, Extra extends object = {}> = InputProps<P, Extra> & {
+  Raw: ComponentType<InputProps<P, Extra>> | null;
+};
 
 export type SlotBaseProps<
   T extends object = {},
   HasChildren extends boolean = false,
   HasNode extends boolean = false,
-> = {
-  Raw: SlotPositionType<SlotBasePropsWithoutRaw<T, HasChildren, HasNode>>;
-} & SlotBasePropsWithoutRaw<T, HasChildren, HasNode>;
+> = PlatformSlot<SharedSlotBaseProps<T, HasChildren, HasNode>>;
 
-export type BlockquoteProps = SlotBaseProps<{}, true, true>;
+export type BlockquoteProps = PlatformSlot<BaseSlotProps['Blockquote']>;
 
-export type BreakLineProps = SlotBaseProps;
+export type BreakLineProps = PlatformSlot<BaseSlotProps['BreakLine']>;
 
-export interface CodeBlockBaseContent {
-  code: string;
+export type CodeBlockProps = PlatformSlot<BaseSlotProps['CodeBlock']>;
 
-  language?: string;
+export type CodeHeaderProps = PlatformSlot<BaseSlotProps['CodeHeader']>;
 
-  meta?: string;
-}
+export type CodeHighlighterProps = PlatformSlot<BaseSlotProps['CodeHighlighter']>;
 
-/** Called after the default copy action successfully writes code to the clipboard. */
-export type CodeBlockHandleCopyFunction = (content: CodeBlockBaseContent) => void;
+export type EmphasisProps = PlatformSlot<BaseSlotProps['Emphasis']>;
 
-export enum CodeHeaderInnerActionKey {
-  Copy = 'copy',
-}
+export type HeadingProps = PlatformSlot<BaseSlotProps['Heading']>;
 
-export interface CodeHeaderAction {
-  key: CodeHeaderInnerActionKey | string;
+export type ListProps = PlatformSlot<BaseSlotProps['List']>;
 
-  target: ComponentType | ReactNode;
-}
+export type ParagraphProps = PlatformSlot<BaseSlotProps['Paragraph']>;
 
-export type CodeHeaderActions =
-  | CodeHeaderAction[]
-  | ((previous: CodeHeaderAction[]) => CodeHeaderAction[]);
+export type StrongProps = PlatformSlot<BaseSlotProps['Strong']>;
 
-export type CodeBlockProps = SlotBaseProps<
-  CodeBlockBaseContent & {
-    loading?: boolean;
+export type TableProps = PlatformSlot<BaseSlotProps['Table']>;
 
-    onCopy?: CodeBlockHandleCopyFunction;
+export type TableCellProps = PlatformSlot<BaseSlotProps['TableCell']>;
 
-    showHeader?: boolean;
+export type NodeProps = PlatformSlot<BaseSlotProps['Node']>;
 
-    suffix?: ReactNode;
-  }
->;
+export type ShadProps = PlatformSlot<BaseSlotProps['Shad']>;
 
-export type CodeHeaderProps = SlotBaseProps<
-  CodeBlockBaseContent & {
-    actions?: CodeHeaderActions;
+export type TexProps = PlatformSlot<BaseSlotProps['Tex']>;
 
-    left?: ReactNode;
+export type FallbackProps = PlatformSlot<BaseSlotProps['Fallback']>;
 
-    onCopy?: CodeBlockHandleCopyFunction;
-  }
->;
-
-export type CodeHighlighterProps = SlotBaseProps<
-  CodeBlockBaseContent & {
-    suffix?: ReactNode;
-  }
->;
-
-export type EmphasisProps = SlotBaseProps<{}, true, true>;
-
-export type HeadingProps = SlotBaseProps<{ level: number }, true, true>;
+export type WrapperProps = PlatformSlot<BaseSlotProps['Wrapper']>;
 
 export interface ImageClickParams {
   event: MouseEvent<HTMLImageElement>;
 }
 
-export type ImageProps = SlotBaseProps<
-  {
-    alt?: string;
-
-    height?: number | string;
-
-    onClick?: (params: ImageClickParams) => void;
-
-    src: string;
-
-    title?: string;
-
-    width?: number | string;
-  },
-  false,
-  true
->;
-
 export interface LinkClickParams {
   event: MouseEvent<HTMLAnchorElement>;
 }
 
-export type LinkProps = SlotBaseProps<
+export type ImageProps = PlatformSlot<
+  BaseSlotProps['Image'],
   {
-    href: string;
+    width?: number | string;
 
+    height?: number | string;
+
+    onClick?: (params: ImageClickParams) => void;
+  }
+>;
+
+export type LinkProps = PlatformSlot<
+  BaseSlotProps['Link'],
+  {
     onClick?: (params: LinkClickParams) => void;
-
-    title?: string;
-  },
-  true,
-  true
+  }
 >;
-
-export type ListType = 'bullet' | 'ordered' | 'task';
-
-export type ListProps = SlotBaseProps<{ type: ListType }, true, true>;
-
-export type ParagraphProps = SlotBaseProps<{}, true, true>;
-
-export type StrongProps = SlotBaseProps<{}, true, true>;
-
-export type TableProps = SlotBaseProps<{}, true>;
-
-export type TexProps = SlotBaseProps<
-  {
-    mode?: 'display' | 'inline';
-
-    tex: string;
-  },
-  false,
-  true
->;
-
-type FallbackOwnProps = {
-  props?: unknown;
-
-  error?: unknown;
-
-  onReset?: () => void;
-};
-
-type FallbackPropsWithoutRaw = SlotBasePropsWithoutRaw<FallbackOwnProps, false, false> & {
-  type: SlotType;
-};
-
-export type FallbackProps = {
-  Raw: SlotPositionType<FallbackPropsWithoutRaw>;
-} & FallbackPropsWithoutRaw;
-
-type WrapperPropsWithoutRaw = SlotBasePropsWithoutRaw<{ props?: unknown }, true, false> & {
-  type: SlotType;
-};
-
-export type WrapperProps = {
-  Raw: SlotPositionType<WrapperPropsWithoutRaw>;
-} & WrapperPropsWithoutRaw;
 
 export interface SlotProps {
   Blockquote: BlockquoteProps;
@@ -218,10 +118,6 @@ export interface SlotProps {
 
   Heading: HeadingProps;
 
-  Image: ImageProps;
-
-  Link: LinkProps;
-
   List: ListProps;
 
   Paragraph: ParagraphProps;
@@ -230,11 +126,21 @@ export interface SlotProps {
 
   Table: TableProps;
 
+  TableCell: TableCellProps;
+
+  Node: NodeProps;
+
+  Shad: ShadProps;
+
   Tex: TexProps;
 
   Fallback: FallbackProps;
 
   Wrapper: WrapperProps;
+
+  Image: ImageProps;
+
+  Link: LinkProps;
 }
 
 export type SlotInputProps<T extends SlotType = SlotType> = {
@@ -250,6 +156,13 @@ export interface ISlotPlugin<T extends SlotType> {
 
   readonly type: T;
 }
+
+// Keep the shared constructor identity while exposing the DOM slot contract.
+export type BaseSlotPlugin<T extends SlotType> = ISlotPlugin<T>;
+
+export const BaseSlotPlugin = SharedBaseSlotPlugin as abstract new <
+  T extends SlotType,
+>() => BaseSlotPlugin<T>;
 
 export type ISlotPluggable<T extends SlotType, O = unknown> = IPluggable<ISlotPlugin<T>, O>;
 
@@ -269,12 +182,20 @@ export type RuntimeSlotComponent = ComponentType<RuntimeSlotProps>;
 
 export type RuntimeSlotInputComponent = ComponentType<SlotInputProps>;
 
-export type NamedSlotType = Exclude<SlotType, 'Fallback' | 'Wrapper'>;
-
 export interface SlotFallbackContextValue {
   Component: RuntimeSlotInputComponent | null;
 
   props: SlotInputProps;
 
   type: NamedSlotType;
+}
+
+export interface SlotProviderProps extends PropsWithChildren {
+  plugins: readonly AnySlotPluggable[];
+}
+
+export interface SlotRendererProps {
+  props: SlotInputProps;
+
+  type: SlotType;
 }

@@ -1,1 +1,1 @@
-export * from './blockquote';
+export * from '@fluxdown/react-base-presets/plugins/blockquote';

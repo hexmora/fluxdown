@@ -15,11 +15,16 @@
   "dependencies": {
     "@fluxdown/core": "workspace:^",
     "@fluxdown/core-presets": "workspace:^",
+    "@fluxdown/react-base-presets": "workspace:^",
+    "@fluxdown/react-native": "workspace:^",
+    "@fluxdown/react-native-presets": "workspace:^",
     "@fluxdown/react-presets": "workspace:^",
     "@fluxdown/utils": "workspace:^",
     "fluxdown": "workspace:^",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-native-svg": "catalog:native",
+    "react-native-web": "catalog:native",
     "stative": "workspace:^"
   },
   "devDependencies": {
@@ -32,6 +37,7 @@
     "@types/react-dom": "catalog:",
     "less": "catalog:",
     "oxlint": "catalog:",
+    "react-native": "catalog:native",
     "sass": "catalog:",
     "typescript": "catalog:"
   }

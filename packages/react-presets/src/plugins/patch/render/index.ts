@@ -1,1 +1,1 @@
-export * from './patch';
+export * from '@fluxdown/react-base-presets/plugins/patch';

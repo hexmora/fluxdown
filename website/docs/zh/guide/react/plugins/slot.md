@@ -9,7 +9,7 @@ Slot 插件负责渲染插槽：代码块、链接、标题等内容已经准备
 ```tsx
 import type { CodeBlockProps } from '@fluxdown/react-presets/base';
 
-import { BaseSlotPlugin } from '@fluxdown/react-presets/base';
+import { BaseSlotPlugin } from '@fluxdown/react-base-presets/base';
 import { Fluxdown } from 'fluxdown';
 
 function CompactCodeBlock({ Raw, ...props }: CodeBlockProps) {
@@ -35,7 +35,7 @@ export function Message({ text }: MessageProps) {
 
 `key` 标识插件，`type` 选择插槽，`Component` 提供组件。把插件类放进 `slots`，Fluxdown 会管理它的创建和清理。
 
-> 插件基类和属性类型从 `@fluxdown/react-presets/base` 导入。先运行 `pnpm add @fluxdown/react-presets` 安装扩展包。
+> 共享插件基类从 `@fluxdown/react-base-presets/base` 导入，Web 属性类型从 `@fluxdown/react-presets/base` 导入。先运行 `pnpm add @fluxdown/react-base-presets @fluxdown/react-presets` 安装两个扩展包。
 
 ## 保留默认功能
 

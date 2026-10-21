@@ -1,0 +1,190 @@
+{
+  "name": "@fluxdown/react-native-presets",
+  "version": "0.1.0",
+  "description": "Platform slot plugins for Fluxdown React Native.",
+  "keywords": [
+    "llm",
+    "markdown",
+    "react-native",
+    "streaming"
+  ],
+  "homepage": "https://github.com/hexmora/fluxdown/tree/main/packages/react-native-presets#readme",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/react-native-presets"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    "./base": "./src/base/index.ts",
+    "./slot": "./src/slot/index.ts",
+    "./typings": "./src/typings/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts",
+    "./full": "./src/presets/full/index.ts",
+    "./lite": "./src/presets/lite/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      "./base": {
+        "react-native": {
+          "types": "./dist/typescript/module/base/index.d.ts",
+          "default": "./dist/module/base/index.js"
+        },
+        "import": {
+          "types": "./dist/typescript/module/base/index.d.ts",
+          "default": "./dist/module/base/index.js"
+        },
+        "require": {
+          "types": "./dist/typescript/commonjs/base/index.d.ts",
+          "default": "./dist/commonjs/base/index.js"
+        }
+      },
+      "./slot": {
+        "react-native": {
+          "types": "./dist/typescript/module/slot/index.d.ts",
+          "default": "./dist/module/slot/index.js"
+        },
+        "import": {
+          "types": "./dist/typescript/module/slot/index.d.ts",
+          "default": "./dist/module/slot/index.js"
+        },
+        "require": {
+          "types": "./dist/typescript/commonjs/slot/index.d.ts",
+          "default": "./dist/commonjs/slot/index.js"
+        }
+      },
+      "./typings": {
+        "react-native": {
+          "types": "./dist/typescript/module/typings/index.d.ts",
+          "default": "./dist/module/typings/index.js"
+        },
+        "import": {
+          "types": "./dist/typescript/module/typings/index.d.ts",
+          "default": "./dist/module/typings/index.js"
+        },
+        "require": {
+          "types": "./dist/typescript/commonjs/typings/index.d.ts",
+          "default": "./dist/commonjs/typings/index.js"
+        }
+      },
+      "./plugins/*": {
+        "react-native": {
+          "types": "./dist/typescript/module/plugins/*/index.d.ts",
+          "default": "./dist/module/plugins/*/index.js"
+        },
+        "import": {
+          "types": "./dist/typescript/module/plugins/*/index.d.ts",
+          "default": "./dist/module/plugins/*/index.js"
+        },
+        "require": {
+          "types": "./dist/typescript/commonjs/plugins/*/index.d.ts",
+          "default": "./dist/commonjs/plugins/*/index.js"
+        }
+      },
+      "./full": {
+        "react-native": {
+          "types": "./dist/typescript/module/presets/full/index.d.ts",
+          "default": "./dist/module/presets/full/index.js"
+        },
+        "import": {
+          "types": "./dist/typescript/module/presets/full/index.d.ts",
+          "default": "./dist/module/presets/full/index.js"
+        },
+        "require": {
+          "types": "./dist/typescript/commonjs/presets/full/index.d.ts",
+          "default": "./dist/commonjs/presets/full/index.js"
+        }
+      },
+      "./lite": {
+        "react-native": {
+          "types": "./dist/typescript/module/presets/lite/index.d.ts",
+          "default": "./dist/module/presets/lite/index.js"
+        },
+        "import": {
+          "types": "./dist/typescript/module/presets/lite/index.d.ts",
+          "default": "./dist/module/presets/lite/index.js"
+        },
+        "require": {
+          "types": "./dist/typescript/commonjs/presets/lite/index.d.ts",
+          "default": "./dist/commonjs/presets/lite/index.js"
+        }
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "bob build",
+    "lint": "oxlint .",
+    "test": "jest --config ../../jest.native.config.cjs --selectProjects react-native-presets --runInBand",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core-presets": "workspace:^",
+    "@fluxdown/react-base-presets": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@types/hast": "catalog:",
+    "lodash-es": "catalog:"
+  },
+  "devDependencies": {
+    "@react-native/jest-preset": "catalog:native",
+    "@testing-library/react-native": "catalog:native",
+    "@types/lodash-es": "catalog:",
+    "@types/react": "catalog:native",
+    "expect-type": "catalog:",
+    "oxlint": "catalog:",
+    "react": "catalog:native",
+    "react-native": "catalog:native",
+    "react-native-builder-bob": "catalog:native",
+    "react-native-svg": "catalog:native",
+    "react-test-renderer": "catalog:native",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "react-native": ">=0.76.0",
+    "react-native-svg": ">=15.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-native-svg": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "dist",
+    "exclude": "**/{__tests__,__snapshots__}/**",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "commonjs",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  }
+}

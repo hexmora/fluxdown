@@ -6,7 +6,7 @@
 
 `@fluxdown/core` 将不断变化的 Markdown 转为基于 HAST（HTML 语法树）的响应式内容块。它负责解析、语法修复和更新，由你的渲染器决定每个块如何输出。
 
-Core 无需浏览器即可运行，适合构建自定义渲染器或框架集成。如果需要开箱即用的 React 组件，请使用 [`fluxdown`](../../react/docs/README.zh-CN.md)。
+Core 无需浏览器即可运行，适合构建自定义渲染器或框架集成。如果需要开箱即用的组件，React 应用使用 [`fluxdown`](../../react/docs/README.zh-CN.md)，原生应用使用 [`@fluxdown/react-native`](../../react-native/docs/README.zh-CN.md)。
 
 ## 安装
 

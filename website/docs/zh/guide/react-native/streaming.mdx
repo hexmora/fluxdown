@@ -1,0 +1,58 @@
+import { NativeDemo } from '../../../../components';
+
+# 流式内容
+
+React Native 与 React 使用相同的累计 `text`、语法修复、平滑输出和 `streaming.effect` 配置。在应用中累加收到的片段，在请求结束、失败或取消时将 `streaming` 设为 `false`。
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text, pending }: { text: string; pending: boolean }) {
+  return (
+    <Fluxdown
+      streaming={pending && { effect: ['scale', ['suffix', { type: 'dot' }]] }}
+      text={text}
+    />
+  );
+}
+```
+
+请求处理和累计文本示例见 [React 的流式内容](../react/streaming.md)。三个[原生预设](./bundle-size.md)遵循相同的流式契约；Raw 需要加入对应效果的渲染插件。
+
+## 对比渲染组件
+
+两侧预览接收同一份 Markdown 和相同的更新。可以选择效果、预设和内容，也可以拖动已接收文本滑块检查具体位置。关闭流式模式可查看完成后的输出。本例的 Raw 使用完整的 Lite 插件列表。
+
+<NativeDemo />
+
+原生预览通过 React Native Web 运行实际的 React Native 组件，并与 React 预览使用相同的字体、字号和行高。它使用原生效果插件，不将其替换为 React 的 DOM 插件。原生设备仍采用各自的文本测量、选择行为和平台字体。
+
+## 选择效果
+
+`streaming={true}` 开启语法修复、平滑输出和默认的 `scale` 效果。传入对象可分别配置；使用 `effect: false` 可保留修复和平滑输出，同时关闭动画。
+
+| 效果     | 原生行为                                 | 配置                                  |
+| -------- | ---------------------------------------- | ------------------------------------- |
+| `shad`   | 逐渐显示末尾文字。                       | `enabled`、`length`、`maskWidth`      |
+| `scale`  | 保留字符布局位置，为新字符添加入场效果。 | `enabled`、`duration`、`from`、`blur` |
+| `chunk`  | 让新出现的一组文字淡入，不移动已有内容。 | `enabled`、`duration`                 |
+| `suffix` | 在当前输出末尾跟随光标或圆点。           | `enabled`、`type`                     |
+
+```tsx
+<Fluxdown streaming={{ effect: ['shad', { length: 6, maskWidth: 18 }] }} text={text} />
+<Fluxdown streaming={{ effect: ['scale', { duration: 250, from: 0.5 }] }} text={text} />
+<Fluxdown streaming={{ smooth: false, effect: ['chunk', { duration: 300 }] }} text={text} />
+<Fluxdown streaming={{ effect: ['suffix', { type: 'cursor' }] }} text={text} />
+```
+
+效果名、配置元组、组合、自定义 mapper 和默认值遵循[通用动画指南](../common/streaming-effects/animation/index.mdx)。效果作用于平滑处理后的文本。关闭平滑时，chunk 分组对应收到的更新；开启平滑会产生更小的可见分组。效果尊重减少动态效果的系统偏好。
+
+React Native Web 使用与 React 相同的 CSS 遮罩、模糊和关键帧。iOS / Android 保留相同的配置与流式边界：`shad` 延续原生的透明度动画，`scale` 提供缩放和透明度动画；原生 Text 不支持跨平台 CSS 模糊，因此设备端不应用 `blur`。浏览器表现可通过上方的实时示例对比。
+
+## 末尾标记与自定义组件
+
+内置 suffix 支持 `cursor` 和 `dot`。未知类型只作为自定义渲染插件的元数据，不会变成可见文字。回复结束后将 `streaming` 设为 `false`，即可移除标记。
+
+原生自定义 render 插件使用 `@fluxdown/react-base-presets/base` 中的 `BaseReactRenderPlugin`，返回原生组件。行内内容必须能够放入 `Text`。自定义代码 slot 应在代码内容后渲染 `suffix` 属性，并让标记与源码分离，避免复制时混入标记。
+
+原生 slot 写法见[使用与编写插件](./plugins.md)，组件属性见[配置](./configuration.md#streaming)。

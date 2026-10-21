@@ -1,17 +1,18 @@
-import type { IBasePluginConfig } from '@fluxdown/types';
-import type { ElementContent, Parent } from 'hast';
-import type { ReactNode } from 'react';
-
-import { BaseRenderPlugin } from '@fluxdown/core';
-
-import type { IReactRenderPlugin, ReactRenderExtraParams } from './type';
-
-export * from './type';
 export * from './utils';
-
-export abstract class BaseReactRenderPlugin
-  extends BaseRenderPlugin<ElementContent, Parent, ReactNode, ReactRenderExtraParams>
-  implements IReactRenderPlugin
-{
-  readonly config: IBasePluginConfig = {};
-}
+export {
+  BaseReactRenderPlugin,
+  getStringProperty,
+  getTextContent,
+  isElementWithTag,
+  isHastElement,
+  isHastParent,
+  isHastText,
+  isSafeTagName,
+} from '@fluxdown/react-base-presets/base';
+export type {
+  IReactRenderPlugin,
+  IReactRenderPluggable,
+  ReactRenderExtraParams,
+  ReactRenderMatchParams,
+  ReactRenderParams,
+} from '@fluxdown/react-base-presets/base';

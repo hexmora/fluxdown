@@ -9,7 +9,7 @@ This example hides the code toolbar while keeping the default highlighting and c
 ```tsx
 import type { CodeBlockProps } from '@fluxdown/react-presets/base';
 
-import { BaseSlotPlugin } from '@fluxdown/react-presets/base';
+import { BaseSlotPlugin } from '@fluxdown/react-base-presets/base';
 import { Fluxdown } from 'fluxdown';
 
 function CompactCodeBlock({ Raw, ...props }: CodeBlockProps) {
@@ -35,7 +35,7 @@ export function Message({ text }: MessageProps) {
 
 `key` identifies the plugin, `type` selects the slot, and `Component` provides its component. Add the plugin class to `slots`; Fluxdown manages its creation and cleanup.
 
-> Import base classes and prop types from `@fluxdown/react-presets/base`. Install the extension package with `pnpm add @fluxdown/react-presets` first.
+> Import the shared base class from `@fluxdown/react-base-presets/base` and web prop types from `@fluxdown/react-presets/base`. Install both extension packages with `pnpm add @fluxdown/react-base-presets @fluxdown/react-presets` first.
 
 ## Keep the defaults
 

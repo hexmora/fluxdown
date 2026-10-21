@@ -32,6 +32,12 @@ export const Home = () => {
           <code>{INSTALL_COMMAND}</code>
           <CopyButton label={copy.install} value={INSTALL_COMMAND} />
         </div>
+        <div>
+          <a className={styles.textLink} href={href('/guide/react-native/quick-start')}>
+            {copy.nativeLink}
+            <ArrowIcon />
+          </a>
+        </div>
       </section>
 
       <StreamingDemo key={lang} />
@@ -83,10 +89,16 @@ export const Home = () => {
             <CodeBlockRuntime code={quickStart} lang="tsx" wrapCode />
           </div>
         </div>
-        <a className={styles.textLink} href={href('/guide/react/quick-start')}>
-          {copy.quickLink}
-          <ArrowIcon />
-        </a>
+        <div className={styles.quickLinks}>
+          <a className={styles.textLink} href={href('/guide/react/quick-start')}>
+            {copy.quickLink}
+            <ArrowIcon />
+          </a>
+          <a className={styles.textLink} href={href('/guide/react-native/quick-start')}>
+            {copy.nativeLink}
+            <ArrowIcon />
+          </a>
+        </div>
       </section>
 
       <section className={styles.architecture} aria-labelledby="architecture-title">
@@ -98,6 +110,10 @@ export const Home = () => {
           <div className={styles.renderers}>
             <a className={styles.frameworkCard} href={href('/guide/react/quick-start')}>
               <strong>React</strong>
+              <span>{copy.react}</span>
+            </a>
+            <a className={styles.frameworkCard} href={href('/guide/react-native/quick-start')}>
+              <strong>React Native</strong>
               <span>{copy.react}</span>
             </a>
             {UPCOMING_FRAMEWORKS.map((framework) => (
@@ -153,7 +169,7 @@ export const Home = () => {
 
       <section className={styles.closing}>
         <h2>{copy.finalTitle}</h2>
-        <a className={styles.primaryLink} href={href('/guide/react/quick-start')}>
+        <a className={styles.primaryLink} href={href('/guide/')}>
           {copy.finalButton}
           <ArrowIcon />
         </a>

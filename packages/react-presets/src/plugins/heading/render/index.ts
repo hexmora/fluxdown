@@ -1,1 +1,1 @@
-export * from './heading';
+export * from '@fluxdown/react-base-presets/plugins/heading';

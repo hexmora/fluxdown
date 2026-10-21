@@ -1,0 +1,58 @@
+import { NativeDemo } from '../../../../components';
+
+# Streaming content
+
+React Native uses the same accumulated `text`, repair, smoothing, and `streaming.effect` configuration as React. Append received chunks in your app and set `streaming` to `false` when the request finishes, fails, or is cancelled.
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text, pending }: { text: string; pending: boolean }) {
+  return (
+    <Fluxdown
+      streaming={pending && { effect: ['scale', ['suffix', { type: 'dot' }]] }}
+      text={text}
+    />
+  );
+}
+```
+
+For request handling and accumulated text examples, see [Streaming content for React](../react/streaming.md). All three [native presets](./bundle-size.md) share the same streaming contract; Raw needs the effect plugins you choose to render.
+
+## Compare the renderers
+
+Both previews receive the same Markdown and updates. Choose an effect, preset, and content type, or drag the received-text control to inspect an exact point. Disable streaming to inspect the completed output. Raw uses the complete Lite plugin list in this example.
+
+<NativeDemo />
+
+The native preview runs the actual React Native component through React Native Web. Its typography uses the same font, size, and line height as the React preview. It does not replace the native effect plugins with React's DOM plugins. Native devices still use their own text measurement, selection, and platform fonts.
+
+## Choose an effect
+
+`streaming={true}` enables repair, smoothing, and the default `scale` effect. An object lets you configure them separately. Use `effect: false` to keep repair and smoothing without animation.
+
+| Effect   | Native behavior                                            | Configuration                         |
+| -------- | ---------------------------------------------------------- | ------------------------------------- |
+| `shad`   | Reveal trailing text gradually.                            | `enabled`, `length`, `maskWidth`      |
+| `scale`  | Animate each new character while preserving its layout.    | `enabled`, `duration`, `from`, `blur` |
+| `chunk`  | Fade each newly visible group without moving earlier text. | `enabled`, `duration`                 |
+| `suffix` | Follow the current output with a cursor or dot.            | `enabled`, `type`                     |
+
+```tsx
+<Fluxdown streaming={{ effect: ['shad', { length: 6, maskWidth: 18 }] }} text={text} />
+<Fluxdown streaming={{ effect: ['scale', { duration: 250, from: 0.5 }] }} text={text} />
+<Fluxdown streaming={{ smooth: false, effect: ['chunk', { duration: 300 }] }} text={text} />
+<Fluxdown streaming={{ effect: ['suffix', { type: 'cursor' }] }} text={text} />
+```
+
+Effect names, tuples, combinations, custom mappers, and defaults follow the [shared animation guide](../common/streaming-effects/animation/index.mdx). Effects run after smoothing. With `smooth: false`, chunk groups follow your received updates; smoothing creates smaller visible groups. Effects respect reduced-motion preferences.
+
+React Native Web uses the same CSS masks, blur, and keyframes as React. On iOS and Android, configuration and stream boundaries stay the same: `shad` retains the native opacity animation, while `scale` animates scale and opacity. Native Text has no portable CSS blur support, so `blur` is not applied on devices. See the live comparison above for browser rendering.
+
+## Suffixes and custom components
+
+The built-in suffix accepts `cursor` and `dot`. Unknown types remain metadata for custom render plugins and do not become visible text. Set `streaming` to `false` to remove the marker when the response ends.
+
+Native custom render plugins use `BaseReactRenderPlugin` from `@fluxdown/react-base-presets/base` and return native components. Inline content must fit inside `Text`. Custom code slots should render their `suffix` prop immediately after the code; keep it separate from source text so copy actions do not include the marker.
+
+See [Using and writing plugins](./plugins.md) for native slots and [Configuration](./configuration.md#streaming) for the component props.

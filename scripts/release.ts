@@ -10,6 +10,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import semver from 'semver';
+import { parse as parseYaml } from 'yaml';
 
 import type {
   ArtifactPackage,
@@ -20,6 +21,7 @@ import type {
 import type { PackageArtifact, WorkspacePackage } from './types.ts';
 
 import { checkBrowserConsumer } from './check-browser.ts';
+import { checkNativePacks } from './check-native-packs.ts';
 import { checkPackage, publicEntries, readManifest } from './check-package.ts';
 import { checkReactPacks } from './check-react-packs.ts';
 import {
@@ -278,7 +280,7 @@ async function validateDependencies(selected: PackageArtifact[]) {
   }
 }
 
-async function verifyConsumer(artifacts: PackageArtifact[]) {
+async function verifyNodeConsumer(artifacts: PackageArtifact[]) {
   const consumer = await mkdtemp(path.join(tmpdir(), 'fluxdown-consumer-'));
 
   try {
@@ -517,6 +519,166 @@ ${renderSmoke}`;
   }
 }
 
+// Native declarations use a separate React Native dependency graph without DOM
+// globals. Browser bundles then resolve those same artifacts through React Native
+// Web, checking modular pack boundaries and published .web implementations.
+async function verifyNativeDeclarations(
+  artifacts: PackageArtifact[],
+  nativeArtifacts: PackageArtifact[],
+): Promise<number> {
+  const consumer = await mkdtemp(path.join(tmpdir(), 'fluxdown-native-types-'));
+
+  try {
+    const workspace = parseYaml(await readFile(path.join(root, 'pnpm-workspace.yaml'), 'utf8')) as {
+      catalogs?: { native?: Record<string, string> };
+    };
+
+    const catalog = workspace.catalogs?.native;
+
+    assert(catalog, 'Missing native dependency catalog');
+
+    const nativeDependencies = Object.fromEntries(
+      [
+        'react',
+        'react-dom',
+        'react-native',
+        'react-native-web',
+        'react-native-svg',
+        '@types/react',
+      ].map((name) => {
+        const version = catalog[name];
+
+        assert(
+          version && semver.validRange(version),
+          `Invalid native consumer version for ${name}`,
+        );
+
+        return [name, version];
+      }),
+    );
+
+    await writeFile(
+      path.join(consumer, 'package.json'),
+      JSON.stringify({
+        name: 'fluxdown-native-declaration-check',
+        private: true,
+        type: 'module',
+        dependencies: {
+          ...nativeDependencies,
+          ...Object.fromEntries(
+            artifacts.map((artifact) => [artifact.manifest.name, `file:${artifact.tarball}`]),
+          ),
+        },
+        overrides: Object.fromEntries(
+          artifacts.map((artifact) => [artifact.manifest.name, `$${artifact.manifest.name}`]),
+        ),
+      }),
+    );
+
+    run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--no-package-lock'], {
+      cwd: consumer,
+    });
+
+    run('npm', ['ls', '--all'], { cwd: consumer, capture: true });
+
+    const specifiers = nativeArtifacts.flatMap(({ manifest, files }) =>
+      publicEntries(manifest, files).map(
+        ([entry]) => manifest.name + (entry === '.' ? '' : entry.slice(1)),
+      ),
+    );
+
+    const imports = specifiers
+      .map(
+        (specifier, index) =>
+          `import * as Entry${index} from ${JSON.stringify(specifier)};\nvoid Entry${index};`,
+      )
+      .join('\n');
+
+    const usage = specifiers.includes('@fluxdown/react-native')
+      ? `
+import { createElement } from 'react';
+import { Fluxdown } from '@fluxdown/react-native';
+import { FluxdownLite } from '@fluxdown/react-native/lite';
+import { FluxdownRaw } from '@fluxdown/react-native/raw';
+import { PRESET_LIGHT_PLUGINS } from '@fluxdown/react-native-presets/lite';
+import { CodeShikiPlugin } from '@fluxdown/react-native-presets/plugins/code-shiki';
+import { TexMathjaxPlugin } from '@fluxdown/react-native-presets/plugins/tex-mathjax';
+import type { IPluginItem, PluginConfigs } from '@fluxdown/react-native-presets/typings';
+const config: PluginConfigs = { 'slot-code-header': { disabled: true } };
+const plugin: IPluginItem = { ...CodeShikiPlugin, config };
+createElement(Fluxdown, { text: 'consumer', streaming: true, selectable: true, style: [{ padding: 8 }] });
+createElement(FluxdownLite, { text: 'consumer', plugins: [plugin, TexMathjaxPlugin], streaming: { effect: ['scale', 'suffix'] } });
+createElement(FluxdownRaw, { text: 'consumer', plugins: PRESET_LIGHT_PLUGINS });
+// @ts-expect-error Raw intentionally requires an explicit plugin selection.
+createElement(FluxdownRaw, { text: 'consumer' });
+`
+      : '';
+
+    await writeFile(path.join(consumer, 'native-smoke.ts'), imports + usage);
+
+    await writeFile(
+      path.join(consumer, 'tsconfig.json'),
+      JSON.stringify({
+        compilerOptions: {
+          module: 'ESNext',
+          moduleResolution: 'Bundler',
+          customConditions: ['react-native'],
+          target: 'ES2022',
+          lib: ['ES2022'],
+          types: ['react', 'react-native'],
+          strict: true,
+          noEmit: true,
+          skipLibCheck: false,
+          jsx: 'react-jsx',
+        },
+        files: ['native-smoke.ts'],
+      }),
+    );
+
+    run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')]);
+
+    console.log(`Isolated native declarations OK: ${specifiers.length} entry points`);
+
+    if (specifiers.includes('@fluxdown/react-native/lite')) await checkNativePacks(consumer);
+
+    return specifiers.length;
+  } finally {
+    if (process.env.FLUXDOWN_KEEP_CONSUMER === '1') {
+      console.log(`Preserved native declaration consumer for inspection: ${consumer}`);
+    } else {
+      await rm(consumer, { recursive: true, force: true });
+    }
+  }
+}
+
+const isNativeArtifact = ({ manifest }: PackageArtifact) =>
+  manifest.name === '@fluxdown/react-native' || manifest.name === '@fluxdown/react-native-presets';
+
+async function verifyConsumer(
+  artifacts: PackageArtifact[],
+): Promise<ReleaseArtifactManifest['verification']> {
+  const nativeArtifacts = artifacts.filter(isNativeArtifact);
+
+  const nodeArtifacts = artifacts.filter((artifact) => !isNativeArtifact(artifact));
+
+  const verification: ReleaseArtifactManifest['verification'] = nodeArtifacts.length
+    ? await verifyNodeConsumer(nodeArtifacts)
+    : { nodeEntries: 0, browser: [] };
+
+  if (nativeArtifacts.length) {
+    const nativeDependencies = artifacts.filter(
+      ({ manifest }) => manifest.name !== 'fluxdown' && manifest.name !== '@fluxdown/react-presets',
+    );
+
+    verification.nativeTypeEntries = await verifyNativeDeclarations(
+      nativeDependencies,
+      nativeArtifacts,
+    );
+  }
+
+  return verification;
+}
+
 function retryableDownloadError(result: ReturnType<typeof run>): string | null {
   if (result.error) {
     return 'code' in result.error && result.error.code === 'ETIMEDOUT' ? 'ETIMEDOUT' : null;
@@ -622,7 +784,11 @@ async function verifyPublished(
 
     if (remaining <= 0) {
       throw new Error(
-        `npm availability verification exceeded the shared 20-minute deadline: ${[...pending.values()].map((artifact) => `${artifact.manifest.name}@${artifact.manifest.version}`).join(', ')}`,
+        `npm availability verification exceeded the shared 20-minute deadline: ${[
+          ...pending.values(),
+        ]
+          .map((artifact) => `${artifact.manifest.name}@${artifact.manifest.version}`)
+          .join(', ')}`,
       );
     }
 
@@ -859,7 +1025,8 @@ async function prepareRelease(options: ReturnType<typeof parseReleaseOptions>) {
       const destination = path.join(stage, 'packages', pkg.directory);
       const manifest = await readManifest(destination);
 
-      for (const field of dependencyFields) {
+      // Packing resolves development workspace ranges even without an installed staging tree.
+      for (const field of [...dependencyFields, 'devDependencies'] as const) {
         for (const [name, range] of Object.entries(manifest[field] ?? {})) {
           const version = stagedVersions.get(name);
 

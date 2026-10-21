@@ -20,6 +20,8 @@ const EXPECTED_SLOT_TYPES: SlotType[] = [
   'Paragraph',
   'Strong',
   'Table',
+  'TableCell',
+  'Node',
   'Tex',
 ];
 

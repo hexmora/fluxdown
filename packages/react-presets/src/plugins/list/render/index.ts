@@ -1,1 +1,1 @@
-export * from './list';
+export * from '@fluxdown/react-base-presets/plugins/list';
