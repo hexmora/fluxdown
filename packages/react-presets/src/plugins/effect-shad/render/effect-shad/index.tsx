@@ -4,7 +4,7 @@ import { assert } from '@fluxdown/utils';
 
 import type { ReactRenderMatchParams, ReactRenderParams } from '../../../../base';
 
-import { BaseReactRenderPlugin, getTextContent, isElementWithTag } from '../../../../base';
+import { BaseReactRenderPlugin } from '../../../../base';
 import { ShadRenderer } from './renderer';
 import { getShadConfig, isShadNode } from './utils';
 
@@ -24,19 +24,6 @@ export class EffectShadRenderPlugin extends BaseReactRenderPlugin {
   render({ node, renderChildren }: ReactRenderParams) {
     assert(isShadNode(node));
 
-    const [leading, active] = node.children;
-
-    assert(leading && isElementWithTag(leading, 'span'));
-
-    assert(active && isElementWithTag(active, 'span'));
-
-    return (
-      <ShadRenderer
-        {...getShadConfig(node)}
-        active={renderChildren(active)}
-        isActive={getTextContent(active).length > 0}
-        leading={renderChildren(leading)}
-      />
-    );
+    return <ShadRenderer {...getShadConfig(node)}>{renderChildren(node)}</ShadRenderer>;
   }
 }

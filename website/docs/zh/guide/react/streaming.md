@@ -55,13 +55,13 @@ async function readMarkdown(
 ```tsx
 <Fluxdown
   streaming={{
-    effect: ['shad', { length: 3, maskWidth: 18 }],
+    effect: ['shad', { length: 6, duration: 600 }],
   }}
   text={text}
 />
 ```
 
-`length` 是参与渐变的末尾字符数，`maskWidth` 是渐变遮罩的宽度，单位为像素。默认效果通常已足够；只在需要配合字体或整体动效时调整。
+`length` 是希望同时淡入的字符数，`duration` 是单个字符最长的淡入时长，单位为毫秒。在播字符越多，淡入越短。默认效果通常已足够；只在需要配合字体或整体动效时调整。
 
 ## 逐字展示新内容
 

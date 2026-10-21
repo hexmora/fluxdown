@@ -1,74 +1,85 @@
-import type { IRenderPatchItem } from '@fluxdown/core';
 import type { Element } from 'hast';
-import type { ReactNode } from 'react';
 
-import { SHAD_DATA_ATTR, SHAD_HOST_VALUE } from '@fluxdown/core-presets/mapper';
+import { SHAD_DATA_ATTR, SHAD_FADE_VALUE } from '@fluxdown/core-presets/mapper';
 import { cleanup, render } from '@testing-library/react';
-import { MutableState } from 'stative';
 
 import { EffectShadRenderPlugin } from '..';
+import { ShadRenderer } from '../renderer';
 import styles from '../renderer/index.module.scss';
+import { getShadConfig, isShadNode } from '../utils';
 
-afterEach(cleanup);
+const fade = (properties: Element['properties']): Element => ({
+  type: 'element',
+  tagName: 'span',
+  properties: { [SHAD_DATA_ATTR]: SHAD_FADE_VALUE, ...properties },
+  children: [{ type: 'text', value: 'fade' }],
+});
+
+afterEach(() => {
+  cleanup();
+
+  jest.restoreAllMocks();
+});
 
 describe('EffectShadRenderPlugin', () => {
-  test.each([
-    { maskWidth: undefined, expected: 15 },
-    { maskWidth: '24.5', expected: 24.5 },
-    { maskWidth: 'invalid', expected: 15 },
-    { maskWidth: Infinity, expected: 15 },
-    { maskWidth: -10, expected: 0 },
-    { maskWidth: 0, expected: 0 },
-  ])('renders HAST maskWidth=$maskWidth without root styles', ({ maskWidth, expected }) => {
+  test('matches only fade spans', () => {
     const plugin = new EffectShadRenderPlugin();
 
-    const patches = MutableState.of<IRenderPatchItem<ReactNode>[]>([]);
+    expect(plugin.match({ node: fade({}) } as never)).toBe(true);
 
-    const node: Element = {
-      type: 'element',
-      tagName: 'span',
-      properties: { [SHAD_DATA_ATTR]: SHAD_HOST_VALUE, dataShadMaskWidth: maskWidth },
-      children: [
-        {
-          type: 'element',
-          tagName: 'span',
-          properties: {},
-          children: [{ type: 'text', value: 'leading' }],
-        },
-        {
-          type: 'element',
-          tagName: 'span',
-          properties: {},
-          children: [{ type: 'text', value: 'active' }],
-        },
-      ],
-    };
+    expect(isShadNode({ ...fade({}), tagName: 'div' })).toBe(false);
 
-    const view = render(
-      plugin.render({
-        node,
-        parents: [],
-        getProps: () => ({}),
-        patches,
-        render: () => null,
-        renderChildren: (parent) =>
-          parent?.children.map((child) => (child.type === 'text' ? child.value : '')).join(''),
-      }),
+    expect(isShadNode(fade({ [SHAD_DATA_ATTR]: 'host' }))).toBe(false);
+  });
+
+  test.each([
+    { properties: { dataShadStart: 120, dataShadDuration: 250 }, start: 120, duration: 250 },
+    { properties: { dataShadStart: '120', dataShadDuration: '250' }, start: 120, duration: 250 },
+    { properties: {}, start: -1, duration: 400 },
+    { properties: { dataShadStart: -20, dataShadDuration: -5 }, start: -1, duration: 0 },
+    { properties: { dataShadStart: 'x', dataShadDuration: Infinity }, start: -1, duration: 400 },
+  ])('reads start and duration from $properties', ({ properties, start, duration }) => {
+    expect(getShadConfig(fade(properties))).toEqual({ start, duration });
+  });
+});
+
+describe('ShadRenderer', () => {
+  test('resumes a fade from its own start time and settles once it has finished', () => {
+    const now = jest.spyOn(performance, 'now').mockReturnValue(1100);
+
+    const running = render(
+      <ShadRenderer duration={400} start={1000}>
+        fade
+      </ShadRenderer>,
     );
 
-    expect(view.container.textContent).toBe('leadingactive');
+    expect(running.getByText('fade')).toHaveClass(styles.active!);
 
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: `${expected}px`,
-      marginLeft: `${-expected}px`,
+    expect(running.getByText('fade')).toHaveStyle({
+      animationDelay: '-100ms',
+      '--fluxdown-shad-duration': '400ms',
     });
 
-    expect(view.container.firstElementChild).not.toHaveAttribute('style');
+    running.unmount();
 
-    expect(view.container.innerHTML).not.toContain('--');
+    now.mockReturnValue(1500);
 
-    patches.destroy();
+    const settled = render(
+      <ShadRenderer duration={400} start={1000}>
+        fade
+      </ShadRenderer>,
+    );
 
-    plugin.destroy();
+    expect(settled.getByText('fade')).not.toHaveClass(styles.active!);
+  });
+
+  test('does not animate content that was already settled', () => {
+    const { getByText } = render(
+      <ShadRenderer duration={400} start={-1}>
+        fade
+      </ShadRenderer>,
+    );
+
+    expect(getByText('fade')).not.toHaveClass(styles.active!);
   });
 });

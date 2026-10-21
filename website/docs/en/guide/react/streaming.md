@@ -55,13 +55,13 @@ You can also control them separately. For example, add the trailing fade:
 ```tsx
 <Fluxdown
   streaming={{
-    effect: ['shad', { length: 3, maskWidth: 18 }],
+    effect: ['shad', { length: 6, duration: 600 }],
   }}
   text={text}
 />
 ```
 
-`length` is the number of trailing characters included in the fade. `maskWidth` is the fade mask's width in pixels. The defaults work well for most interfaces; adjust them when you need to match your typography or motion style.
+`length` is how many characters the fade aims to keep fading at once, and `duration` is the longest fade for one character in milliseconds. Fades get shorter while more characters are in flight. The defaults work well for most interfaces; adjust them when you need to match your typography or motion style.
 
 ## Animate each new character
 

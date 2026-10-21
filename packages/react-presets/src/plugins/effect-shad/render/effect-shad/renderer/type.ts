@@ -1,11 +1,9 @@
 import type { ReactNode } from 'react';
 
 export interface ShadRendererProps {
-  leading: ReactNode;
+  children: ReactNode;
 
-  active: ReactNode;
+  start: number;
 
-  isActive: boolean;
-
-  maskWidth: number;
+  duration: number;
 }

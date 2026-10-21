@@ -8,9 +8,8 @@ import { MutableState, toClosure } from 'stative';
 import type { FluxdownRef } from '../packs/full';
 
 import styles from '../../../react-presets/src/plugins/effect-scale/render/effect-scale/renderer/index.module.scss';
-import shadStyles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 
 beforeEach(() => {
   jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
@@ -60,9 +59,13 @@ describe('Fluxdown scale streaming', () => {
   });
 
   test('animates newly revealed Smooth output while preserving completed blocks and inline markup', () => {
-    const ticker = createManualTicker();
+    const driver = createManualDriver();
 
-    const smooth = { enabled: true, ticker: ticker.Ticker, scheduler: createStepScheduler(2) };
+    const smooth = {
+      enabled: true,
+      driver: driver.Driver,
+      interpolation: createStepInterpolator(2),
+    };
 
     const view = render(<Fluxdown streaming={{ smooth, effect: 'scale' }} text="first" />);
 
@@ -76,7 +79,7 @@ describe('Fluxdown scale streaming', () => {
 
     expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
 
-    act(() => ticker.current().tick(16));
+    act(() => driver.current().tick(16));
 
     expect(view.container.textContent).toBe('firstse');
 
@@ -88,7 +91,7 @@ describe('Fluxdown scale streaming', () => {
 
     jest.mocked(performance.now).mockReturnValue(1016);
 
-    act(() => ticker.current().tick(32));
+    act(() => driver.current().tick(32));
 
     expect(view.container.textContent).toBe('firstseco');
 
@@ -132,7 +135,7 @@ describe('Fluxdown scale streaming', () => {
 
     expect(view.container.querySelectorAll(`.${styles.glyph}`)).not.toHaveLength(0);
 
-    expect(view.container.querySelector(`.${shadStyles.mask}`)).not.toBeNull();
+    expect(view.container.querySelector('[data-fluxdown-shad="fade"]')).not.toBeNull();
   });
 
   test('updates tuple configuration and restarts from settled content after disabling', async () => {
@@ -183,22 +186,26 @@ describe('Fluxdown scale streaming', () => {
     expect(ref.current).toBe(core);
   });
 
-  test('accepts the Scale mapper with readable config and releases its ticker when removed', async () => {
+  test('accepts the Scale mapper with readable config and releases its driver when removed', async () => {
     const enabled = MutableState.of(true);
 
     const duration = MutableState.of(200);
 
     const options = { enabled: toClosure(enabled), duration: toClosure(duration) };
 
-    const ticker = createManualTicker();
+    const driver = createManualDriver();
 
-    const smooth = { enabled: true, ticker: ticker.Ticker, scheduler: createStepScheduler(1) };
+    const smooth = {
+      enabled: true,
+      driver: driver.Driver,
+      interpolation: createStepInterpolator(1),
+    };
 
     const view = render(<Fluxdown streaming={{ smooth, effect: [Scale, options] }} text="a" />);
 
     view.rerender(<Fluxdown streaming={{ smooth, effect: [Scale, options] }} text="abc" />);
 
-    act(() => ticker.current().tick(16));
+    act(() => driver.current().tick(16));
 
     expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('b');
 
@@ -212,7 +219,7 @@ describe('Fluxdown scale streaming', () => {
 
     expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
 
-    const instance = ticker.current();
+    const instance = driver.current();
 
     view.unmount();
 

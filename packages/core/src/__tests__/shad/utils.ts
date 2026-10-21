@@ -1,40 +1,25 @@
 import type { Element, RootContent } from 'hast';
 
-import { SHAD_DATA_ATTR, SHAD_HOST_VALUE } from '@fluxdown/core-presets/mapper';
-import { assert } from '@fluxdown/utils';
+import { SHAD_DATA_ATTR, SHAD_FADE_VALUE } from '@fluxdown/core-presets/mapper';
 
 import type { HastRoot } from '../../typings';
 
 import { collectText } from '../smooth/utils';
 
-export const findHost = (node: HastRoot | RootContent): Element | undefined => {
-  if (node.type === 'element' && node.properties[SHAD_DATA_ATTR] === SHAD_HOST_VALUE) {
-    return node;
+const findFades = (node: HastRoot | RootContent): Element[] => {
+  if (node.type === 'element' && node.properties[SHAD_DATA_ATTR] === SHAD_FADE_VALUE) {
+    return [node];
   }
 
-  if ('children' in node) {
-    for (const child of node.children) {
-      const host = findHost(child);
-
-      if (host) {
-        return host;
-      }
-    }
-  }
-
-  return undefined;
+  return 'children' in node ? node.children.flatMap(findFades) : [];
 };
 
-export const readParts = (root: HastRoot) => {
-  const host = findHost(root);
-
-  if (!host) {
-    return undefined;
-  }
-
-  const [leading, active] = host.children;
-
-  assert(leading && active);
-
-  return { leading: collectText(leading), active: collectText(active) };
-};
+/**
+ * Fading runs in document order, with the entrance each one plays.
+ */
+export const readFades = (root: HastRoot) =>
+  findFades(root).map((node) => ({
+    text: collectText(node),
+    start: node.properties.dataShadStart as number,
+    duration: node.properties.dataShadDuration as number,
+  }));

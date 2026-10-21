@@ -6,30 +6,28 @@ import type {
 } from '@fluxdown/types';
 import type { Root as HastRoot } from 'hast';
 
-export interface ShadConfig {
+export interface ShadAnimationConfig {
   /**
-   * Shade the tail of newly visible content. React effects enable this by default.
-   * @default false
-   */
-  enabled?: boolean;
-
-  /**
-   * Maximum number of visible characters in the shaded tail.
+   * Number of characters that should be fading in at once. Each arriving batch gets a shorter
+   * fade when more characters are already fading, so roughly this many stay in flight.
    * @default 10
    */
   length?: number;
 
   /**
-   * Width of the trailing gradient in pixels.
-   * @default 15
+   * Longest opacity fade for one character in milliseconds, used while few characters are
+   * fading.
+   * @default 400
    */
-  maskWidth?: number;
+  duration?: number;
+}
 
+export interface ShadConfig extends ShadAnimationConfig {
   /**
-   * Milliseconds the shaded tail remains after visible content stops growing.
-   * @default 200
+   * Fade newly visible characters in. React effects enable this by default.
+   * @default false
    */
-  hideDelay?: number;
+  enabled?: boolean;
 }
 
 export type BaseShadConfig = Required<ShadConfig>;

@@ -61,7 +61,7 @@ Core includes these plugins by default; no registration is needed.
 | Plugin   | Purpose                                                                               |
 | -------- | ------------------------------------------------------------------------------------- |
 | `Smooth` | Releases new content over time so incoming bursts appear smoothly.                    |
-| `Shad`   | Marks newly visible trailing text for a fade effect supplied by the renderer.         |
+| `Shad`   | Marks each newly visible character with a fade that the renderer plays.               |
 | `Scale`  | Marks new characters for scale, opacity, and blur animation supplied by the renderer. |
 
 All three are disabled by default in Core. To enable them in your renderer, see [Enable smooth output](../streaming.md#enable-smooth-output).
