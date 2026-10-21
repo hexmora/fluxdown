@@ -1,7 +1,7 @@
-import { BaseSmoothTicker } from '..';
+import { BaseSmoothDriver } from '..';
 import { stubGlobal } from '../../../../../../../../scripts/testing/globals';
 
-export class FakeSmoothTicker extends BaseSmoothTicker {
+export class FakeSmoothDriver extends BaseSmoothDriver {
   destroyCalls = 0;
 
   private active = false;
@@ -20,7 +20,7 @@ export class FakeSmoothTicker extends BaseSmoothTicker {
 
   start() {
     if (this.active) {
-      throw new Error('Cannot start a running ticker');
+      throw new Error('Cannot start a running driver');
     }
 
     this.active = true;
@@ -30,7 +30,7 @@ export class FakeSmoothTicker extends BaseSmoothTicker {
 
   stop() {
     if (!this.active) {
-      throw new Error('Cannot stop a stopping ticker');
+      throw new Error('Cannot stop a stopping driver');
     }
 
     this.active = false;
@@ -38,7 +38,7 @@ export class FakeSmoothTicker extends BaseSmoothTicker {
 
   tick(timestamp: number) {
     if (!this.active) {
-      throw new Error('Cannot tick a stopping ticker');
+      throw new Error('Cannot tick a stopping driver');
     }
 
     if (timestamp < this.timestamp) {
@@ -52,7 +52,7 @@ export class FakeSmoothTicker extends BaseSmoothTicker {
 
   advanceTo(timestamp: number) {
     if (this.active) {
-      throw new Error('Cannot advance a running ticker');
+      throw new Error('Cannot advance a running driver');
     }
 
     if (timestamp < this.timestamp) {

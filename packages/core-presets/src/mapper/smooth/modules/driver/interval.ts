@@ -1,9 +1,9 @@
 import { assert } from '@fluxdown/utils';
 
-import { BaseSmoothTicker } from './base';
+import { BaseSmoothDriver } from './base';
 import { getNow } from './utils';
 
-export class IntervalSmoothTicker extends BaseSmoothTicker {
+export class IntervalSmoothDriver extends BaseSmoothDriver {
   private timer: ReturnType<typeof setInterval> | null = null;
 
   static get name() {
@@ -19,9 +19,9 @@ export class IntervalSmoothTicker extends BaseSmoothTicker {
   }
 
   start() {
-    assert(!this.destroyed, 'Cannot start a destroyed ticker');
+    assert(!this.destroyed, 'Cannot start a destroyed driver');
 
-    assert(!this.running, 'Cannot start a running ticker');
+    assert(!this.running, 'Cannot start a running driver');
 
     const timestamp = getNow();
 
@@ -31,7 +31,7 @@ export class IntervalSmoothTicker extends BaseSmoothTicker {
   }
 
   stop() {
-    assert(this.timer !== null, 'Cannot stop a stopping ticker');
+    assert(this.timer !== null, 'Cannot stop a stopping driver');
 
     clearInterval(this.timer);
 

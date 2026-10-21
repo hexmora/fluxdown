@@ -1,7 +1,7 @@
 import type {
+  SmoothDriverClass,
   SmoothInputs,
-  SmoothSchedulerClass,
-  SmoothTickerClass,
+  SmoothInterpolatorClass,
 } from '@fluxdown/core-presets/mapper';
 import type { IBlockState } from '@fluxdown/types';
 import type { IReactiveState, IReadableClosure } from 'stative';
@@ -22,12 +22,12 @@ test('Smooth exposes closure inputs and reactive HAST blocks', () => {
     .toEqualTypeOf<IReadableClosure<boolean | undefined>>();
 
   expectTypeOf<Required<SmoothInputs<HastRoot>>>()
-    .toHaveProperty('ticker')
-    .toEqualTypeOf<IReadableClosure<SmoothTickerClass | undefined>>();
+    .toHaveProperty('driver')
+    .toEqualTypeOf<IReadableClosure<SmoothDriverClass | undefined>>();
 
   expectTypeOf<Required<SmoothInputs<HastRoot>>>()
-    .toHaveProperty('scheduler')
-    .toEqualTypeOf<IReadableClosure<SmoothSchedulerClass | undefined>>();
+    .toHaveProperty('interpolation')
+    .toEqualTypeOf<IReadableClosure<SmoothInterpolatorClass | undefined>>();
 
   const { state } = setupSmooth();
 

@@ -1,9 +1,9 @@
 import { assert } from '@fluxdown/utils';
 
-import { BaseSmoothTicker } from './base';
+import { BaseSmoothDriver } from './base';
 import { getNow } from './utils';
 
-export class RafSmoothTicker extends BaseSmoothTicker {
+export class RafSmoothDriver extends BaseSmoothDriver {
   private frame: number | null = null;
 
   private generation = 0;
@@ -17,9 +17,9 @@ export class RafSmoothTicker extends BaseSmoothTicker {
   }
 
   start() {
-    assert(!this.destroyed, 'Cannot start a destroyed ticker');
+    assert(!this.destroyed, 'Cannot start a destroyed driver');
 
-    assert(!this.running, 'Cannot start a running ticker');
+    assert(!this.running, 'Cannot start a running driver');
 
     const timestamp = getNow();
 
@@ -43,7 +43,7 @@ export class RafSmoothTicker extends BaseSmoothTicker {
   }
 
   stop() {
-    assert(this.frame !== null, 'Cannot stop a stopping ticker');
+    assert(this.frame !== null, 'Cannot stop a stopping driver');
 
     cancelAnimationFrame(this.frame);
 

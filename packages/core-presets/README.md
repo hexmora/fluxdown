@@ -13,4 +13,4 @@ import { PRESET_REMARK_PLUGINS } from "@fluxdown/core-presets/remark";
 import { PRESET_REPAIR_PLUGINS } from "@fluxdown/core-presets/repair";
 ```
 
-The package has no root export. Each entry point exports its plugins, configuration types, and shared base classes. The mapper entry point also exports the smooth ticker and scheduler modules.
+The package has no root export. Each entry point exports its plugins, configuration types, and shared base classes. The mapper entry point also exports the smooth driver and interpolation modules.

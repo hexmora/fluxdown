@@ -1,34 +1,34 @@
-import { getSpringMotion, SpringSmoothScheduler } from '..';
+import { getSpringMotion, SpringSmoothInterpolator } from '..';
 
 const DEFAULT_SPRING = { frequency: 5, dampingRatio: 1 };
 
 const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 
-const tickAll = (scheduler: SpringSmoothScheduler, timestamps: number[]) =>
-  timestamps.map((timestamp) => scheduler.tick(timestamp));
+const tickAll = (interpolator: SpringSmoothInterpolator, timestamps: number[]) =>
+  timestamps.map((timestamp) => interpolator.tick(timestamp));
 
 const frames = (count: number, interval = 16, offset = 0) =>
   Array.from({ length: count }, (_, index) => offset + (index + 1) * interval);
 
-describe('SpringSmoothScheduler', () => {
+describe('SpringSmoothInterpolator', () => {
   test('exposes the default spring and constructor name', () => {
-    const scheduler = new SpringSmoothScheduler();
+    const interpolator = new SpringSmoothInterpolator();
 
-    expect(SpringSmoothScheduler.name).toBe('spring');
+    expect(SpringSmoothInterpolator.name).toBe('spring');
 
-    expect(scheduler.tuple).toEqual([5, 1]);
+    expect(interpolator.tuple).toEqual([5, 1]);
 
-    expect(scheduler.spring).toEqual(DEFAULT_SPRING);
+    expect(interpolator.spring).toEqual(DEFAULT_SPRING);
   });
 
   test('honors a supplied tuple', () => {
     const tuple = [20, 0.5];
 
-    const scheduler = new SpringSmoothScheduler(tuple);
+    const interpolator = new SpringSmoothInterpolator(tuple);
 
-    expect(scheduler.tuple).toBe(tuple);
+    expect(interpolator.tuple).toBe(tuple);
 
-    expect(scheduler.spring).toEqual({ frequency: 20, dampingRatio: 0.5 });
+    expect(interpolator.spring).toEqual({ frequency: 20, dampingRatio: 0.5 });
   });
 
   test.each([
@@ -38,32 +38,34 @@ describe('SpringSmoothScheduler', () => {
     [15, Number.NaN],
     [Infinity, 1],
   ])('rejects the spring [%d, %d] when sampled', (frequency, dampingRatio) => {
-    const scheduler = new SpringSmoothScheduler([frequency, dampingRatio]);
+    const interpolator = new SpringSmoothInterpolator([frequency, dampingRatio]);
 
-    scheduler.start(0);
+    interpolator.start(0);
 
-    scheduler.push(10);
+    interpolator.push(10);
 
-    expect(() => scheduler.tick(16)).toThrow('Expected a positive spring frequency');
+    expect(() => interpolator.tick(16)).toThrow('Expected a positive spring frequency');
   });
 
   test('requires start before ticking or resuming', () => {
-    expect(() => new SpringSmoothScheduler().tick(16)).toThrow('Cannot tick without call start');
+    expect(() => new SpringSmoothInterpolator().tick(16)).toThrow('Cannot tick without call start');
 
-    expect(() => new SpringSmoothScheduler().resume(16)).toThrow('Cannot tick without call start');
+    expect(() => new SpringSmoothInterpolator().resume(16)).toThrow(
+      'Cannot tick without call start',
+    );
   });
 
   test('reports the rounded closed-form position on every frame', () => {
-    const scheduler = new SpringSmoothScheduler();
+    const interpolator = new SpringSmoothInterpolator();
 
-    scheduler.start(0, 5);
+    interpolator.start(0, 5);
 
-    scheduler.push(100);
+    interpolator.push(100);
 
     let cursor = 5;
 
     for (const timestamp of frames(60)) {
-      cursor += scheduler.tick(timestamp);
+      cursor += interpolator.tick(timestamp);
 
       const { displacement } = getSpringMotion(
         DEFAULT_SPRING,
@@ -85,27 +87,27 @@ describe('SpringSmoothScheduler', () => {
     ];
 
     const totals = timelines.map((timestamps) => {
-      const scheduler = new SpringSmoothScheduler();
+      const interpolator = new SpringSmoothInterpolator();
 
-      scheduler.start(0);
+      interpolator.start(0);
 
-      scheduler.push(100);
+      interpolator.push(100);
 
-      return sum(tickAll(scheduler, timestamps));
+      return sum(tickAll(interpolator, timestamps));
     });
 
     expect(new Set(totals).size).toBe(1);
   });
 
   test('keeps the trajectory unchanged when the target does not move', () => {
-    const plain = new SpringSmoothScheduler();
+    const plain = new SpringSmoothInterpolator();
 
-    const retargeted = new SpringSmoothScheduler();
+    const retargeted = new SpringSmoothInterpolator();
 
-    for (const scheduler of [plain, retargeted]) {
-      scheduler.start(0);
+    for (const interpolator of [plain, retargeted]) {
+      interpolator.start(0);
 
-      scheduler.push(50);
+      interpolator.push(50);
     }
 
     const expected = tickAll(plain, frames(40));
@@ -134,22 +136,22 @@ describe('SpringSmoothScheduler', () => {
       [31, 100],
     ]);
 
-    const scheduler = new SpringSmoothScheduler(tuple);
+    const interpolator = new SpringSmoothInterpolator(tuple);
 
     let cursor = 0;
 
     let available = 0;
 
-    scheduler.start(0);
+    interpolator.start(0);
 
     for (let frame = 1; frame <= 500; frame += 1) {
       const length = arrivals.get(frame) ?? 0;
 
-      scheduler.push(length);
+      interpolator.push(length);
 
       available += length;
 
-      const distance = scheduler.tick(frame * 16);
+      const distance = interpolator.tick(frame * 16);
 
       cursor += distance;
 
@@ -162,50 +164,50 @@ describe('SpringSmoothScheduler', () => {
 
     expect(cursor).toBe(209);
 
-    expect(scheduler.idle).toBe(true);
+    expect(interpolator.idle).toBe(true);
   });
 
   test('accelerates from rest and settles without overshooting', () => {
-    const scheduler = new SpringSmoothScheduler();
+    const interpolator = new SpringSmoothInterpolator();
 
-    scheduler.start(0);
+    interpolator.start(0);
 
-    scheduler.push(100);
+    interpolator.push(100);
 
-    const distances = tickAll(scheduler, frames(130));
+    const distances = tickAll(interpolator, frames(130));
 
     expect(distances.slice(0, 4)).toEqual([0, 1, 1, 2]);
 
     expect(sum(distances)).toBe(100);
 
-    expect(scheduler.idle).toBe(true);
+    expect(interpolator.idle).toBe(true);
   });
 
   test('is busy until the visible cursor reaches the target', () => {
-    const scheduler = new SpringSmoothScheduler();
+    const interpolator = new SpringSmoothInterpolator();
 
-    scheduler.start(0);
+    interpolator.start(0);
 
-    expect(scheduler.idle).toBe(true);
+    expect(interpolator.idle).toBe(true);
 
-    scheduler.push(3);
+    interpolator.push(3);
 
-    expect(scheduler.idle).toBe(false);
+    expect(interpolator.idle).toBe(false);
 
-    tickAll(scheduler, frames(60));
+    tickAll(interpolator, frames(60));
 
-    expect(scheduler.idle).toBe(true);
+    expect(interpolator.idle).toBe(true);
   });
 
   test('evaluates a pause as if frames had kept arriving', () => {
-    const paused = new SpringSmoothScheduler();
+    const paused = new SpringSmoothInterpolator();
 
-    const continuous = new SpringSmoothScheduler();
+    const continuous = new SpringSmoothInterpolator();
 
-    for (const scheduler of [paused, continuous]) {
-      scheduler.start(0);
+    for (const interpolator of [paused, continuous]) {
+      interpolator.start(0);
 
-      scheduler.push(2);
+      interpolator.push(2);
     }
 
     tickAll(paused, frames(40));
@@ -216,24 +218,24 @@ describe('SpringSmoothScheduler', () => {
 
     paused.resume(720);
 
-    for (const scheduler of [paused, continuous]) {
-      scheduler.push(40);
+    for (const interpolator of [paused, continuous]) {
+      interpolator.push(40);
     }
 
     expect(tickAll(paused, frames(20, 16, 720))).toEqual(tickAll(continuous, frames(20, 16, 720)));
   });
 
   test('keeps momentum when resetting progress', () => {
-    const reset = new SpringSmoothScheduler();
+    const reset = new SpringSmoothInterpolator();
 
-    const restarted = new SpringSmoothScheduler();
+    const restarted = new SpringSmoothInterpolator();
 
-    for (const scheduler of [reset, restarted]) {
-      scheduler.start(0);
+    for (const interpolator of [reset, restarted]) {
+      interpolator.start(0);
 
-      scheduler.push(100);
+      interpolator.push(100);
 
-      tickAll(scheduler, frames(3));
+      tickAll(interpolator, frames(3));
     }
 
     reset.reset(10);
@@ -252,39 +254,39 @@ describe('SpringSmoothScheduler', () => {
   });
 
   test('restarts at rest from the requested index', () => {
-    const scheduler = new SpringSmoothScheduler();
+    const interpolator = new SpringSmoothInterpolator();
 
-    scheduler.start(0);
+    interpolator.start(0);
 
-    scheduler.push(100);
+    interpolator.push(100);
 
-    tickAll(scheduler, frames(10));
+    tickAll(interpolator, frames(10));
 
-    scheduler.start(1000, 4);
+    interpolator.start(1000, 4);
 
-    scheduler.push(100);
+    interpolator.push(100);
 
-    const fresh = new SpringSmoothScheduler();
+    const fresh = new SpringSmoothInterpolator();
 
     fresh.start(0, 4);
 
     fresh.push(100);
 
-    expect(tickAll(scheduler, frames(20, 16, 1000))).toEqual(tickAll(fresh, frames(20)));
+    expect(tickAll(interpolator, frames(20, 16, 1000))).toEqual(tickAll(fresh, frames(20)));
   });
 
   test('ignores repeated or backward timestamps without shifting forward timing', () => {
-    const scheduler = new SpringSmoothScheduler();
+    const interpolator = new SpringSmoothInterpolator();
 
-    const reference = new SpringSmoothScheduler();
+    const reference = new SpringSmoothInterpolator();
 
-    for (const instance of [scheduler, reference]) {
+    for (const instance of [interpolator, reference]) {
       instance.start(10);
 
       instance.push(100);
     }
 
-    expect(tickAll(scheduler, [42, 42, 30, 58])).toEqual([
+    expect(tickAll(interpolator, [42, 42, 30, 58])).toEqual([
       ...tickAll(reference, [42]),
       0,
       0,
@@ -293,14 +295,14 @@ describe('SpringSmoothScheduler', () => {
   });
 
   test('reports the closed-form motion without changing the trajectory', () => {
-    const inspected = new SpringSmoothScheduler();
+    const inspected = new SpringSmoothInterpolator();
 
-    const reference = new SpringSmoothScheduler();
+    const reference = new SpringSmoothInterpolator();
 
-    for (const scheduler of [inspected, reference]) {
-      scheduler.start(0, 10);
+    for (const interpolator of [inspected, reference]) {
+      interpolator.start(0, 10);
 
-      scheduler.push(40);
+      interpolator.push(40);
     }
 
     expect(inspected.getMotion()).toEqual({ position: 10, velocity: 0, target: 50, cursor: 10 });

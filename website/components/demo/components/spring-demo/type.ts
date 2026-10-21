@@ -1,4 +1,4 @@
-import type { SpringSmoothScheduler } from '@fluxdown/core-presets/mapper';
+import type { SpringSmoothInterpolator } from '@fluxdown/core-presets/mapper';
 
 export type SpringCursorParams = {
   text: string;
@@ -17,7 +17,7 @@ export type SpringPlayback = {
 
   cycle: number;
 
-  scheduler: SpringSmoothScheduler;
+  interpolator: SpringSmoothInterpolator;
 
   received: number;
 

@@ -1,8 +1,8 @@
-import { BaseSmoothScheduler, BaseSmoothTicker } from '@fluxdown/core-presets/mapper';
+import { BaseSmoothDriver, BaseSmoothInterpolator } from '@fluxdown/core-presets/mapper';
 import { last } from 'lodash-es';
 
-export const createManualTicker = () => {
-  class ManualTicker extends BaseSmoothTicker {
+export const createManualDriver = () => {
+  class ManualDriver extends BaseSmoothDriver {
     private active = false;
 
     destroyCalls = 0;
@@ -44,23 +44,23 @@ export const createManualTicker = () => {
     }
   }
 
-  const instances: ManualTicker[] = [];
+  const instances: ManualDriver[] = [];
 
   const current = () => {
-    const ticker = last(instances);
+    const driver = last(instances);
 
-    if (!ticker) {
-      throw new Error('Expected the configured ticker to be constructed.');
+    if (!driver) {
+      throw new Error('Expected the configured driver to be constructed.');
     }
 
-    return ticker;
+    return driver;
   };
 
-  return { Ticker: ManualTicker, current, instances };
+  return { Driver: ManualDriver, current, instances };
 };
 
-export const createStepScheduler = (step: number) => {
-  return class StepScheduler extends BaseSmoothScheduler {
+export const createStepInterpolator = (step: number) => {
+  return class StepInterpolator extends BaseSmoothInterpolator {
     protected readonly defaultTuple = [];
 
     private cursor = 0;

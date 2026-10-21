@@ -1,11 +1,11 @@
-import type { SmoothSchedulerClass, SmoothTickerClass } from '@fluxdown/core-presets/mapper';
+import type { SmoothDriverClass, SmoothInterpolatorClass } from '@fluxdown/core-presets/mapper';
 
 import {
-  IntervalSmoothTicker,
-  RafSmoothTicker,
-  SpringSmoothScheduler,
+  IntervalSmoothDriver,
+  RafSmoothDriver,
+  SpringSmoothInterpolator,
 } from '@fluxdown/core-presets/mapper';
 
-export const ALL_TICKERS: SmoothTickerClass[] = [RafSmoothTicker, IntervalSmoothTicker];
+export const ALL_DRIVERS: SmoothDriverClass[] = [RafSmoothDriver, IntervalSmoothDriver];
 
-export const ALL_SCHEDULERS: SmoothSchedulerClass[] = [SpringSmoothScheduler];
+export const ALL_INTERPOLATORS: SmoothInterpolatorClass[] = [SpringSmoothInterpolator];

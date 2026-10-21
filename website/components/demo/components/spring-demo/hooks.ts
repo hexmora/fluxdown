@@ -1,4 +1,4 @@
-import { SpringSmoothScheduler } from '@fluxdown/core-presets/mapper';
+import { SpringSmoothInterpolator } from '@fluxdown/core-presets/mapper';
 import { useEffect, useRef, useState } from 'react';
 
 import type { SpringCursorParams, SpringPlayback } from './type';
@@ -23,18 +23,18 @@ export const useSpringCursor = ({
       playback.cycle !== cycle ||
       text.length < playback.received
     ) {
-      const scheduler = new SpringSmoothScheduler();
+      const interpolator = new SpringSmoothInterpolator();
 
-      scheduler.start(performance.now());
+      interpolator.start(performance.now());
 
-      playback = { source, cycle, scheduler, received: 0, visible: 0 };
+      playback = { source, cycle, interpolator, received: 0, visible: 0 };
 
       playbackRef.current = playback;
 
       setCursor(0);
     }
 
-    playback.scheduler.push(text.length - playback.received);
+    playback.interpolator.push(text.length - playback.received);
 
     playback.received = text.length;
 
@@ -42,12 +42,12 @@ export const useSpringCursor = ({
       return;
     }
 
-    playback.scheduler.resume(performance.now());
+    playback.interpolator.resume(performance.now());
 
     let frame: number;
 
     const tick = (timestamp: number) => {
-      const distance = playback.scheduler.tick(timestamp);
+      const distance = playback.interpolator.tick(timestamp);
 
       if (distance > 0) {
         playback.visible = Math.min(playback.received, playback.visible + distance);
@@ -55,7 +55,7 @@ export const useSpringCursor = ({
         setCursor(playback.visible);
       }
 
-      if (!playback.scheduler.idle) {
+      if (!playback.interpolator.idle) {
         frame = requestAnimationFrame(tick);
       }
     };

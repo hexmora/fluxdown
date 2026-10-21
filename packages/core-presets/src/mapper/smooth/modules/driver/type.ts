@@ -1,9 +1,9 @@
 import type { Observable } from 'rxjs';
 import type { IDestructible } from 'stative';
 
-export interface ITicker extends IDestructible {
+export interface IDriver extends IDestructible {
   /**
-   * Whether the ticker currently schedules timestamp events.
+   * Whether the driver currently schedules timestamp events.
    */
   readonly running: boolean;
 

@@ -1,6 +1,6 @@
-import type { IScheduler } from './type';
+import type { IInterpolator } from './type';
 
-export abstract class BaseSmoothScheduler implements IScheduler {
+export abstract class BaseSmoothInterpolator implements IInterpolator {
   protected abstract readonly defaultTuple: number[];
 
   protected fullIndex = 0;
@@ -11,7 +11,7 @@ export abstract class BaseSmoothScheduler implements IScheduler {
     const tuple = this.configuredTuple ?? this.defaultTuple;
 
     if (tuple.length !== this.defaultTuple.length) {
-      throw new Error(`Expected a scheduler tuple with ${this.defaultTuple.length} values`);
+      throw new Error(`Expected an interpolator tuple with ${this.defaultTuple.length} values`);
     }
 
     return tuple;

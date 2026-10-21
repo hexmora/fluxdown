@@ -1,9 +1,9 @@
 import { Subject } from 'rxjs';
 import { Destructible } from 'stative';
 
-import type { ITicker } from './type';
+import type { IDriver } from './type';
 
-export abstract class BaseSmoothTicker extends Destructible implements ITicker {
+export abstract class BaseSmoothDriver extends Destructible implements IDriver {
   protected readonly subject = new Subject<number>();
 
   readonly value = this.subject.asObservable();

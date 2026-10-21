@@ -1,6 +1,6 @@
-import { getNow, IntervalSmoothTicker, RafSmoothTicker } from '..';
+import { getNow, IntervalSmoothDriver, RafSmoothDriver } from '..';
 import { restoreGlobals, stubGlobal } from '../../../../../../../../scripts/testing/globals';
-import { FakeSmoothTicker, mockAnimationFrames } from './utils';
+import { FakeSmoothDriver, mockAnimationFrames } from './utils';
 
 afterEach(() => {
   jest.useRealTimers();
@@ -10,7 +10,7 @@ afterEach(() => {
   restoreGlobals();
 });
 
-describe('ticker timestamps', () => {
+describe('driver timestamps', () => {
   test('uses performance.now without consulting the wall clock', () => {
     const now = jest.fn(() => 42);
 
@@ -26,21 +26,21 @@ describe('ticker timestamps', () => {
   });
 });
 
-describe('RafSmoothTicker', () => {
+describe('RafSmoothDriver', () => {
   test('emits frame timestamps and cancels the pending frame on stop', () => {
     const frames = mockAnimationFrames();
 
-    const ticker = new RafSmoothTicker();
+    const driver = new RafSmoothDriver();
 
     const next = jest.fn();
 
-    ticker.value.subscribe(next);
+    driver.value.subscribe(next);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
-    expect(ticker.start()).toEqual(expect.any(Number));
+    expect(driver.start()).toEqual(expect.any(Number));
 
-    expect(ticker.running).toBe(true);
+    expect(driver.running).toBe(true);
 
     expect(frames.request).toHaveBeenCalledTimes(1);
 
@@ -53,9 +53,9 @@ describe('RafSmoothTicker', () => {
 
     const pending = frames.frame(2);
 
-    ticker.stop();
+    driver.stop();
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
     expect(frames.cancel).toHaveBeenCalledTimes(1);
     expect(frames.cancel).toHaveBeenCalledWith(2);
@@ -66,25 +66,25 @@ describe('RafSmoothTicker', () => {
 
     expect(frames.request).toHaveBeenCalledTimes(2);
 
-    ticker.destroy();
+    driver.destroy();
   });
 
   test('ignores an old canceled callback after restart', () => {
     const frames = mockAnimationFrames();
 
-    const ticker = new RafSmoothTicker();
+    const driver = new RafSmoothDriver();
 
     const next = jest.fn();
 
-    ticker.value.subscribe(next);
+    driver.value.subscribe(next);
 
-    ticker.start();
+    driver.start();
 
     const stale = frames.frame(1);
 
-    ticker.stop();
+    driver.stop();
 
-    ticker.start();
+    driver.start();
 
     stale(10);
 
@@ -99,25 +99,25 @@ describe('RafSmoothTicker', () => {
 
     expect(frames.request).toHaveBeenCalledTimes(3);
 
-    ticker.destroy();
+    driver.destroy();
   });
 
-  test('does not schedule another frame when an observer stops the ticker', () => {
+  test('does not schedule another frame when an observer stops the driver', () => {
     const frames = mockAnimationFrames();
 
-    const ticker = new RafSmoothTicker();
+    const driver = new RafSmoothDriver();
 
-    ticker.value.subscribe(() => ticker.stop());
+    driver.value.subscribe(() => driver.stop());
 
-    ticker.start();
+    driver.start();
 
     frames.frame(1)(10);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
     expect(frames.request).toHaveBeenCalledTimes(1);
 
-    ticker.destroy();
+    driver.destroy();
   });
 
   test('starts with the same monotonic clock used by animation frames', () => {
@@ -127,31 +127,31 @@ describe('RafSmoothTicker', () => {
 
     const wallClock = jest.spyOn(Date, 'now').mockReturnValue(-1);
 
-    const ticker = new RafSmoothTicker();
+    const driver = new RafSmoothDriver();
 
-    expect(ticker.start()).toBe(42);
+    expect(driver.start()).toBe(42);
 
     expect(now).toHaveBeenCalledTimes(1);
 
     expect(wallClock).not.toHaveBeenCalled();
 
-    ticker.destroy();
+    driver.destroy();
   });
 });
 
-describe('IntervalSmoothTicker', () => {
+describe('IntervalSmoothDriver', () => {
   test('emits on the configured interval and stops future emissions', () => {
     jest.useFakeTimers();
 
-    const ticker = new IntervalSmoothTicker(20);
+    const driver = new IntervalSmoothDriver(20);
 
     const next = jest.fn();
 
-    ticker.value.subscribe(next);
+    driver.value.subscribe(next);
 
-    expect(ticker.start()).toEqual(expect.any(Number));
+    expect(driver.start()).toEqual(expect.any(Number));
 
-    expect(ticker.running).toBe(true);
+    expect(driver.running).toBe(true);
 
     jest.advanceTimersByTime(45);
 
@@ -159,53 +159,53 @@ describe('IntervalSmoothTicker', () => {
 
     expect(next).toHaveBeenNthCalledWith(1, expect.any(Number));
 
-    ticker.stop();
+    driver.stop();
 
     jest.advanceTimersByTime(60);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
     expect(next).toHaveBeenCalledTimes(2);
 
     expect(jest.getTimerCount()).toBe(0);
 
-    ticker.destroy();
+    driver.destroy();
   });
 
   test('defaults to approximately sixty frames per second', () => {
     jest.useFakeTimers();
 
-    const ticker = new IntervalSmoothTicker();
+    const driver = new IntervalSmoothDriver();
 
     const next = jest.fn();
 
-    ticker.value.subscribe(next);
+    driver.value.subscribe(next);
 
-    ticker.start();
+    driver.start();
 
     jest.advanceTimersByTime(50);
 
     expect(next).toHaveBeenCalledTimes(3);
 
-    ticker.destroy();
+    driver.destroy();
   });
 
   test('can restart after stop without duplicating the interval', () => {
     jest.useFakeTimers();
 
-    const ticker = new IntervalSmoothTicker(10);
+    const driver = new IntervalSmoothDriver(10);
 
     const next = jest.fn();
 
-    ticker.value.subscribe(next);
+    driver.value.subscribe(next);
 
-    ticker.start();
+    driver.start();
 
     jest.advanceTimersByTime(10);
 
-    ticker.stop();
+    driver.stop();
 
-    ticker.start();
+    driver.start();
 
     jest.advanceTimersByTime(10);
 
@@ -213,29 +213,29 @@ describe('IntervalSmoothTicker', () => {
 
     expect(jest.getTimerCount()).toBe(1);
 
-    ticker.destroy();
+    driver.destroy();
   });
 });
 
-describe.each([RafSmoothTicker, IntervalSmoothTicker])('$name lifecycle', (Ticker) => {
+describe.each([RafSmoothDriver, IntervalSmoothDriver])('$name lifecycle', (Driver) => {
   test('rejects repeated starts and stops', () => {
     jest.useFakeTimers();
 
     mockAnimationFrames();
 
-    const ticker = new Ticker();
+    const driver = new Driver();
 
-    expect(() => ticker.stop()).toThrow('Cannot stop a stopping ticker');
+    expect(() => driver.stop()).toThrow('Cannot stop a stopping driver');
 
-    ticker.start();
+    driver.start();
 
-    expect(() => ticker.start()).toThrow('Cannot start a running ticker');
+    expect(() => driver.start()).toThrow('Cannot start a running driver');
 
-    ticker.stop();
+    driver.stop();
 
-    expect(() => ticker.stop()).toThrow('Cannot stop a stopping ticker');
+    expect(() => driver.stop()).toThrow('Cannot stop a stopping driver');
 
-    ticker.destroy();
+    driver.destroy();
   });
 
   test.each([false, true])('destroy completes once when running=%s', (running) => {
@@ -243,21 +243,21 @@ describe.each([RafSmoothTicker, IntervalSmoothTicker])('$name lifecycle', (Ticke
 
     const frames = mockAnimationFrames();
 
-    const ticker = new Ticker();
+    const driver = new Driver();
 
     const complete = jest.fn();
 
-    const subscription = ticker.value.subscribe({ complete });
+    const subscription = driver.value.subscribe({ complete });
 
     if (running) {
-      ticker.start();
+      driver.start();
     }
 
-    ticker.destroy();
+    driver.destroy();
 
-    ticker.destroy();
+    driver.destroy();
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
     expect(subscription.closed).toBe(true);
 
@@ -265,42 +265,42 @@ describe.each([RafSmoothTicker, IntervalSmoothTicker])('$name lifecycle', (Ticke
 
     expect(jest.getTimerCount()).toBe(0);
 
-    expect(frames.cancel).toHaveBeenCalledTimes(running && Ticker === RafSmoothTicker ? 1 : 0);
+    expect(frames.cancel).toHaveBeenCalledTimes(running && Driver === RafSmoothDriver ? 1 : 0);
   });
 });
 
-describe('FakeSmoothTicker test utility', () => {
+describe('FakeSmoothDriver test utility', () => {
   test('supports repeated timestamps and rejects backward or inactive ticks', () => {
-    const ticker = new FakeSmoothTicker(10);
+    const driver = new FakeSmoothDriver(10);
 
     const next = jest.fn();
 
-    ticker.value.subscribe(next);
+    driver.value.subscribe(next);
 
-    expect(() => ticker.tick(11)).toThrow('Cannot tick a stopping ticker');
+    expect(() => driver.tick(11)).toThrow('Cannot tick a stopping driver');
 
-    expect(ticker.start()).toBe(10);
+    expect(driver.start()).toBe(10);
 
-    expect(() => ticker.start()).toThrow('Cannot start a running ticker');
+    expect(() => driver.start()).toThrow('Cannot start a running driver');
 
-    ticker.tick(12);
+    driver.tick(12);
 
-    ticker.tick(12);
+    driver.tick(12);
 
-    expect(() => ticker.tick(11)).toThrow('Cannot tick previous timestamp');
+    expect(() => driver.tick(11)).toThrow('Cannot tick previous timestamp');
 
     expect(next.mock.calls).toEqual([[12], [12]]);
 
-    ticker.stop();
+    driver.stop();
 
-    expect(() => ticker.stop()).toThrow('Cannot stop a stopping ticker');
+    expect(() => driver.stop()).toThrow('Cannot stop a stopping driver');
 
-    expect(() => ticker.tick(13)).toThrow('Cannot tick a stopping ticker');
+    expect(() => driver.tick(13)).toThrow('Cannot tick a stopping driver');
 
-    ticker.advanceTo(20);
+    driver.advanceTo(20);
 
-    expect(ticker.start()).toBe(20);
+    expect(driver.start()).toBe(20);
 
-    ticker.destroy();
+    driver.destroy();
   });
 });

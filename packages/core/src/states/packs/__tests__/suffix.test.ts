@@ -18,7 +18,7 @@ import type { HastRoot } from '../../../typings';
 import type { MapperPluggable } from '../../base';
 
 import { collectText, firstBlock } from '../../../__tests__/smooth/utils';
-import { FakeSmoothTicker, StepSmoothScheduler } from '../../../__tests__/utils/smooth';
+import { FakeSmoothDriver, StepSmoothInterpolator } from '../../../__tests__/utils/smooth';
 import { countStateObservers } from '../../../../../../scripts/testing/state';
 import { BaseRenderer } from '../../../externals';
 import { Core } from '../index';
@@ -31,11 +31,11 @@ class BlockRenderer extends BaseRenderer<HastRoot, ElementContent, Parent, Block
   }
 }
 
-class ManualTicker extends FakeSmoothTicker {
-  static current: ManualTicker;
+class ManualDriver extends FakeSmoothDriver {
+  static current: ManualDriver;
   constructor() {
     super();
-    ManualTicker.current = this;
+    ManualDriver.current = this;
   }
 }
 
@@ -62,7 +62,7 @@ const ConfiguredCore = once(
     const suffixMapper: MapperPluggable = [Suffix, { ...options, priority: suffixFirst ? -1 : 1 }];
     const smoothMapper: MapperPluggable = [
       Smooth,
-      { enabled: true, ticker: ManualTicker, scheduler: StepSmoothScheduler },
+      { enabled: true, driver: ManualDriver, interpolation: StepSmoothInterpolator },
     ];
 
     return S([
@@ -120,7 +120,7 @@ describe('Core suffix pipeline', () => {
     expect(view.read()).toEqual(['first']);
     expect(findMarkers(first.value.value)).toHaveLength(1);
 
-    ManualTicker.current.tick(16);
+    ManualDriver.current.tick(16);
     expect(view.read()).toEqual(['first', 's']);
     expect(view.markers()).toHaveLength(1);
     expect(findMarkers(first.value.value)).toHaveLength(0);

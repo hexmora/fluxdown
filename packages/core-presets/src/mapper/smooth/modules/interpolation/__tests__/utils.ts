@@ -1,6 +1,6 @@
-import { BaseSmoothScheduler } from '..';
+import { BaseSmoothInterpolator } from '..';
 
-export class TargetScheduler extends BaseSmoothScheduler {
+export class TargetInterpolator extends BaseSmoothInterpolator {
   protected readonly defaultTuple = [1, 2];
 
   start(_timestamp: number, index = 0) {
@@ -12,8 +12,8 @@ export class TargetScheduler extends BaseSmoothScheduler {
   }
 }
 
-export class StepSmoothScheduler extends BaseSmoothScheduler {
-  static instances: StepSmoothScheduler[] = [];
+export class StepSmoothInterpolator extends BaseSmoothInterpolator {
+  static instances: StepSmoothInterpolator[] = [];
 
   protected readonly defaultTuple = [1];
 
@@ -28,7 +28,7 @@ export class StepSmoothScheduler extends BaseSmoothScheduler {
   constructor() {
     super();
 
-    StepSmoothScheduler.instances.push(this);
+    StepSmoothInterpolator.instances.push(this);
   }
 
   override get idle() {
@@ -58,14 +58,14 @@ export class StepSmoothScheduler extends BaseSmoothScheduler {
   }
 }
 
-export class DoubleStepSmoothScheduler extends StepSmoothScheduler {
-  static override instances: DoubleStepSmoothScheduler[] = [];
+export class DoubleStepSmoothInterpolator extends StepSmoothInterpolator {
+  static override instances: DoubleStepSmoothInterpolator[] = [];
 
   protected override readonly defaultTuple = [2];
 
   constructor() {
     super();
 
-    DoubleStepSmoothScheduler.instances.push(this);
+    DoubleStepSmoothInterpolator.instances.push(this);
   }
 }

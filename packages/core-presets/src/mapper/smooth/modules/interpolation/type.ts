@@ -1,6 +1,6 @@
-export interface IScheduler {
+export interface IInterpolator {
   /**
-   * Configuration values interpreted by the scheduler implementation.
+   * Configuration values interpreted by the interpolator implementation.
    */
   readonly tuple: number[];
 
@@ -90,9 +90,9 @@ export interface SpringMotion {
 }
 
 /**
- * Snapshot of a spring scheduler for inspection.
+ * Snapshot of a spring interpolator for inspection.
  */
-export interface SpringSchedulerMotion {
+export interface SpringInterpolatorMotion {
   /**
    * Unrounded spring position in visible units.
    */

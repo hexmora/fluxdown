@@ -12,19 +12,22 @@ import {
   toClosure,
 } from 'stative';
 
-import type { SmoothSchedulerClass } from '../../..';
+import type { SmoothInterpolatorClass } from '../../..';
 import type { SmoothPosition } from '../states';
 
 import { SmoothCursor } from '..';
 import { ArrayBlock, createArrayBlock } from '../../../__tests__/block';
-import { latest, PrimarySmoothTicker, resetSmoothTests } from '../../../__tests__/utils';
-import { SpringSmoothScheduler } from '../../../modules';
-import { StepSmoothScheduler, TargetScheduler } from '../../../modules/scheduler/__tests__/utils';
+import { latest, PrimarySmoothDriver, resetSmoothTests } from '../../../__tests__/utils';
+import { SpringSmoothInterpolator } from '../../../modules';
+import {
+  StepSmoothInterpolator,
+  TargetInterpolator,
+} from '../../../modules/interpolation/__tests__/utils';
 
 const setupCursor = (
   initial: IBlockState<number[]>[] = [],
   active = true,
-  Scheduler: SmoothSchedulerClass = StepSmoothScheduler,
+  Interpolator: SmoothInterpolatorClass = StepSmoothInterpolator,
 ) => {
   const source = MutableState.of(initial);
 
@@ -36,8 +39,8 @@ const setupCursor = (
       {
         source: toClosure(source),
         enabled: toClosure(enabled),
-        ticker: toClosure(ReactiveState.of(PrimarySmoothTicker)),
-        scheduler: toClosure(ReactiveState.of(Scheduler)),
+        driver: toClosure(ReactiveState.of(PrimarySmoothDriver)),
+        interpolation: toClosure(ReactiveState.of(Interpolator)),
       },
     ]),
   );
@@ -73,19 +76,19 @@ describe('SmoothCursor', () => {
     { lengths: [3, 3], step: 3, end: { blockIndex: 0, charIndex: 3 } },
     { lengths: [0, 3], step: 0, end: { blockIndex: 0, charIndex: 0 } },
   ])('locates a step of $step in $lengths', ({ lengths, step, end }) => {
-    class Scheduler extends StepSmoothScheduler {
+    class Interpolator extends StepSmoothInterpolator {
       override tick() {
         return step;
       }
     }
 
-    const { cursor, source } = setupCursor([], true, Scheduler);
+    const { cursor, source } = setupCursor([], true, Interpolator);
 
     expect(cursor.value.value).toEqual({ blockIndex: -1, charIndex: 0 });
 
     source.next(lengths.map((length) => createArrayBlock(Array<number>(length).fill(0)).block));
 
-    latest(PrimarySmoothTicker.instances).tick(16);
+    latest(PrimarySmoothDriver.instances).tick(16);
 
     expect(cursor.value.value).toEqual(end);
 
@@ -107,17 +110,17 @@ describe('SmoothCursor', () => {
 
     expect(cursor.value.value).toEqual({ blockIndex: 0, charIndex: 0 });
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
-    ticker.tick(16);
+    driver.tick(16);
 
     expect(cursor.value.value).toEqual({ blockIndex: 1, charIndex: 1 });
 
-    ticker.tick(32);
+    driver.tick(32);
 
     expect(cursor.value.value).toEqual({ blockIndex: 1, charIndex: 2 });
 
-    ticker.tick(48);
+    driver.tick(48);
 
     expect(cursor.value.value).toEqual({ blockIndex: 3, charIndex: 1 });
 
@@ -210,34 +213,34 @@ describe('SmoothCursor', () => {
     derived.destroy();
   });
 
-  test('keeps a scheduler with the default idle behavior running until disabled', () => {
+  test('keeps an interpolator with the default idle behavior running until disabled', () => {
     const block = createArrayBlock<number>([]);
 
-    const { cursor, enabled } = setupCursor([block.block], true, TargetScheduler);
+    const { cursor, enabled } = setupCursor([block.block], true, TargetInterpolator);
 
     expect(cursor.value.value.charIndex).toBe(0);
 
     block.source.next([1]);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
-    ticker.tick(16);
-
-    expect(cursor.value.value.charIndex).toBe(1);
-
-    expect(ticker.running).toBe(true);
-
-    ticker.tick(32);
+    driver.tick(16);
 
     expect(cursor.value.value.charIndex).toBe(1);
 
-    expect(ticker.running).toBe(true);
+    expect(driver.running).toBe(true);
+
+    driver.tick(32);
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    expect(driver.running).toBe(true);
 
     enabled.next(false);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
-    expect(ticker.destroyCalls).toBe(1);
+    expect(driver.destroyCalls).toBe(1);
 
     cursor.destroy();
   });
@@ -245,68 +248,68 @@ describe('SmoothCursor', () => {
   test('stops once the spring reveals everything and resumes from the paused timestamp', () => {
     const block = createArrayBlock<number>([]);
 
-    const { cursor } = setupCursor([block.block], true, SpringSmoothScheduler);
+    const { cursor } = setupCursor([block.block], true, SpringSmoothInterpolator);
 
     expect(cursor.value.value.charIndex).toBe(0);
 
-    expect(PrimarySmoothTicker.instances).toHaveLength(0);
+    expect(PrimarySmoothDriver.instances).toHaveLength(0);
 
     block.source.next([1]);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     let timestamp = 0;
 
-    while (ticker.running && timestamp < 1000) {
+    while (driver.running && timestamp < 1000) {
       timestamp += 16;
 
-      ticker.tick(timestamp);
+      driver.tick(timestamp);
     }
 
     expect(cursor.value.value.charIndex).toBe(1);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
-    ticker.advanceTo(10_000);
+    driver.advanceTo(10_000);
 
     block.source.next([1, 2, 3]);
 
-    expect(ticker.running).toBe(true);
+    expect(driver.running).toBe(true);
 
     // A trajectory still anchored before the pause would reveal everything on this frame.
-    ticker.tick(10_016);
+    driver.tick(10_016);
 
     expect(cursor.value.value.charIndex).toBe(1);
 
     timestamp = 10_016;
 
-    while (ticker.running && timestamp < 11_000) {
+    while (driver.running && timestamp < 11_000) {
       timestamp += 16;
 
-      ticker.tick(timestamp);
+      driver.tick(timestamp);
     }
 
     expect(cursor.value.value.charIndex).toBe(3);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
     cursor.destroy();
   });
 
-  test('stops immediately on completion even while the scheduler is busy', () => {
+  test('stops immediately on completion even while the interpolator is busy', () => {
     const block = createArrayBlock<number>([]);
 
-    const { cursor, source, enabled } = setupCursor([block.block], true, TargetScheduler);
+    const { cursor, source, enabled } = setupCursor([block.block], true, TargetInterpolator);
 
     expect(cursor.value.value.charIndex).toBe(0);
 
     block.source.next([1]);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
-    ticker.tick(1);
+    driver.tick(1);
 
-    expect(ticker.running).toBe(true);
+    expect(driver.running).toBe(true);
 
     batch(() => {
       block.source.complete();
@@ -320,9 +323,9 @@ describe('SmoothCursor', () => {
 
     expect(cursor.value.closed).toBe(true);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
-    expect(ticker.destroyCalls).toBe(1);
+    expect(driver.destroyCalls).toBe(1);
 
     cursor.destroy();
   });

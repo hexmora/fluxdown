@@ -13,4 +13,4 @@ import { PRESET_REMARK_PLUGINS } from "@fluxdown/core-presets/remark";
 import { PRESET_REPAIR_PLUGINS } from "@fluxdown/core-presets/repair";
 ```
 
-包没有根导出。各入口导出对应的插件、配置类型和共享基类；mapper 入口还导出平滑输出的时钟与调度器模块。
+包没有根导出。各入口导出对应的插件、配置类型和共享基类；mapper 入口还导出平滑输出的驱动与插值模块。

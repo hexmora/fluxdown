@@ -1,9 +1,9 @@
 import { assert } from '@fluxdown/utils';
 import { isUndefined } from 'lodash-es';
 
-import type { PerceptualSpring, SpringSchedulerMotion } from './type';
+import type { PerceptualSpring, SpringInterpolatorMotion } from './type';
 
-import { BaseSmoothScheduler } from './base';
+import { BaseSmoothInterpolator } from './base';
 import { getSpringMotion } from './utils';
 
 interface SpringOrigin {
@@ -23,7 +23,7 @@ interface SpringOrigin {
   velocity: number;
 }
 
-export class SpringSmoothScheduler extends BaseSmoothScheduler {
+export class SpringSmoothInterpolator extends BaseSmoothInterpolator {
   /**
    * Angular frequency ω in rad/s and damping ratio ζ.
    * Use `toPerceptualSpring` to derive them from stiffness, damping, and mass.
@@ -133,7 +133,7 @@ export class SpringSmoothScheduler extends BaseSmoothScheduler {
    * Inspect the spring at `time`, which defaults to the latest timestamp. Sampling has no side
    * effects, so debugging tools can read it on every frame.
    */
-  getMotion(time = this.timestamp ?? this.origin.time): SpringSchedulerMotion {
+  getMotion(time = this.timestamp ?? this.origin.time): SpringInterpolatorMotion {
     return { ...this.sample(time), target: this.fullIndex, cursor: this.cursor };
   }
 

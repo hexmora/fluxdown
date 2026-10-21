@@ -4,6 +4,7 @@ import type { IReadableClosure } from 'stative';
 import { expectTypeOf } from 'expect-type';
 
 import type {
+  DeprecatedSmoothConfig,
   ScaleConfig,
   ScaleInputs,
   ScalePluginConfig,
@@ -34,7 +35,10 @@ test('mapper configuration derives required and optional closure inputs', () => 
 });
 
 test('preset mappers export config, inputs and public plugin config from the mapper entry', () => {
-  expectTypeOf<SmoothPluginConfig>().toEqualTypeOf<MapperPluginConfig<SmoothConfig>>();
+  // Smooth also accepts its pre-rename option names for one release.
+  expectTypeOf<SmoothPluginConfig>().toEqualTypeOf<
+    MapperPluginConfig<SmoothConfig & DeprecatedSmoothConfig>
+  >();
 
   expectTypeOf<ShadPluginConfig>().toEqualTypeOf<MapperPluginConfig<ShadConfig>>();
 

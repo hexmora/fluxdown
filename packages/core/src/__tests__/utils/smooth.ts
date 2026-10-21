@@ -1,7 +1,7 @@
-import { BaseSmoothScheduler, BaseSmoothTicker } from '@fluxdown/core-presets/mapper';
+import { BaseSmoothDriver, BaseSmoothInterpolator } from '@fluxdown/core-presets/mapper';
 
-export class StepSmoothScheduler extends BaseSmoothScheduler {
-  static instances: StepSmoothScheduler[] = [];
+export class StepSmoothInterpolator extends BaseSmoothInterpolator {
+  static instances: StepSmoothInterpolator[] = [];
 
   protected readonly defaultTuple = [1];
 
@@ -16,7 +16,7 @@ export class StepSmoothScheduler extends BaseSmoothScheduler {
   constructor() {
     super();
 
-    StepSmoothScheduler.instances.push(this);
+    StepSmoothInterpolator.instances.push(this);
   }
 
   override get idle() {
@@ -46,19 +46,19 @@ export class StepSmoothScheduler extends BaseSmoothScheduler {
   }
 }
 
-export class DoubleStepSmoothScheduler extends StepSmoothScheduler {
-  static override instances: DoubleStepSmoothScheduler[] = [];
+export class DoubleStepSmoothInterpolator extends StepSmoothInterpolator {
+  static override instances: DoubleStepSmoothInterpolator[] = [];
 
   protected override readonly defaultTuple = [2];
 
   constructor() {
     super();
 
-    DoubleStepSmoothScheduler.instances.push(this);
+    DoubleStepSmoothInterpolator.instances.push(this);
   }
 }
 
-export class FakeSmoothTicker extends BaseSmoothTicker {
+export class FakeSmoothDriver extends BaseSmoothDriver {
   destroyCalls = 0;
 
   private active = false;
@@ -77,7 +77,7 @@ export class FakeSmoothTicker extends BaseSmoothTicker {
 
   start() {
     if (this.active) {
-      throw new Error('Cannot start a running ticker');
+      throw new Error('Cannot start a running driver');
     }
 
     this.active = true;
@@ -87,7 +87,7 @@ export class FakeSmoothTicker extends BaseSmoothTicker {
 
   stop() {
     if (!this.active) {
-      throw new Error('Cannot stop a stopping ticker');
+      throw new Error('Cannot stop a stopping driver');
     }
 
     this.active = false;
@@ -95,7 +95,7 @@ export class FakeSmoothTicker extends BaseSmoothTicker {
 
   tick(timestamp: number) {
     if (!this.active) {
-      throw new Error('Cannot tick a stopping ticker');
+      throw new Error('Cannot tick a stopping driver');
     }
 
     if (timestamp < this.timestamp) {
