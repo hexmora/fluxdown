@@ -4,7 +4,7 @@ import type { Root } from 'hast';
 import type { ReactNode } from 'react';
 
 import { BlockItem } from '@fluxdown/core';
-import { PatchRenderPlugin } from '@fluxdown/react-presets/render';
+import { PatchRenderPlugin } from '@fluxdown/react-presets/plugins/patch';
 import { act, render, screen } from '@testing-library/react';
 import { MutableState, toClosure } from 'stative';
 

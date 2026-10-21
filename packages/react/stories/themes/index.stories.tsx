@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SanitizerRehypePlugin } from '@fluxdown/core-presets/rehype';
 import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-presets/remark';
 
-import { Fluxdown } from '../../src';
+import { Fluxdown } from '../../src/packs/full';
 import { THEME_MARKDOWN } from './consts';
 
 const meta = {

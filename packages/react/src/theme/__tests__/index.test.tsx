@@ -4,10 +4,10 @@ import { expectTypeOf } from 'expect-type';
 import { createRef } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import type { FluxdownRef, PartialThemeConfig, Theme, ThemeConfig } from '../..';
+import type { FluxdownRef, PartialThemeConfig, Theme, ThemeConfig } from '../../packs/full';
 
 import { useThemeStyles } from '..';
-import { Fluxdown } from '../..';
+import { Fluxdown } from '../../packs/full';
 import { PRESET_THEME_MAP } from '../presets';
 import { mapTokensToStyles, resolveTheme } from '../utils';
 

@@ -3,10 +3,10 @@ import { PREFIX } from '@fluxdown/react-presets/base';
 import { act, cleanup, render } from '@testing-library/react';
 import { MutableState, toClosure } from 'stative';
 
-import type { EffectItem } from '../types';
+import type { EffectItem } from '../packs/full';
 
-import { Fluxdown } from '..';
-import styles from '../../../react-presets/src/render/chunk/renderer/index.module.scss';
+import styles from '../../../react-presets/src/plugins/effect-chunk/render/effect-chunk/renderer/index.module.scss';
+import { Fluxdown } from '../packs/full';
 import { createManualTicker, createStepScheduler } from './utils/smooth';
 
 const selector = '[data-fluxdown-chunk]';

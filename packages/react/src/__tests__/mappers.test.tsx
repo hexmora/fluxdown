@@ -16,10 +16,10 @@ import {
   useMap,
 } from 'stative';
 
-import type { FluxdownRef, IPluginItem } from '../types';
+import type { FluxdownRef, IPluginItem } from '../packs/full';
 
-import { Fluxdown } from '..';
-import styles from '../../../react-presets/src/render/shad/renderer/index.module.scss';
+import styles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
+import { Fluxdown } from '../packs/full';
 import { createManualTicker, createStepScheduler } from './utils/smooth';
 
 declare global {

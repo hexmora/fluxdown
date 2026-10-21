@@ -1,9 +1,10 @@
+import type { PluginClass } from '@fluxdown/types';
 import type { Element, Text } from 'hast';
 
-import type { SlotType } from '../base';
+import type { AnySlotPlugin, IReactRenderPlugin, SlotType } from '../base';
 
-import { PRESET_RENDER_PLUGINS } from '../render';
-import { PRESET_SLOT_PLUGINS } from '../slot';
+import { PRESET_FULL_PLUGINS } from '../presets/full';
+import { PRESET_LIGHT_PLUGINS } from '../presets/lite';
 
 const EXPECTED_SLOT_TYPES: SlotType[] = [
   'Blockquote',
@@ -29,9 +30,18 @@ const createMath = (tagName: string): Element => ({
   type: 'element',
 });
 
-describe('plugin presets', () => {
+describe.each([
+  ['lite', PRESET_LIGHT_PLUGINS],
+  ['full', PRESET_FULL_PLUGINS],
+] as const)('%s plugin preset', (_name, plugins) => {
+  const renderPlugins = plugins.flatMap(
+    (plugin) => plugin.renders ?? [],
+  ) as PluginClass<IReactRenderPlugin>[];
+  const slotPlugins = plugins.flatMap(
+    (plugin) => plugin.slots ?? [],
+  ) as PluginClass<AnySlotPlugin>[];
   test('exports a render preset whose always-match fallback is last', () => {
-    const instances = PRESET_RENDER_PLUGINS.map((Plugin) => new Plugin());
+    const instances = renderPlugins.map((Plugin) => new Plugin());
 
     const genericTextNode: Text = { type: 'text', value: 'plain' };
 
@@ -45,9 +55,9 @@ describe('plugin presets', () => {
   });
 
   test('exports slot presets for all business slots but not special policy slots', () => {
-    const instances = PRESET_SLOT_PLUGINS.map((Plugin) => new Plugin());
+    const instances = slotPlugins.map((Plugin) => new Plugin());
 
-    const types = instances.map((plugin) => plugin.type);
+    const types = [...new Set(instances.map((plugin) => plugin.type))];
 
     expect(types).toHaveLength(EXPECTED_SLOT_TYPES.length);
 
@@ -61,7 +71,7 @@ describe('plugin presets', () => {
   });
 
   test('matches Tex placeholders only when the placeholder element is a span', () => {
-    const instances = PRESET_RENDER_PLUGINS.map((Plugin) => new Plugin());
+    const instances = renderPlugins.map((Plugin) => new Plugin());
 
     const fallback = instances.at(-1);
 

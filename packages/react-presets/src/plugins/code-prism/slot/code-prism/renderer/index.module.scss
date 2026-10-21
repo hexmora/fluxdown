@@ -1,0 +1,60 @@
+@use "@prefix" as *;
+
+.root {
+  :global(.token.comment),
+  :global(.token.prolog),
+  :global(.token.doctype),
+  :global(.token.cdata) {
+    color: var(--#{$prefix}-syntax-comment);
+  }
+
+  :global(.token.keyword),
+  :global(.token.atrule) {
+    color: var(--#{$prefix}-syntax-keyword);
+  }
+
+  :global(.token.string),
+  :global(.token.char),
+  :global(.token.attr-value),
+  :global(.token.tag) {
+    color: var(--#{$prefix}-syntax-string);
+  }
+
+  :global(.token.number),
+  :global(.token.boolean),
+  :global(.token.constant) {
+    color: var(--#{$prefix}-syntax-number);
+  }
+
+  :global(.token.function),
+  :global(.token.class-name) {
+    color: var(--#{$prefix}-syntax-function);
+  }
+
+  :global(.token.property),
+  :global(.token.variable),
+  :global(.token.attr-name) {
+    color: var(--#{$prefix}-syntax-variable);
+  }
+
+  :global(.token.punctuation),
+  :global(.token.operator) {
+    color: var(--#{$prefix}-syntax-punctuation);
+  }
+
+  :global(.token.inserted) {
+    color: var(--#{$prefix}-syntax-inserted);
+  }
+
+  :global(.token.deleted) {
+    color: var(--#{$prefix}-syntax-deleted);
+  }
+
+  :global(.token.bold) {
+    font-weight: bold;
+  }
+
+  :global(.token.italic) {
+    font-style: italic;
+  }
+}

@@ -4,12 +4,12 @@ import { BaseRemarkPlugin } from '@fluxdown/core-presets/remark';
 import { act, cleanup, render } from '@testing-library/react';
 import { createRef } from 'react';
 
-import type { FluxdownProps, FluxdownRef } from '../types';
+import type { FluxdownProps, FluxdownRef } from '../packs/full';
 
-import { Fluxdown } from '..';
 import { restoreGlobals } from '../../../../scripts/testing/globals';
-import scaleStyles from '../../../react-presets/src/render/scale/renderer/index.module.scss';
-import styles from '../../../react-presets/src/render/shad/renderer/index.module.scss';
+import scaleStyles from '../../../react-presets/src/plugins/effect-scale/render/effect-scale/renderer/index.module.scss';
+import styles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
+import { Fluxdown } from '../packs/full';
 import { createRafClock } from './utils/raf';
 
 afterEach(async () => {

@@ -1,5 +1,18 @@
 # @fluxdown/core-presets
 
+## 0.10.0
+
+### Minor Changes
+
+- 9867aed: Add a chunk streaming effect that fades each incoming text batch in together, preserves existing content and natural wrapping, and respects reduced motion.
+- aeaa05f: Use monotonic animation clocks and scale as the default streaming effect. Keep plugin configuration entries optional while declaring complete global configuration registries, and organize effect documentation with shared streaming previews.
+- ea3f399: Add a suffix streaming effect with cursor and dot markers, extensible marker types, and support for code blocks and syntax highlighting.
+
+### Patch Changes
+
+- Updated dependencies [aeaa05f]
+  - @fluxdown/types@0.10.0
+
 ## 0.9.0
 
 ### Minor Changes

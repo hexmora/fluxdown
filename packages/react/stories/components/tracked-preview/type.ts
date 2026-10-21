@@ -1,7 +1,7 @@
 import type { IPatchItem } from '@fluxdown/core';
 import type { ReactNode } from 'react';
 
-import type { StreamingConfig } from '../../../src';
+import type { StreamingConfig } from '../../../src/packs/full';
 import type { PlaygroundSettings } from '../playground/type';
 
 export interface TrackedPreviewProps {

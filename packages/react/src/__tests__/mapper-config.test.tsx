@@ -4,7 +4,7 @@ import type { MapperConfigInputs as ConfigInputs, MapperPluginConfig } from '@fl
 import { act, cleanup, render } from '@testing-library/react';
 import { type IReadableClosure, MutableState, once, toClosure, useDefaults, useMap } from 'stative';
 
-import { Fluxdown } from '..';
+import { Fluxdown } from '../packs/full';
 
 type PreviewConfig = { count?: number };
 

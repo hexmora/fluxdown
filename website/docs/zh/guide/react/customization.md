@@ -58,7 +58,9 @@ export function Article({ text, dark }: ArticleProps) {
 
 ## 样式字段
 
-以下字段均位于 `theme.tokens`，支持局部覆盖。颜色、尺寸和间距接受 CSS 值；行高和字重也可以使用数字。未设置的字段沿用所选主题。完整类型 `ThemeTokens` 可从 `fluxdown` 导入。
+以下字段均位于 `theme.tokens`，支持局部覆盖。颜色、尺寸和间距接受 CSS 值；行高和字重也可以使用数字。未设置的字段沿用所选主题。
+
+> 完整类型 `ThemeTokens` 可从 `fluxdown` 导入。
 
 ### 颜色
 

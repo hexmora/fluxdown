@@ -2,8 +2,8 @@
 
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import { Fluxdown } from '..';
 import { restoreGlobals, stubGlobal } from '../../../../scripts/testing/globals';
+import { Fluxdown } from '../packs/full';
 
 describe('Fluxdown smooth server rendering', () => {
   test('renders full server markup with smoothing enabled and starts no timers', () => {

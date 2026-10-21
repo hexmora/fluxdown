@@ -1,5 +1,11 @@
 # @fluxdown/types
 
+## 0.10.0
+
+### Minor Changes
+
+- aeaa05f: Use monotonic animation clocks and scale as the default streaming effect. Keep plugin configuration entries optional while declaring complete global configuration registries, and organize effect documentation with shared streaming previews.
+
 ## 0.9.0
 
 ### Minor Changes

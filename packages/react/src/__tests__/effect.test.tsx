@@ -23,12 +23,12 @@ import {
   useMap,
 } from 'stative';
 
-import type { EffectItem, FluxdownRef, StreamingConfig } from '../types';
+import type { EffectItem, FluxdownRef, StreamingConfig } from '../packs/full';
 
-import { Fluxdown } from '..';
 import { restoreGlobals } from '../../../../scripts/testing/globals';
-import scaleStyles from '../../../react-presets/src/render/scale/renderer/index.module.scss';
-import styles from '../../../react-presets/src/render/shad/renderer/index.module.scss';
+import scaleStyles from '../../../react-presets/src/plugins/effect-scale/render/effect-scale/renderer/index.module.scss';
+import styles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
+import { Fluxdown } from '../packs/full';
 import { createRafClock } from './utils/raf';
 
 declare global {

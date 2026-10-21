@@ -3,12 +3,33 @@
 import { createRsbuild } from '@rsbuild/core';
 import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
 import path from 'node:path';
 
-import type { BrowserCheckResult, PackageManifest } from './types.ts';
+import type { BrowserCheckResult, PackageArtifact } from './types.ts';
 
 import { publicEntries, resolveExport } from './check-package.ts';
+
+async function readStylesheet(file: string): Promise<string> {
+  const css = await readFile(file, 'utf8');
+  const imports = [...css.matchAll(/@import\s+['"]([^'"]+)['"];?/g)];
+  const nested = await Promise.all(
+    imports.map(([, target]) => readStylesheet(path.resolve(path.dirname(file), target))),
+  );
+
+  return [css, ...nested].join('\n');
+}
+
+async function entryStylesheet(directory: string, entry: string): Promise<string> {
+  const file = path.join(directory, entry);
+  const source = await readFile(file, 'utf8');
+  const imports = [...source.matchAll(/(?:import\s*|require\()['"]([^'"]+\.css)['"]/g)];
+
+  return (
+    await Promise.all(
+      imports.map(([, target]) => readStylesheet(path.resolve(path.dirname(file), target))),
+    )
+  ).join('\n');
+}
 
 function cssClassNames(css: string): string[] {
   const plain = css
@@ -50,10 +71,8 @@ function assertCssCoverage(label: string, expected: string, actual: string): num
 
 export async function checkBrowserConsumer(
   consumer: string,
-  artifacts: readonly { manifest: PackageManifest }[],
+  artifacts: PackageArtifact[],
 ): Promise<BrowserCheckResult[]> {
-  const consumerRequire = createRequire(path.join(consumer, 'package.json'));
-
   const entries: Record<string, string> = {};
 
   const checks: {
@@ -63,7 +82,8 @@ export async function checkBrowserConsumer(
     stylesheet: string;
   }[] = [];
 
-  for (const { manifest } of artifacts) {
+  for (const { manifest, files } of artifacts) {
+    const directory = path.join(consumer, 'node_modules', manifest.name);
     const style = resolveExport(manifest.exports?.['./styles.css'], ['browser', 'import']);
 
     if (['fluxdown', '@fluxdown/react-presets'].includes(manifest.name)) {
@@ -72,15 +92,24 @@ export async function checkBrowserConsumer(
 
     if (!style) continue;
 
-    const stylesheet = await readFile(
-      consumerRequire.resolve(`${manifest.name}/styles.css`),
-      'utf8',
-    );
-
-    for (const [subpath] of publicEntries(manifest)) {
+    for (const [subpath, target] of publicEntries(manifest, files)) {
       const specifier = manifest.name + (subpath === '.' ? '' : subpath.slice(1));
 
+      let esmHasStyles = false;
+
       for (const format of ['import', 'require'] as const) {
+        const entry = resolveExport(target, ['browser', format]);
+        assert(entry, `${specifier}: missing browser entry`);
+        const stylesheet = await entryStylesheet(directory, entry);
+
+        if (format === 'import') esmHasStyles = Boolean(stylesheet.trim());
+        else
+          assert.equal(
+            Boolean(stylesheet.trim()),
+            esmHasStyles,
+            `${specifier}: ESM and CJS browser entries disagree on stylesheet coverage`,
+          );
+
         const name = `browser-${checks.length}-${format}`;
 
         const filename = path.join(consumer, `${name}.${format === 'import' ? 'mjs' : 'cjs'}`);
@@ -132,13 +161,19 @@ export async function checkBrowserConsumer(
         .map((asset) => asset.name)
         .filter((asset): asset is string => Boolean(asset?.endsWith('.css')));
 
-      assert(cssAssets.length, `${specifier} (${format}): browser entry has no initial CSS asset`);
+      if (stylesheet)
+        assert(
+          cssAssets.length,
+          `${specifier} (${format}): browser entry has no initial CSS asset`,
+        );
 
       const css = (
         await Promise.all(cssAssets.map((asset) => readFile(path.join(output, asset), 'utf8')))
       ).join('\n');
 
-      const selectors = assertCssCoverage(`${specifier} (${format})`, stylesheet, css);
+      const selectors = stylesheet
+        ? assertCssCoverage(`${specifier} (${format})`, stylesheet, css)
+        : 0;
 
       const html = await readFile(path.join(output, `${name}.html`), 'utf8');
 
@@ -149,7 +184,7 @@ export async function checkBrowserConsumer(
     }
 
     console.log(
-      `Browser CSS OK: ${results.length} JavaScript-only ESM/CJS entries retain and load all package CSS class selectors`,
+      `Browser CSS OK: ${results.length} JavaScript-only ESM/CJS entries load their reachable CSS class selectors`,
     );
 
     return results;

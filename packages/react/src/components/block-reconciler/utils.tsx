@@ -10,6 +10,7 @@ import {
   isHastParent,
   PATCH_MARKER,
 } from '@fluxdown/react-presets/base';
+import { PluginPriority } from '@fluxdown/types';
 import { isObject, isString } from 'lodash-es';
 import { Fragment } from 'react';
 
@@ -73,20 +74,30 @@ const renderNode = ({ node, parents, patches, plugins }: RenderNodeParams): Reac
   const getProps = (target?: Element) =>
     getReactProps(target ?? (isHastElement(node) ? node : undefined));
 
+  let matched: IReactRenderPlugin | undefined;
+
+  let priority = Infinity;
+
   for (const plugin of plugins) {
-    if (!plugin.match({ node, parents })) {
+    const nextPriority = plugin.config.priority ?? PluginPriority.Default;
+
+    if (nextPriority > priority || !plugin.match({ node, parents })) {
       continue;
     }
 
-    return plugin.render({
+    matched = plugin;
+
+    priority = nextPriority;
+  }
+
+  return (
+    matched?.render({
       getProps,
       node,
       parents,
       patches,
       render,
       renderChildren,
-    });
-  }
-
-  return null;
+    }) ?? null
+  );
 };

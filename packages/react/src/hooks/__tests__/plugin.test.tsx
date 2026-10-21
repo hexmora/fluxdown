@@ -8,7 +8,7 @@ import { once } from 'stative';
 
 import type { IPluginItem } from '../../types';
 
-import { usePlugins } from '..';
+import { useMergePlugins, usePlugins } from '..';
 
 type RemarkItem = IPluggable<IRemarkPlugin, unknown>;
 
@@ -33,6 +33,22 @@ const asRender = (name: string) => ({ name }) as unknown as IReactRenderPluggabl
 const createPluginClass = <const K extends string>(key: K) => {
   return Object.assign(function TestPlugin() {}, { key });
 };
+
+describe('useMergePlugins', () => {
+  test.each(['mappers', 'remarks', 'rehypes', 'repairs', 'renders', 'slots'] as const)(
+    'keeps preset entries before user entries in the %s channel',
+    (type) => {
+      const preset = { name: 'preset' } as never;
+      const first = { name: 'first' } as never;
+      const last = { name: 'last' } as never;
+      const presets: IPluginItem[] = [{ [type]: [preset] }];
+      const plugins: IPluginItem[] = [{ [type]: [first] }, { [type]: [last] }];
+      const { result } = renderHook(() => useMergePlugins(presets, plugins));
+
+      expect(result.current[type]).toEqual([preset, first, last]);
+    },
+  );
+});
 
 describe('usePlugins', () => {
   test('flattens one requested plugin type in pack order and ignores missing fields', () => {

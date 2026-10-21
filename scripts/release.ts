@@ -21,6 +21,7 @@ import type { PackageArtifact, WorkspacePackage } from './types.ts';
 
 import { checkBrowserConsumer } from './check-browser.ts';
 import { checkPackage, publicEntries, readManifest } from './check-package.ts';
+import { checkReactPacks } from './check-react-packs.ts';
 import {
   assertPublishEnvironment,
   assertSourceSha,
@@ -337,17 +338,17 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
 
     checkInstalled(installed.dependencies);
 
-    const specifiers = artifacts.flatMap(({ manifest }) =>
-      publicEntries(manifest).map(
+    const specifiers = artifacts.flatMap(({ manifest, files }) =>
+      publicEntries(manifest, files).map(
         ([entry]) => manifest.name + (entry === '.' ? '' : entry.slice(1)),
       ),
     );
 
-    const esmSmoke = specifiers
+    let esmSmoke = specifiers
       .map((specifier) => `await import(${JSON.stringify(specifier)});`)
       .join('\n');
 
-    const cjsSmoke = specifiers
+    let cjsSmoke = specifiers
       .map((specifier) => `require(${JSON.stringify(specifier)});`)
       .join('\n');
 
@@ -365,6 +366,68 @@ jsx(({ x }: { x: number }) => x, { x: D(42) });
 
     if (specifiers.includes('fluxdown')) {
       typeSmoke += `\nimport { createElement } from 'react';\nimport { Fluxdown } from 'fluxdown';\ncreateElement(Fluxdown, { text: 'consumer', streaming: true });\n`;
+      typeSmoke += `
+import { FluxdownLite } from 'fluxdown/lite';
+import { FluxdownRaw } from 'fluxdown/raw';
+import { PRESET_LIGHT_PLUGINS } from '@fluxdown/react-presets/lite';
+import { CodePrismPlugin } from '@fluxdown/react-presets/plugins/code-prism';
+import { TexKatexPlugin } from '@fluxdown/react-presets/plugins/tex-katex';
+import type { IPluginItem, PluginConfigs } from '@fluxdown/react-presets/typings';
+const config: PluginConfigs = { 'slot-code-header': { disabled: true } };
+const plugin: IPluginItem = { ...CodePrismPlugin, config };
+createElement(FluxdownLite, { text: 'consumer', plugins: [plugin, TexKatexPlugin] });
+createElement(FluxdownRaw, { text: 'consumer', plugins: PRESET_LIGHT_PLUGINS });
+// @ts-expect-error Raw intentionally requires an explicit plugin selection.
+createElement(FluxdownRaw, { text: 'consumer' });
+`;
+
+      const renderSmoke = `
+class ParagraphOverride {
+  static key = 'slot-paragraph';
+  type = 'Paragraph';
+  config = {};
+  Component = ({ Raw, ...props }) => createElement('aside', null, createElement(Raw, props));
+  destroy() {}
+}
+const html = renderToString(createElement(FluxdownLite, {
+  text: 'packed consumer', plugins: { slots: [ParagraphOverride] },
+}));
+if (!/<aside><p class=/.test(html) || !html.includes('packed consumer')) {
+  throw new Error('Published entries do not share the slot context or preserve Raw composition');
+}
+async function checkFormulaSsr() {
+  let output = '';
+  await new Promise((resolve, reject) => {
+    const destination = new PassThrough();
+    const timer = setTimeout(() => { stream.abort(); reject(new Error('Formula SSR timed out')); }, 10000);
+    destination.on('data', (chunk) => { output += chunk; });
+    destination.on('end', () => { clearTimeout(timer); resolve(); });
+    destination.on('error', (error) => { clearTimeout(timer); reject(error); });
+    const stream = renderToPipeableStream(createElement(Fluxdown, {
+      text: '$x^2$', build: { tex: true },
+    }), {
+      onAllReady() { stream.pipe(destination); },
+      onError(error) { clearTimeout(timer); reject(error); },
+    });
+  });
+  if (!output.includes('class="katex"')) throw new Error('The published lazy formula renderer failed during SSR');
+}
+checkFormulaSsr().catch((error) => { console.error(error); process.exitCode = 1; });
+`;
+      esmSmoke += `
+import { PassThrough } from 'node:stream';
+import { createElement } from 'react';
+import { renderToPipeableStream, renderToString } from 'react-dom/server';
+import { Fluxdown } from 'fluxdown';
+import { FluxdownLite } from 'fluxdown/lite';
+${renderSmoke}`;
+      cjsSmoke += `
+const { PassThrough } = require('node:stream');
+const { createElement } = require('react');
+const { renderToPipeableStream, renderToString } = require('react-dom/server');
+const { Fluxdown } = require('fluxdown');
+const { FluxdownLite } = require('fluxdown/lite');
+${renderSmoke}`;
     }
 
     await writeFile(path.join(consumer, '__tests__', 'smoke.mjs'), esmSmoke);
@@ -409,6 +472,8 @@ jsx(({ x }: { x: number }) => x, { x: D(42) });
     );
 
     const browser = await checkBrowserConsumer(consumer, artifacts);
+
+    if (specifiers.includes('fluxdown/lite')) await checkReactPacks(consumer);
 
     if (specifiers.includes('fluxdown')) {
       run(

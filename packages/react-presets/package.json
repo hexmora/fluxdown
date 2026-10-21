@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/react-presets",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Preset render and slot plugins with shared React rendering infrastructure for Fluxdown.",
   "keywords": [
     "hast",
@@ -29,17 +29,26 @@
   "sideEffects": [
     "**/*.css",
     "**/*.scss",
-    "./dist/esm/*.browser.js",
-    "./dist/cjs/*.browser.cjs"
+    "./dist/esm/**/*.browser.js",
+    "./dist/cjs/**/*.browser.cjs"
   ],
   "exports": {
+    "./typings": "./src/typings/index.ts",
     "./base": "./src/base/index.ts",
-    "./render": "./src/render/index.ts",
-    "./slot": "./src/slot/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts",
+    "./*": "./src/presets/*/index.ts",
     "./styles.css": "./dist/esm/styles.css"
   },
   "publishConfig": {
     "exports": {
+      "./typings": {
+        "import": {
+          "types": "./dist/esm/typings/index.d.ts"
+        },
+        "require": {
+          "types": "./dist/cjs/typings/index.d.cts"
+        }
+      },
       "./base": {
         "import": {
           "types": "./dist/esm/base/index.d.ts",
@@ -54,32 +63,32 @@
           "default": "./dist/cjs/base.browser.cjs"
         }
       },
-      "./render": {
+      "./plugins/*": {
         "import": {
-          "types": "./dist/esm/render/index.d.ts",
-          "browser": "./dist/esm/render.browser.js",
-          "node": "./dist/esm/render.js",
-          "default": "./dist/esm/render.browser.js"
+          "types": "./dist/esm/plugins/*/index.d.ts",
+          "browser": "./dist/esm/plugins/*.browser.js",
+          "node": "./dist/esm/plugins/*.js",
+          "default": "./dist/esm/plugins/*.browser.js"
         },
         "require": {
-          "types": "./dist/cjs/render/index.d.cts",
-          "browser": "./dist/cjs/render.browser.cjs",
-          "node": "./dist/cjs/render.cjs",
-          "default": "./dist/cjs/render.browser.cjs"
+          "types": "./dist/cjs/plugins/*/index.d.cts",
+          "browser": "./dist/cjs/plugins/*.browser.cjs",
+          "node": "./dist/cjs/plugins/*.cjs",
+          "default": "./dist/cjs/plugins/*.browser.cjs"
         }
       },
-      "./slot": {
+      "./*": {
         "import": {
-          "types": "./dist/esm/slot/index.d.ts",
-          "browser": "./dist/esm/slot.browser.js",
-          "node": "./dist/esm/slot.js",
-          "default": "./dist/esm/slot.browser.js"
+          "types": "./dist/esm/presets/*/index.d.ts",
+          "browser": "./dist/esm/presets/*.browser.js",
+          "node": "./dist/esm/presets/*.js",
+          "default": "./dist/esm/presets/*.browser.js"
         },
         "require": {
-          "types": "./dist/cjs/slot/index.d.cts",
-          "browser": "./dist/cjs/slot.browser.cjs",
-          "node": "./dist/cjs/slot.cjs",
-          "default": "./dist/cjs/slot.browser.cjs"
+          "types": "./dist/cjs/presets/*/index.d.cts",
+          "browser": "./dist/cjs/presets/*.browser.cjs",
+          "node": "./dist/cjs/presets/*.cjs",
+          "default": "./dist/cjs/presets/*.browser.cjs"
         }
       },
       "./styles.css": "./dist/esm/styles.css"
@@ -104,6 +113,7 @@
     "classnames": "catalog:",
     "katex": "catalog:",
     "lodash-es": "catalog:",
+    "prismjs": "catalog:",
     "react-error-boundary": "catalog:",
     "shallow-equal": "catalog:",
     "shiki": "catalog:",
@@ -115,6 +125,7 @@
     "@testing-library/react": "catalog:",
     "@types/lodash-es": "catalog:",
     "@types/node": "catalog:",
+    "@types/prismjs": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "expect-type": "catalog:",

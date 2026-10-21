@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ChunkPacing, SmoothStreamingProps } from './type';
 
 import { useResolvedTheme } from '../../../.storybook/theme-addon';
-import { Fluxdown } from '../../../src';
+import { Fluxdown } from '../../../src/packs/full';
 import { StreamingLabControls, StreamingLabInspector, useStreamingLab } from '../streaming-lab';
 import { Button, NumberField } from '../ui';
 import { DEFAULT_PACING, SMOOTH_MARKDOWN } from './consts';

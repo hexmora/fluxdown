@@ -1,11 +1,5 @@
 # @fluxdown/react-presets
 
-Preset render and slot plugins with shared React rendering infrastructure for Fluxdown.
+React plugins and shared rendering infrastructure for Fluxdown.
 
-```ts
-import { BaseReactRenderPlugin, BaseSlotPlugin, SlotsContext } from "@fluxdown/react-presets/base";
-import { PRESET_RENDER_PLUGINS } from "@fluxdown/react-presets/render";
-import { PRESET_SLOT_PLUGINS } from "@fluxdown/react-presets/slot";
-```
-
-`/base` exports the shared render and slot types, classes, contexts, components, and hooks. `/render` and `/slot` export the plugins and their preset lists. There is no root export.
+[Documentation](../../website/docs/en/guide/react/plugins.md) · [简体中文](./docs/README.zh-CN.md)

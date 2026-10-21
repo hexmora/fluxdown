@@ -17,6 +17,8 @@
 
 `plugins` 接收一个 `IPluginItem`，也可以接收它的数组。一个插件包可以包含 `slots`、`renders`、`remarks`、`rehypes`、`repairs` 和 `mappers` 中的多个列表。
 
+> `IPluginItem` 类型从 `@fluxdown/react-presets/typings` 导入。
+
 ```tsx
 import { Fluxdown } from 'fluxdown';
 
@@ -31,11 +33,11 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
-这里的 `HighlightedPlugin` 是应用中导出的插件包对象。具体声明见 [Slot 插件](./plugins/slot.md#声明与使用)和 [Render 插件](./plugins/render.md#声明与使用)。
+这里的 `HighlightedPlugin` 是应用中导出的[聚合插件](./plugins/aggregate.md)，可以把多个 slot、render 和 Core 插件组成一个功能。
 
 ## 组合多个插件包
 
-把需要的插件包按顺序放进数组，直接传给 `Fluxdown`：
+把需要的插件包按顺序放进数组，直接传给 `Fluxdown`。相同优先级下，后面的 render 先匹配，后面的 slot 通过 `Raw` 包裹前面的组件：
 
 ```tsx
 import { Fluxdown } from 'fluxdown';
@@ -82,4 +84,4 @@ export function Message({ text }: MessageProps) {
 
 > 这个例子需要 `pnpm add @fluxdown/core-presets`。默认图片策略是 `placeholder`，会先显示占位内容。
 
-`config` 作用于同一个插件包里列出的插件。其他预设会继续保留。各类型插件页末尾列出了内置插件：[Slot](./plugins/slot.md#内置插件)、[Render](./plugins/render.md#内置插件)，以及 [Core 插件](../core/plugins.md)。完整属性见[自定义配置](./configuration.md#plugins)。
+`config` 作用于同一个插件包里列出的插件。其他预设会继续保留。内置 React 插件见[聚合插件](./plugins/aggregate.md#内置插件)，解析与映射预设见 [Core 插件](../core/plugins.md)。完整属性见[自定义配置](./configuration.md#plugins)。

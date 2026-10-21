@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 
-import type { EffectItem, StreamingConfig } from '../../../src';
+import type { EffectItem, StreamingConfig } from '../../../src/packs/full';
 import type { StreamingLabSettings } from './type';
 
 import { createClockTicker, PlaybackClock } from './clock';

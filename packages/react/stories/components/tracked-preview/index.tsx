@@ -3,7 +3,7 @@ import { useRendersCount, useUpdate } from 'react-use';
 import type { TrackedPreviewProps } from './type';
 
 import { useResolvedTheme } from '../../../.storybook/theme-addon';
-import { Fluxdown } from '../../../src';
+import { Fluxdown } from '../../../src/packs/full';
 import { Button } from '../ui';
 
 export const TrackedPreview = ({
