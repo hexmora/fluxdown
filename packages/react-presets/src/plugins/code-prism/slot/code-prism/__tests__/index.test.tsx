@@ -1,26 +1,31 @@
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 import { CodePrismRenderer } from '../renderer';
 
 describe('Prism code rendering', () => {
-  test('highlights JavaScript aliases while preserving source and suffixes', () => {
+  test('highlights JavaScript aliases while preserving source and suffixes', async () => {
     const code = 'const answer = 42;\n';
     const { container } = render(
       <CodePrismRenderer Raw={null} code={code} language="JS" suffix={<i>tail</i>} />,
     );
 
-    expect(container.querySelector('.token.keyword')).toHaveTextContent('const');
+    expect(container.querySelector('.token')).toBeNull();
+    expect(container.querySelector('code')?.textContent).toBe(`${code}tail`);
+
+    await waitFor(() =>
+      expect(container.querySelector('.token.keyword')).toHaveTextContent('const'),
+    );
     expect(container.querySelector('.token.number')).toHaveTextContent('42');
     expect(container.querySelector('code')?.textContent).toBe(`${code}tail`);
   });
 
-  test('escapes markup and replaces stale tokens when the language changes', () => {
+  test('escapes markup and replaces stale tokens when the language changes', async () => {
     const code = '<script>alert("source")</script>\n';
     const { container, rerender } = render(
       <CodePrismRenderer Raw={null} code={code} language="html" />,
     );
 
-    expect(container.querySelector('.token')).not.toBeNull();
+    await waitFor(() => expect(container.querySelector('.token')).not.toBeNull());
     expect(container.querySelector('script')).toBeNull();
     expect(container.querySelector('code')?.textContent).toBe(code);
 
