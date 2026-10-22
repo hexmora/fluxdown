@@ -186,6 +186,9 @@ catalogs:
     oxlint:
       specifier: ^1.69.0
       version: 1.69.0
+    pele:
+      specifier: ^1.8.0
+      version: 1.8.0
     prismjs:
       specifier: ^1.30.0
       version: 1.30.0
@@ -737,6 +740,9 @@ importers:
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1
+      pele:
+        specifier: 'catalog:'
+        version: 1.8.0
       prismjs:
         specifier: 'catalog:'
         version: 1.30.0
@@ -5597,6 +5603,10 @@ packages:
   pathval@2.0.1:
     resolution: {integrity: sha512-//nshmD55c46FuFw26xV/xFAaB5HF9Xdap7HJBBnrKdAd6/GxDBaNA1870O79+9ueg61cZLSVc+OaFlfmObYVQ==}
     engines: {node: '>= 14.16'}
+
+  pele@1.8.0:
+    resolution: {integrity: sha512-AYmHttE70cwNJVXdfPMCANGivFlmc3bGGpMG0GqH5S5vE3RgtEuLlkqbhRfe94Csv/ZEd1TUbv2dMUHpw4p1Bg==}
+    engines: {node: '>=20'}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -11667,6 +11677,8 @@ snapshots:
   path-type@4.0.0: {}
 
   pathval@2.0.1: {}
+
+  pele@1.8.0: {}
 
   picocolors@1.1.1: {}
 

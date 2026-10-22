@@ -113,6 +113,7 @@
     "classnames": "catalog:",
     "katex": "catalog:",
     "lodash-es": "catalog:",
+    "pele": "catalog:",
     "prismjs": "catalog:",
     "react-error-boundary": "catalog:",
     "shallow-equal": "catalog:",

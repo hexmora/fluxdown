@@ -29,5 +29,11 @@
     "type": "file",
     "name": "bundle-size",
     "label": "Bundle size"
+  },
+  {
+    "type": "dir",
+    "name": "features",
+    "label": "Other features",
+    "collapsed": false
   }
 ]

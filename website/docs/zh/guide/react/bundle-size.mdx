@@ -2,11 +2,11 @@ import { PackDemo } from '../../../../components';
 
 # 体积优化
 
-Fluxdown 提供 Lite 与 Full 两个入口。它们共享 Markdown 排版、代码复制和流式能力，主要区别是代码高亮与公式排版所需的依赖。只需要基础显示时选择 Lite；需要完整高亮与公式支持时使用默认的 Full。
+Fluxdown 提供 Lite 与 Full 两个入口。它们共享 Markdown 排版、代码复制和流式能力，主要区别是代码高亮、公式与图表渲染所需的依赖。只需要基础显示时选择 Lite；需要完整高亮、公式以及 Mermaid 和脑图支持时使用默认的 Full。
 
 ## Lite：保留基础显示
 
-从 `fluxdown/lite` 导入 `FluxdownLite`。代码使用等宽字体显示，公式显示 LaTeX 源码；此入口不引入 Prism、Shiki、KaTeX 或 MathJax。
+从 `fluxdown/lite` 导入 `FluxdownLite`。代码、图表与公式均显示源码；此入口不引入 Prism、Shiki、KaTeX、MathJax 或 Pele。
 
 ```tsx
 import { FluxdownLite } from 'fluxdown/lite';
@@ -43,9 +43,9 @@ Lite 包含以下全部 18 个插件包，由 `@fluxdown/react-presets/lite` 的
 | `BlockquotePlugin`   | `blockquote`    | 引用块                                           |
 | `FallbackPlugin`     | `fallback`      | 普通文本、行内代码与其余基础节点                 |
 
-## Full：代码高亮与公式排版
+## Full：代码高亮、公式与图表
 
-从 `fluxdown` 导入 `Fluxdown`，也可以显式使用 `fluxdown/full`。Full 使用 Shiki 为代码高亮，公式渲染器按需加载，先使用 KaTeX，无法渲染时再回退到 MathJax；加载期间仍显示公式源码。
+从 `fluxdown` 导入 `Fluxdown`，也可以显式使用 `fluxdown/full`。Full 使用 Shiki 为代码高亮，公式先使用 KaTeX，无法渲染时再回退到 MathJax；`mermaid` 和 `mindmap` 代码块都由 Pele 渲染。公式与图表引擎按需加载，加载期间保留源码。
 
 ```tsx
 import { Fluxdown } from 'fluxdown';
@@ -59,28 +59,31 @@ export function Message({ text }: { text: string }) {
 
 <PackDemo variant="full" />
 
-Full 由 `@fluxdown/react-presets/full` 的 `PRESET_FULL_PLUGINS` 提供。下表列出全部插件包，<span className="preset-upgrade">彩色「增强」</span>标注相对 Lite 替换的两项；其余插件保持相同。
+Full 由 `@fluxdown/react-presets/full` 的 `PRESET_FULL_PLUGINS` 提供。下表列出全部插件包，彩色标注相对 Lite 增强或新增的能力。
 
-| 插件包                                                          | 能力                                  | 与 Lite 的区别                                                  |
-| --------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------- |
-| `PatchPlugin`                                                   | 按文本范围替换内容                    | 相同                                                            |
-| `EffectShadPlugin`                                              | 流式输出末尾渐变                      | 相同                                                            |
-| `EffectScalePlugin`                                             | 逐字缩放、淡入与模糊消退              | 相同                                                            |
-| `EffectChunkPlugin`                                             | 分组淡入文字                          | 相同                                                            |
-| `EffectSuffixPlugin`                                            | 末尾光标与圆点                        | 相同                                                            |
-| <span className="preset-upgrade">`CodeShikiPlugin`</span>       | 代码容器、复制工具栏与 Shiki 语法高亮 | <span className="preset-upgrade">增强：替换 `CodePlugin`</span> |
-| `EmphasisPlugin`                                                | 斜体文字                              | 相同                                                            |
-| `ImagePlugin`                                                   | 图片与地址检查                        | 相同                                                            |
-| `LinkPlugin`                                                    | 链接与地址检查                        | 相同                                                            |
-| `ListPlugin`                                                    | 有序、无序与任务列表                  | 相同                                                            |
-| `ParagraphPlugin`                                               | 段落排版                              | 相同                                                            |
-| `StrongPlugin`                                                  | 加粗文字                              | 相同                                                            |
-| `TablePlugin`                                                   | 表格、单元格与列对齐                  | 相同                                                            |
-| <span className="preset-upgrade">`TexMathjaxKatexPlugin`</span> | 按需加载 KaTeX，必要时回退 MathJax    | <span className="preset-upgrade">增强：替换 `TexPlugin`</span>  |
-| `HeadingPlugin`                                                 | 一至六级标题                          | 相同                                                            |
-| `BreakLinePlugin`                                               | 换行                                  | 相同                                                            |
-| `BlockquotePlugin`                                              | 引用块                                | 相同                                                            |
-| `FallbackPlugin`                                                | 普通文本、行内代码与其余基础节点      | 相同                                                            |
+| 插件包                                                          | 能力                                  | 与 Lite 的区别                                                              |
+| --------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------- |
+| `PatchPlugin`                                                   | 按文本范围替换内容                    | 相同                                                                        |
+| `EffectShadPlugin`                                              | 流式输出末尾渐变                      | 相同                                                                        |
+| `EffectScalePlugin`                                             | 逐字缩放、淡入与模糊消退              | 相同                                                                        |
+| `EffectChunkPlugin`                                             | 分组淡入文字                          | 相同                                                                        |
+| `EffectSuffixPlugin`                                            | 末尾光标与圆点                        | 相同                                                                        |
+| <span className="preset-upgrade">`CodeShikiPlugin`</span>       | 代码容器、复制工具栏与 Shiki 语法高亮 | <span className="preset-upgrade">增强：替换 `CodePlugin`</span>             |
+| <span className="preset-upgrade">`CodePelePlugin`</span>        | 按需加载 Pele，显示流程图、脑图等图表 | <span className="preset-upgrade">新增：`mermaid` 与 `mindmap` 代码块</span> |
+| `EmphasisPlugin`                                                | 斜体文字                              | 相同                                                                        |
+| `ImagePlugin`                                                   | 图片与地址检查                        | 相同                                                                        |
+| `LinkPlugin`                                                    | 链接与地址检查                        | 相同                                                                        |
+| `ListPlugin`                                                    | 有序、无序与任务列表                  | 相同                                                                        |
+| `ParagraphPlugin`                                               | 段落排版                              | 相同                                                                        |
+| `StrongPlugin`                                                  | 加粗文字                              | 相同                                                                        |
+| `TablePlugin`                                                   | 表格、单元格与列对齐                  | 相同                                                                        |
+| <span className="preset-upgrade">`TexMathjaxKatexPlugin`</span> | 按需加载 KaTeX，必要时回退 MathJax    | <span className="preset-upgrade">增强：替换 `TexPlugin`</span>              |
+| `HeadingPlugin`                                                 | 一至六级标题                          | 相同                                                                        |
+| `BreakLinePlugin`                                               | 换行                                  | 相同                                                                        |
+| `BlockquotePlugin`                                              | 引用块                                | 相同                                                                        |
+| `FallbackPlugin`                                                | 普通文本、行内代码与其余基础节点      | 相同                                                                        |
+
+也可从 `@fluxdown/react-presets/plugins/code-pele` 导入 `CodePelePlugin`，按需加入 Lite。接入代码与演示见[图表展示](./features/diagrams.mdx)。
 
 ## 更多备选插件
 
@@ -105,6 +108,6 @@ export function Message({ text }: { text: string }) {
 }
 ```
 
-Lite 和 Full 的 `plugins` 都是可选参数，传入的插件优先于预设。若目的是减少依赖，从 Lite 开始添加需要的能力；覆盖 Full 的插件不会移除 Full 已引入的 Shiki 或 MathJax。
+Lite 和 Full 的 `plugins` 都是可选参数，传入的插件优先于预设。若目的是减少依赖，从 Lite 开始添加需要的能力；覆盖 Full 的插件不会移除 Full 已引入的高亮、公式或图表依赖。
 
 需要完全控制预设时，从 `fluxdown/raw` 导入 `FluxdownRaw`，并显式传入必填的 `plugins`。例如，`plugins={PRESET_LIGHT_PLUGINS}` 使用全部轻量插件，也可以自行列出所需的插件包。

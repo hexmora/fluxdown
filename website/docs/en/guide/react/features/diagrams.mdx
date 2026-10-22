@@ -1,0 +1,67 @@
+import { DiagramDemo } from '../../../../../components';
+
+# Diagrams
+
+Full supports `mermaid` and `mindmap` code blocks out of the box. Pele renders Mermaid syntax as flowcharts, sequence diagrams, mind maps, and more, following the component's light or dark theme.
+
+## Get started
+
+Install `fluxdown` and pass labeled code blocks as ordinary Markdown:
+
+````tsx
+import { Fluxdown } from 'fluxdown';
+
+const markdown = [
+  '```mermaid',
+  'flowchart LR',
+  '  A[Idea] --> B[Build] --> C[Share]',
+  '```',
+  '',
+  '```mindmap',
+  'mindmap',
+  '  Project',
+  '    Content',
+  '      Markdown',
+  '      Diagrams',
+  '    Experience',
+  '      Streaming',
+  '```',
+].join('\n');
+
+export function Message() {
+  return <Fluxdown text={markdown} />;
+}
+````
+
+Pele loads on demand, showing source during the initial load. No separate diagram stylesheet import is needed. The previous diagram stays visible during edits, and incomplete syntax keeps the last valid diagram visible.
+
+SVGs scale to fit their container. Pele supports Mermaid 12.1's built-in diagram types, with layouts that differ from Mermaid. External plugins and Mermaid themes are not supported. See [Pele compatibility](https://pele.run/compatibility).
+
+## Mermaid flowcharts
+
+Set the code block language to `mermaid` and write Mermaid syntax. Edit the source below to see the result:
+
+<DiagramDemo language="mermaid" />
+
+## Mind maps
+
+Set the code block language to `mindmap`, start the content with `mindmap`, and indent nodes to describe the hierarchy:
+
+<DiagramDemo language="mindmap" />
+
+## Add diagrams to Lite
+
+Lite displays the source of these code blocks by default. Install `@fluxdown/react-presets` and add `CodePelePlugin`:
+
+```tsx
+import { CodePelePlugin } from '@fluxdown/react-presets/plugins/code-pele';
+import { FluxdownLite } from 'fluxdown/lite';
+
+const plugins = [CodePelePlugin];
+
+export function Message({ text }: { text: string }) {
+  return <FluxdownLite plugins={plugins} text={text} />;
+}
+```
+
+`CodePelePlugin` handles both `mermaid` and `mindmap` code blocks. Both require the diagram type declaration, such as `flowchart` or `mindmap`, in the source. See [Bundle size](../bundle-size.mdx) for preset and dependency choices.

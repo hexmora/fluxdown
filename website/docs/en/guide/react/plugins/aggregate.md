@@ -58,9 +58,3 @@ export function Message({ text }: { text: string }) {
 `config` applies only to plugins listed in the same object, matched by their `key`. It overrides matching options in `[Plugin, options]` list entries. This example explicitly lists `CodeHeaderSlotPlugin` to disable the inherited toolbar while keeping the code container and source display.
 
 At the same `priority`, later render plugins match first. Later slot plugins sit outside earlier components in the `Raw` chain and can wrap or replace them. Different priorities still run from lowest to highest. Passing `plugins={[FirstPlugin, SecondPlugin]}` directly uses the same order.
-
-## Built-in plugins
-
-Import built-in plugins by feature from `@fluxdown/react-presets/plugins/<directory>`, such as `CodePlugin`, `TablePlugin`, and `BlockquotePlugin`. Enhanced plugins use `pluginExtends` to inherit their base: `CodeShikiPlugin` and `CodePrismPlugin` extend `CodePlugin`; `TexKatexPlugin` and `TexMathjaxKatexPlugin` extend `TexPlugin`.
-
-Lite uses `PRESET_LIGHT_PLUGINS`, which includes lightweight code and formula source display. Full uses `PRESET_FULL_PLUGINS`, replacing those two features with Shiki and KaTeX/MathJax. See [Bundle size](../bundle-size.mdx) for complete plugin lists, entry points, and alternative plugins.
