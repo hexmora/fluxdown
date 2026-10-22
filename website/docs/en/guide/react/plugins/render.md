@@ -62,4 +62,4 @@ Lower `priority` values match first. With equal priorities, later render plugins
 
 > This example requires `pnpm add @fluxdown/react-presets`.
 
-For component, style, or interaction changes, use a [slot plugin](./slot.md). To change HAST content before rendering, use a [rehype plugin](../../core/plugins/rehype.md).
+For component, style, or interaction changes, use a [slot plugin](./slot.md). To change HAST content before rendering, use a [rehype plugin](../../core/plugins/rehype.mdx).

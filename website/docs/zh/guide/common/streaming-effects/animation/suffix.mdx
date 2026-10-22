@@ -53,7 +53,10 @@ import type {
   ReactRenderParams,
 } from '@fluxdown/react-presets/base';
 
-import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/mapper';
+import {
+  isSuffixNode,
+  SUFFIX_DATA_ATTR,
+} from '@fluxdown/core-presets/plugins/mapper/suffix';
 import { BaseReactRenderPlugin } from '@fluxdown/react-presets/base';
 import { SuffixRenderer } from '@fluxdown/react-presets/plugins/effect-suffix';
 import { Fluxdown } from 'fluxdown';
@@ -89,7 +92,7 @@ class SmileRenderPlugin extends BaseReactRenderPlugin {
 
 Core 的 `Suffix` mapper 将标记插入当前可见 HAST 的末尾，不增加文本长度，具体外观由 renderer 决定。
 
-> `Suffix` mapper、`SuffixConfig`、`SuffixType`、`SUFFIX_DATA_ATTR` 和 `isSuffixNode` 从 `@fluxdown/core-presets/mapper` 导出。
+> `Suffix` mapper、`SuffixConfig`、`SuffixType`、`SUFFIX_DATA_ATTR` 和 `isSuffixNode` 从 `@fluxdown/core-presets/plugins/mapper/suffix` 导出。
 
 ## 配置
 

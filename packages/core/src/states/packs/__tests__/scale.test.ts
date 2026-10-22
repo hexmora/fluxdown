@@ -1,8 +1,12 @@
-import type { BaseScaleConfig } from '@fluxdown/core-presets/mapper';
+import type { BaseScaleConfig } from '@fluxdown/core-presets/plugins/mapper/scale';
 import type { IBlockState, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { Element, ElementContent, Parent, RootContent } from 'hast';
 
-import { Scale, SCALE_CHAR_VALUE, SCALE_DATA_ATTR } from '@fluxdown/core-presets/mapper';
+import {
+  Scale,
+  SCALE_CHAR_VALUE,
+  SCALE_DATA_ATTR,
+} from '@fluxdown/core-presets/plugins/mapper/scale';
 import {
   D,
   type IReadableClosure,

@@ -1,4 +1,4 @@
-import { Chunk } from '@fluxdown/core-presets/mapper';
+import { Chunk } from '@fluxdown/core-presets/plugins/mapper/chunk';
 import { PREFIX } from '@fluxdown/react-presets/base';
 import { act, cleanup, render } from '@testing-library/react';
 import { MutableState, toClosure } from 'stative';

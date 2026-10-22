@@ -1,6 +1,10 @@
 import type { Element, ElementContent } from 'hast';
 
-import { SHAD_DATA_ATTR, SHAD_HOST_VALUE, SHAD_TAG_NAME } from '@fluxdown/core-presets/mapper';
+import {
+  SHAD_DATA_ATTR,
+  SHAD_HOST_VALUE,
+  SHAD_TAG_NAME,
+} from '@fluxdown/core-presets/plugins/mapper/shad';
 import { toNumber } from 'lodash-es';
 
 import { isElementWithTag } from '../../../../base';

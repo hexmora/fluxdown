@@ -4,7 +4,7 @@ import type { PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { ReactNode } from 'react';
 
 import { Core, isPluggablesEqual, isPluginSetEqual } from '@fluxdown/core';
-import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/mapper';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
 import {
   SlotProvider,
   useDeferredUnmount,

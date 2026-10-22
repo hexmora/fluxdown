@@ -10,10 +10,15 @@ import type {
 } from '@fluxdown/types';
 /** @jsxImportSource stative */
 
-import { Chunk, Scale, Shad, Smooth, Suffix } from '@fluxdown/core-presets/mapper';
-import { HoistFootnoteRehypePlugin } from '@fluxdown/core-presets/rehype';
-import { ApplyRepairsRemarkPlugin, SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/remark';
-import { DanglingFootnoteRepairPlugin } from '@fluxdown/core-presets/repair';
+import { Chunk } from '@fluxdown/core-presets/plugins/mapper/chunk';
+import { Scale } from '@fluxdown/core-presets/plugins/mapper/scale';
+import { Shad } from '@fluxdown/core-presets/plugins/mapper/shad';
+import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { Suffix } from '@fluxdown/core-presets/plugins/mapper/suffix';
+import { HoistFootnoteRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/hoist-footnote';
+import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/apply-repairs';
+import { SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-math';
+import { DanglingFootnoteRepairPlugin } from '@fluxdown/core-presets/plugins/repair/dangling-footnote';
 import { expectTypeOf } from 'expect-type';
 import {
   type IReactiveState,

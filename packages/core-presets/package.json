@@ -28,52 +28,33 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    "./mapper": "./src/mapper/index.ts",
-    "./rehype": "./src/rehype/index.ts",
-    "./remark": "./src/remark/index.ts",
-    "./repair": "./src/repair/index.ts",
+    "./plugins/mapper/*": "./src/plugins/mapper/*/index.tsx",
+    "./plugins/rehype/*": "./src/plugins/rehype/*/index.ts",
+    "./plugins/remark/*": "./src/plugins/remark/*/index.ts",
+    "./plugins/repair/*": "./src/plugins/repair/*/index.ts",
+    "./presets/*": "./src/presets/*/index.ts",
     "./typings": "./src/typings/index.ts"
   },
   "publishConfig": {
     "exports": {
-      "./mapper": {
+      "./plugins/*": {
         "import": {
-          "types": "./dist/esm/mapper/index.d.ts",
-          "default": "./dist/esm/mapper.js"
+          "types": "./dist/esm/plugins/*/index.d.ts",
+          "default": "./dist/esm/plugins/*.js"
         },
         "require": {
-          "types": "./dist/cjs/mapper/index.d.cts",
-          "default": "./dist/cjs/mapper.cjs"
+          "types": "./dist/cjs/plugins/*/index.d.cts",
+          "default": "./dist/cjs/plugins/*/index.cjs"
         }
       },
-      "./rehype": {
+      "./presets/*": {
         "import": {
-          "types": "./dist/esm/rehype/index.d.ts",
-          "default": "./dist/esm/rehype.js"
+          "types": "./dist/esm/presets/*/index.d.ts",
+          "default": "./dist/esm/presets/*.js"
         },
         "require": {
-          "types": "./dist/cjs/rehype/index.d.cts",
-          "default": "./dist/cjs/rehype.cjs"
-        }
-      },
-      "./remark": {
-        "import": {
-          "types": "./dist/esm/remark/index.d.ts",
-          "default": "./dist/esm/remark.js"
-        },
-        "require": {
-          "types": "./dist/cjs/remark/index.d.cts",
-          "default": "./dist/cjs/remark.cjs"
-        }
-      },
-      "./repair": {
-        "import": {
-          "types": "./dist/esm/repair/index.d.ts",
-          "default": "./dist/esm/repair.js"
-        },
-        "require": {
-          "types": "./dist/cjs/repair/index.d.cts",
-          "default": "./dist/cjs/repair.cjs"
+          "types": "./dist/cjs/presets/*/index.d.cts",
+          "default": "./dist/cjs/presets/*/index.cjs"
         }
       },
       "./typings": {

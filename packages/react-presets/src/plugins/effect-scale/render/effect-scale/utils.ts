@@ -5,7 +5,7 @@ import {
   SCALE_DATA_ATTR,
   SCALE_TAG_NAME,
   SCALE_WORD_VALUE,
-} from '@fluxdown/core-presets/mapper';
+} from '@fluxdown/core-presets/plugins/mapper/scale';
 import { toNumber } from 'lodash-es';
 
 import { isElementWithTag } from '../../../../base';

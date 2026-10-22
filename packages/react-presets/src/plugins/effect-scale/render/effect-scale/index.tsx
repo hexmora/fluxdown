@@ -1,6 +1,6 @@
 import type { IPluggableConfig } from '@fluxdown/types';
 
-import { SCALE_DATA_ATTR, SCALE_WORD_VALUE } from '@fluxdown/core-presets/mapper';
+import { SCALE_DATA_ATTR, SCALE_WORD_VALUE } from '@fluxdown/core-presets/plugins/mapper/scale';
 import { assert } from '@fluxdown/utils';
 
 import type { ReactRenderMatchParams, ReactRenderParams } from '../../../../base';

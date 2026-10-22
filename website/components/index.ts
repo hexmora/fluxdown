@@ -3,3 +3,4 @@ export * from './demo';
 export * from './home';
 export * from './icons';
 export * from './playground';
+export * from './preset-check';

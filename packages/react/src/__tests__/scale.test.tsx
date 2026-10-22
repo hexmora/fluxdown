@@ -1,4 +1,4 @@
-import { Scale } from '@fluxdown/core-presets/mapper';
+import { Scale } from '@fluxdown/core-presets/plugins/mapper/scale';
 import { PREFIX } from '@fluxdown/react-presets/base';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
 import { createRef } from 'react';

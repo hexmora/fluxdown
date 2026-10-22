@@ -1,4 +1,4 @@
-import type { SuffixType } from '@fluxdown/core-presets/mapper';
+import type { SuffixType } from '@fluxdown/core-presets/plugins/mapper/suffix';
 import type { ReactNode } from 'react';
 
 export interface SuffixRendererProps {

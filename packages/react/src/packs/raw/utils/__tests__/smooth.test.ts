@@ -6,13 +6,13 @@ import type {
   SmoothTickerClass,
   TickerParams,
   TickerType,
-} from '@fluxdown/core-presets/mapper';
+} from '@fluxdown/core-presets/plugins/mapper/smooth';
 
 import {
   IntervalSmoothTicker,
   RafSmoothTicker,
   SpringSmoothScheduler,
-} from '@fluxdown/core-presets/mapper';
+} from '@fluxdown/core-presets/plugins/mapper/smooth';
 import { expectTypeOf } from 'expect-type';
 
 import {

@@ -1,9 +1,9 @@
-import type { BaseSmoothConfig } from '@fluxdown/core-presets/mapper';
+import type { BaseSmoothConfig } from '@fluxdown/core-presets/plugins/mapper/smooth';
 import type { IBlockState, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { ElementContent, Parent, RootContent } from 'hast';
 import type { Plugin } from 'unified';
 
-import { BaseRehypePlugin } from '@fluxdown/core-presets/rehype';
+import { BaseRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/base';
 import { assert } from '@fluxdown/utils';
 import { first, last } from 'lodash-es';
 import {
