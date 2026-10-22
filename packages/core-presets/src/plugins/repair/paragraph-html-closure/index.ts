@@ -1,0 +1,37 @@
+import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/types';
+
+import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
+
+import { isRepairNodeType } from '../../../utils';
+import { BaseRepairPlugin } from '../base';
+import { closeParagraphTags, isRightmostNode } from './utils';
+
+declare global {
+  interface RepairConfigs {
+    'repair-paragraph-html-closure': IPluggableConfig<void>;
+  }
+}
+
+export class ParagraphHtmlClosureRepairPlugin extends BaseRepairPlugin {
+  static readonly key = 'repair-paragraph-html-closure';
+
+  readonly config: RepairPluginSystemConfig = {
+    ending: false,
+    allows: 'paragraph',
+    priority: PluginPriority.Low,
+  };
+
+  runner: RepairPluginRunner = ({ node, parents, skipTree }) => {
+    if (!isRepairNodeType(node, 'paragraph')) {
+      return;
+    }
+
+    skipTree();
+
+    if (isRightmostNode(node, parents)) {
+      return;
+    }
+
+    closeParagraphTags(node);
+  };
+}

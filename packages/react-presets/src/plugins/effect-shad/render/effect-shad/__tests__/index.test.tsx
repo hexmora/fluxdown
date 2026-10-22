@@ -2,7 +2,7 @@ import type { IRenderPatchItem } from '@fluxdown/core';
 import type { Element } from 'hast';
 import type { ReactNode } from 'react';
 
-import { SHAD_DATA_ATTR, SHAD_HOST_VALUE } from '@fluxdown/core-presets/mapper';
+import { SHAD_DATA_ATTR, SHAD_HOST_VALUE } from '@fluxdown/core-presets/plugins/mapper/shad';
 import { cleanup, render } from '@testing-library/react';
 import { MutableState } from 'stative';
 

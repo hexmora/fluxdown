@@ -1,6 +1,6 @@
 import type { Element, RootContent } from 'hast';
 
-import { SHAD_DATA_ATTR, SHAD_HOST_VALUE } from '@fluxdown/core-presets/mapper';
+import { SHAD_DATA_ATTR, SHAD_HOST_VALUE } from '@fluxdown/core-presets/plugins/mapper/shad';
 import { assert } from '@fluxdown/utils';
 
 import type { HastRoot } from '../../typings';

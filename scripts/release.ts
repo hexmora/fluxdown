@@ -354,6 +354,29 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
 
     let typeSmoke = '';
 
+    if (specifiers.includes('@fluxdown/core-presets/presets/remark')) {
+      const presetSmoke = `
+if (!PRESET_REMARK_PLUGINS.includes(SyntaxMathRemarkPlugin)) {
+  throw new Error('The remark preset and individual plugin entries do not share class identity');
+}
+if (!PRESET_MAPPER_PLUGINS.includes(Smooth)) {
+  throw new Error('The mapper preset and individual plugin entries do not share mapper identity');
+}
+`;
+      esmSmoke += `
+import { SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-math';
+import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-presets/presets/remark';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
+${presetSmoke}`;
+      cjsSmoke += `
+const { SyntaxMathRemarkPlugin } = require('@fluxdown/core-presets/plugins/remark/syntax-math');
+const { Smooth } = require('@fluxdown/core-presets/plugins/mapper/smooth');
+const { PRESET_REMARK_PLUGINS } = require('@fluxdown/core-presets/presets/remark');
+const { PRESET_MAPPER_PLUGINS } = require('@fluxdown/core-presets/presets/mapper');
+${presetSmoke}`;
+    }
+
     if (specifiers.includes('stative')) {
       typeSmoke = `
 import { D, render, type JSXDescriptor } from 'stative';
@@ -466,6 +489,30 @@ ${renderSmoke}`;
     );
 
     run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')]);
+
+    if (specifiers.includes('@fluxdown/core')) {
+      // Check Core alone: importing every plugin above can mask missing augmentations.
+      const coreTypes = `
+import type {} from '@fluxdown/core';
+export type PresetConfigs = [
+  MapperConfigs['smooth'],
+  RemarkConfigs['remark-syntax-policy'],
+  RehypeConfigs['rehype-sanitizer'],
+  RehypeConfigs['rehype-hoist-footnote'],
+  RepairConfigs['repair-incomplete-image'],
+];
+`;
+      await writeFile(path.join(consumer, '__tests__', 'core-types.mts'), coreTypes);
+      await writeFile(path.join(consumer, '__tests__', 'core-types.cts'), coreTypes);
+      await writeFile(
+        path.join(consumer, 'tsconfig.core.json'),
+        JSON.stringify({
+          extends: './tsconfig.json',
+          files: ['__tests__/core-types.mts', '__tests__/core-types.cts'],
+        }),
+      );
+      run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.core.json')]);
+    }
 
     console.log(
       `Isolated npm consumer OK: ${specifiers.length} ESM/CJS entry points and NodeNext declarations`,

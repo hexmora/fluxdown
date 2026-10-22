@@ -4,14 +4,14 @@ Plugins work at different stages of content processing. Start with slots to chan
 
 For a streaming visual effect, you can pass a mapper directly through [`streaming.effect`](./configuration.md#streamingeffect). It accepts the same mapper and options as `plugins.mappers`, without requiring a plugin pack.
 
-| Type     | Purpose                                                        | Guide                                       |
-| -------- | -------------------------------------------------------------- | ------------------------------------------- |
-| `slot`   | Render slots with components and interactions.                 | [Slot plugins](./plugins/slot.md)           |
-| `render` | Render HAST into slots.                                        | [Render plugins](./plugins/render.md)       |
-| `mapper` | Reactively map HAST to control how content appears.            | [Mapper plugins](../core/plugins/mapper.md) |
-| `remark` | Parse Markdown syntax.                                         | [Remark plugins](../core/plugins/remark.md) |
-| `rehype` | Further process HAST.                                          | [Rehype plugins](../core/plugins/rehype.md) |
-| `repair` | Further process the Markdown AST to repair unfinished content. | [Repair plugins](../core/plugins/repair.md) |
+| Type     | Purpose                                                        | Guide                                        |
+| -------- | -------------------------------------------------------------- | -------------------------------------------- |
+| `slot`   | Render slots with components and interactions.                 | [Slot plugins](./plugins/slot.md)            |
+| `render` | Render HAST into slots.                                        | [Render plugins](./plugins/render.md)        |
+| `mapper` | Reactively map HAST to control how content appears.            | [Mapper plugins](../core/plugins/mapper.mdx) |
+| `remark` | Parse Markdown syntax.                                         | [Remark plugins](../core/plugins/remark.mdx) |
+| `rehype` | Further process HAST.                                          | [Rehype plugins](../core/plugins/rehype.mdx) |
+| `repair` | Further process the Markdown AST to repair unfinished content. | [Repair plugins](../core/plugins/repair.mdx) |
 
 ## Use one plugin pack
 
@@ -59,7 +59,7 @@ export function Message({ text }: MessageProps) {
 List the preset you want to configure, then supply its options in `config`, keyed by the plugin’s `key`. For example, hide an image while its URL is still being generated:
 
 ```tsx
-import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/repair';
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/plugins/repair/incomplete-image';
 import { Fluxdown } from 'fluxdown';
 
 type MessageProps = {

@@ -164,7 +164,7 @@ Each plugin matches HAST nodes and produces an output value. Use `[]` for a rend
 
 **Default:** `undefined`
 
-Syntax parsing plugins and preset options. See [remark](./plugins/remark.md).
+Syntax parsing plugins and preset options. See [remark](./plugins/remark.mdx).
 
 ```ts
 type RemarkOptions = [[], RemarkConfigs];
@@ -181,7 +181,7 @@ const remarks: RemarkOptions = [
 
 **Default:** `undefined`
 
-HAST post-processing plugins and preset options. See [rehype](./plugins/rehype.md).
+HAST post-processing plugins and preset options. See [rehype](./plugins/rehype.mdx).
 
 ```ts
 type RehypeOptions = [[], RehypeConfigs];
@@ -192,7 +192,7 @@ const rehypes: RehypeOptions = [
 ];
 ```
 
-> For embedded HTML, also allow the tag during [syntax filtering](./plugins/rehype.md#allow-additional-html-tags).
+> For embedded HTML, also allow the tag during [syntax filtering](./plugins/rehype.mdx#allow-additional-html-tags).
 
 ## repairs <span className="field-tag">Optional</span> {#repairs}
 
@@ -200,7 +200,7 @@ const rehypes: RehypeOptions = [
 
 **Default:** `undefined`
 
-Markdown AST post-processing plugins and preset options. The group requires `build.repair`; individual ending repairs also require `build.repairEnding`. See [repair](./plugins/repair.md).
+Markdown AST post-processing plugins and preset options. The group requires `build.repair`; individual ending repairs also require `build.repairEnding`. See [repair](./plugins/repair.mdx).
 
 ```ts
 type RepairOptions = [[], RepairConfigs];
@@ -217,7 +217,7 @@ const repairs: RepairOptions = [
 
 **Default:** `undefined`
 
-Reactive HAST mapping. `Smooth`, `Shad`, and `Scale` are included but disabled until configured. See [mapper](./plugins/mapper.md) for declaration and reactive options.
+Reactive HAST mapping. `Smooth`, `Shad`, and `Scale` are included but disabled until configured. See [mapper](./plugins/mapper.mdx) for declaration and reactive options.
 
 ```ts
 import { toClosure } from 'stative';
@@ -249,7 +249,7 @@ repairs.next({
 });
 ```
 
-You can also pass a static keyed object to `S` as a readable input with `toClosure(config)`. See [Allow additional HTML tags](./plugins/rehype.md#allow-additional-html-tags). A configuration by key only adjusts plugins that are already present; use a list to register a new plugin.
+You can also pass a static keyed object to `S` as a readable input with `toClosure(config)`. See [Allow additional HTML tags](./plugins/rehype.mdx#allow-additional-html-tags). A configuration by key only adjusts plugins that are already present; use a list to register a new plugin.
 
 ## Plugin options.disabled <span className="field-tag">Optional</span> {#plugin-optionsdisabled}
 
@@ -267,4 +267,4 @@ Excludes a plugin without constructing it. Omitted or `false` keeps it enabled. 
 
 Sets order within a plugin group. Lower numbers run earlier. Equal priorities preserve list order; omitting it keeps the plugin's priority. The enum provides `Highest`, `High`, `Default`, `Low`, and `Lowest`.
 
-> Imports: compiler and renderer types come from `@fluxdown/core`; plugin contracts and `PluginSet` come from `@fluxdown/types`; `IReadableClosure` comes from `stative`. Built-in plugins are listed in their respective [plugin guides](./plugins.md).
+> Imports: compiler and renderer types come from `@fluxdown/core`; plugin contracts and `PluginSet` come from `@fluxdown/types`; `IReadableClosure` comes from `stative`. Supported plugins and their preset membership are listed in the respective [plugin guides](./plugins.md).

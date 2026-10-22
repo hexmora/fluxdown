@@ -2,14 +2,14 @@
 
 插件用于扩展内容处理流程中的一个环节。先确定想改变的行为属于哪一层，再选择对应的插件：
 
-| 类型     | 职责                                   | 使用指南                                  |
-| -------- | -------------------------------------- | ----------------------------------------- |
-| `remark` | 语法解析。                             | [扩展 Markdown 语法](./plugins/remark.md) |
-| `repair` | AST 二次处理，包括修复尚未完成的语法。 | [处理 Markdown AST](./plugins/repair.md)  |
-| `rehype` | HAST 二次处理。                        | [处理 HTML 语法树](./plugins/rehype.md)   |
-| `mapper` | 响应式映射 HAST 内容块。               | [映射响应式内容](./plugins/mapper.md)     |
+| 类型     | 职责                                   | 使用指南                                   |
+| -------- | -------------------------------------- | ------------------------------------------ |
+| `remark` | 语法解析。                             | [扩展 Markdown 语法](./plugins/remark.mdx) |
+| `repair` | AST 二次处理，包括修复尚未完成的语法。 | [处理 Markdown AST](./plugins/repair.mdx)  |
+| `rehype` | HAST 二次处理。                        | [处理 HTML 语法树](./plugins/rehype.mdx)   |
+| `mapper` | 响应式映射 HAST 内容块。               | [映射响应式内容](./plugins/mapper.mdx)     |
 
-Core 已内置常见语法、修复、HTML 处理和平滑输出能力。各子页末尾列出对应的内置插件；优先调整它们的选项，需要新行为时再编写插件。
+Core 已内置常见语法、修复、HTML 处理和平滑输出能力。各子页列出支持的插件，并标明默认内置的项目；优先调整它们的选项，需要新行为时再编写插件。
 
 ## 配置预设
 
@@ -35,7 +35,7 @@ pnpm add @fluxdown/core-presets
 ```ts
 import type { IPluggable, IRepairPlugin } from '@fluxdown/types';
 
-import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/repair';
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/plugins/repair/incomplete-image';
 
 type RepairPlugin = IPluggable<IRepairPlugin, unknown>;
 
@@ -69,11 +69,11 @@ remark 和 rehype 插件用于接入 unified 插件；repair 插件访问并修�
 
 各子页分别介绍声明方式和如何接入：
 
-- [Remark 插件](./plugins/remark.md)
-- [Repair 插件](./plugins/repair.md)
-- [Rehype 插件](./plugins/rehype.md)
-- [Mapper 插件](./plugins/mapper.md)
+- [Remark 插件](./plugins/remark.mdx)
+- [Repair 插件](./plugins/repair.mdx)
+- [Rehype 插件](./plugins/rehype.mdx)
+- [Mapper 插件](./plugins/mapper.mdx)
 
 传入插件类或 mapper 函数即可，由 Core 管理生命周期。每次运行的数据应留在转换函数或状态流内，让同一个声明可以用于多份内容。
 
-> 预设从 `/remark`、`/rehype`、`/repair` 或 `/mapper` 导入。`@fluxdown/core-presets` 没有根入口。
+> 单个插件从 `@fluxdown/core-presets/plugins/[type]/[子路径]` 导入，预设数组从 `@fluxdown/core-presets/presets/[type]` 导入。`[type]` 为 `remark`、`rehype`、`repair` 或 `mapper`，子路径见各类插件文档。包根路径和插件分类路径不提供统一入口。

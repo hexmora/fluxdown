@@ -84,7 +84,7 @@ Choose the clock that drives output: `'raf'` follows animation frames, `'interva
 
 Determine how much content to reveal on each update. Use `'spring'` for the built-in spring scheduler, or pass a custom scheduler class.
 
-> Usually, `smooth: true` is enough. Import `SmoothConfig` from `fluxdown`, and `SmoothTickerClass` and `SmoothSchedulerClass` from `@fluxdown/core-presets/mapper`.
+> Usually, `smooth: true` is enough. Import `SmoothConfig` from `fluxdown`, and `SmoothTickerClass` and `SmoothSchedulerClass` from `@fluxdown/core-presets/plugins/mapper/smooth`.
 
 ### streaming.effect <span className="field-tag">Optional</span> {#streamingeffect}
 
@@ -94,7 +94,7 @@ Determine how much content to reveal on each update. Use `'spring'` for the buil
 
 Choose an animation effect or combine multiple effects. See [Animation](../common/streaming-effects/animation/index.mdx) for the supported input forms, available effects, live demos, and their configuration fields.
 
-> Import `EffectItem` from `fluxdown` and effect configuration types from `@fluxdown/core-presets/mapper`.
+> Import `EffectItem` from `fluxdown`. Effect configuration types come from their plugin entry points, such as `ScaleConfig` from `@fluxdown/core-presets/plugins/mapper/scale`. See [Mapper plugins](../core/plugins/mapper.mdx#supported-plugins) for the available subpaths.
 
 ## build <span className="field-tag">Optional</span> {#build}
 
@@ -114,7 +114,7 @@ Choose Markdown compilation features. Tables, task lists, strikethrough, autolin
 />
 ```
 
-HTML in Markdown goes through tag filtering and sanitization. The default allowed tags are `span`, `u`, `br`, `em`, and `a`. See [Rehype plugins](../core/plugins/rehype.md) to adjust this behavior.
+HTML in Markdown goes through tag filtering and sanitization. The default allowed tags are `span`, `u`, `br`, `em`, and `a`. See [Rehype plugins](../core/plugins/rehype.mdx) to adjust this behavior.
 
 ### build.repair <span className="field-tag">Optional</span> {#buildrepair}
 

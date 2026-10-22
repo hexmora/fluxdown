@@ -1,4 +1,7 @@
-import { BaseSmoothScheduler, BaseSmoothTicker } from '@fluxdown/core-presets/mapper';
+import {
+  BaseSmoothScheduler,
+  BaseSmoothTicker,
+} from '@fluxdown/core-presets/plugins/mapper/smooth';
 
 export class StepSmoothScheduler extends BaseSmoothScheduler {
   static instances: StepSmoothScheduler[] = [];

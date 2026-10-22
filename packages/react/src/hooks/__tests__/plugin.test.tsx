@@ -2,7 +2,7 @@ import type { MapperInputs } from '@fluxdown/core';
 import type { IReactRenderPluggable } from '@fluxdown/react-presets/base';
 import type { IPluggable, IPluggableConfig, IRemarkPlugin } from '@fluxdown/types';
 
-import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-presets/remark';
+import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-policy';
 import { renderHook } from '@testing-library/react';
 import { once } from 'stative';
 

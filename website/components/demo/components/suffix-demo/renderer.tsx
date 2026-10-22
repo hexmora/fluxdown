@@ -1,6 +1,6 @@
 import type { ReactRenderMatchParams, ReactRenderParams } from '@fluxdown/react-presets/base';
 
-import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/mapper';
+import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/plugins/mapper/suffix';
 import { BaseReactRenderPlugin } from '@fluxdown/react-presets/base';
 import { SuffixRenderer } from '@fluxdown/react-presets/plugins/effect-suffix';
 

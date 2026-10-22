@@ -84,7 +84,7 @@
 
 决定每次更新显示多少内容。`'spring'` 使用内置弹簧调度，也可以传自定义调度类。
 
-> 通常直接使用 `smooth: true` 即可。`SmoothConfig` 从 `fluxdown` 导入；`SmoothTickerClass` 和 `SmoothSchedulerClass` 从 `@fluxdown/core-presets/mapper` 导入。
+> 通常直接使用 `smooth: true` 即可。`SmoothConfig` 从 `fluxdown` 导入；`SmoothTickerClass` 和 `SmoothSchedulerClass` 从 `@fluxdown/core-presets/plugins/mapper/smooth` 导入。
 
 ### streaming.effect <span className="field-tag">可选</span> {#streamingeffect}
 
@@ -94,7 +94,7 @@
 
 选择动画效果，也可以组合多个效果。支持的输入形式、内置效果、实时演示与配置字段见[动画效果](../common/streaming-effects/animation/index.mdx)。
 
-> `EffectItem` 从 `fluxdown` 导入，效果配置类型从 `@fluxdown/core-presets/mapper` 导入。
+> `EffectItem` 从 `fluxdown` 导入。效果配置类型从对应插件入口导入，例如 `ScaleConfig` 来自 `@fluxdown/core-presets/plugins/mapper/scale`。完整子路径见 [Mapper 插件](../core/plugins/mapper.mdx#支持的插件)。
 
 ## build <span className="field-tag">可选</span> {#build}
 
@@ -114,7 +114,7 @@
 />
 ```
 
-Markdown 内的 HTML 会经过标签检查与清理，默认允许 `span`、`u`、`br`、`em` 和 `a`。调整方式见 [Rehype 插件](../core/plugins/rehype.md)。
+Markdown 内的 HTML 会经过标签检查与清理，默认允许 `span`、`u`、`br`、`em` 和 `a`。调整方式见 [Rehype 插件](../core/plugins/rehype.mdx)。
 
 ### build.repair <span className="field-tag">可选</span> {#buildrepair}
 

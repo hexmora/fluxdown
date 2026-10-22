@@ -1,0 +1,306 @@
+import { getNow, IntervalSmoothTicker, RafSmoothTicker } from '..';
+import { restoreGlobals, stubGlobal } from '../../../../../../../../../scripts/testing/globals';
+import { FakeSmoothTicker, mockAnimationFrames } from './utils';
+
+afterEach(() => {
+  jest.useRealTimers();
+
+  jest.restoreAllMocks();
+
+  restoreGlobals();
+});
+
+describe('ticker timestamps', () => {
+  test('uses performance.now without consulting the wall clock', () => {
+    const now = jest.fn(() => 42);
+
+    stubGlobal('performance', { now });
+
+    const wallClock = jest.spyOn(Date, 'now').mockReturnValue(-1);
+
+    expect(getNow()).toBe(42);
+
+    expect(now).toHaveBeenCalledTimes(1);
+
+    expect(wallClock).not.toHaveBeenCalled();
+  });
+});
+
+describe('RafSmoothTicker', () => {
+  test('emits frame timestamps and cancels the pending frame on stop', () => {
+    const frames = mockAnimationFrames();
+
+    const ticker = new RafSmoothTicker();
+
+    const next = jest.fn();
+
+    ticker.value.subscribe(next);
+
+    expect(ticker.running).toBe(false);
+
+    expect(ticker.start()).toEqual(expect.any(Number));
+
+    expect(ticker.running).toBe(true);
+
+    expect(frames.request).toHaveBeenCalledTimes(1);
+
+    frames.frame(1)(10);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledWith(10);
+
+    expect(frames.request).toHaveBeenCalledTimes(2);
+
+    const pending = frames.frame(2);
+
+    ticker.stop();
+
+    expect(ticker.running).toBe(false);
+
+    expect(frames.cancel).toHaveBeenCalledTimes(1);
+    expect(frames.cancel).toHaveBeenCalledWith(2);
+
+    pending(20);
+
+    expect(next).toHaveBeenCalledTimes(1);
+
+    expect(frames.request).toHaveBeenCalledTimes(2);
+
+    ticker.destroy();
+  });
+
+  test('ignores an old canceled callback after restart', () => {
+    const frames = mockAnimationFrames();
+
+    const ticker = new RafSmoothTicker();
+
+    const next = jest.fn();
+
+    ticker.value.subscribe(next);
+
+    ticker.start();
+
+    const stale = frames.frame(1);
+
+    ticker.stop();
+
+    ticker.start();
+
+    stale(10);
+
+    expect(next).not.toHaveBeenCalled();
+
+    expect(frames.request).toHaveBeenCalledTimes(2);
+
+    frames.frame(2)(20);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledWith(20);
+
+    expect(frames.request).toHaveBeenCalledTimes(3);
+
+    ticker.destroy();
+  });
+
+  test('does not schedule another frame when an observer stops the ticker', () => {
+    const frames = mockAnimationFrames();
+
+    const ticker = new RafSmoothTicker();
+
+    ticker.value.subscribe(() => ticker.stop());
+
+    ticker.start();
+
+    frames.frame(1)(10);
+
+    expect(ticker.running).toBe(false);
+
+    expect(frames.request).toHaveBeenCalledTimes(1);
+
+    ticker.destroy();
+  });
+
+  test('starts with the same monotonic clock used by animation frames', () => {
+    mockAnimationFrames();
+
+    const now = jest.spyOn(performance, 'now').mockReturnValue(42);
+
+    const wallClock = jest.spyOn(Date, 'now').mockReturnValue(-1);
+
+    const ticker = new RafSmoothTicker();
+
+    expect(ticker.start()).toBe(42);
+
+    expect(now).toHaveBeenCalledTimes(1);
+
+    expect(wallClock).not.toHaveBeenCalled();
+
+    ticker.destroy();
+  });
+});
+
+describe('IntervalSmoothTicker', () => {
+  test('emits on the configured interval and stops future emissions', () => {
+    jest.useFakeTimers();
+
+    const ticker = new IntervalSmoothTicker(20);
+
+    const next = jest.fn();
+
+    ticker.value.subscribe(next);
+
+    expect(ticker.start()).toEqual(expect.any(Number));
+
+    expect(ticker.running).toBe(true);
+
+    jest.advanceTimersByTime(45);
+
+    expect(next).toHaveBeenCalledTimes(2);
+
+    expect(next).toHaveBeenNthCalledWith(1, expect.any(Number));
+
+    ticker.stop();
+
+    jest.advanceTimersByTime(60);
+
+    expect(ticker.running).toBe(false);
+
+    expect(next).toHaveBeenCalledTimes(2);
+
+    expect(jest.getTimerCount()).toBe(0);
+
+    ticker.destroy();
+  });
+
+  test('defaults to approximately sixty frames per second', () => {
+    jest.useFakeTimers();
+
+    const ticker = new IntervalSmoothTicker();
+
+    const next = jest.fn();
+
+    ticker.value.subscribe(next);
+
+    ticker.start();
+
+    jest.advanceTimersByTime(50);
+
+    expect(next).toHaveBeenCalledTimes(3);
+
+    ticker.destroy();
+  });
+
+  test('can restart after stop without duplicating the interval', () => {
+    jest.useFakeTimers();
+
+    const ticker = new IntervalSmoothTicker(10);
+
+    const next = jest.fn();
+
+    ticker.value.subscribe(next);
+
+    ticker.start();
+
+    jest.advanceTimersByTime(10);
+
+    ticker.stop();
+
+    ticker.start();
+
+    jest.advanceTimersByTime(10);
+
+    expect(next).toHaveBeenCalledTimes(2);
+
+    expect(jest.getTimerCount()).toBe(1);
+
+    ticker.destroy();
+  });
+});
+
+describe.each([RafSmoothTicker, IntervalSmoothTicker])('$name lifecycle', (Ticker) => {
+  test('rejects repeated starts and stops', () => {
+    jest.useFakeTimers();
+
+    mockAnimationFrames();
+
+    const ticker = new Ticker();
+
+    expect(() => ticker.stop()).toThrow('Cannot stop a stopping ticker');
+
+    ticker.start();
+
+    expect(() => ticker.start()).toThrow('Cannot start a running ticker');
+
+    ticker.stop();
+
+    expect(() => ticker.stop()).toThrow('Cannot stop a stopping ticker');
+
+    ticker.destroy();
+  });
+
+  test.each([false, true])('destroy completes once when running=%s', (running) => {
+    jest.useFakeTimers();
+
+    const frames = mockAnimationFrames();
+
+    const ticker = new Ticker();
+
+    const complete = jest.fn();
+
+    const subscription = ticker.value.subscribe({ complete });
+
+    if (running) {
+      ticker.start();
+    }
+
+    ticker.destroy();
+
+    ticker.destroy();
+
+    expect(ticker.running).toBe(false);
+
+    expect(subscription.closed).toBe(true);
+
+    expect(complete).toHaveBeenCalledTimes(1);
+
+    expect(jest.getTimerCount()).toBe(0);
+
+    expect(frames.cancel).toHaveBeenCalledTimes(running && Ticker === RafSmoothTicker ? 1 : 0);
+  });
+});
+
+describe('FakeSmoothTicker test utility', () => {
+  test('supports repeated timestamps and rejects backward or inactive ticks', () => {
+    const ticker = new FakeSmoothTicker(10);
+
+    const next = jest.fn();
+
+    ticker.value.subscribe(next);
+
+    expect(() => ticker.tick(11)).toThrow('Cannot tick a stopping ticker');
+
+    expect(ticker.start()).toBe(10);
+
+    expect(() => ticker.start()).toThrow('Cannot start a running ticker');
+
+    ticker.tick(12);
+
+    ticker.tick(12);
+
+    expect(() => ticker.tick(11)).toThrow('Cannot tick previous timestamp');
+
+    expect(next.mock.calls).toEqual([[12], [12]]);
+
+    ticker.stop();
+
+    expect(() => ticker.stop()).toThrow('Cannot stop a stopping ticker');
+
+    expect(() => ticker.tick(13)).toThrow('Cannot tick a stopping ticker');
+
+    ticker.advanceTo(20);
+
+    expect(ticker.start()).toBe(20);
+
+    ticker.destroy();
+  });
+});

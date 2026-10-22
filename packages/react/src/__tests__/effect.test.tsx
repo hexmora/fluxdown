@@ -2,12 +2,8 @@ import type { Mapper, MapperInputs } from '@fluxdown/core';
 import type { MapperConfigInputs as ConfigInputs, MapperPluginConfig } from '@fluxdown/types';
 import type { IPluggableConfig } from '@fluxdown/types';
 
-import {
-  PRESET_MAPPER_PLUGINS,
-  Shad,
-  SHAD_DATA_ATTR,
-  SHAD_HOST_VALUE,
-} from '@fluxdown/core-presets/mapper';
+import { Shad, SHAD_DATA_ATTR, SHAD_HOST_VALUE } from '@fluxdown/core-presets/plugins/mapper/shad';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
 import { PluginPriority } from '@fluxdown/types';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
 import { expectTypeOf } from 'expect-type';

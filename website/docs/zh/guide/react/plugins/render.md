@@ -62,4 +62,4 @@ export function Note() {
 
 > 这个例子需要 `pnpm add @fluxdown/react-presets`。
 
-只想修改组件、样式或交互时，使用 [Slot 插件](./slot.md) 更直接。要先修改 HAST 内容，使用 [Rehype 插件](../../core/plugins/rehype.md)。
+只想修改组件、样式或交互时，使用 [Slot 插件](./slot.md) 更直接。要先修改 HAST 内容，使用 [Rehype 插件](../../core/plugins/rehype.mdx)。
