@@ -8,6 +8,7 @@ import { EffectChunkPlugin } from '../../plugins/effect-chunk';
 import { EffectScalePlugin } from '../../plugins/effect-scale';
 import { EffectShadPlugin } from '../../plugins/effect-shad';
 import { EffectSuffixPlugin } from '../../plugins/effect-suffix';
+import { EmojiPlugin } from '../../plugins/emoji';
 import { EmphasisPlugin } from '../../plugins/emphasis';
 import { FallbackPlugin } from '../../plugins/fallback';
 import { HeadingPlugin } from '../../plugins/heading';
@@ -28,6 +29,7 @@ export const PRESET_FULL_PLUGINS: IPluginItem[] = [
   EffectSuffixPlugin,
   CodeShikiPlugin,
   CodePelePlugin,
+  EmojiPlugin,
   EmphasisPlugin,
   ImagePlugin,
   LinkPlugin,

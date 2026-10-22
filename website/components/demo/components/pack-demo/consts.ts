@@ -1,4 +1,6 @@
 export const SAMPLE = [
+  'Hello :smile: Great work :+1:',
+  '',
   '```ts',
   'const greet = (name: string) => `Hello, ${name}!`;',
   '```',

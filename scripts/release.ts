@@ -497,6 +497,7 @@ import type {} from '@fluxdown/core';
 export type PresetConfigs = [
   MapperConfigs['smooth'],
   RemarkConfigs['remark-syntax-policy'],
+  RemarkConfigs['remark-emoji'],
   RehypeConfigs['rehype-sanitizer'],
   RehypeConfigs['rehype-hoist-footnote'],
   RepairConfigs['repair-incomplete-image'],
