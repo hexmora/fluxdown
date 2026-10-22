@@ -4,5 +4,11 @@
     "name": "streaming-effects",
     "label": "流式特效",
     "collapsed": false
+  },
+  {
+    "type": "dir",
+    "name": "features",
+    "label": "其他功能",
+    "collapsed": false
   }
 ]

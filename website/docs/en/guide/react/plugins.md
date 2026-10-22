@@ -33,7 +33,7 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
-`HighlightedPlugin` is an [aggregate plugin](./plugins/aggregate.md) exported by your app. It combines slot, render, and Core plugins into one feature.
+`HighlightedPlugin` is an [composite plugin](./plugins/aggregate.md) exported by your app. It combines slot, render, and Core plugins into one feature.
 
 ## Combine plugin packs
 
@@ -84,4 +84,4 @@ export function Message({ text }: MessageProps) {
 
 > This example requires `pnpm add @fluxdown/core-presets`. The default image strategy is `placeholder`, which displays placeholder content.
 
-`config` applies to the plugins listed in the same pack. Other presets remain in place. See [Bundle size](./bundle-size.mdx) for built-in React plugins, and the [Core plugin guides](../core/plugins.md) for parsing and mapping presets. See [Configuration](./configuration.md#plugins) for the full prop.
+`config` applies to the plugins listed in the same pack. Other presets remain in place. See [Plugin matrix](./plugins/matrix.mdx) for built-in React plugins, and the [Core plugin guides](../core/plugins.md) for parsing and mapping presets. See [Configuration](./configuration.md#plugins) for the full prop.

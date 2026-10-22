@@ -1,6 +1,6 @@
-# Aggregate plugins
+# Composite plugins
 
-An aggregate plugin uses `IPluginItem` to group the slot, render, and Core plugins needed for one feature. Pass one object to enable the whole feature.
+An composite plugin uses `IPluginItem` to group the slot, render, and Core plugins needed for one feature. Pass one object to enable the whole feature.
 
 ## Declare and use a plugin
 
@@ -31,7 +31,7 @@ You can also add `remarks`, `rehypes`, `repairs`, and `mappers`. Extend `BaseSlo
 
 ## Derive and configure a plugin
 
-`pluginExtends` accepts two or more aggregate plugins and returns an `IPluginItem`. Pass the base plugin first, then add overrides. For example, derive a plugin that hides the code toolbar:
+`pluginExtends` accepts two or more composite plugins and returns an `IPluginItem`. Pass the base plugin first, then add overrides. For example, derive a plugin that hides the code toolbar:
 
 ```tsx
 import { pluginExtends } from '@fluxdown/react-presets/base';

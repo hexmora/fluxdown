@@ -26,11 +26,6 @@
     "collapsed": false
   },
   {
-    "type": "file",
-    "name": "bundle-size",
-    "label": "体积优化"
-  },
-  {
     "type": "dir",
     "name": "features",
     "label": "其他功能",

@@ -2,7 +2,7 @@ import { DiagramDemo } from '../../../../../components';
 
 # 图表展示
 
-Full 开箱即用支持 `mermaid` 与 `mindmap` 代码块，统一由 Pele 将 Mermaid 语法渲染为流程图、时序图、脑图等，跟随组件的明暗主题。
+React Full 开箱即用支持 `mermaid` 与 `mindmap` 代码块，统一由 Pele 将 Mermaid 语法渲染为流程图、时序图、脑图等，跟随组件的明暗主题。
 
 ## 直接使用
 
@@ -49,9 +49,9 @@ SVG 随展示区域缩放。Pele 支持 Mermaid 12.1 的内置图表类型，布
 
 <DiagramDemo language="mindmap" />
 
-## 在 Lite 中按需接入
+## 在 React Lite 中按需接入
 
-Lite 默认显示这两种代码块的源码。需要图表时，安装 `@fluxdown/react-presets` 并加入 `CodePelePlugin`：
+React Lite 默认显示这两种代码块的源码。需要图表时，安装 `@fluxdown/react-presets` 并加入 `CodePelePlugin`：
 
 ```tsx
 import { CodePelePlugin } from '@fluxdown/react-presets/plugins/code-pele';
@@ -64,4 +64,4 @@ export function Message({ text }: { text: string }) {
 }
 ```
 
-`CodePelePlugin` 同时处理 `mermaid` 与 `mindmap` 代码块，两者都需在源码中声明图表类型，例如 `flowchart` 或 `mindmap`。预设与依赖的选择见[体积优化](../bundle-size.mdx)。
+`CodePelePlugin` 同时处理 `mermaid` 与 `mindmap` 代码块，两者都需在源码中声明图表类型，例如 `flowchart` 或 `mindmap`。预设与依赖的选择见[插件矩阵](../plugins/matrix.mdx)。

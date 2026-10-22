@@ -214,7 +214,7 @@ Markdown 内的 HTML 会经过标签检查与清理，默认允许 `span`、`u`�
 
 **默认值：** `[]`
 
-> `IPluginItem` 从 `@fluxdown/react-presets/typings` 导出。Lite 和 Full 会合并预设与传入的插件，传入的优先级更高。`FluxdownRaw` 的此参数必填，入口区别见[体积优化](./bundle-size.mdx)。
+> `IPluginItem` 从 `@fluxdown/react-presets/typings` 导出。Lite 和 Full 会合并预设与传入的插件，传入的优先级更高。`FluxdownRaw` 的此参数必填，入口区别见[插件矩阵](./plugins/matrix.mdx)。
 
 一个对象表示一个插件包；数组组合多个插件包。每个包可以提供以下列表：
 

@@ -1,0 +1,46 @@
+import { PresetCheck } from '../../../../../components';
+
+# Plugin matrix
+
+## Component variants
+
+React Lite and React Full share the same component API. Choose the defaults that suit your app:
+
+| Component      | Import path                   | Purpose                                                                                     |
+| -------------- | ----------------------------- | ------------------------------------------------------------------------------------------- |
+| `FluxdownLite` | `fluxdown/lite`               | Keeps the bundle small with basic Markdown rendering, ready for features you add as needed. |
+| `Fluxdown`     | `fluxdown` or `fluxdown/full` | Provides more complete Markdown functionality and richer presentation out of the box.       |
+
+For full control over plugin selection, use `FluxdownRaw` from `fluxdown/raw` and supply `plugins`.
+
+## All plugins
+
+The table lists every composite plugin provided by `@fluxdown/react-presets`. A check means the component includes that plugin by default; an empty cell means it must be added explicitly.
+
+| Plugin                  |      Lite       |      Full       |
+| ----------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`      | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PresetCheck /> | <PresetCheck /> |
+| `CodePlugin`            | <PresetCheck /> |                 |
+| `CodePelePlugin`        |                 | <PresetCheck /> |
+| `CodePrismPlugin`       |                 |                 |
+| `CodeShikiPlugin`       |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PresetCheck /> | <PresetCheck /> |
+| `EmphasisPlugin`        | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PresetCheck /> |                 |
+| `TexKatexPlugin`        |                 |                 |
+| `TexMathjaxKatexPlugin` |                 | <PresetCheck /> |
+
+Import composite plugins from `@fluxdown/react-presets/plugins/<directory>`, for example `CodePlugin` from `@fluxdown/react-presets/plugins/code`. Add the plugins you need through `plugins`; see [Composite plugins](./aggregate.md) for declaration, composition, and configuration.

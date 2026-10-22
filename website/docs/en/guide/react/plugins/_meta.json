@@ -12,6 +12,11 @@
   {
     "type": "file",
     "name": "aggregate",
-    "label": "Aggregate plugins"
+    "label": "Composite plugins"
+  },
+  {
+    "type": "file",
+    "name": "matrix",
+    "label": "Plugin matrix"
   }
 ]
