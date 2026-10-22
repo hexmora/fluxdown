@@ -104,6 +104,7 @@
     "rehype-raw": "catalog:",
     "rehype-sanitize": "catalog:",
     "remark-breaks": "catalog:",
+    "remark-gemoji": "catalog:",
     "rxjs": "catalog:",
     "shallow-equal": "catalog:",
     "stative": "workspace:^",

@@ -6,6 +6,8 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const engines = ['shiki', '@shikijs', 'prismjs', 'katex', '@mathjax', 'pele'];
+const syntaxExtensions = ['remark-gemoji'];
+const dependencies = [...engines, ...syntaxExtensions];
 
 export async function checkReactPacks(consumer: string): Promise<void> {
   const entries = [
@@ -13,9 +15,10 @@ export async function checkReactPacks(consumer: string): Promise<void> {
     { specifier: 'fluxdown/lite', allowed: [] },
     {
       specifier: 'fluxdown/full',
-      allowed: ['shiki', '@shikijs', 'katex', '@mathjax', 'pele'],
+      allowed: ['shiki', '@shikijs', 'katex', '@mathjax', 'pele', ...syntaxExtensions],
     },
     { specifier: '@fluxdown/react-presets/plugins/blockquote', allowed: [] },
+    { specifier: '@fluxdown/react-presets/plugins/emoji', allowed: ['remark-gemoji'] },
     {
       specifier: '@fluxdown/react-presets/plugins/code-pele',
       allowed: ['pele'],
@@ -63,8 +66,10 @@ export async function checkReactPacks(consumer: string): Promise<void> {
           ids: true,
         });
         assert(stats, `${specifier}: missing bundle stats`);
-        const forbidden = new Set(engines.filter((engine) => !allowed.includes(engine)));
-        const bundledEngines = new Set<string>();
+        const forbidden = new Set(
+          dependencies.filter((dependency) => !allowed.includes(dependency)),
+        );
+        const bundledDependencies = new Set<string>();
         const initialEngines = new Set<string>();
         const compilations = [stats, ...(stats.children ?? [])];
         const initialChunks = new Set(
@@ -87,11 +92,11 @@ export async function checkReactPacks(consumer: string): Promise<void> {
             const moduleName = module.name?.replaceAll('\\', '/') ?? '';
 
             if (bundled)
-              for (const engine of engines)
-                if (moduleName.includes(`/node_modules/${engine}/`)) {
-                  bundledEngines.add(engine);
+              for (const dependency of dependencies)
+                if (moduleName.includes(`/node_modules/${dependency}/`)) {
+                  bundledDependencies.add(dependency);
 
-                  if (initial) initialEngines.add(engine);
+                  if (initial && engines.includes(dependency)) initialEngines.add(dependency);
                 }
 
             if (module.modules) visit(module.modules, bundled, initial);
@@ -101,9 +106,9 @@ export async function checkReactPacks(consumer: string): Promise<void> {
         for (const child of compilations) visit(child.modules ?? []);
 
         assert.deepEqual(
-          [...bundledEngines].filter((engine) => forbidden.has(engine)),
+          [...bundledDependencies].filter((dependency) => forbidden.has(dependency)),
           [],
-          `${specifier} (${format}) includes an unselected engine`,
+          `${specifier} (${format}) includes an unselected dependency`,
         );
 
         assert.deepEqual(
@@ -112,8 +117,11 @@ export async function checkReactPacks(consumer: string): Promise<void> {
           `${specifier} (${format}) eagerly loads an engine`,
         );
 
-        for (const engine of allowed)
-          assert(bundledEngines.has(engine), `${specifier} (${format}) is missing ${engine}`);
+        for (const dependency of allowed)
+          assert(
+            bundledDependencies.has(dependency),
+            `${specifier} (${format}) is missing ${dependency}`,
+          );
 
         const assets = compilations.flatMap((child) => child.assets ?? []);
         const jsBytes = assets

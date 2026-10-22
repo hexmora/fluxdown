@@ -10,6 +10,7 @@ import '../../plugins/effect-chunk';
 import '../../plugins/effect-scale';
 import '../../plugins/effect-shad';
 import '../../plugins/effect-suffix';
+import '../../plugins/emoji';
 import '../../plugins/emphasis';
 import '../../plugins/fallback';
 import '../../plugins/heading';
