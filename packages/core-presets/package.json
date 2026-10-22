@@ -93,6 +93,8 @@
     "mdast-util-gfm-task-list-item": "catalog:",
     "mdast-util-math": "catalog:",
     "mdast-util-to-markdown": "catalog:",
+    "micromark-extension-cjk-friendly": "catalog:",
+    "micromark-extension-cjk-friendly-gfm-strikethrough": "catalog:",
     "micromark-extension-gfm-autolink-literal": "catalog:",
     "micromark-extension-gfm-footnote": "catalog:",
     "micromark-extension-gfm-strikethrough": "catalog:",

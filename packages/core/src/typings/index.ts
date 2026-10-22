@@ -11,6 +11,7 @@ export type {} from '@fluxdown/core-presets/plugins/rehype/raw-parser';
 export type {} from '@fluxdown/core-presets/plugins/rehype/sanitizer';
 export type {} from '@fluxdown/core-presets/plugins/remark/apply-repairs';
 export type {} from '@fluxdown/core-presets/plugins/remark/base';
+export type {} from '@fluxdown/core-presets/plugins/remark/cjk';
 export type {} from '@fluxdown/core-presets/plugins/remark/code-meta';
 export type {} from '@fluxdown/core-presets/plugins/remark/emoji';
 export type {} from '@fluxdown/core-presets/plugins/remark/patches';
