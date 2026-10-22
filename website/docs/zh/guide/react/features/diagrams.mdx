@@ -1,0 +1,67 @@
+import { DiagramDemo } from '../../../../../components';
+
+# 图表展示
+
+Full 开箱即用支持 `mermaid` 与 `mindmap` 代码块，统一由 Pele 将 Mermaid 语法渲染为流程图、时序图、脑图等，跟随组件的明暗主题。
+
+## 直接使用
+
+安装 `fluxdown` 后，像普通 Markdown 一样传入带语言标记的代码块：
+
+````tsx
+import { Fluxdown } from 'fluxdown';
+
+const markdown = [
+  '```mermaid',
+  'flowchart LR',
+  '  A[想法] --> B[实现] --> C[分享]',
+  '```',
+  '',
+  '```mindmap',
+  'mindmap',
+  '  项目',
+  '    内容',
+  '      Markdown',
+  '      图表',
+  '    体验',
+  '      流式输出',
+  '```',
+].join('\n');
+
+export function Message() {
+  return <Fluxdown text={markdown} />;
+}
+````
+
+Pele 按需加载，首次加载期间保留源码，无需单独引入图表样式。编辑期间保留原图表，语法暂不完整时保留上一张有效图表。
+
+SVG 随展示区域缩放。Pele 支持 Mermaid 12.1 的内置图表类型，布局与 Mermaid 有所不同，不支持外部插件和 Mermaid 主题配置，具体见 [Pele 兼容说明](https://pele.run/compatibility)。
+
+## Mermaid 流程图
+
+把代码块语言设为 `mermaid`，内容使用 Mermaid 语法。可以直接编辑下面的源码，查看结果：
+
+<DiagramDemo language="mermaid" />
+
+## 脑图
+
+把代码块语言设为 `mindmap`，内容以 `mindmap` 开头，用缩进表达节点层级：
+
+<DiagramDemo language="mindmap" />
+
+## 在 Lite 中按需接入
+
+Lite 默认显示这两种代码块的源码。需要图表时，安装 `@fluxdown/react-presets` 并加入 `CodePelePlugin`：
+
+```tsx
+import { CodePelePlugin } from '@fluxdown/react-presets/plugins/code-pele';
+import { FluxdownLite } from 'fluxdown/lite';
+
+const plugins = [CodePelePlugin];
+
+export function Message({ text }: { text: string }) {
+  return <FluxdownLite plugins={plugins} text={text} />;
+}
+```
+
+`CodePelePlugin` 同时处理 `mermaid` 与 `mindmap` 代码块，两者都需在源码中声明图表类型，例如 `flowchart` 或 `mindmap`。预设与依赖的选择见[体积优化](../bundle-size.mdx)。

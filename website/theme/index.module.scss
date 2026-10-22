@@ -89,6 +89,13 @@
       background: var(--site-accent-tint);
       color: var(--site-accent);
       font-weight: 600;
+
+      code {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+      }
     }
 
     .field-tag {

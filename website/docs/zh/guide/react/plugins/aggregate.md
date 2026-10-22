@@ -58,9 +58,3 @@ export function Message({ text }: { text: string }) {
 `config` 只配置当前对象列表中的插件，按插件的 `key` 匹配；它会覆盖列表项 `[Plugin, options]` 中的同名选项。上例显式列出 `CodeHeaderSlotPlugin`，关闭继承的工具栏，保留代码容器和源码显示。
 
 相同 `priority` 下，后传入的 render 先匹配；后传入的 slot 位于 `Raw` 链的外层，可以包裹或替换之前的组件。不同 `priority` 仍按数值从小到大处理。直接传入 `plugins={[FirstPlugin, SecondPlugin]}` 也使用相同顺序。
-
-## 内置插件
-
-内置插件按功能从 `@fluxdown/react-presets/plugins/<目录>` 导入，例如 `CodePlugin`、`TablePlugin` 和 `BlockquotePlugin`。增强插件通过 `pluginExtends` 继承基础插件：`CodeShikiPlugin`、`CodePrismPlugin` 继承 `CodePlugin`，`TexKatexPlugin`、`TexMathjaxKatexPlugin` 继承 `TexPlugin`。
-
-Lite 使用 `PRESET_LIGHT_PLUGINS`，包含轻量代码与公式源码显示；Full 使用 `PRESET_FULL_PLUGINS`，把这两项换成 Shiki 和 KaTeX／MathJax。完整插件列表、入口选择和备选插件见[体积优化](../bundle-size.mdx)。

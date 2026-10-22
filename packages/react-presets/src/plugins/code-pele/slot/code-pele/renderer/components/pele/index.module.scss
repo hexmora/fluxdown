@@ -1,0 +1,53 @@
+@use "@prefix" as *;
+
+.root {
+  min-width: 0;
+  margin-block: var(--#{$prefix}-spacing-lg);
+  overflow: hidden;
+
+  border: 1px solid var(--#{$prefix}-colors-border);
+  border-radius: var(--#{$prefix}-radius-lg);
+  background: var(--#{$prefix}-colors-surface-subtle);
+  color: var(--#{$prefix}-colors-fg);
+
+  &[aria-busy="true"] {
+    border-color: var(--#{$prefix}-colors-border-emphasis);
+  }
+
+  .canvas {
+    display: flex;
+    min-height: 12rem;
+    max-height: 40rem;
+    margin: 0;
+    justify-content: center;
+    padding: var(--#{$prefix}-spacing-lg);
+    overflow: auto;
+
+    background-color: var(--#{$prefix}-colors-bg);
+    background-image: radial-gradient(var(--#{$prefix}-colors-border) 0.75px, transparent 0.75px);
+    background-size: 1rem 1rem;
+
+    > svg {
+      --pele-bg: var(--#{$prefix}-colors-bg);
+      --pele-fg: var(--#{$prefix}-colors-fg);
+      --pele-muted: var(--#{$prefix}-colors-fg-muted);
+      --pele-line: var(--#{$prefix}-colors-fg-muted);
+      --pele-surface: var(--#{$prefix}-colors-surface-subtle);
+      --pele-surface-alt: var(--#{$prefix}-colors-surface-muted);
+      --pele-border: var(--#{$prefix}-colors-border-emphasis);
+      --pele-accent: var(--#{$prefix}-colors-accent);
+      --pele-font: var(--#{$prefix}-typography-font-sans, sans-serif);
+      --pele-font-mono: var(--#{$prefix}-typography-font-mono, monospace);
+      --pele-series-1: var(--#{$prefix}-colors-accent);
+      --pele-series-2: var(--#{$prefix}-syntax-function);
+      --pele-series-3: var(--#{$prefix}-syntax-inserted);
+      --pele-series-4: var(--#{$prefix}-syntax-variable);
+
+      display: block;
+      width: auto;
+      height: auto;
+      flex: 0 0 auto;
+      align-self: flex-start;
+    }
+  }
+}
