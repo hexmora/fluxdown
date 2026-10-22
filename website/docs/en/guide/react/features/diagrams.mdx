@@ -2,7 +2,7 @@ import { DiagramDemo } from '../../../../../components';
 
 # Diagrams
 
-Full supports `mermaid` and `mindmap` code blocks out of the box. Pele renders Mermaid syntax as flowcharts, sequence diagrams, mind maps, and more, following the component's light or dark theme.
+React Full supports `mermaid` and `mindmap` code blocks out of the box. Pele renders Mermaid syntax as flowcharts, sequence diagrams, mind maps, and more, following the component's light or dark theme.
 
 ## Get started
 
@@ -49,9 +49,9 @@ Set the code block language to `mindmap`, start the content with `mindmap`, and 
 
 <DiagramDemo language="mindmap" />
 
-## Add diagrams to Lite
+## Add diagrams to React Lite
 
-Lite displays the source of these code blocks by default. Install `@fluxdown/react-presets` and add `CodePelePlugin`:
+React Lite displays the source of these code blocks by default. Install `@fluxdown/react-presets` and add `CodePelePlugin`:
 
 ```tsx
 import { CodePelePlugin } from '@fluxdown/react-presets/plugins/code-pele';
@@ -64,4 +64,4 @@ export function Message({ text }: { text: string }) {
 }
 ```
 
-`CodePelePlugin` handles both `mermaid` and `mindmap` code blocks. Both require the diagram type declaration, such as `flowchart` or `mindmap`, in the source. See [Bundle size](../bundle-size.mdx) for preset and dependency choices.
+`CodePelePlugin` handles both `mermaid` and `mindmap` code blocks. Both require the diagram type declaration, such as `flowchart` or `mindmap`, in the source. See [Plugin matrix](../plugins/matrix.mdx) for preset and dependency choices.

@@ -33,7 +33,7 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
-这里的 `HighlightedPlugin` 是应用中导出的[聚合插件](./plugins/aggregate.md)，可以把多个 slot、render 和 Core 插件组成一个功能。
+这里的 `HighlightedPlugin` 是应用中导出的[综合插件](./plugins/aggregate.md)，可以把多个 slot、render 和 Core 插件组成一个功能。
 
 ## 组合多个插件包
 
@@ -84,4 +84,4 @@ export function Message({ text }: MessageProps) {
 
 > 这个例子需要 `pnpm add @fluxdown/core-presets`。默认图片策略是 `placeholder`，会先显示占位内容。
 
-`config` 作用于同一个插件包里列出的插件。其他预设会继续保留。内置 React 插件见[体积优化](./bundle-size.mdx)，解析与映射预设见 [Core 插件](../core/plugins.md)。完整属性见[自定义配置](./configuration.md#plugins)。
+`config` 作用于同一个插件包里列出的插件。其他预设会继续保留。内置 React 插件见[插件矩阵](./plugins/matrix.mdx)，解析与映射预设见 [Core 插件](../core/plugins.md)。完整属性见[自定义配置](./configuration.md#plugins)。

@@ -4,5 +4,11 @@
     "name": "streaming-effects",
     "label": "Streaming effects",
     "collapsed": false
+  },
+  {
+    "type": "dir",
+    "name": "features",
+    "label": "Other features",
+    "collapsed": false
   }
 ]

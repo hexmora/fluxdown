@@ -12,6 +12,11 @@
   {
     "type": "file",
     "name": "aggregate",
-    "label": "聚合插件"
+    "label": "综合插件"
+  },
+  {
+    "type": "file",
+    "name": "matrix",
+    "label": "插件矩阵"
   }
 ]

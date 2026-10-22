@@ -1,6 +1,6 @@
-# 聚合插件
+# 综合插件
 
-聚合插件用 `IPluginItem` 把一个功能需要的 slot、render 和 Core 插件放在一起。应用只需传入一个对象，就能启用整套能力。
+综合插件用 `IPluginItem` 把一个功能需要的 slot、render 和 Core 插件放在一起。应用只需传入一个对象，就能启用整套能力。
 
 ## 声明与使用
 
@@ -31,7 +31,7 @@ export function Message({ text }: { text: string }) {
 
 ## 派生与配置
 
-`pluginExtends` 接收两个或更多聚合插件，返回一个 `IPluginItem`。先传基础插件，再追加需要覆盖的能力。例如，派生一个隐藏代码工具栏的插件：
+`pluginExtends` 接收两个或更多综合插件，返回一个 `IPluginItem`。先传基础插件，再追加需要覆盖的能力。例如，派生一个隐藏代码工具栏的插件：
 
 ```tsx
 import { pluginExtends } from '@fluxdown/react-presets/base';

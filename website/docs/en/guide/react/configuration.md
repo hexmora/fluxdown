@@ -214,7 +214,7 @@ Every group under `tokens` supports partial overrides:
 
 **Default:** `[]`
 
-> `IPluginItem` is exported from `@fluxdown/react-presets/typings`. Lite and Full merge supplied plugins with their presets, giving supplied plugins precedence. This prop is required for `FluxdownRaw`; see [Bundle size](./bundle-size.mdx) for entry point differences.
+> `IPluginItem` is exported from `@fluxdown/react-presets/typings`. Lite and Full merge supplied plugins with their presets, giving supplied plugins precedence. This prop is required for `FluxdownRaw`; see [Plugin matrix](./plugins/matrix.mdx) for entry point differences.
 
 An object provides one plugin pack; an array combines several packs. Each pack can contain these lists:
 
