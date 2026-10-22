@@ -2,25 +2,41 @@
 
 Remark 插件参与 Markdown 到语法树 MDAST 的解析。需要扩展语法，或接入现有的 unified remark 插件时，使用这一层。
 
-## 声明插件
+## CJK 支持
 
-例如，`remark-cjk-friendly` 可以改善中文、日文和韩文标点附近的强调语法解析：
+`CjkRemarkPlugin` 改善中文、日文和韩文标点附近的斜体、加粗、删除线与裸链接解析。它独立提供，不包含在 `PRESET_REMARK_PLUGINS` 中。
 
 ```sh
-pnpm add @fluxdown/core-presets remark-cjk-friendly
+pnpm add @fluxdown/core-presets
+```
+
+```ts
+import { CjkRemarkPlugin } from '@fluxdown/core-presets/remark';
+
+const remarks = [CjkRemarkPlugin];
+```
+
+把 `remarks` 传入[快速开始](../quick-start.md)中的 Core 输入即可。React 集成可以直接使用聚合 [CJK 插件](../../react/plugins/cjk.md)，由它注册此 remark 插件。
+
+## 声明插件
+
+接入其他 unified 插件时，继承 `BaseRemarkPlugin`。例如，`remark-directive` 可以添加指令语法：
+
+```sh
+pnpm add @fluxdown/core-presets remark-directive
 ```
 
 ```ts
 import { BaseRemarkPlugin } from '@fluxdown/core-presets/remark';
-import remarkCjkFriendly from 'remark-cjk-friendly';
+import remarkDirective from 'remark-directive';
 
-class CjkSyntaxPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-cjk-syntax';
+class DirectiveSyntaxPlugin extends BaseRemarkPlugin {
+  static readonly key = 'remark-directive-syntax';
 
-  readonly plugin = remarkCjkFriendly;
+  readonly plugin = remarkDirective;
 }
 
-const remarks = [CjkSyntaxPlugin];
+const remarks = [DirectiveSyntaxPlugin];
 ```
 
 `key` 标识插件，`plugin` 是用于注册语法扩展的 unified 插件。Core 已提供 Markdown 解析器，无需重复添加。

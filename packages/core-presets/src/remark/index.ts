@@ -16,6 +16,7 @@ import { TableNoralizerRemarkPlugin } from './table-noralizer';
 
 export * from './base';
 export * from './apply-repairs';
+export * from './cjk';
 export * from './syntax-autolink';
 export * from './code-meta';
 export * from './syntax-footnote';

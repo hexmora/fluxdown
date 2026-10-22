@@ -1,6 +1,11 @@
 [
   {
     "type": "file",
+    "name": "cjk",
+    "label": "CJK plugin"
+  },
+  {
+    "type": "file",
     "name": "slot",
     "label": "Slot plugins"
   },

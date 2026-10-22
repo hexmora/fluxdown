@@ -2,25 +2,41 @@
 
 Remark plugins run while Markdown is parsed into its syntax tree, MDAST. Use them to add a syntax extension or adapt an existing unified remark plugin.
 
-## Declare a plugin
+## CJK support
 
-For example, `remark-cjk-friendly` improves emphasis parsing around Chinese, Japanese, and Korean punctuation:
+`CjkRemarkPlugin` improves emphasis, strong emphasis, strikethrough, and bare-link parsing around Chinese, Japanese, and Korean punctuation. It is available separately and is not included in `PRESET_REMARK_PLUGINS`.
 
 ```sh
-pnpm add @fluxdown/core-presets remark-cjk-friendly
+pnpm add @fluxdown/core-presets
+```
+
+```ts
+import { CjkRemarkPlugin } from '@fluxdown/core-presets/remark';
+
+const remarks = [CjkRemarkPlugin];
+```
+
+Pass `remarks` to the Core inputs from the [quick start](../quick-start.md). For React, use the aggregate [CJK plugin](../../react/plugins/cjk.md), which registers this remark plugin for you.
+
+## Declare a plugin
+
+To wrap another unified plugin, extend `BaseRemarkPlugin`. For example, `remark-directive` adds directive syntax:
+
+```sh
+pnpm add @fluxdown/core-presets remark-directive
 ```
 
 ```ts
 import { BaseRemarkPlugin } from '@fluxdown/core-presets/remark';
-import remarkCjkFriendly from 'remark-cjk-friendly';
+import remarkDirective from 'remark-directive';
 
-class CjkSyntaxPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-cjk-syntax';
+class DirectiveSyntaxPlugin extends BaseRemarkPlugin {
+  static readonly key = 'remark-directive-syntax';
 
-  readonly plugin = remarkCjkFriendly;
+  readonly plugin = remarkDirective;
 }
 
-const remarks = [CjkSyntaxPlugin];
+const remarks = [DirectiveSyntaxPlugin];
 ```
 
 `key` identifies the plugin. `plugin` is the unified plugin that registers the syntax extension. Core already supplies the Markdown parser.

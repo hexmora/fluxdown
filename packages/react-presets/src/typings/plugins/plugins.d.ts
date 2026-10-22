@@ -2,6 +2,7 @@ import type { PluggableConfigs } from '@fluxdown/types';
 
 import '../../plugins/blockquote';
 import '../../plugins/break-line';
+import '../../plugins/cjk';
 import '../../plugins/code';
 import '../../plugins/code-prism';
 import '../../plugins/code-shiki';

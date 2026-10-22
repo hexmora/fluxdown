@@ -84,14 +84,15 @@ Full uses `PRESET_FULL_PLUGINS` from `@fluxdown/react-presets/full`. The table l
 
 ## More plugin options
 
-Neither preset includes the two alternatives below. Install the extension package with `pnpm add @fluxdown/react-presets`, then combine the plugins you need.
+Neither preset includes the optional plugins below. Install the extension package with `pnpm add @fluxdown/react-presets`, then combine the plugins you need.
 
-| Plugin pack       | Import path                                  | Use case                                                                              |
-| ----------------- | -------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `CodePrismPlugin` | `@fluxdown/react-presets/plugins/code-prism` | Use Prism for syntax highlighting.                                                    |
-| `TexKatexPlugin`  | `@fluxdown/react-presets/plugins/tex-katex`  | Load only KaTeX on demand, without MathJax; show LaTeX source when typesetting fails. |
+| Plugin pack                     | Import path                                  | Use case                                                                              |
+| ------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [`CjkPlugin`](./plugins/cjk.md) | `@fluxdown/react-presets/plugins/cjk`        | Improve emphasis and bare-link parsing around CJK punctuation.                        |
+| `CodePrismPlugin`               | `@fluxdown/react-presets/plugins/code-prism` | Use Prism for syntax highlighting.                                                    |
+| `TexKatexPlugin`                | `@fluxdown/react-presets/plugins/tex-katex`  | Load only KaTeX on demand, without MathJax; show LaTeX source when typesetting fails. |
 
-Add these plugins to Lite to choose your highlighting and formula dependencies:
+For example, add the code and formula plugins to Lite to choose your highlighting and formula dependencies:
 
 ```tsx
 import { CodePrismPlugin } from '@fluxdown/react-presets/plugins/code-prism';

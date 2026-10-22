@@ -1,4 +1,5 @@
 import type { Root as MdastRoot } from 'mdast';
+import type { Extension } from 'micromark-util-types';
 import type { Plugin } from 'unified';
 
 import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@fluxdown/types';
@@ -13,6 +14,12 @@ import { BaseRemarkPlugin } from '../base';
 
 export interface SyntaxStrikethroughRemarkPluginConfig {
   singleTilde?: boolean | null;
+}
+
+declare module 'unified' {
+  interface Data {
+    fluxdownStrikethrough?: (options: SyntaxStrikethroughRemarkPluginConfig) => Extension;
+  }
 }
 
 declare global {
@@ -38,8 +45,10 @@ export class SyntaxStrikethroughRemarkPlugin extends BaseRemarkPlugin {
     this.innerConfig = { ...config };
     const { innerConfig } = this;
     this.plugin = function () {
-      appendRemarkExtensions(this.data(), {
-        micromark: gfmStrikethrough(innerConfig),
+      const data = this.data();
+
+      appendRemarkExtensions(data, {
+        micromark: (data.fluxdownStrikethrough ?? gfmStrikethrough)(innerConfig),
         fromMarkdown: gfmStrikethroughFromMarkdown(),
         toMarkdown: gfmStrikethroughToMarkdown(),
       });

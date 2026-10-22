@@ -84,14 +84,15 @@ Full 由 `@fluxdown/react-presets/full` 的 `PRESET_FULL_PLUGINS` 提供。下�
 
 ## 更多备选插件
 
-Lite 和 Full 都没有预装以下两种方案，可以按需组合。先运行 `pnpm add @fluxdown/react-presets` 安装扩展包。
+Lite 和 Full 都没有预装以下可选插件，可以按需组合。先运行 `pnpm add @fluxdown/react-presets` 安装扩展包。
 
-| 插件包            | 导入路径                                     | 适用情况                                                      |
-| ----------------- | -------------------------------------------- | ------------------------------------------------------------- |
-| `CodePrismPlugin` | `@fluxdown/react-presets/plugins/code-prism` | 使用 Prism 实现代码高亮。                                     |
-| `TexKatexPlugin`  | `@fluxdown/react-presets/plugins/tex-katex`  | 仅按需加载 KaTeX，不包含 MathJax；无法排版时显示 LaTeX 源码。 |
+| 插件包                          | 导入路径                                     | 适用情况                                                      |
+| ------------------------------- | -------------------------------------------- | ------------------------------------------------------------- |
+| [`CjkPlugin`](./plugins/cjk.md) | `@fluxdown/react-presets/plugins/cjk`        | 改善 CJK 标点附近的强调语法与裸链接解析。                     |
+| `CodePrismPlugin`               | `@fluxdown/react-presets/plugins/code-prism` | 使用 Prism 实现代码高亮。                                     |
+| `TexKatexPlugin`                | `@fluxdown/react-presets/plugins/tex-katex`  | 仅按需加载 KaTeX，不包含 MathJax；无法排版时显示 LaTeX 源码。 |
 
-在 Lite 基础上补充这两个插件，就能选择自己的高亮与公式依赖：
+例如，在 Lite 基础上补充代码与公式插件，就能选择自己的高亮与公式依赖：
 
 ```tsx
 import { CodePrismPlugin } from '@fluxdown/react-presets/plugins/code-prism';

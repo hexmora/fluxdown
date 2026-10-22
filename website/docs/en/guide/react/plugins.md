@@ -4,6 +4,8 @@ Plugins work at different stages of content processing. Start with slots to chan
 
 For a streaming visual effect, you can pass a mapper directly through [`streaming.effect`](./configuration.md#streamingeffect). It accepts the same mapper and options as `plugins.mappers`, without requiring a plugin pack.
 
+For Chinese, Japanese, and Korean content, add the optional [CJK plugin](./plugins/cjk.md) to improve punctuation handling in emphasis and bare links.
+
 | Type     | Purpose                                                        | Guide                                       |
 | -------- | -------------------------------------------------------------- | ------------------------------------------- |
 | `slot`   | Render slots with components and interactions.                 | [Slot plugins](./plugins/slot.md)           |

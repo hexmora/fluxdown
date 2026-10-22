@@ -1,6 +1,11 @@
 [
   {
     "type": "file",
+    "name": "cjk",
+    "label": "CJK 插件"
+  },
+  {
+    "type": "file",
     "name": "slot",
     "label": "Slot 插件"
   },
