@@ -6,7 +6,11 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const engines = ['shiki', '@shikijs', 'prismjs', 'katex', '@mathjax', 'pele'];
-const syntaxExtensions = ['remark-gemoji'];
+const syntaxExtensions = [
+  'remark-gemoji',
+  'micromark-extension-cjk-friendly',
+  'micromark-extension-cjk-friendly-gfm-strikethrough',
+];
 const dependencies = [...engines, ...syntaxExtensions];
 
 export async function checkReactPacks(consumer: string): Promise<void> {
@@ -19,6 +23,13 @@ export async function checkReactPacks(consumer: string): Promise<void> {
     },
     { specifier: '@fluxdown/react-presets/plugins/blockquote', allowed: [] },
     { specifier: '@fluxdown/react-presets/plugins/emoji', allowed: ['remark-gemoji'] },
+    {
+      specifier: '@fluxdown/react-presets/plugins/cjk',
+      allowed: [
+        'micromark-extension-cjk-friendly',
+        'micromark-extension-cjk-friendly-gfm-strikethrough',
+      ],
+    },
     {
       specifier: '@fluxdown/react-presets/plugins/code-pele',
       allowed: ['pele'],

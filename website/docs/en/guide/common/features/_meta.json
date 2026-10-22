@@ -3,5 +3,10 @@
     "type": "file",
     "name": "emoji",
     "label": "Emoji shortcodes"
+  },
+  {
+    "type": "file",
+    "name": "cjk",
+    "label": "CJK support"
   }
 ]

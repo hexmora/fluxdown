@@ -41,19 +41,20 @@ Append a subpath from the table to `@fluxdown/core-presets/plugins/remark/` to i
 
 A check marks plugins included in `PRESET_REMARK_PLUGINS`, exported from `@fluxdown/core-presets/presets/remark`. Core registers these automatically; add plugins without a check explicitly.
 
-| Plugin                            | Subpath                |    Built in     | Purpose                                                                                  |
-| --------------------------------- | ---------------------- | :-------------: | ---------------------------------------------------------------------------------------- |
-| `ApplyRepairsRemarkPlugin`        | `apply-repairs`        | <PresetCheck /> | Applies repair plugins so unfinished Markdown has a suitable presentation at each stage. |
-| `CodeMetaRemarkPlugin`            | `code-meta`            | <PresetCheck /> | Preserves metadata after a fenced code block's language label for renderers.             |
-| `EmojiRemarkPlugin`               | `emoji`                |                 | Converts [emoji shortcodes](../../common/features/emoji.md) into Unicode emoji.          |
-| `PatchesRemarkPlugin`             | `patches`              | <PresetCheck /> | Marks text ranges that the app will replace with custom content.                         |
-| `SyntaxAutolinkRemarkPlugin`      | `syntax-autolink`      | <PresetCheck /> | Converts recognized URLs and email addresses into links.                                 |
-| `SyntaxFootnoteRemarkPlugin`      | `syntax-footnote`      | <PresetCheck /> | Supports footnote references and definitions; requires `build.footnote`.                 |
-| `SyntaxHtmlAllowedRemarkPlugin`   | `syntax-html-allowed`  | <PresetCheck /> | Controls which raw HTML tags are allowed and treats other tags as text.                  |
-| `SyntaxMathRemarkPlugin`          | `syntax-math`          | <PresetCheck /> | Supports formulas and their intermediate streaming states; requires `build.tex`.         |
-| `SyntaxPolicyRemarkPlugin`        | `syntax-policy`        | <PresetCheck /> | Controls whether indented code blocks and Setext headings are enabled.                   |
-| `SyntaxSoftEndlineRemarkPlugin`   | `syntax-soft-endline`  | <PresetCheck /> | Displays plain newlines as line breaks.                                                  |
-| `SyntaxStrikethroughRemarkPlugin` | `syntax-strikethrough` | <PresetCheck /> | Supports strikethrough.                                                                  |
-| `SyntaxTableRemarkPlugin`         | `syntax-table`         | <PresetCheck /> | Supports Markdown tables.                                                                |
-| `SyntaxTaskListRemarkPlugin`      | `syntax-task-list`     | <PresetCheck /> | Supports task lists with checkboxes.                                                     |
-| `TableNoralizerRemarkPlugin`      | `table-noralizer`      | <PresetCheck /> | Fills in table column alignment as the number of columns changes.                        |
+| Plugin                            | Subpath                |    Built in     | Purpose                                                                                         |
+| --------------------------------- | ---------------------- | :-------------: | ----------------------------------------------------------------------------------------------- |
+| `ApplyRepairsRemarkPlugin`        | `apply-repairs`        | <PresetCheck /> | Applies repair plugins so unfinished Markdown has a suitable presentation at each stage.        |
+| `CjkRemarkPlugin`                 | `cjk`                  |                 | Improves emphasis and bare-link parsing around [CJK punctuation](../../common/features/cjk.md). |
+| `CodeMetaRemarkPlugin`            | `code-meta`            | <PresetCheck /> | Preserves metadata after a fenced code block's language label for renderers.                    |
+| `EmojiRemarkPlugin`               | `emoji`                |                 | Converts [emoji shortcodes](../../common/features/emoji.md) into Unicode emoji.                 |
+| `PatchesRemarkPlugin`             | `patches`              | <PresetCheck /> | Marks text ranges that the app will replace with custom content.                                |
+| `SyntaxAutolinkRemarkPlugin`      | `syntax-autolink`      | <PresetCheck /> | Converts recognized URLs and email addresses into links.                                        |
+| `SyntaxFootnoteRemarkPlugin`      | `syntax-footnote`      | <PresetCheck /> | Supports footnote references and definitions; requires `build.footnote`.                        |
+| `SyntaxHtmlAllowedRemarkPlugin`   | `syntax-html-allowed`  | <PresetCheck /> | Controls which raw HTML tags are allowed and treats other tags as text.                         |
+| `SyntaxMathRemarkPlugin`          | `syntax-math`          | <PresetCheck /> | Supports formulas and their intermediate streaming states; requires `build.tex`.                |
+| `SyntaxPolicyRemarkPlugin`        | `syntax-policy`        | <PresetCheck /> | Controls whether indented code blocks and Setext headings are enabled.                          |
+| `SyntaxSoftEndlineRemarkPlugin`   | `syntax-soft-endline`  | <PresetCheck /> | Displays plain newlines as line breaks.                                                         |
+| `SyntaxStrikethroughRemarkPlugin` | `syntax-strikethrough` | <PresetCheck /> | Supports strikethrough.                                                                         |
+| `SyntaxTableRemarkPlugin`         | `syntax-table`         | <PresetCheck /> | Supports Markdown tables.                                                                       |
+| `SyntaxTaskListRemarkPlugin`      | `syntax-task-list`     | <PresetCheck /> | Supports task lists with checkboxes.                                                            |
+| `TableNoralizerRemarkPlugin`      | `table-noralizer`      | <PresetCheck /> | Fills in table column alignment as the number of columns changes.                               |

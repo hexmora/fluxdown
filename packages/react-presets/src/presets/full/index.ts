@@ -2,6 +2,7 @@ import type { IPluginItem } from '../../typings';
 
 import { BlockquotePlugin } from '../../plugins/blockquote';
 import { BreakLinePlugin } from '../../plugins/break-line';
+import { CjkPlugin } from '../../plugins/cjk';
 import { CodePelePlugin } from '../../plugins/code-pele';
 import { CodeShikiPlugin } from '../../plugins/code-shiki';
 import { EffectChunkPlugin } from '../../plugins/effect-chunk';
@@ -29,6 +30,7 @@ export const PRESET_FULL_PLUGINS: IPluginItem[] = [
   EffectSuffixPlugin,
   CodeShikiPlugin,
   CodePelePlugin,
+  CjkPlugin,
   EmojiPlugin,
   EmphasisPlugin,
   ImagePlugin,

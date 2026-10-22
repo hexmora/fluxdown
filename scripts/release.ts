@@ -498,6 +498,7 @@ export type PresetConfigs = [
   MapperConfigs['smooth'],
   RemarkConfigs['remark-syntax-policy'],
   RemarkConfigs['remark-emoji'],
+  RemarkConfigs['remark-cjk'],
   RehypeConfigs['rehype-sanitizer'],
   RehypeConfigs['rehype-hoist-footnote'],
   RepairConfigs['repair-incomplete-image'],
