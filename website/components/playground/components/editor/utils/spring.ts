@@ -2,7 +2,7 @@ import {
   type PerceptualSpring,
   type SmoothInterpolatorClass,
   SpringSmoothInterpolator,
-} from '@fluxdown/core-presets/mapper';
+} from '@fluxdown/core-presets/plugins/mapper/smooth';
 
 export interface TunableSpring {
   /**

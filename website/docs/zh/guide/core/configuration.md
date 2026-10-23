@@ -164,7 +164,7 @@ type RenderPlugin<R, C = {}> = IRenderPluggable<
 
 **默认值：** `undefined`
 
-语法解析插件与预设配置。编写方式见 [remark](./plugins/remark.md)。
+语法解析插件与预设配置。编写方式见 [remark](./plugins/remark.mdx)。
 
 ```ts
 type RemarkOptions = [[], RemarkConfigs];
@@ -181,7 +181,7 @@ const remarks: RemarkOptions = [
 
 **默认值：** `undefined`
 
-HAST 二次处理插件与预设配置。编写方式见 [rehype](./plugins/rehype.md)。
+HAST 二次处理插件与预设配置。编写方式见 [rehype](./plugins/rehype.mdx)。
 
 ```ts
 type RehypeOptions = [[], RehypeConfigs];
@@ -192,7 +192,7 @@ const rehypes: RehypeOptions = [
 ];
 ```
 
-> 对于嵌入的 HTML，还需要在[语法过滤阶段](./plugins/rehype.md#允许额外-html-标签)允许该标签。
+> 对于嵌入的 HTML，还需要在[语法过滤阶段](./plugins/rehype.mdx#允许额外-html-标签)允许该标签。
 
 ## repairs <span className="field-tag">可选</span> {#repairs}
 
@@ -200,7 +200,7 @@ const rehypes: RehypeOptions = [
 
 **默认值：** `undefined`
 
-Markdown AST 二次处理插件与预设配置。整组需要开启 `build.repair`，末尾修复还需要开启 `build.repairEnding`。编写方式见 [repair](./plugins/repair.md)。
+Markdown AST 二次处理插件与预设配置。整组需要开启 `build.repair`，末尾修复还需要开启 `build.repairEnding`。编写方式见 [repair](./plugins/repair.mdx)。
 
 ```ts
 type RepairOptions = [[], RepairConfigs];
@@ -217,7 +217,7 @@ const repairs: RepairOptions = [
 
 **默认值：** `undefined`
 
-响应式映射 HAST。默认包含 `Smooth`、`Shad` 和 `Scale`，但需要配置后才会启用。声明与响应式选项见 [mapper](./plugins/mapper.md)。
+响应式映射 HAST。默认包含 `Smooth`、`Shad` 和 `Scale`，但需要配置后才会启用。声明与响应式选项见 [mapper](./plugins/mapper.mdx)。
 
 ```ts
 import { toClosure } from 'stative';
@@ -249,7 +249,7 @@ repairs.next({
 });
 ```
 
-在 `S` 中使用静态配置对象时，也可以通过 `toClosure(config)` 转为可读输入，见[允许额外 HTML 标签](./plugins/rehype.md#允许额外-html-标签)。按名称配置只调整已有插件；注册新的插件需使用列表。
+在 `S` 中使用静态配置对象时，也可以通过 `toClosure(config)` 转为可读输入，见[允许额外 HTML 标签](./plugins/rehype.mdx#允许额外-html-标签)。按名称配置只调整已有插件；注册新的插件需使用列表。
 
 ## 插件选项.disabled <span className="field-tag">可选</span> {#插件选项disabled}
 
@@ -267,4 +267,4 @@ repairs.next({
 
 控制同类插件的执行顺序，数值越小越早执行。相同优先级保持列表顺序；省略时使用插件自身的优先级。枚举提供 `Highest`、`High`、`Default`、`Low` 和 `Lowest`。
 
-> 类型导入：编译器与渲染器类型来自 `@fluxdown/core`，插件契约与 `PluginSet` 来自 `@fluxdown/types`，`IReadableClosure` 来自 `stative`。各内置插件随对应的[插件类型](./plugins.md)介绍。
+> 类型导入：编译器与渲染器类型来自 `@fluxdown/core`，插件契约与 `PluginSet` 来自 `@fluxdown/types`，`IReadableClosure` 来自 `stative`。支持的插件及其内置状态见对应的[插件类型](./plugins.md)。

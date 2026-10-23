@@ -1,6 +1,6 @@
 import type { IPluggableConfig } from '@fluxdown/types';
 
-import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/mapper';
+import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/plugins/mapper/suffix';
 import { assert } from '@fluxdown/utils';
 
 import type { ReactRenderMatchParams, ReactRenderParams } from '../../../../base';

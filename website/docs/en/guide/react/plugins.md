@@ -4,14 +4,14 @@ Plugins work at different stages of content processing. Start with slots to chan
 
 For a streaming visual effect, you can pass a mapper directly through [`streaming.effect`](./configuration.md#streamingeffect). It accepts the same mapper and options as `plugins.mappers`, without requiring a plugin pack.
 
-| Type     | Purpose                                                        | Guide                                       |
-| -------- | -------------------------------------------------------------- | ------------------------------------------- |
-| `slot`   | Render slots with components and interactions.                 | [Slot plugins](./plugins/slot.md)           |
-| `render` | Render HAST into slots.                                        | [Render plugins](./plugins/render.md)       |
-| `mapper` | Reactively map HAST to control how content appears.            | [Mapper plugins](../core/plugins/mapper.md) |
-| `remark` | Parse Markdown syntax.                                         | [Remark plugins](../core/plugins/remark.md) |
-| `rehype` | Further process HAST.                                          | [Rehype plugins](../core/plugins/rehype.md) |
-| `repair` | Further process the Markdown AST to repair unfinished content. | [Repair plugins](../core/plugins/repair.md) |
+| Type     | Purpose                                                        | Guide                                        |
+| -------- | -------------------------------------------------------------- | -------------------------------------------- |
+| `slot`   | Render slots with components and interactions.                 | [Slot plugins](./plugins/slot.md)            |
+| `render` | Render HAST into slots.                                        | [Render plugins](./plugins/render.md)        |
+| `mapper` | Reactively map HAST to control how content appears.            | [Mapper plugins](../core/plugins/mapper.mdx) |
+| `remark` | Parse Markdown syntax.                                         | [Remark plugins](../core/plugins/remark.mdx) |
+| `rehype` | Further process HAST.                                          | [Rehype plugins](../core/plugins/rehype.mdx) |
+| `repair` | Further process the Markdown AST to repair unfinished content. | [Repair plugins](../core/plugins/repair.mdx) |
 
 ## Use one plugin pack
 
@@ -33,7 +33,7 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
-`HighlightedPlugin` is an [aggregate plugin](./plugins/aggregate.md) exported by your app. It combines slot, render, and Core plugins into one feature.
+`HighlightedPlugin` is an [composite plugin](./plugins/aggregate.md) exported by your app. It combines slot, render, and Core plugins into one feature.
 
 ## Combine plugin packs
 
@@ -59,7 +59,7 @@ export function Message({ text }: MessageProps) {
 List the preset you want to configure, then supply its options in `config`, keyed by the plugin’s `key`. For example, hide an image while its URL is still being generated:
 
 ```tsx
-import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/repair';
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/plugins/repair/incomplete-image';
 import { Fluxdown } from 'fluxdown';
 
 type MessageProps = {
@@ -84,4 +84,4 @@ export function Message({ text }: MessageProps) {
 
 > This example requires `pnpm add @fluxdown/core-presets`. The default image strategy is `placeholder`, which displays placeholder content.
 
-`config` applies to the plugins listed in the same pack. Other presets remain in place. See [Aggregate plugins](./plugins/aggregate.md#built-in-plugins) for built-in React plugins, and the [Core plugin guides](../core/plugins.md) for parsing and mapping presets. See [Configuration](./configuration.md#plugins) for the full prop.
+`config` applies to the plugins listed in the same pack. Other presets remain in place. See [Plugin matrix](./plugins/matrix.mdx) for built-in React plugins, and the [Core plugin guides](../core/plugins.md) for parsing and mapping presets. See [Configuration](./configuration.md#plugins) for the full prop.

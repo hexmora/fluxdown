@@ -82,7 +82,7 @@ Add this configuration to the inputs used to create Core:
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
 
-import { Smooth } from '@fluxdown/core-presets/mapper';
+import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
 import { MutableState, toClosure } from 'stative';
 
 const smoothEnabled = MutableState.of(true);

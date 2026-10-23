@@ -1,6 +1,6 @@
 import type { Element } from 'hast';
 
-import { SHAD_DATA_ATTR, SHAD_FADE_VALUE } from '@fluxdown/core-presets/mapper';
+import { SHAD_DATA_ATTR, SHAD_FADE_VALUE } from '@fluxdown/core-presets/plugins/mapper/shad';
 import { cleanup, render } from '@testing-library/react';
 
 import { EffectShadRenderPlugin } from '..';

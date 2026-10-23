@@ -1,21 +1,20 @@
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
 
-import {
-  Chunk,
-  PRESET_MAPPER_PLUGINS,
-  Scale,
-  Shad,
-  Smooth,
-  Suffix,
-} from '@fluxdown/core-presets/mapper';
-import { PRESET_REHYPE_PLUGINS } from '@fluxdown/core-presets/rehype';
-import { PRESET_REMARK_PLUGINS, SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/remark';
-import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-presets/repair';
+import { Chunk } from '@fluxdown/core-presets/plugins/mapper/chunk';
+import { Scale } from '@fluxdown/core-presets/plugins/mapper/scale';
+import { Shad } from '@fluxdown/core-presets/plugins/mapper/shad';
+import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { Suffix } from '@fluxdown/core-presets/plugins/mapper/suffix';
+import { SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-math';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
+import { PRESET_REHYPE_PLUGINS } from '@fluxdown/core-presets/presets/rehype';
+import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-presets/presets/remark';
+import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-presets/presets/repair';
 
 import { mergePluginPluggables } from '../states/base';
 
 describe('core preset imports', () => {
-  test('resolves plugins through their public type entry points', () => {
+  test('resolves plugins through their public plugin and preset entry points', () => {
     expect(typeof Smooth).toBe('function');
 
     expect(PRESET_MAPPER_PLUGINS).toEqual([Smooth, Shad, Scale, Chunk, Suffix]);

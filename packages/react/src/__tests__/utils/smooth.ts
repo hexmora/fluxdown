@@ -1,4 +1,7 @@
-import { BaseSmoothDriver, BaseSmoothInterpolator } from '@fluxdown/core-presets/mapper';
+import {
+  BaseSmoothDriver,
+  BaseSmoothInterpolator,
+} from '@fluxdown/core-presets/plugins/mapper/smooth';
 import { last } from 'lodash-es';
 
 export const createManualDriver = () => {

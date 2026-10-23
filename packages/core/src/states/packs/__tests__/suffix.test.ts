@@ -1,8 +1,9 @@
-import type { BaseSuffixConfig, SuffixType } from '@fluxdown/core-presets/mapper';
+import type { BaseSuffixConfig, SuffixType } from '@fluxdown/core-presets/plugins/mapper/suffix';
 import type { IBlockState, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { Element, ElementContent, Parent, RootContent } from 'hast';
 
-import { isSuffixNode, Smooth, Suffix } from '@fluxdown/core-presets/mapper';
+import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { isSuffixNode, Suffix } from '@fluxdown/core-presets/plugins/mapper/suffix';
 import {
   D,
   type IReadableClosure,

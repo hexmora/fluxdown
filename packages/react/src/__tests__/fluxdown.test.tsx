@@ -1,7 +1,7 @@
 import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-presets/base';
 import type { IPluggable, IPluggableConfig, IRemarkPlugin } from '@fluxdown/types';
 
-import { SyntaxSoftEndlineRemarkPlugin } from '@fluxdown/core-presets/remark';
+import { SyntaxSoftEndlineRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-soft-endline';
 import {
   ParagraphRenderPlugin,
   ParagraphSlotPlugin,

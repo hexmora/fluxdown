@@ -73,7 +73,7 @@ Use `effect: 'scale'` to grow and fade in newly revealed characters while their 
 
 Existing content stays still, and the animation respects reduced-motion preferences. See [effect configuration](../common/streaming-effects/animation/scale.mdx#duration) to adjust the timing, scale, and blur.
 
-`effect` also accepts a [mapper plugin](../core/plugins/mapper.md), a configured tuple, or an array such as `['shad', 'scale']`. Set it to `false` to disable visual effects while keeping smooth output.
+`effect` also accepts a [mapper plugin](../core/plugins/mapper.mdx), a configured tuple, or an array such as `['shad', 'scale']`. Set it to `false` to disable visual effects while keeping smooth output.
 
 ## Finish or replace a message
 

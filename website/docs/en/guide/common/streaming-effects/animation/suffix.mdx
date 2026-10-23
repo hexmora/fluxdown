@@ -53,7 +53,10 @@ import type {
   ReactRenderParams,
 } from '@fluxdown/react-presets/base';
 
-import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/mapper';
+import {
+  isSuffixNode,
+  SUFFIX_DATA_ATTR,
+} from '@fluxdown/core-presets/plugins/mapper/suffix';
 import { BaseReactRenderPlugin } from '@fluxdown/react-presets/base';
 import { SuffixRenderer } from '@fluxdown/react-presets/plugins/effect-suffix';
 import { Fluxdown } from 'fluxdown';
@@ -89,7 +92,7 @@ Inside a code block, the marker follows the visible code, on the same line as it
 
 Core's `Suffix` mapper inserts the marker at the tail of the visible HAST, without adding text length. Your renderer decides how to display it.
 
-> The `Suffix` mapper, `SuffixConfig`, `SuffixType`, `SUFFIX_DATA_ATTR`, and `isSuffixNode` are exported from `@fluxdown/core-presets/mapper`.
+> The `Suffix` mapper, `SuffixConfig`, `SuffixType`, `SUFFIX_DATA_ATTR`, and `isSuffixNode` are exported from `@fluxdown/core-presets/plugins/mapper/suffix`.
 
 ## Configuration
 

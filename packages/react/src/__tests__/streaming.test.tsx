@@ -1,6 +1,6 @@
 import type { IRemarkPlugin } from '@fluxdown/types';
 
-import { BaseRemarkPlugin } from '@fluxdown/core-presets/remark';
+import { BaseRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/base';
 import { act, cleanup, render } from '@testing-library/react';
 import { createRef } from 'react';
 

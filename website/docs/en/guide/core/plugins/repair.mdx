@@ -1,0 +1,105 @@
+import { PresetCheck } from '../../../../../components';
+
+# Repair plugins
+
+Repair plugins post-process the Markdown AST before it becomes HAST. They can repair incomplete syntax, tidy node boundaries, or add temporary presentation without changing the source string.
+
+## Declare a plugin
+
+Add a small indicator after the content while a response is arriving, then remove it when the response finishes:
+
+```ts
+import type {
+  RepairPluginRunner,
+  RepairPluginSystemConfig,
+} from '@fluxdown/types';
+
+import { BaseRepairPlugin } from '@fluxdown/core-presets/plugins/repair/base';
+import { PluginPriority } from '@fluxdown/types';
+
+class StreamingIndicatorPlugin extends BaseRepairPlugin {
+  static readonly key = 'repair-streaming-indicator';
+
+  readonly config: RepairPluginSystemConfig = {
+    ending: true,
+    priority: PluginPriority.Lowest,
+  };
+
+  readonly runner: RepairPluginRunner = ({ node, break: stop }) => {
+    if (node.type !== 'root' || !('children' in node)) {
+      return;
+    }
+
+    node.children.push({
+      type: 'html',
+      value: '<span class="indicator"></span>',
+    });
+
+    stop();
+  };
+}
+
+const repairs = [StreamingIndicatorPlugin];
+```
+
+After the built-in repairs, this plugin appends an HTML node with the `indicator` class to the current trailing block. `stop()` ends the traversal so it is inserted just once.
+
+## Connect to Core
+
+Add `repairs` to the Core inputs from the [quick start](../quick-start.md), and enable `build.repair` and `build.repairEnding`.
+
+`ending: true` limits the plugin to the last block while it is still being generated. Set `repairEnding` to `false` when the response finishes to remove the indicator. The original Markdown stays unchanged.
+
+The built-in HTML processing already allows the `class` attribute on `span`. With an HTML renderer, a little CSS gives the indicator its shape:
+
+```css
+.indicator {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.45;
+}
+```
+
+> Put traversal settings in `config` and keep constructor options in a separate field. Core runs the plugin and manages its lifecycle.
+
+## Supported plugins
+
+Append a subpath from the table to `@fluxdown/core-presets/plugins/repair/` to import a plugin. For example, `incomplete-image` becomes `@fluxdown/core-presets/plugins/repair/incomplete-image`.
+
+A check marks plugins included in `PRESET_REPAIR_PLUGINS`, exported from `@fluxdown/core-presets/presets/repair`. Core registers these automatically; add plugins without a check explicitly.
+
+`build.repair` controls repairs. The first group below handles temporary states at the end of a stream and also requires `build.repairEnding`.
+
+### The streaming tail
+
+| Plugin                               | Subpath                     |    Built in     | Purpose                                                                                              |
+| ------------------------------------ | --------------------------- | :-------------: | ---------------------------------------------------------------------------------------------------- |
+| `TrailingEscapeRepairPlugin`         | `trailing-escape`           | <PresetCheck /> | Temporarily hides a trailing backslash that has not yet formed an escape sequence.                   |
+| `TrailingEmptyCodeBlockRepairPlugin` | `trailing-empty-code-block` | <PresetCheck /> | Hides a trailing code fence that has no language or content yet.                                     |
+| `IncompleteCodeFenceRepairPlugin`    | `incomplete-code-fence`     | <PresetCheck /> | Hides unfinished trailing fence backticks so they do not appear inside the code.                     |
+| `IncompleteInlineCodeRepairPlugin`   | `incomplete-inline-code`    | <PresetCheck /> | Presents unfinished inline code as code before its closing backtick arrives.                         |
+| `IncompleteImageRepairPlugin`        | `incomplete-image`          | <PresetCheck /> | Creates a placeholder for an unfinished image, or hides it with `strategy: 'discard'`.               |
+| `IncompleteLinkRepairPlugin`         | `incomplete-link`           | <PresetCheck /> | Presents an unfinished link's text while waiting for the URL to complete.                            |
+| `TrailingEmptyHeadingRepairPlugin`   | `trailing-empty-heading`    | <PresetCheck /> | Hides a trailing level-one heading that contains only `#` and no text.                               |
+| `IncompleteStrongRepairPlugin`       | `incomplete-strong`         | <PresetCheck /> | Presents bold content before its closing delimiter arrives.                                          |
+| `IncompleteEmphasisRepairPlugin`     | `incomplete-emphasis`       | <PresetCheck /> | Presents italic content opened with an asterisk before it is closed.                                 |
+| `IncompleteListMarkerRepairPlugin`   | `incomplete-list-marker`    | <PresetCheck /> | Hides a trailing list marker while waiting for the item's content.                                   |
+| `DanglingFootnoteRepairPlugin`       | `dangling-footnote`         | <PresetCheck /> | Temporarily hides unresolved and incomplete trailing footnote references; requires `build.footnote`. |
+
+### Formatting boundaries
+
+These plugins run when `build.repair` is enabled and do not require `repairEnding`.
+
+| Plugin                                 | Subpath                       |    Built in     | Purpose                                                                       |
+| -------------------------------------- | ----------------------------- | :-------------: | ----------------------------------------------------------------------------- |
+| `IncompleteHtmlTagRepairPlugin`        | `incomplete-html-tag`         | <PresetCheck /> | Hides an unfinished HTML tag fragment at the end of the content.              |
+| `RedundantBreakBeforeHtmlRepairPlugin` | `redundant-break-before-html` | <PresetCheck /> | Removes redundant line-break nodes before HTML fragments.                     |
+| `HtmlBoundaryLineBreakRepairPlugin`    | `html-boundary-line-break`    | <PresetCheck /> | Preserves intended line breaks where text meets HTML.                         |
+| `ParagraphHtmlClosureRepairPlugin`     | `paragraph-html-closure`      | <PresetCheck /> | Closes HTML tags in completed paragraphs so they do not affect later content. |
+| `RedundantTrailingBreakRepairPlugin`   | `redundant-trailing-break`    | <PresetCheck /> | Removes redundant trailing line breaks.                                       |
+| `AdjacentTextRepairPlugin`             | `adjacent-text`               | <PresetCheck /> | Merges adjacent text and removes empty text after repairs.                    |
+
+Repairs affect the current presentation, not the original Markdown stored by your app.

@@ -1,6 +1,6 @@
 import type { Element, ElementContent } from 'hast';
 
-import { CHUNK_DATA_ATTR, CHUNK_TAG_NAME } from '@fluxdown/core-presets/mapper';
+import { CHUNK_DATA_ATTR, CHUNK_TAG_NAME } from '@fluxdown/core-presets/plugins/mapper/chunk';
 import { toNumber } from 'lodash-es';
 
 import { isElementWithTag } from '../../../../base';

@@ -1,5 +1,12 @@
 # @fluxdown/mdast
 
+## 0.7.2
+
+### Patch Changes
+
+- Updated dependencies [134f67b]
+  - @fluxdown/utils@0.7.0
+
 ## 0.7.1
 
 ### Patch Changes

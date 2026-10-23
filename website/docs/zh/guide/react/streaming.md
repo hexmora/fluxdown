@@ -73,7 +73,7 @@ async function readMarkdown(
 
 已有内容保持静止，动画遵循系统的减少动态效果偏好。时长、缩放和模糊参数见[特效配置](../common/streaming-effects/animation/scale.mdx#duration)。
 
-`effect` 也支持 [mapper 插件](../core/plugins/mapper.md)、配置元组，或 `['shad', 'scale']` 这样的组合数组。设为 `false` 即可关闭视觉特效，同时保留平滑输出。
+`effect` 也支持 [mapper 插件](../core/plugins/mapper.mdx)、配置元组，或 `['shad', 'scale']` 这样的组合数组。设为 `false` 即可关闭视觉特效，同时保留平滑输出。
 
 ## 完成与替换
 

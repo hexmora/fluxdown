@@ -88,7 +88,7 @@ Choose the clock that drives output: `'raf'` follows animation frames, `'interva
 
 Turn elapsed time into visible progress. Use `'spring'` for the built-in closed-form spring, or pass a custom interpolator class.
 
-> Usually, `smooth: true` is enough. Import `SmoothConfig` from `fluxdown`, and `SmoothDriverClass` and `SmoothInterpolatorClass` from `@fluxdown/core-presets/mapper`. The previous names `ticker` and `scheduler` still work for one release and are deprecated.
+> Usually, `smooth: true` is enough. Import `SmoothConfig` from `fluxdown`, and `SmoothDriverClass` and `SmoothInterpolatorClass` from `@fluxdown/core-presets/plugins/mapper/smooth`. The previous names `ticker` and `scheduler` still work for one release and are deprecated.
 
 ### streaming.effect <span className="field-tag">Optional</span> {#streamingeffect}
 
@@ -98,7 +98,7 @@ Turn elapsed time into visible progress. Use `'spring'` for the built-in closed-
 
 Choose an animation effect or combine multiple effects. See [Animation](../common/streaming-effects/animation/index.mdx) for the supported input forms, available effects, live demos, and their configuration fields.
 
-> Import `EffectItem` from `fluxdown` and effect configuration types from `@fluxdown/core-presets/mapper`.
+> Import `EffectItem` from `fluxdown`. Effect configuration types come from their plugin entry points, such as `ScaleConfig` from `@fluxdown/core-presets/plugins/mapper/scale`. See [Mapper plugins](../core/plugins/mapper.mdx#supported-plugins) for the available subpaths.
 
 ## build <span className="field-tag">Optional</span> {#build}
 
@@ -118,7 +118,7 @@ Choose Markdown compilation features. Tables, task lists, strikethrough, autolin
 />
 ```
 
-HTML in Markdown goes through tag filtering and sanitization. The default allowed tags are `span`, `u`, `br`, `em`, and `a`. See [Rehype plugins](../core/plugins/rehype.md) to adjust this behavior.
+HTML in Markdown goes through tag filtering and sanitization. The default allowed tags are `span`, `u`, `br`, `em`, and `a`. See [Rehype plugins](../core/plugins/rehype.mdx) to adjust this behavior.
 
 ### build.repair <span className="field-tag">Optional</span> {#buildrepair}
 
@@ -218,7 +218,7 @@ Every group under `tokens` supports partial overrides:
 
 **Default:** `[]`
 
-> `IPluginItem` is exported from `@fluxdown/react-presets/typings`. Lite and Full merge supplied plugins with their presets, giving supplied plugins precedence. This prop is required for `FluxdownRaw`; see [Bundle size](./bundle-size.mdx) for entry point differences.
+> `IPluginItem` is exported from `@fluxdown/react-presets/typings`. Lite and Full merge supplied plugins with their presets, giving supplied plugins precedence. This prop is required for `FluxdownRaw`; see [Plugin matrix](./plugins/matrix.mdx) for entry point differences.
 
 An object provides one plugin pack; an array combines several packs. Each pack can contain these lists:
 

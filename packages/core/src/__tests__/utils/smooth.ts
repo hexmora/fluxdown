@@ -1,4 +1,7 @@
-import { BaseSmoothDriver, BaseSmoothInterpolator } from '@fluxdown/core-presets/mapper';
+import {
+  BaseSmoothDriver,
+  BaseSmoothInterpolator,
+} from '@fluxdown/core-presets/plugins/mapper/smooth';
 
 export class StepSmoothInterpolator extends BaseSmoothInterpolator {
   static instances: StepSmoothInterpolator[] = [];

@@ -1,8 +1,11 @@
-import type { SmoothDriverClass, SmoothInterpolatorClass } from '@fluxdown/core-presets/mapper';
+import type {
+  SmoothDriverClass,
+  SmoothInterpolatorClass,
+} from '@fluxdown/core-presets/plugins/mapper/smooth';
 import type { IBlockMeta, IBlockState } from '@fluxdown/types';
 import type { Element, ElementContent, RootContent, Text } from 'hast';
 
-import { Smooth } from '@fluxdown/core-presets/mapper';
+import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
 import { first, last } from 'lodash-es';
 import { MutableState, render, S } from 'stative';
 

@@ -1,6 +1,6 @@
-import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/mapper';
-import { SanitizerRehypePlugin } from '@fluxdown/core-presets/rehype';
-import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-presets/remark';
+import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/plugins/mapper/suffix';
+import { SanitizerRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/sanitizer';
+import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-html-allowed';
 import {
   BaseReactRenderPlugin,
   type ReactRenderMatchParams,

@@ -5,13 +5,35 @@ import assert from 'node:assert/strict';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-const engines = ['shiki', '@shikijs', 'prismjs', 'katex', '@mathjax'];
+const engines = ['shiki', '@shikijs', 'prismjs', 'katex', '@mathjax', 'pele'];
+const syntaxExtensions = [
+  'remark-gemoji',
+  'micromark-extension-cjk-friendly',
+  'micromark-extension-cjk-friendly-gfm-strikethrough',
+];
+const dependencies = [...engines, ...syntaxExtensions];
 
 export async function checkReactPacks(consumer: string): Promise<void> {
   const entries = [
     { specifier: 'fluxdown/raw', allowed: [] },
     { specifier: 'fluxdown/lite', allowed: [] },
+    {
+      specifier: 'fluxdown/full',
+      allowed: ['shiki', '@shikijs', 'katex', '@mathjax', 'pele', ...syntaxExtensions],
+    },
     { specifier: '@fluxdown/react-presets/plugins/blockquote', allowed: [] },
+    { specifier: '@fluxdown/react-presets/plugins/emoji', allowed: ['remark-gemoji'] },
+    {
+      specifier: '@fluxdown/react-presets/plugins/cjk',
+      allowed: [
+        'micromark-extension-cjk-friendly',
+        'micromark-extension-cjk-friendly-gfm-strikethrough',
+      ],
+    },
+    {
+      specifier: '@fluxdown/react-presets/plugins/code-pele',
+      allowed: ['pele'],
+    },
     { specifier: '@fluxdown/react-presets/plugins/code-prism', allowed: ['prismjs'] },
     { specifier: '@fluxdown/react-presets/plugins/tex-katex', allowed: ['katex'] },
   ];
@@ -51,37 +73,68 @@ export async function checkReactPacks(consumer: string): Promise<void> {
           modulesSpace: Infinity,
           nestedModulesSpace: Infinity,
           assets: true,
+          chunks: true,
           ids: true,
         });
         assert(stats, `${specifier}: missing bundle stats`);
-        const forbidden = new Set(engines.filter((engine) => !allowed.includes(engine)));
-        const bundledEngines = new Set<string>();
+        const forbidden = new Set(
+          dependencies.filter((dependency) => !allowed.includes(dependency)),
+        );
+        const bundledDependencies = new Set<string>();
+        const initialEngines = new Set<string>();
+        const compilations = [stats, ...(stats.children ?? [])];
+        const initialChunks = new Set(
+          compilations.flatMap((child) =>
+            (child.chunks ?? []).flatMap((chunk) =>
+              chunk.initial && chunk.id !== undefined ? [chunk.id] : [],
+            ),
+          ),
+        );
 
-        const visit = (modules: NonNullable<typeof stats.modules>, parentBundled = false) => {
+        const visit = (
+          modules: NonNullable<typeof stats.modules>,
+          parentBundled = false,
+          parentInitial = false,
+        ) => {
           for (const module of modules) {
             const bundled = parentBundled || Boolean(module.chunks?.length);
+            const initial =
+              parentInitial || Boolean(module.chunks?.some((id) => initialChunks.has(id)));
             const moduleName = module.name?.replaceAll('\\', '/') ?? '';
 
             if (bundled)
-              for (const engine of engines)
-                if (moduleName.includes(`/node_modules/${engine}/`)) bundledEngines.add(engine);
+              for (const dependency of dependencies)
+                if (moduleName.includes(`/node_modules/${dependency}/`)) {
+                  bundledDependencies.add(dependency);
 
-            if (module.modules) visit(module.modules, bundled);
+                  if (initial && engines.includes(dependency)) initialEngines.add(dependency);
+                }
+
+            if (module.modules) visit(module.modules, bundled, initial);
           }
         };
 
-        for (const child of [stats, ...(stats.children ?? [])]) visit(child.modules ?? []);
+        for (const child of compilations) visit(child.modules ?? []);
 
         assert.deepEqual(
-          [...bundledEngines].filter((engine) => forbidden.has(engine)),
+          [...bundledDependencies].filter((dependency) => forbidden.has(dependency)),
           [],
-          `${specifier} (${format}) includes an unselected engine`,
+          `${specifier} (${format}) includes an unselected dependency`,
         );
 
-        for (const engine of allowed)
-          assert(bundledEngines.has(engine), `${specifier} (${format}) is missing ${engine}`);
+        assert.deepEqual(
+          [...initialEngines],
+          [],
+          `${specifier} (${format}) eagerly loads an engine`,
+        );
 
-        const assets = [stats, ...(stats.children ?? [])].flatMap((child) => child.assets ?? []);
+        for (const dependency of allowed)
+          assert(
+            bundledDependencies.has(dependency),
+            `${specifier} (${format}) is missing ${dependency}`,
+          );
+
+        const assets = compilations.flatMap((child) => child.assets ?? []);
         const jsBytes = assets
           .filter((asset) => asset.name?.endsWith('.js'))
           .reduce((total, asset) => total + asset.size, 0);

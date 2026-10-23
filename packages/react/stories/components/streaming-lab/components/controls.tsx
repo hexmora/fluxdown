@@ -1,4 +1,4 @@
-import { toPhysicalSpring } from '@fluxdown/core-presets/mapper';
+import { toPhysicalSpring } from '@fluxdown/core-presets/plugins/mapper/smooth';
 
 import type { StreamingLab } from '../hooks';
 import type { AnimationSpeed, LabDriver, LabEffect } from '../type';

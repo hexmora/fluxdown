@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/react-presets",
-  "version": "0.8.0",
+  "version": "0.9.1",
   "description": "Preset render and slot plugins with shared React rendering infrastructure for Fluxdown.",
   "keywords": [
     "hast",
@@ -113,6 +113,7 @@
     "classnames": "catalog:",
     "katex": "catalog:",
     "lodash-es": "catalog:",
+    "pele": "catalog:",
     "prismjs": "catalog:",
     "react-error-boundary": "catalog:",
     "shallow-equal": "catalog:",

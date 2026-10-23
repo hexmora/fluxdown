@@ -1,5 +1,14 @@
 # @fluxdown/core
 
+## 0.12.2
+
+### Patch Changes
+
+- Updated dependencies [134f67b]
+  - @fluxdown/utils@0.7.0
+  - @fluxdown/core-presets@0.10.1
+  - @fluxdown/types@0.10.1
+
 ## 0.12.1
 
 ### Patch Changes

@@ -2,13 +2,16 @@ import type { PluggableConfigs } from '@fluxdown/types';
 
 import '../../plugins/blockquote';
 import '../../plugins/break-line';
+import '../../plugins/cjk';
 import '../../plugins/code';
+import '../../plugins/code-pele';
 import '../../plugins/code-prism';
 import '../../plugins/code-shiki';
 import '../../plugins/effect-chunk';
 import '../../plugins/effect-scale';
 import '../../plugins/effect-shad';
 import '../../plugins/effect-suffix';
+import '../../plugins/emoji';
 import '../../plugins/emphasis';
 import '../../plugins/fallback';
 import '../../plugins/heading';

@@ -4,7 +4,7 @@ import type {
   InterpolationType,
   SmoothDriverClass,
   SmoothInterpolatorClass,
-} from '@fluxdown/core-presets/mapper';
+} from '@fluxdown/core-presets/plugins/mapper/smooth';
 import type { IPluginItem } from '@fluxdown/react-presets/typings';
 import type { IPluggableConfig } from '@fluxdown/types';
 import type { CSSProperties, ReactNode } from 'react';

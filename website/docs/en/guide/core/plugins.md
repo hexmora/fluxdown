@@ -2,14 +2,14 @@
 
 Plugins extend one stage of Core's content pipeline. Choose the stage that owns the behavior you want to change:
 
-| Type     | Responsibility                                              | Guide                                        |
-| -------- | ----------------------------------------------------------- | -------------------------------------------- |
-| `remark` | Parse Markdown syntax.                                      | [Syntax parsing](./plugins/remark.md)        |
-| `repair` | Post-process the Markdown AST, including incomplete syntax. | [AST processing](./plugins/repair.md)        |
-| `rehype` | Post-process HAST, the HTML syntax tree.                    | [HAST processing](./plugins/rehype.md)       |
-| `mapper` | Reactively map HAST content blocks.                         | [Reactive HAST mapping](./plugins/mapper.md) |
+| Type     | Responsibility                                              | Guide                                         |
+| -------- | ----------------------------------------------------------- | --------------------------------------------- |
+| `remark` | Parse Markdown syntax.                                      | [Syntax parsing](./plugins/remark.mdx)        |
+| `repair` | Post-process the Markdown AST, including incomplete syntax. | [AST processing](./plugins/repair.mdx)        |
+| `rehype` | Post-process HAST, the HTML syntax tree.                    | [HAST processing](./plugins/rehype.mdx)       |
+| `mapper` | Reactively map HAST content blocks.                         | [Reactive HAST mapping](./plugins/mapper.mdx) |
 
-Core includes common Markdown syntax, repair, HTML handling, and streaming features. Each guide ends with its built-in plugins. Start by configuring one; write a plugin when you need another behavior.
+Core includes common Markdown syntax, repair, HTML handling, and streaming features. Each guide lists supported plugins and marks those included by default. Start by configuring one; write a plugin when you need another behavior.
 
 ## Configure a preset
 
@@ -35,7 +35,7 @@ pnpm add @fluxdown/core-presets
 ```ts
 import type { IPluggable, IRepairPlugin } from '@fluxdown/types';
 
-import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/repair';
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/plugins/repair/incomplete-image';
 
 type RepairPlugin = IPluggable<IRepairPlugin, unknown>;
 
@@ -69,11 +69,11 @@ Remark and rehype plugins adapt unified plugins. Repair plugins visit and update
 
 Each guide includes a declaration and shows how to register it:
 
-- [Remark plugins](./plugins/remark.md)
-- [Repair plugins](./plugins/repair.md)
-- [Rehype plugins](./plugins/rehype.md)
-- [Mapper plugins](./plugins/mapper.md)
+- [Remark plugins](./plugins/remark.mdx)
+- [Repair plugins](./plugins/repair.mdx)
+- [Rehype plugins](./plugins/rehype.mdx)
+- [Mapper plugins](./plugins/mapper.mdx)
 
 Pass plugin classes or mapper functions; Core manages their lifecycle. Keep per-run data inside the transform or state flow so one declaration can serve multiple documents.
 
-> Import presets from `/remark`, `/rehype`, `/repair`, or `/mapper`. The `@fluxdown/core-presets` package has no root entry point.
+> Import individual plugins from `@fluxdown/core-presets/plugins/[type]/[subpath]` and preset arrays from `@fluxdown/core-presets/presets/[type]`. Replace `[type]` with `remark`, `rehype`, `repair`, or `mapper`; each guide lists its plugin subpaths. The package has no root or plugin-category entry point.

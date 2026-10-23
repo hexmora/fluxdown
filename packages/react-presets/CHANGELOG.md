@@ -1,5 +1,29 @@
 # @fluxdown/react-presets
 
+## 0.9.1
+
+### Patch Changes
+
+- b1d3ade: Load Prism highlighting lazily and add the full extended language bundle used by next-raw, including language aliases and embedded template support. Preserve readable source while loading, after failures, and during server rendering, and ignore stale highlighting results when streamed code changes.
+
+## 0.9.0
+
+### Minor Changes
+
+- 134f67b: Add raw, lite, and full React entry points with independently importable plugin packs. Split code highlighting into plain, Prism, and Shiki options, and formulas into source, lazy KaTeX, and lazy KaTeX with MathJax fallback. Export plugin pack types from react-presets/typings and replace the render/slot barrels with plugins/\* exports.
+
+  Compose derived packs with pluginExtends and give later renderers precedence at equal priority, preserving slot composition and explicit disabling. Load only each entry's styles, and document aggregate plugins and bundle choices with live Lite and Full examples.
+
+  Export PartialBy from @fluxdown/utils and reuse it for optional plugin props in the full and lite entries and prop comparison.
+
+### Patch Changes
+
+- Updated dependencies [134f67b]
+  - @fluxdown/utils@0.7.0
+  - @fluxdown/core@0.12.2
+  - @fluxdown/core-presets@0.10.1
+  - @fluxdown/types@0.10.1
+
 ## 0.8.0
 
 ### Minor Changes

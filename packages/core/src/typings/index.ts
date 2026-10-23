@@ -1,9 +1,48 @@
-// Keep preset augmentations in emitted declarations without runtime imports.
+// Keep plugin augmentations in emitted declarations without runtime imports.
 /* oxlint-disable typescript/no-useless-empty-export, unicorn/require-module-specifiers */
-export type {} from '@fluxdown/core-presets/mapper';
-export type {} from '@fluxdown/core-presets/rehype';
-export type {} from '@fluxdown/core-presets/remark';
-export type {} from '@fluxdown/core-presets/repair';
+export type {} from '@fluxdown/core-presets/plugins/mapper/chunk';
+export type {} from '@fluxdown/core-presets/plugins/mapper/scale';
+export type {} from '@fluxdown/core-presets/plugins/mapper/shad';
+export type {} from '@fluxdown/core-presets/plugins/mapper/smooth';
+export type {} from '@fluxdown/core-presets/plugins/mapper/suffix';
+export type {} from '@fluxdown/core-presets/plugins/rehype/base';
+export type {} from '@fluxdown/core-presets/plugins/rehype/hoist-footnote';
+export type {} from '@fluxdown/core-presets/plugins/rehype/raw-parser';
+export type {} from '@fluxdown/core-presets/plugins/rehype/sanitizer';
+export type {} from '@fluxdown/core-presets/plugins/remark/apply-repairs';
+export type {} from '@fluxdown/core-presets/plugins/remark/base';
+export type {} from '@fluxdown/core-presets/plugins/remark/cjk';
+export type {} from '@fluxdown/core-presets/plugins/remark/code-meta';
+export type {} from '@fluxdown/core-presets/plugins/remark/emoji';
+export type {} from '@fluxdown/core-presets/plugins/remark/patches';
+export type {} from '@fluxdown/core-presets/plugins/remark/syntax-autolink';
+export type {} from '@fluxdown/core-presets/plugins/remark/syntax-footnote';
+export type {} from '@fluxdown/core-presets/plugins/remark/syntax-html-allowed';
+export type {} from '@fluxdown/core-presets/plugins/remark/syntax-math';
+export type {} from '@fluxdown/core-presets/plugins/remark/syntax-policy';
+export type {} from '@fluxdown/core-presets/plugins/remark/syntax-soft-endline';
+export type {} from '@fluxdown/core-presets/plugins/remark/syntax-strikethrough';
+export type {} from '@fluxdown/core-presets/plugins/remark/syntax-table';
+export type {} from '@fluxdown/core-presets/plugins/remark/syntax-task-list';
+export type {} from '@fluxdown/core-presets/plugins/remark/table-noralizer';
+export type {} from '@fluxdown/core-presets/plugins/repair/adjacent-text';
+export type {} from '@fluxdown/core-presets/plugins/repair/base';
+export type {} from '@fluxdown/core-presets/plugins/repair/dangling-footnote';
+export type {} from '@fluxdown/core-presets/plugins/repair/html-boundary-line-break';
+export type {} from '@fluxdown/core-presets/plugins/repair/incomplete-code-fence';
+export type {} from '@fluxdown/core-presets/plugins/repair/incomplete-emphasis';
+export type {} from '@fluxdown/core-presets/plugins/repair/incomplete-html-tag';
+export type {} from '@fluxdown/core-presets/plugins/repair/incomplete-image';
+export type {} from '@fluxdown/core-presets/plugins/repair/incomplete-inline-code';
+export type {} from '@fluxdown/core-presets/plugins/repair/incomplete-link';
+export type {} from '@fluxdown/core-presets/plugins/repair/incomplete-list-marker';
+export type {} from '@fluxdown/core-presets/plugins/repair/incomplete-strong';
+export type {} from '@fluxdown/core-presets/plugins/repair/paragraph-html-closure';
+export type {} from '@fluxdown/core-presets/plugins/repair/redundant-break-before-html';
+export type {} from '@fluxdown/core-presets/plugins/repair/redundant-trailing-break';
+export type {} from '@fluxdown/core-presets/plugins/repair/trailing-empty-code-block';
+export type {} from '@fluxdown/core-presets/plugins/repair/trailing-empty-heading';
+export type {} from '@fluxdown/core-presets/plugins/repair/trailing-escape';
 /* oxlint-enable typescript/no-useless-empty-export, unicorn/require-module-specifiers */
 
 export * from './hast';

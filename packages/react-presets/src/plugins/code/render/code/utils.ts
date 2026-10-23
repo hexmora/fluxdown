@@ -1,6 +1,6 @@
 import type { Element } from 'hast';
 
-import { isSuffixNode } from '@fluxdown/core-presets/mapper';
+import { isSuffixNode } from '@fluxdown/core-presets/plugins/mapper/suffix';
 import { isString } from 'lodash-es';
 
 import { getStringProperty, getTextContent, isElementWithTag } from '../../../../base';

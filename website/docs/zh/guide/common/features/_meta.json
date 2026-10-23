@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "emoji",
+    "label": "Emoji 短码"
+  },
+  {
+    "type": "file",
+    "name": "cjk",
+    "label": "CJK 支持"
+  }
+]
