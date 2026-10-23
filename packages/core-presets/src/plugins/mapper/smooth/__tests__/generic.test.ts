@@ -5,9 +5,9 @@ import { expectTypeOf } from 'expect-type';
 import { batch, mapClosure, MutableState, ReactiveState, render, S } from 'stative';
 
 import { Smooth } from '..';
-import { StepSmoothScheduler } from '../modules/scheduler/__tests__/utils';
+import { StepSmoothInterpolator } from '../modules/interpolation/__tests__/utils';
 import { ArrayBlock, createArrayBlock } from './block';
-import { latest, PrimarySmoothTicker, resetSmoothTests } from './utils';
+import { latest, PrimarySmoothDriver, resetSmoothTests } from './utils';
 
 const setupSmooth = (initial: IBlockState<number[]>[] = []) => {
   const source = MutableState.of(initial);
@@ -18,8 +18,8 @@ const setupSmooth = (initial: IBlockState<number[]>[] = []) => {
       {
         source,
         enabled: ReactiveState.of(true),
-        ticker: ReactiveState.of(PrimarySmoothTicker),
-        scheduler: ReactiveState.of(StepSmoothScheduler),
+        driver: ReactiveState.of(PrimarySmoothDriver),
+        interpolation: ReactiveState.of(StepSmoothInterpolator),
       },
     ]),
   );
@@ -92,7 +92,7 @@ describe('Smooth generic blocks', () => {
 
     expect(output.map((block) => block.value.value)).toEqual([[]]);
 
-    latest(PrimarySmoothTicker.instances).tick(16);
+    latest(PrimarySmoothDriver.instances).tick(16);
 
     expect(state.value.value).toBe(output);
 

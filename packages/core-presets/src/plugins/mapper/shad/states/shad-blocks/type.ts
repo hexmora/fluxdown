@@ -1,19 +1,7 @@
-import type { IBlockState } from '@fluxdown/types';
-import type { Root as HastRoot } from 'hast';
-import type { IReadableClosure } from 'stative';
+import type { MapperConfigInputs, MapperInputs } from '@fluxdown/types';
 
-import type { ShadPosition } from '../shad-progress';
+import type { ShadAnimationConfig } from '../../type';
 
-export interface ShadBlocksInputs {
-  source: IReadableClosure<IBlockState<HastRoot>[]>;
+export type ShadAnimationInputs = MapperConfigInputs<Required<ShadAnimationConfig>>;
 
-  progress: IReadableClosure<ShadPosition>;
-
-  maskWidth: IReadableClosure<number>;
-}
-
-export interface ShadBlockEntry {
-  closure: IReadableClosure<IBlockState<HastRoot>>;
-
-  block: IBlockState<HastRoot>;
-}
+export type ShadBlocksInputs = MapperInputs<ShadAnimationInputs>;

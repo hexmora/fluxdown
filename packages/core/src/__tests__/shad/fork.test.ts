@@ -21,11 +21,11 @@ import {
   firstBlock,
   latest,
   paragraph,
-  PrimarySmoothTicker,
+  PrimarySmoothDriver,
   resetSmoothTests,
   setupSmooth,
 } from '../smooth/utils';
-import { readParts } from './utils';
+import { readFades } from './utils';
 
 const cleanups = new Set<() => void>();
 
@@ -133,7 +133,12 @@ describe('Shad forks', () => {
     expect(collectText(main.value.value)).toBe('ABCDEFGH');
 
     if (enabled) {
-      expect(readParts(main.value.value)?.active).toBe('GH');
+      // Every character after the initial content plays its own fade, ending with the new 'H'.
+      expect(
+        readFades(main.value.value)
+          .map(({ text }) => text)
+          .join(''),
+      ).toBe('ABCDEFGH');
     }
 
     state.destroy();
@@ -160,11 +165,11 @@ describe('Shad forks', () => {
 
     smooth.source.next([source.block]);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
-    ticker.tick(16);
+    driver.tick(16);
 
-    ticker.tick(32);
+    driver.tick(32);
 
     const main = firstBlock(state.value.value);
 
@@ -182,7 +187,7 @@ describe('Shad forks', () => {
 
     expect(downstream.baseLength.value).toBe(6);
 
-    ticker.tick(48);
+    driver.tick(48);
 
     expect(collectText(main.value.value)).toBe('abc');
 

@@ -1,9 +1,9 @@
 import type { BlockCompilerConfig, IPatchItem, MapperPluggable } from '@fluxdown/core';
 import type {
-  SchedulerType,
-  SmoothSchedulerClass,
-  SmoothTickerClass,
-  TickerType,
+  DriverType,
+  InterpolationType,
+  SmoothDriverClass,
+  SmoothInterpolatorClass,
 } from '@fluxdown/core-presets/plugins/mapper/smooth';
 import type { IPluginItem } from '@fluxdown/react-presets/typings';
 import type { IPluggableConfig } from '@fluxdown/types';
@@ -27,14 +27,27 @@ export interface SmoothConfig {
   enabled?: boolean;
 
   /**
-   * Built-in timestamp source name or a custom ticker constructor.
+   * Built-in driver name or a custom driver constructor that supplies animation timestamps.
+   * @default 'raf' when animation frames are available, otherwise 'interval'
    */
-  ticker: TickerType | SmoothTickerClass;
+  driver?: DriverType | SmoothDriverClass;
 
   /**
-   * Built-in progress scheduler name or a custom scheduler constructor.
+   * Built-in interpolation name or a custom interpolator constructor that turns elapsed time
+   * into visible progress.
+   * @default 'spring'
    */
-  scheduler: SchedulerType | SmoothSchedulerClass;
+  interpolation?: InterpolationType | SmoothInterpolatorClass;
+
+  /**
+   * @deprecated Renamed to `driver`.
+   */
+  ticker?: DriverType | SmoothDriverClass;
+
+  /**
+   * @deprecated Renamed to `interpolation`.
+   */
+  scheduler?: InterpolationType | SmoothInterpolatorClass;
 }
 
 export interface StreamingConfig {

@@ -1,82 +1,56 @@
-import type { Element, ElementContent, Root as HastRoot, RootContent } from 'hast';
+import type { Root as HastRoot } from 'hast';
 
-import { clamp, floor } from 'lodash-es';
+import type { FadeConcurrency } from './concurrency';
+import type { ShadCharacter, ShadRootConfig } from './type';
 
-import { SHAD_DATA_ATTR, SHAD_HOST_VALUE, SHAD_TAG_NAME } from './consts';
-import { splitChildren } from './partition';
-import { getTailRange } from './tail';
+import { createEntranceRoot } from '../../../../utils';
+import {
+  SHAD_DATA_ATTR,
+  SHAD_DEFAULT_DURATION,
+  SHAD_DEFAULT_LENGTH,
+  SHAD_FADE_VALUE,
+  SHAD_TAG_NAME,
+} from './consts';
 
-export { SHAD_DATA_ATTR, SHAD_HOST_VALUE, SHAD_TAG_NAME } from './consts';
+export * from './concurrency';
+export * from './consts';
+export * from './type';
 
-const createPart = (children: RootContent[]): Element => ({
-  type: 'element',
-  tagName: SHAD_TAG_NAME,
-  properties: {},
-  // An empty element counts as one visible unit. An empty text keeps this part zero-width.
-  children: children.length > 0 ? (children as ElementContent[]) : [{ type: 'text', value: '' }],
-});
+const toFinite = (value: number, fallback: number) =>
+  Number.isFinite(value) ? Math.max(0, value) : fallback;
 
-export interface CreateShadRootParams {
-  root: HastRoot;
+/**
+ * Give each newly visible character its own opacity fade, independent of reveal progress.
+ * Batches that arrive while many characters are fading get shorter fades.
+ */
+export const createShadRoot = (
+  root: HastRoot,
+  previous: ShadCharacter[],
+  { initial, start, length: _length, duration: _duration }: ShadRootConfig,
+  concurrency: FadeConcurrency,
+) => {
+  const length = Math.floor(toFinite(_length, SHAD_DEFAULT_LENGTH));
 
-  length: number;
+  const duration = toFinite(_duration, SHAD_DEFAULT_DURATION);
 
-  activeLength: number;
-
-  maskWidth?: number;
-}
-
-export const createShadRoot = ({ root, ...params }: CreateShadRootParams): HastRoot => {
-  const length = floor(params.length);
-
-  if (!(length > 0)) {
-    return root;
-  }
-
-  const range = getTailRange(root, length);
-
-  if (!range) {
-    return root;
-  }
-
-  const result: HastRoot = { ...root, children: root.children.slice() };
-  let parent: HastRoot | Element = result;
-
-  for (const index of range.path) {
-    const child = parent.children[index];
-
-    if (child?.type !== 'element') {
-      return root;
-    }
-
-    const copy: Element = { ...child, children: child.children.slice() };
-    parent.children[index] = copy;
-    parent = copy;
-  }
-
-  const activeLength = clamp(floor(params.activeLength) || 0, 0, range.end - range.start);
-  const affected = parent.children.slice(range.startIndex, range.endIndex);
-  const [prefix, rest] = splitChildren(affected, range.start);
-  const [leading, tail] = splitChildren(rest, range.end - range.start - activeLength);
-  const [active, suffix] = splitChildren(tail, activeLength);
-
-  const maskWidth = params.maskWidth ?? 15;
-
-  const host: Element = {
-    type: 'element',
-    tagName: SHAD_TAG_NAME,
-    properties: {
-      [SHAD_DATA_ATTR]: SHAD_HOST_VALUE,
-      dataShadMaskWidth: Number.isFinite(maskWidth) ? Math.max(0, maskWidth) : 15,
-    },
-    children: [createPart(leading), createPart(active)],
-  };
-
-  parent.children.splice(
-    range.startIndex,
-    range.endIndex - range.startIndex,
-    ...([...prefix, host, ...suffix] as ElementContent[]),
-  );
-
-  return result;
+  return createEntranceRoot(root, previous, {
+    // A zero length disables the fade: new characters appear settled.
+    initial: initial || length === 0,
+    start,
+    duration: (added) => concurrency.allocate(start, added, length, duration),
+    wrap: (text, entrance, fade) => ({
+      type: 'element',
+      tagName: SHAD_TAG_NAME,
+      properties: {
+        [SHAD_DATA_ATTR]: SHAD_FADE_VALUE,
+        dataShadStart: entrance,
+        dataShadDuration: fade,
+      },
+      children: [text],
+    }),
+    isWrapper: (element, entrance, fade) =>
+      element.properties[SHAD_DATA_ATTR] === SHAD_FADE_VALUE &&
+      element.properties.dataShadStart === entrance &&
+      element.properties.dataShadDuration === fade,
+  });
 };

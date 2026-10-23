@@ -1,10 +1,10 @@
 import type { BlockCompilerConfig } from '@fluxdown/core';
 import type {
   BaseSmoothConfig,
-  SchedulerType,
-  SmoothSchedulerClass,
-  SmoothTickerClass,
-  TickerType,
+  DriverType,
+  InterpolationType,
+  SmoothDriverClass,
+  SmoothInterpolatorClass,
 } from '@fluxdown/core-presets/plugins/mapper/smooth';
 
 import { assert, defaultsBy } from '@fluxdown/utils';
@@ -12,7 +12,7 @@ import { isBoolean, isFunction, isString } from 'lodash-es';
 
 import type { BaseBuildConfig, SmoothConfig, StreamingConfig } from '../type';
 
-import { ALL_SCHEDULERS, ALL_TICKERS, DEFAULT_CONFIG } from '../../../consts';
+import { ALL_DRIVERS, ALL_INTERPOLATORS, DEFAULT_CONFIG } from '../../../consts';
 
 export interface ToBuildConfigParams {
   base: BaseBuildConfig;
@@ -28,47 +28,46 @@ export const isEnableRAF = () => {
   );
 };
 
-export const getTickerByType = (type: TickerType | SmoothTickerClass): SmoothTickerClass => {
+export const getDriverByType = (type: DriverType | SmoothDriverClass): SmoothDriverClass => {
   if (!isString(type)) {
     return type;
   }
 
-  const ticker = ALL_TICKERS.find((item) => item.name === type);
+  const driver = ALL_DRIVERS.find((item) => item.name === type);
 
-  assert(ticker, `Unknown ticker type: ${type}`);
+  assert(driver, `Unknown driver type: ${type}`);
 
-  return ticker;
+  return driver;
 };
 
-export const getSchedulerByType = (
-  type: SchedulerType | SmoothSchedulerClass,
-): SmoothSchedulerClass => {
+export const getInterpolationByType = (
+  type: InterpolationType | SmoothInterpolatorClass,
+): SmoothInterpolatorClass => {
   if (!isString(type)) {
     return type;
   }
 
-  const scheduler = ALL_SCHEDULERS.find((item) => item.name === type);
+  const interpolator = ALL_INTERPOLATORS.find((item) => item.name === type);
 
-  assert(scheduler, `Unknown scheduler type: ${type}`);
+  assert(interpolator, `Unknown interpolation type: ${type}`);
 
-  return scheduler;
+  return interpolator;
 };
 
 export const toSmoothConfig = (config: boolean | SmoothConfig): BaseSmoothConfig => {
-  const options: SmoothConfig = isBoolean(config)
-    ? {
-        enabled: config,
-        ticker: isEnableRAF() ? 'raf' : 'interval',
-        scheduler: 'spring',
-      }
-    : config;
+  const options: SmoothConfig = isBoolean(config) ? { enabled: config } : config;
 
-  const { enabled = false, ticker, scheduler } = options;
+  // The deprecated names only apply when the new ones are absent.
+  const {
+    enabled = false,
+    driver = options.ticker ?? (isEnableRAF() ? 'raf' : 'interval'),
+    interpolation = options.scheduler ?? 'spring',
+  } = options;
 
   return {
     enabled,
-    ticker: getTickerByType(ticker),
-    scheduler: getSchedulerByType(scheduler),
+    driver: getDriverByType(driver),
+    interpolation: getInterpolationByType(interpolation),
   };
 };
 

@@ -101,6 +101,7 @@
     "stative": "workspace:^"
   },
   "devDependencies": {
+    "@base-ui/react": "catalog:",
     "@rslib/core": "catalog:",
     "@storybook/addon-docs": "catalog:",
     "@storybook/react-vite": "catalog:",

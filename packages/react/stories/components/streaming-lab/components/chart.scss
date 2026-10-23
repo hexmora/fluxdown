@@ -1,0 +1,74 @@
+// Series colors are the reference categorical slots 1–3, stepped separately for each theme and
+// validated against the panel surface. Text stays in ink; the keys carry identity.
+.lab-chart {
+  --lab-series-target: light-dark(#eb6834, #d95926);
+  --lab-series-position: light-dark(#2a78d6, #3987e5);
+  --lab-series-velocity: light-dark(#1baf7a, #199e70);
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 8px;
+}
+
+.lab-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--playground-muted);
+  font-size: 11px;
+
+  output {
+    color: var(--playground-ink);
+    font-family: var(--playground-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.lab-chart-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.lab-chart-key {
+  width: 10px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.lab-chart-key-target {
+  background-color: var(--lab-series-target);
+}
+
+.lab-chart-key-position {
+  background-color: var(--lab-series-position);
+}
+
+.lab-chart-key-velocity {
+  background-color: var(--lab-series-velocity);
+}
+
+// The time stays muted: it labels the cursor position, not a measured value.
+.lab-chart-legend .lab-chart-time {
+  margin-left: auto;
+  color: var(--playground-muted);
+}
+
+.lab-chart-plots {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: crosshair;
+}
+
+// Canvas reads its chrome colors from these resolved properties. Both panels share one height
+// so their time axes and grids read as a pair.
+.lab-chart-canvas {
+  display: block;
+  width: 100%;
+  height: 72px;
+  border: 0 solid var(--playground-line);
+  outline: 0 none var(--playground-surface);
+  color: var(--playground-muted);
+}

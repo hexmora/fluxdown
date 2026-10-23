@@ -2,7 +2,7 @@ import { AnimationDemo } from '../../../../../../components';
 
 # Trailing fade
 
-`shad` gradually reveals the trailing text with a moving gradient. Content already displayed stays unchanged, while the last few characters become visible as the stream advances.
+`shad` fades each newly revealed character from transparent to opaque. Every character plays its own fade from the moment it appears, so the fade keeps going after the stream pauses instead of following the reveal position. Content already displayed stays unchanged.
 
 <AnimationDemo effect="shad" />
 
@@ -14,14 +14,18 @@ The following examples use the React component:
 <Fluxdown streaming={{ effect: 'shad' }} text={text} />
 ```
 
-Smoothing is enabled by default. The following React component example adjusts the tail length and mask width to match your typography:
+Smoothing is enabled by default. The following React component example keeps a shorter tail and allows longer fades:
 
 ```tsx
 <Fluxdown
-  streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+  streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
   text={text}
 />
 ```
+
+## How the fade adapts
+
+When characters arrive faster, more of them are fading at once. To keep the tail about `length` characters long, each new batch gets a shorter fade while more than `length` characters are in flight: its duration is `duration × length ÷ characters fading`. While fewer characters are fading, every batch uses the full `duration`. A burst that arrives all at once therefore settles quickly, and a slow stream fades in gently.
 
 ## Configuration
 
@@ -41,12 +45,14 @@ Enable the trailing fade.
 
 **Default:** `10`
 
-Number of trailing characters included in the fade. Fractions round down; negative and non-finite values become `0`.
+Number of characters the fade aims to keep in flight at once. Fractions round down; `0` disables the fade, negative values become `0`, and non-finite values use the default.
 
-### maskWidth <span className="field-tag">Optional</span> {#maskwidth}
+### duration <span className="field-tag">Optional</span> {#duration}
 
 **Type:** `number`
 
-**Default:** `15`
+**Default:** `400`
 
-Fade mask width in pixels. `0` hides the mask, negative values become `0`, and non-finite values use the default width.
+Longest fade for one character, in milliseconds, used while at most `length` characters are fading. Negative values become `0`, and non-finite values use the default.
+
+> Earlier versions shaded a fixed-width tail with a gradient mask. The `maskWidth` and `hideDelay` options were removed with that mask.

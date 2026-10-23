@@ -10,10 +10,11 @@ import { type IReadableClosure, once, useDefaults, useSwitchMap } from 'stative'
 import type { ShadInputs, ShadPluginConfig } from './type';
 
 import { withKey } from '../../../utils';
-import { ShadBlocks, ShadProgress } from './states';
+import { ShadBlocks } from './states';
+import { SHAD_DEFAULT_DURATION, SHAD_DEFAULT_LENGTH } from './utils';
 
 export * from './type';
-export { SHAD_DATA_ATTR, SHAD_HOST_VALUE, SHAD_TAG_NAME } from './utils';
+export { SHAD_DATA_ATTR, SHAD_FADE_VALUE, SHAD_TAG_NAME } from './utils';
 
 declare global {
   interface EffectConfigs {
@@ -31,24 +32,16 @@ export const Shad = /*#__PURE__*/ withKey(
     source,
     enabled: _enabled,
     length: _length,
-    maskWidth: _maskWidth,
+    duration: _duration,
   }: ShadInputs): IReadableClosure<IBlockState<HastRoot>[]> {
     const enabled = useDefaults(_enabled, false);
 
-    const length = useDefaults(_length, 10);
+    const length = useDefaults(_length, SHAD_DEFAULT_LENGTH);
 
-    const maskWidth = useDefaults(_maskWidth, 15);
+    const duration = useDefaults(_duration, SHAD_DEFAULT_DURATION);
 
     return useSwitchMap(enabled, (active) =>
-      active ? (
-        <ShadBlocks
-          source={source}
-          progress={<ShadProgress source={source} enabled={enabled} length={length} />}
-          maskWidth={maskWidth}
-        />
-      ) : (
-        source
-      ),
+      active ? <ShadBlocks source={source} length={length} duration={duration} /> : source,
     );
   }),
 );

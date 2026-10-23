@@ -1,39 +1,39 @@
 import { last } from 'lodash-es';
 
+import { FakeSmoothDriver } from '../modules/driver/__tests__/utils';
 import {
-  DoubleStepSmoothScheduler,
-  StepSmoothScheduler,
-} from '../modules/scheduler/__tests__/utils';
-import { FakeSmoothTicker } from '../modules/ticker/__tests__/utils';
+  DoubleStepSmoothInterpolator,
+  StepSmoothInterpolator,
+} from '../modules/interpolation/__tests__/utils';
 
-export class PrimarySmoothTicker extends FakeSmoothTicker {
-  static instances: PrimarySmoothTicker[] = [];
+export class PrimarySmoothDriver extends FakeSmoothDriver {
+  static instances: PrimarySmoothDriver[] = [];
 
   constructor() {
     super();
 
-    PrimarySmoothTicker.instances.push(this);
+    PrimarySmoothDriver.instances.push(this);
   }
 }
 
-export class SecondarySmoothTicker extends FakeSmoothTicker {
-  static instances: SecondarySmoothTicker[] = [];
+export class SecondarySmoothDriver extends FakeSmoothDriver {
+  static instances: SecondarySmoothDriver[] = [];
 
   constructor() {
     super();
 
-    SecondarySmoothTicker.instances.push(this);
+    SecondarySmoothDriver.instances.push(this);
   }
 }
 
 export const resetSmoothTests = () => {
-  PrimarySmoothTicker.instances = [];
+  PrimarySmoothDriver.instances = [];
 
-  SecondarySmoothTicker.instances = [];
+  SecondarySmoothDriver.instances = [];
 
-  StepSmoothScheduler.instances = [];
+  StepSmoothInterpolator.instances = [];
 
-  DoubleStepSmoothScheduler.instances = [];
+  DoubleStepSmoothInterpolator.instances = [];
 };
 
 export const latest = <T>(instances: T[]): T => {

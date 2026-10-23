@@ -2,7 +2,7 @@ import type { Mapper, MapperInputs } from '@fluxdown/core';
 import type { MapperConfigInputs as ConfigInputs, MapperPluginConfig } from '@fluxdown/types';
 import type { IPluggableConfig } from '@fluxdown/types';
 
-import { Shad, SHAD_DATA_ATTR, SHAD_HOST_VALUE } from '@fluxdown/core-presets/plugins/mapper/shad';
+import { Shad, SHAD_DATA_ATTR, SHAD_FADE_VALUE } from '@fluxdown/core-presets/plugins/mapper/shad';
 import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
 import { PluginPriority } from '@fluxdown/types';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
@@ -11,19 +11,20 @@ import { reverse } from 'lodash-es';
 import { createRef, StrictMode } from 'react';
 import {
   type IReadableClosure,
+  mapClosure,
   MutableState,
   once,
   toClosure,
   useClearable,
   useDefaults,
   useMap,
+  useSwitchMap,
 } from 'stative';
 
 import type { EffectItem, FluxdownRef, StreamingConfig } from '../packs/full';
 
 import { restoreGlobals } from '../../../../scripts/testing/globals';
 import scaleStyles from '../../../react-presets/src/plugins/effect-scale/render/effect-scale/renderer/index.module.scss';
-import styles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
 import { createRafClock } from './utils/raf';
 
@@ -53,6 +54,8 @@ afterEach(async () => {
   jest.useRealTimers();
 });
 
+const FADE = '[data-fluxdown-shad="fade"]';
+
 describe('Fluxdown streaming effects', () => {
   test.each<{ effect: StreamingConfig['effect'] }>([{ effect: false }, { effect: [] }])(
     'leaves effects disabled with effect=$effect',
@@ -63,11 +66,11 @@ describe('Fluxdown streaming effects', () => {
 
       expect(view.container.textContent).toBe('abc');
 
-      expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
+      expect(view.container.querySelector(FADE)).toBeNull();
     },
   );
 
-  test('updates shorthand and tuple effects while preserving the core and the active tail', () => {
+  test('updates shorthand and tuple effects while preserving the core and running fades', () => {
     jest.useFakeTimers();
 
     const ref = createRef<FluxdownRef>();
@@ -82,42 +85,28 @@ describe('Fluxdown streaming effects', () => {
       <Fluxdown ref={ref} streaming={{ smooth: false, effect: 'shad' }} text="abcdef" />,
     );
 
-    const active = view.container.querySelector(`.${styles.active}`);
+    const fade = view.container.querySelector<HTMLElement>(FADE);
 
-    expect(active).toHaveTextContent('bcdef');
-
-    view.rerender(
-      <Fluxdown
-        ref={ref}
-        streaming={{ smooth: false, effect: ['shad', { maskWidth: 24 }] }}
-        text="abcdef"
-      />,
-    );
-
-    expect(view.container.querySelector(`.${styles.active}`)).toBe(active);
-
-    expect(active).toHaveTextContent('bcdef');
-
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: '24px',
-      marginLeft: '-24px',
-    });
+    expect(fade).toHaveTextContent('bcdef');
 
     view.rerender(
       <Fluxdown
         ref={ref}
-        streaming={{ smooth: false, effect: ['shad', { length: 2, maskWidth: 24 }] }}
+        streaming={{ smooth: false, effect: ['shad', { duration: 800 }] }}
         text="abcdef"
       />,
     );
 
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('ef');
+    // The running fade keeps its element and the duration it started with.
+    expect(view.container.querySelector(FADE)).toBe(fade);
+
+    expect(fade?.style.getPropertyValue('--fluxdown-shad-duration')).toBe('400ms');
 
     view.rerender(
       <Fluxdown ref={ref} streaming={{ smooth: false, effect: false }} text="abcdef" />,
     );
 
-    expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
+    expect(view.container.querySelector(FADE)).toBeNull();
 
     expect(ref.current).toBe(core);
   });
@@ -170,14 +159,13 @@ describe('Fluxdown streaming effects', () => {
   });
 
   test('enables named effects when their optional enabled value is undefined', () => {
-    const view = render(
-      <Fluxdown
-        streaming={{ smooth: false, effect: ['shad', { enabled: undefined }] }}
-        text="abc"
-      />,
-    );
+    const streaming: StreamingConfig = { smooth: false, effect: ['shad', { enabled: undefined }] };
 
-    expect(view.container.querySelector(`.${styles.active}`)).not.toBeNull();
+    const view = render(<Fluxdown streaming={streaming} text="abc" />);
+
+    view.rerender(<Fluxdown streaming={streaming} text="abcd" />);
+
+    expect(view.container.querySelector(FADE)).toHaveTextContent('d');
   });
 
   test('accepts bare and configured mappers alongside plugin mappers', () => {
@@ -284,30 +272,45 @@ describe('Fluxdown streaming effects', () => {
   test('runs custom effects before or after shad in the declared order', () => {
     const observed = jest.fn();
 
-    const Observe = once(({ source }: MapperInputs) => {
-      const shaded = source.value.value.some((block) =>
-        block.value.value.children.some(
-          (node) =>
-            'children' in node &&
-            node.children.some(
-              (child) =>
-                child.type === 'element' && child.properties[SHAD_DATA_ATTR] === SHAD_HOST_VALUE,
-            ),
+    // Re-checks every block revision, because shad only marks characters that just appeared.
+    const Observe = once(({ source }: MapperInputs) =>
+      useSwitchMap(source, (blocks) =>
+        mapClosure(
+          blocks.map((block) => block.value),
+          (roots) => {
+            observed(
+              roots.some((root) =>
+                root.children.some(
+                  (node) =>
+                    'children' in node &&
+                    node.children.some(
+                      (child) =>
+                        child.type === 'element' &&
+                        child.properties[SHAD_DATA_ATTR] === SHAD_FADE_VALUE,
+                    ),
+                ),
+              ),
+            );
+
+            return blocks;
+          },
         ),
-      );
-
-      observed(shaded);
-
-      return source;
-    });
+      ),
+    );
 
     const view = render(
-      <Fluxdown streaming={{ smooth: false, effect: [Observe, 'shad'] }} text="abc" />,
+      <Fluxdown streaming={{ smooth: false, effect: [Observe, 'shad'] }} text="a" />,
     );
+
+    view.rerender(<Fluxdown streaming={{ smooth: false, effect: [Observe, 'shad'] }} text="abc" />);
 
     expect(observed).toHaveBeenLastCalledWith(false);
 
     view.rerender(<Fluxdown streaming={{ smooth: false, effect: ['shad', Observe] }} text="abc" />);
+
+    view.rerender(
+      <Fluxdown streaming={{ smooth: false, effect: ['shad', Observe] }} text="abcd" />,
+    );
 
     expect(observed).toHaveBeenLastCalledWith(true);
   });
@@ -384,15 +387,17 @@ describe('Fluxdown streaming effects', () => {
 
     const active = toClosure(enabled);
 
-    const view = render(
-      <Fluxdown streaming={{ smooth: false, effect: [Shad, { enabled: active }] }} text="abc" />,
-    );
+    const streaming: StreamingConfig = { smooth: false, effect: [Shad, { enabled: active }] };
 
-    expect(view.container.querySelector(`.${styles.active}`)).not.toBeNull();
+    const view = render(<Fluxdown streaming={streaming} text="abc" />);
+
+    view.rerender(<Fluxdown streaming={streaming} text="abcd" />);
+
+    expect(view.container.querySelector(FADE)).toHaveTextContent('d');
 
     act(() => enabled.next(false));
 
-    expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
+    expect(view.container.querySelector(FADE)).toBeNull();
 
     enabled.destroy();
   });

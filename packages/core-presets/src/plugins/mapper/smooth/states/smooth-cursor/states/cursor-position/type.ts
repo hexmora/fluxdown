@@ -1,18 +1,18 @@
 import type { IReadableClosure } from 'stative';
 
-import type { SmoothSchedulerClass } from '../../../../type';
+import type { SmoothInterpolatorClass } from '../../../../type';
 import type { BlockRevision } from '../block-revisions';
-import type { SmoothTickerInputs } from '../smooth-ticks';
+import type { SmoothDriverInputs } from '../smooth-ticks';
 import type { SmoothTick } from '../smooth-ticks/states';
 
-export interface SmoothSchedulerInputs extends SmoothTickerInputs {
+export interface SmoothInterpolatorInputs extends SmoothDriverInputs {
   /**
    * Constructor used to determine visible progress per tick.
    */
-  scheduler: IReadableClosure<SmoothSchedulerClass>;
+  interpolation: IReadableClosure<SmoothInterpolatorClass>;
 }
 
-export interface CursorPositionInputs extends SmoothSchedulerInputs {
+export interface CursorPositionInputs extends SmoothInterpolatorInputs {
   revisions: IReadableClosure<BlockRevision[]>;
 
   ticks: IReadableClosure<SmoothTick | null>;

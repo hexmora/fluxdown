@@ -22,9 +22,9 @@ import type { HastRoot } from '../../../typings';
 import type { MapperPluggable } from '../../base';
 import type { CoreInputs } from '../type';
 
-import { findHost, readParts } from '../../../__tests__/shad/utils';
+import { readFades } from '../../../__tests__/shad/utils';
 import { collectText, firstBlock } from '../../../__tests__/smooth/utils';
-import { FakeSmoothTicker, StepSmoothScheduler } from '../../../__tests__/utils/smooth';
+import { FakeSmoothDriver, StepSmoothInterpolator } from '../../../__tests__/utils/smooth';
 import { BaseRenderer } from '../../../externals';
 import { Core } from '../index';
 
@@ -36,13 +36,13 @@ class BlockRenderer extends BaseRenderer<HastRoot, ElementContent, Parent, Block
   }
 }
 
-class ManualTicker extends FakeSmoothTicker {
-  static instances: ManualTicker[] = [];
+class ManualDriver extends FakeSmoothDriver {
+  static instances: ManualDriver[] = [];
 
   constructor() {
     super();
 
-    ManualTicker.instances.push(this);
+    ManualDriver.instances.push(this);
   }
 }
 
@@ -57,11 +57,11 @@ const build = {
 
 const smooth: BaseSmoothConfig = {
   enabled: true,
-  ticker: ManualTicker,
-  scheduler: StepSmoothScheduler,
+  driver: ManualDriver,
+  interpolation: StepSmoothInterpolator,
 };
 
-const enabled: BaseShadConfig = { enabled: true, length: 2, maskWidth: 15 };
+const enabled: BaseShadConfig = { enabled: true, length: 2, duration: 400 };
 
 const disabled: BaseShadConfig = { ...enabled, enabled: false };
 
@@ -131,11 +131,11 @@ const setup = (
   const read = () => core.value.value.map((block) => collectText(block.value.value));
 
   const tick = (timestamp: number) => {
-    const ticker = last(ManualTicker.instances);
+    const driver = last(ManualDriver.instances);
 
-    assert(ticker);
+    assert(driver);
 
-    ticker.tick(timestamp);
+    driver.tick(timestamp);
   };
 
   return { core, read, mappers, shad, text, tick };
@@ -144,9 +144,9 @@ const setup = (
 beforeEach(() => {
   jest.useFakeTimers();
 
-  ManualTicker.instances = [];
+  ManualDriver.instances = [];
 
-  StepSmoothScheduler.instances = [];
+  StepSmoothInterpolator.instances = [];
 });
 
 afterEach(() => {
@@ -157,256 +157,147 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
+const fades = (view: ReturnType<typeof setup>) =>
+  view.core.value.value.flatMap((block) => readFades(block.value.value));
+
+/**
+ * Blocks compute lazily, so read once to establish which content was present at mount.
+ */
+const mount = (...args: Parameters<typeof setup>) => {
+  const view = setup(...args);
+
+  view.read();
+
+  return view;
+};
+
 describe('Core shad pipeline', () => {
-  test('keeps a bare Shad disabled and defaults its configured tail length to ten', () => {
+  test('keeps a bare Shad disabled and fades appended characters with the defaults', () => {
     const view = setup('abcdefghijkl');
 
     view.mappers.next([Shad]);
 
-    expect(readParts(firstBlock(view.core.value.value).value.value)).toBeUndefined();
+    view.text.next('abcdefghijklm');
+
+    expect(fades(view)).toEqual([]);
 
     view.mappers.next([[Shad, { enabled: ReactiveState.of(true) }]]);
 
-    expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
-      leading: 'cdefghijkl',
-      active: '',
-    });
+    // Content present when the effect mounts is already settled.
+    expect(fades(view)).toEqual([]);
 
-    expect(
-      findHost(firstBlock(view.core.value.value).value.value)?.properties.dataShadMaskWidth,
-    ).toBe(15);
+    view.text.next('abcdefghijklmn');
 
-    view.text.next('abcdefghijklm');
-
-    expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
-      leading: 'defghijkl',
-      active: 'm',
-    });
-  });
-
-  test('overrides the Shad preset through a public mapper tuple and restores its configuration', () => {
-    const view = setup('abcd', enabled);
-
-    view.mappers.next([[Shad, { enabled: ReactiveState.of(false), length: ReactiveState.of(4) }]]);
-
-    view.text.next('abcde');
-
-    expect(view.read()).toEqual(['abcde']);
-
-    expect(readParts(firstBlock(view.core.value.value).value.value)).toBeUndefined();
-
-    view.mappers.next(undefined);
-
-    expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
-      leading: 'de',
-      active: '',
-    });
-
-    view.text.next('abcdef');
-
-    expect(readParts(firstBlock(view.core.value.value).value.value)?.active).toBe('f');
+    expect(fades(view)).toEqual([{ text: 'n', start: expect.any(Number), duration: 400 }]);
   });
 
   test.each([undefined, disabled, { ...disabled, length: 4 }])(
-    'keeps shading disabled for %j',
+    'keeps fading disabled for %j',
     (config) => {
-      const view = setup('abcd', config);
-
-      expect(view.read()).toEqual(['abcd']);
-
-      expect(readParts(firstBlock(view.core.value.value).value.value)).toBeUndefined();
+      const view = mount('abcd', config);
 
       view.text.next('abcde');
 
       expect(view.read()).toEqual(['abcde']);
 
-      expect(readParts(firstBlock(view.core.value.value).value.value)).toBeUndefined();
-
-      expect(jest.getTimerCount()).toBe(0);
+      expect(fades(view)).toEqual([]);
     },
   );
 
-  test('uses the default tail length and applies live configuration', () => {
-    const view = setup('abcd', enabled);
+  test('plays each batch on its own clock, independent of later appends', () => {
+    const view = mount('ab', enabled);
 
-    let fork = firstBlock(view.core.value.value);
+    view.text.next('abc');
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+    const [first] = fades(view);
+
+    jest.advanceTimersByTime(100);
+
+    view.text.next('abcd');
+
+    expect(fades(view)).toEqual([first, { text: 'd', start: first!.start + 100, duration: 400 }]);
+
+    jest.advanceTimersByTime(300);
 
     view.text.next('abcde');
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+    // 'c' finished at 400 ms; 'd' is still fading on its own clock.
+    expect(fades(view).map(({ text }) => text)).toEqual(['d', 'e']);
+  });
 
-    view.shad.next({ ...enabled, length: 4 });
+  test('shortens fades while more than `length` characters are fading', () => {
+    const view = mount('a', enabled);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'bcd', active: 'e' });
+    view.text.next('abcdefghi');
+
+    // Eight characters arrive at once against a length of two: a quarter of the duration.
+    expect(fades(view)).toEqual([{ text: 'bcdefghi', start: expect.any(Number), duration: 100 }]);
+
+    jest.advanceTimersByTime(100);
+
+    view.text.next('abcdefghij');
+
+    expect(last(fades(view))).toEqual({
+      text: 'j',
+      start: expect.any(Number),
+      duration: 400,
+    });
+  });
+
+  test('counts fades across blocks against one budget', () => {
+    const view = mount('first', enabled);
+
+    view.text.next('first\n\nsecond\n\nthird');
+
+    const [second, third] = fades(view);
+
+    expect(second?.text).toBe('second');
+
+    expect(third?.text).toBe('third');
+
+    expect(second?.start).toBe(third?.start);
+
+    // The later block sees the earlier block's characters already in flight.
+    expect(third!.duration).toBeLessThan(second!.duration);
+  });
+
+  test('applies live configuration to new batches only', () => {
+    const view = mount('ab', enabled);
+
+    view.text.next('abc');
+
+    view.shad.next({ ...enabled, length: 10, duration: 1000 });
+
+    expect(fades(view)).toEqual([{ text: 'c', start: expect.any(Number), duration: 400 }]);
+
+    view.text.next('abcd');
+
+    expect(last(fades(view))).toEqual({ text: 'd', start: expect.any(Number), duration: 1000 });
 
     view.shad.next(disabled);
 
-    expect(view.read()).toEqual(['abcde']);
-
-    expect(fork.value.closed).toBe(true);
-
-    expect(readParts(firstBlock(view.core.value.value).value.value)).toBeUndefined();
-
-    view.shad.next(enabled);
-
-    const previous = fork;
-
-    fork = firstBlock(view.core.value.value);
-
-    expect(Object.is(fork, previous)).toBe(false);
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
+    expect(fades(view)).toEqual([]);
   });
 
-  test('updates mask width without replacing blocks or restarting the active tail', () => {
-    const view = setup('abcd', { ...enabled, maskWidth: 24 });
+  test('fades Smooth output as it is revealed, not when it is received', () => {
+    const view = mount('', enabled, smooth);
 
-    const fork = firstBlock(view.core.value.value);
+    view.text.next('abc');
 
-    expect(findHost(fork.value.value)?.properties.dataShadMaskWidth).toBe(24);
-
-    view.text.next('abcde');
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
-
-    jest.advanceTimersByTime(100);
-
-    view.shad.next({ ...enabled, maskWidth: 6.5 });
-
-    expect(firstBlock(view.core.value.value)).toBe(fork);
-
-    expect(findHost(fork.value.value)?.properties.dataShadMaskWidth).toBe(6.5);
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
-
-    jest.advanceTimersByTime(100);
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
-
-    view.shad.next({ ...enabled, maskWidth: 0 });
-
-    expect(firstBlock(view.core.value.value)).toBe(fork);
-
-    expect(findHost(fork.value.value)?.properties.dataShadMaskWidth).toBe(0);
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
-
-    expect(jest.getTimerCount()).toBe(0);
-  });
-
-  test('shades newly visible Smooth output only after its ticks and keeps lengths consistent', () => {
-    const view = setup('', enabled, smooth);
-
-    expect(view.read()).toEqual([]);
-
-    view.text.next('abcd');
-
-    expect(view.read()).toEqual(['']);
-
-    const fork = firstBlock(view.core.value.value);
-
-    expect(readParts(fork.value.value)).toBeUndefined();
-
-    expect(jest.getTimerCount()).toBe(0);
+    expect(fades(view)).toEqual([]);
 
     view.tick(16);
 
-    expect(view.read()).toEqual(['a']);
+    expect(fades(view).map(({ text }) => text)).toEqual(['a']);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'a' });
-
-    expect(fork.length.value).toBe(1);
+    jest.advanceTimersByTime(16);
 
     view.tick(32);
 
-    expect(view.read()).toEqual(['ab']);
+    const visible = fades(view);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'ab' });
+    expect(visible.map(({ text }) => text)).toEqual(['a', 'b']);
 
-    jest.advanceTimersByTime(200);
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'ab', active: '' });
-
-    view.tick(48);
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'b', active: 'c' });
-
-    expect(fork.length.value).toBe(3);
-
-    view.tick(64);
-
-    expect(view.read()).toEqual(['abcd']);
-
-    expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'cd' });
-  });
-
-  test.each([disabled, enabled, { ...enabled, length: 3 }])(
-    'completes a static document for shad %j without a timer',
-    (shad) => {
-      const core = render(
-        S([
-          ConfiguredCore,
-          {
-            Renderer: D(BlockRenderer),
-            text: ReactiveState.of('ready'),
-            build,
-            shad: ReactiveState.of(shad),
-            smooth: ReactiveState.of(smooth),
-            patches: [],
-            renders: [],
-          },
-        ]),
-      );
-
-      closures.add(core);
-
-      const block = firstBlock(core.value.value);
-
-      expect(collectText(block.value.value)).toBe('ready');
-
-      expect(readParts(block.value.value)).toEqual(
-        shad.enabled ? { leading: shad.length === 2 ? 'dy' : 'ady', active: '' } : undefined,
-      );
-
-      expect(core.value.closed).toBe(true);
-
-      expect(jest.getTimerCount()).toBe(0);
-    },
-  );
-
-  test('finishes the final tail after the stream completes and clears resources on destroy', () => {
-    const view = setup('abc', enabled);
-
-    const fork = firstBlock(view.core.value.value);
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'bc', active: '' });
-
-    view.text.next('abcd');
-
-    view.text.complete();
-
-    view.shad.complete();
-
-    view.mappers.complete();
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'c', active: 'd' });
-
-    expect(fork.value.closed).toBe(false);
-
-    jest.advanceTimersByTime(200);
-
-    expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
-
-    expect(view.core.value.closed).toBe(true);
-
-    const value = fork.value;
-
-    view.core.destroy();
-
-    expect(value.closed).toBe(true);
-
-    expect(jest.getTimerCount()).toBe(0);
+    expect(visible[1]!.start).toBeGreaterThan(visible[0]!.start);
   });
 });

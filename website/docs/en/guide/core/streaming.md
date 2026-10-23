@@ -99,7 +99,7 @@ When finished, you can turn smoothing off to show the remaining content immediat
 smoothEnabled.next(false);
 ```
 
-`Shad` adds fade markers to trailing content. Its `enabled`, `length`, and `maskWidth` options accept plain values or readable closures; `maskWidth` controls the fade width in pixels and defaults to `15`. Your renderer must support those nodes to produce a visual fade. The React presets include `ShadRenderPlugin`.
+`Shad` marks each newly visible character with its own fade. Its `enabled`, `length`, and `duration` options accept plain values or readable closures; `length` is how many characters it aims to keep fading at once (default `10`), and `duration` is the longest fade in milliseconds (default `400`), shortened while more characters are in flight. Your renderer must support those nodes to produce a visual fade. The React presets include `ShadRenderPlugin`.
 
 `Scale` adds character and word markers for a per-character entrance. Like `Smooth`, its `enabled`, `duration`, `from`, and `blur` options accept plain values or readable closures. Your renderer must handle the markers; the React presets include `ScaleRenderPlugin`. In React, use [`streaming.effect`](../react/streaming.md#animate-each-new-character) for the simpler configuration.
 
