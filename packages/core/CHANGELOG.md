@@ -1,5 +1,17 @@
 # @fluxdown/core
 
+## 0.12.3
+
+### Patch Changes
+
+- 2bb482d: Add CjkPlugin and headless CjkRemarkPlugin for CJK emphasis, strikethrough, and autolink punctuation boundaries. Enable CJK parsing in the Full preset, retain explicit installation in Lite and Raw, and preserve strikethrough configuration and literal link targets.
+- 1df885d: Add EmojiRemarkPlugin and EmojiPlugin to convert GitHub emoji shortcodes to Unicode emoji. Enable EmojiPlugin in Full while preserving unknown shortcodes and code literals. Lite and Core can opt in.
+- 9170bab: Move core preset imports to `@fluxdown/core-presets/presets/<type>` and individual plugin imports to `@fluxdown/core-presets/plugins/<type>/<name>`. The previous `/mapper`, `/remark`, `/rehype`, and `/repair` aggregate entry points are removed; import each plugin and its related types from its own subpath.
+- Updated dependencies [2bb482d]
+- Updated dependencies [1df885d]
+- Updated dependencies [9170bab]
+  - @fluxdown/core-presets@0.11.0
+
 ## 0.12.2
 
 ### Patch Changes
