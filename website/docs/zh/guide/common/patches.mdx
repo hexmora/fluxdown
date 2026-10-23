@@ -1,0 +1,110 @@
+import {
+  PatchStaticDemo,
+  PatchStreamingDemo,
+} from '../../../../components/demo/components/patch-demo';
+
+# 位置插入
+
+一段回答里，可能有值得点开的地点、需要注明的来源，或想补充一句解释的词。`patches` 让你把这些内容放到文字的指定位置，直接使用自己的组件。
+
+你不需要往 Markdown 里拼 HTML，也不用先让模型输出特殊标记。正文和补充信息可以分别到达，再由应用把它们连起来。
+
+React Web、React Native 和 Lynx 都支持 `patches`。下面的交互演示使用 React Web；位置规则三端共用，插入的组件则使用各端的写法。
+
+## 给一句话添上信息
+
+下面的文字里，「杭州」变成了城市标签，句末多了一个来源编号。点一下它们，或切换到原文，看看改变发生在哪里。
+
+<PatchStaticDemo />
+
+这里用了两种位置：
+
+- **一个点**：在某个位置插入内容，保留原文。适合来源编号、注释按钮。
+- **一段范围**：用组件替换这段文字的显示。适合地点、人物提及、可点击的关键词。
+
+以 React Web 为例，两种写法可以放在同一个 `patches` 数组里：
+
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+const text = '周末去杭州，沿着西湖走一走。';
+const start = text.indexOf('杭州');
+
+<Fluxdown
+  text={text}
+  patches={[
+    {
+      key: 'city',
+      range: [start, start + '杭州'.length],
+      render: (city) => <button onClick={openCity}>{city}</button>,
+    },
+    {
+      key: 'source-1',
+      range: text.length,
+      render: () => <button onClick={openSource}>1</button>,
+    },
+  ]}
+/>;
+```
+
+`render` 返回你自己的 React 内容。替换文字时，它会收到被替换的文本；只插入内容时，这个参数是 `undefined`。上面的 `openCity` 和 `openSource` 是应用里的点击处理函数。
+
+`text` 本身不会被改写。你仍然保存原来的 Markdown，界面上的标签和按钮交给组件管理。
+
+## 文字还没写完，也能插入
+
+流式回答常常边写边带回来源。可以让正文照常增长，再把来源插到它对应的句子后面；后面收到的新文字不会把来源推到整篇回答的末尾。
+
+<PatchStreamingDemo />
+
+这段演示在两句话后分别插入来源。编号出现后就可以点击，正文继续接收；重播可以再看一次它们出现的时机。
+
+使用时，`text` 传入已经收到的完整字符串，`range` 使用相对于这份原文的位置。例如，服务端告诉你某条来源对应的位置是 `sourceOffset`：
+
+```tsx
+<Fluxdown
+  text={receivedText}
+  streaming={{ smooth: true }}
+  patches={
+    sourceOffset <= receivedText.length
+      ? [
+          {
+            key: 'source-1',
+            range: sourceOffset,
+            render: () => <button onClick={openSource}>1</button>,
+          },
+        ]
+      : []
+  }
+/>
+```
+
+位置还没收到时可以先不传；越界的 patch 也会被忽略，等后续文本覆盖到这个位置才生效。开启平滑化后，插入内容会随对应位置一起显示。给同一条来源保留稳定的 `key`，之后更新它的组件内容时也更清楚。
+
+平滑化会把一个 patch 当作整体，决定它何时出现，不会逐字截开 `render` 返回的内容。一个简短来源编号适合直接插入；较长的补充说明可以放在点击后打开的详情里。这个行为在三端相同。
+
+来源数据晚一些到达也没关系：更新 `patches` 就能补上，正文无需再发送一次。后续如果只是在末尾追加文字，已有位置可以保持不变；如果改写了前面的原文，就需要重新计算受影响的位置。
+
+## 位置怎么算
+
+位置以**原始 Markdown 字符串**为准，从 `0` 开始，和 JavaScript 的 `indexOf`、`slice` 使用同一套索引。空格、换行、`**` 这样的语法符号都算在内；某些 emoji 占两个或更多索引，不适合凭眼睛数。尽量从原文计算，或直接使用服务端提供的同类位置。
+
+范围是 `[start, end)`：包含起点，不包含终点。比如 `text.slice(start, end)` 选中的那段原文，就是要替换的位置。
+
+替换范围要落在同一段普通文本里。可以替换加粗文字内部的某个词，但不要跨过加粗、链接或段落边界；代码里的内容也不适合用这种方式替换。多个范围尽量不要重叠。同一点可以插入多个组件，它们会按数组顺序显示。
+
+## 在 React Native 和 Lynx 中使用
+
+三个入口都接收同样结构的 `patches`：`key` 标识这条补充信息，`range` 指向原文，`render` 返回当前平台的内容。下面是同一个来源编号的三种写法，`openSource` 都由应用提供：
+
+| 平台         | `Fluxdown` 的导入入口    | `render` 回调                                   |
+| ------------ | ------------------------ | ----------------------------------------------- |
+| React Web    | `fluxdown`               | `() => <button onClick={openSource}>1</button>` |
+| React Native | `@fluxdown/react-native` | `() => <Text onPress={openSource}>[1]</Text>`   |
+| Lynx         | `@fluxdown/lynx`         | `() => <text bindtap={openSource}>[1]</text>`   |
+
+React Native 的 `Text` 从 `react-native` 导入。`render` 需要返回原生组件，段落里的文字和编号使用 `Text`，保持行内排版。Lynx 返回 ReactLynx 内容，段落里的文字使用 `text`。网页里的 `button`、`span` 需要换成对应元素，样式也按各端的规则设置。
+
+即使开启平滑化，`range` 也始终使用原文的位置。切换平台时，位置数据可以共用，展示、点击行为和样式则交给对应平台。接入细节见 [React Native 配置](../react-native/configuration.md)与 [Lynx 配置](../lynx/configuration.md)。
+
+需要修改一类内容的整体外观，例如所有代码块的工具栏，用插槽更合适：[React Web](../react/plugins/slot.md)、[React Native](../react-native/plugins/slot.md) 和 [Lynx](../lynx/plugins/slot.md) 都有各自的接入方式。只想在这篇内容的某个位置补一点信息，就用 `patches`。共用字段见 [patches 配置](../react/configuration.md#patches)。

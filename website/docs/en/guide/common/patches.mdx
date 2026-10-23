@@ -1,0 +1,110 @@
+import {
+  PatchStaticDemo,
+  PatchStreamingDemo,
+} from '../../../../components/demo/components/patch-demo';
+
+# Position inserts
+
+A response can mention a place worth opening, a source worth checking, or a word that needs a little context. `patches` lets you put your own components at those positions in the text.
+
+There is no need to add HTML to the Markdown or ask the model to produce special markers. The text and its extra information can arrive separately; your app connects them.
+
+React Web, React Native, and Lynx all support `patches`. The interactive demos below use React Web. All three share the same position rules, while the inserted components use each platform's own elements.
+
+## Add context to a sentence
+
+Here, “Hangzhou” becomes a place label, and a source number appears after the sentence. Click either one, or switch to the original text to see what changed.
+
+<PatchStaticDemo />
+
+The example uses two kinds of position:
+
+- **A point** inserts content without removing text. Use it for source numbers or annotation buttons.
+- **A range** replaces the display of some text with a component. Use it for places, mentions, or interactive keywords.
+
+With React Web, both can live in the same `patches` array:
+
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+const text = 'Spend the weekend in Hangzhou and take a walk by West Lake.';
+const start = text.indexOf('Hangzhou');
+
+<Fluxdown
+  text={text}
+  patches={[
+    {
+      key: 'city',
+      range: [start, start + 'Hangzhou'.length],
+      render: (city) => <button onClick={openCity}>{city}</button>,
+    },
+    {
+      key: 'source-1',
+      range: text.length,
+      render: () => <button onClick={openSource}>1</button>,
+    },
+  ]}
+/>;
+```
+
+`render` returns your React content. For a replacement, it receives the replaced text. For an insertion, that argument is `undefined`. In this example, `openCity` and `openSource` are click handlers provided by your app.
+
+The `text` string stays intact. Keep the original Markdown in your data; let the components manage the labels and buttons on screen.
+
+## Insert while the text is still arriving
+
+A streaming response may return sources along with its text. Keep appending the text and insert each source after its sentence. Later text does not move the source to the end of the entire response.
+
+<PatchStreamingDemo />
+
+This demo inserts references after two sentences. Each becomes clickable when it appears, while the remaining text keeps arriving. Replay to watch their timing again.
+
+Pass all text received so far as `text`, with positions measured against that original string. For example, suppose the server provides a source position called `sourceOffset`:
+
+```tsx
+<Fluxdown
+  text={receivedText}
+  streaming={{ smooth: true }}
+  patches={
+    sourceOffset <= receivedText.length
+      ? [
+          {
+            key: 'source-1',
+            range: sourceOffset,
+            render: () => <button onClick={openSource}>1</button>,
+          },
+        ]
+      : []
+  }
+/>
+```
+
+You can wait until that position has arrived before supplying the patch. Out-of-range patches are also ignored until later text reaches them. With smoothing enabled, an insert appears as its position becomes visible. Keep a stable `key` for each source when updating its component later.
+
+Smoothing reveals a patch as a whole. It does not progressively cut through the content returned by `render`. A short source number works well inline; longer notes can live in a detail panel opened on click or tap. This behavior is the same on all three platforms.
+
+Source data can arrive late, too: update `patches` to add it without sending the text again. Existing positions stay valid when text is appended at the end. If earlier text is rewritten, recalculate the affected positions.
+
+## Count positions in the source
+
+Positions start at `0` in the **original Markdown string**, using the same indexes as JavaScript’s `indexOf` and `slice`. Spaces, line breaks, and syntax such as `**` count. Some emoji occupy two or more indexes, so calculating a position from the string is safer than counting visible characters. Server offsets must use the same convention.
+
+A range is `[start, end)`: it includes the start and excludes the end. It selects the same part of the source as `text.slice(start, end)`.
+
+A replacement must fit inside one ordinary text node. You can replace a word within bold text, but do not span bold, link, or paragraph boundaries, or replace text inside code. Avoid overlapping ranges. Multiple inserts at the same point appear in array order.
+
+## Use patches in React Native and Lynx
+
+All three entry points accept the same `patches` structure: `key` identifies the extra information, `range` points into the source, and `render` returns content for the current platform. Here are three versions of the same source number, with `openSource` supplied by the app:
+
+| Platform     | Import `Fluxdown` from   | `render` callback                               |
+| ------------ | ------------------------ | ----------------------------------------------- |
+| React Web    | `fluxdown`               | `() => <button onClick={openSource}>1</button>` |
+| React Native | `@fluxdown/react-native` | `() => <Text onPress={openSource}>[1]</Text>`   |
+| Lynx         | `@fluxdown/lynx`         | `() => <text bindtap={openSource}>[1]</text>`   |
+
+Import React Native's `Text` from `react-native`. Its `render` callback must return native components; use `Text` for words and source numbers inside a paragraph so they fit the inline text layout. Lynx expects ReactLynx content, with `text` elements inside paragraphs. Replace web elements such as `button` and `span` with their platform equivalents, and use the platform's styling rules.
+
+Even with smoothing enabled, `range` always refers to the original string. You can share position data across platforms while adapting the presentation, interaction, and styles. See [React Native configuration](../react-native/configuration.md) and [Lynx configuration](../lynx/configuration.md) for setup details.
+
+To change every instance of a content type, such as all code toolbars, use a slot. [React Web](../react/plugins/slot.md), [React Native](../react-native/plugins/slot.md), and [Lynx](../lynx/plugins/slot.md) each provide their own integration. To add context at a particular position in one document, use `patches`. See [patches configuration](../react/configuration.md#patches) for the shared fields.

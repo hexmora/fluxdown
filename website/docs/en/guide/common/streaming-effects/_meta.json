@@ -1,8 +1,9 @@
 [
   {
-    "type": "file",
+    "type": "dir",
     "name": "smoothing",
-    "label": "Smoothing"
+    "label": "Smoothing",
+    "collapsed": false
   },
   {
     "type": "dir",

@@ -1,0 +1,61 @@
+import { TimingDemo } from '../../../../../../components/demo/components/timing-demo';
+
+# 节奏器
+
+平滑化需要一只钟。文字什么时候再向前走一步，由节奏器（`ticker`）发出信号；这一步走多远，则交给[追踪器](./scheduler.mdx)。把两件事分开，就可以换一种更新频率，而不必重写显示进度的算法。
+
+## 更新得勤，还是隔一会儿更新
+
+下面两边收到相同的内容，也使用相同的匀速追踪器。左边跟随屏幕刷新，右边每 240 毫秒更新一次。观察进度条：两边的平均速度相近，右边会把这段时间积累的进度一次显示出来。
+
+<TimingDemo mode="ticker" />
+
+所以，减少 tick 次数并不等于降低阅读速度。它改变的是更新有多细腻。普通网页适合默认的 `raf`；希望按固定间隔更新，或运行环境没有动画帧时，可以使用 `interval`。
+
+## 换成自己的间隔
+
+React、React Native 和 Lynx 都支持 `'raf'`、`'interval'`，也接受自定义节奏器的类。这里以 React 为例，沿用内置定时器，只把间隔改成 240 毫秒，和上面的右侧演示一致：
+
+```tsx
+import { IntervalSmoothTicker } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Fluxdown } from 'fluxdown';
+
+class ReadingTicker extends IntervalSmoothTicker {
+  constructor() {
+    super(240);
+  }
+}
+
+<Fluxdown
+  text={text}
+  streaming={{
+    smooth: { enabled: true, ticker: ReadingTicker, scheduler: 'spring' },
+  }}
+/>;
+```
+
+传入的是 `ReadingTicker` 这个类。Fluxdown 会为需要平滑化的内容创建实例，并负责启动、停止和销毁。把类放在组件外面，避免每次 React 渲染都创建一种新的节奏器。
+
+上面的接入示例保留默认弹簧速度；演示为了单独看清更新频率，使用了下一篇的[匀速追踪器](./scheduler.mdx#把弹簧调成匀速)。两者可以自由搭配。
+
+## 三端各用哪只钟
+
+节奏器的接口相同，报时的环境有所不同：
+
+| 渲染器                                             | 报时环境                     | `Fluxdown` 的导入入口    |
+| -------------------------------------------------- | ---------------------------- | ------------------------ |
+| [React](../../../react/streaming.md)               | 浏览器的动画帧               | `fluxdown`               |
+| [React Native](../../../react-native/streaming.md) | React Native 运行时的动画帧  | `@fluxdown/react-native` |
+| [Lynx](../../../lynx/streaming.md)                 | 后台线程可用的动画帧或定时器 | `@fluxdown/lynx`         |
+
+默认的 `smooth: true` 会检查动画帧的启动和取消接口；不可用时，自动选择 `interval`。显式写下 `ticker: 'raf'` 则表示使用动画帧，不会再自动回退。定制时应按运行环境选择，Lynx 后台线程没有动画帧时可以使用 `'interval'` 或上面的 `ReadingTicker`。
+
+三端的节奏器类都从 `@fluxdown/core-plugins/plugins/mapper/smooth` 导入。换用表中对应的组件入口后，`ReadingTicker` 和 `streaming.smooth` 的配置可以原样保留。
+
+## 接入另一只钟
+
+如果应用已经有自己的动画循环，可以继承 `BaseSmoothTicker`。`start()` 返回开始时的时间戳，运行中向 `this.subject` 发送后续时间戳，`stop()` 取消待执行的更新，`running` 表示当前是否在运行。时间以毫秒计，开始和后续更新必须使用同一套时钟；浏览器里通常用 `performance.now()`。
+
+节奏器只报时，不需要知道 Markdown、文本长度或显示位置。内容追上目标且追踪器已经空闲后，Core 会停下它；再有内容到达时重新启动。继承基类也能复用销毁时的停止和清理逻辑。
+
+接着看[追踪器](./scheduler.mdx)：如何让同一只钟，带出不同的阅读节奏。

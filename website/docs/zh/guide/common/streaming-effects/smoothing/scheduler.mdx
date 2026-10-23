@@ -1,0 +1,75 @@
+import { TimingDemo } from '../../../../../../components/demo/components/timing-demo';
+
+# 追踪器
+
+已收到的内容在前面，已经显示的内容在后面。追踪器（`scheduler`）负责让后者逐步追上前者：是保持匀速，还是积压越多就追得越快，都由它决定。
+
+[节奏器](./ticker.mdx)发来时间戳后，追踪器算出这次可以前进多少。它不负责安排定时器，也不直接修改页面。
+
+## 两种追赶方式
+
+左边使用默认的弹簧追踪器，缓冲区变长时会加快；右边保持匀速，有内容可显示时就按固定速度前进。两边使用相同的动画帧和同一份来稿，区别只在追踪方式。
+
+<TimingDemo mode="scheduler" />
+
+弹簧适合到达节奏难以预料的内容，例如 AI 回复。匀速更容易形成稳定的阅读预期，但遇到长段落时，缓冲区可能需要更久才能消化。它们只是两种取舍，可以根据内容和界面选择。
+
+## 把弹簧调成匀速
+
+不必为了换一种节奏重写整套算法。`SpringSmoothScheduler` 允许调整起步速度、缓冲量、弹性、恢复速度和最高速度。把弹性设为零，再让三处速度保持一致，就能得到演示中的匀速效果：
+
+```tsx
+import { SpringSmoothScheduler } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Fluxdown } from 'fluxdown';
+
+class SteadyScheduler extends SpringSmoothScheduler {
+  constructor() {
+    const speed = 32;
+    // 起步速度、缓冲量、弹性、恢复速度、最高速度
+    super([speed, 0, 0, speed, speed]);
+  }
+}
+
+<Fluxdown
+  text={text}
+  streaming={{
+    smooth: { enabled: true, ticker: 'raf', scheduler: SteadyScheduler },
+  }}
+/>;
+```
+
+这里每秒推进 32 个可见单位。普通文字通常可以按字符理解，但这不是每秒 32 个 Markdown 源码字符：粗体标记等语法本身不占阅读进度。没有待显示内容时会停下来，新内容到达后接着走。
+
+速度按经过的时间计算，暂时不足一个单位的进度会留到后续更新。因此换一个节奏器、调整刷新频率，也不会把目标速度变成“每帧固定几个字”。
+
+和节奏器一样，传入的是类，并且应把它定义在 React 组件外面。如果只是希望默认弹簧更快或更慢，可以采用相同写法调整参数，保留非零的弹性。
+
+## 把同一种节奏带到其他端
+
+`SteadyScheduler` 只计算时间和进度，不依赖浏览器或原生视图。它可以直接用于 [React Native](../../../react-native/streaming.md) 和 [Lynx](../../../lynx/streaming.md)，导入追踪器的路径也相同。需要调整的是组件入口，以及运行环境使用的[节奏器](./ticker.mdx#三端各用哪只钟)。
+
+例如，在 Lynx 中继续使用上面定义的 `SteadyScheduler`，由定时器报时：
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+<Fluxdown
+  text={text}
+  streaming={{
+    smooth: { enabled: true, ticker: 'interval', scheduler: SteadyScheduler },
+  }}
+/>;
+```
+
+React Native 中从 `@fluxdown/react-native` 导入组件即可使用同样的配置，也可以用运行时提供的 `'raf'`。追赶规则保持一致，最终的文字与入场效果由各端渲染器呈现。
+
+## 想换一套追踪规则
+
+需要完全不同的算法时，再继承 `BaseSmoothScheduler`。可以把它理解成一本很小的进度账：
+
+- `push(length)` 收到新增的可见长度，把目标向前移动；基类已经实现。
+- `start(timestamp, index)` 从指定位置开始，`reset(index)` 用于重置进度和目标。
+- `tick(timestamp)` 返回**本次前进量**，不是当前位置。返回非负整数，没走够一个单位时返回 `0`。
+- `idle` 表示追踪器是否已无需继续更新；`resume(timestamp)` 接上新的计时，避免把等待新内容的时间也算成前进时间。
+
+只有显示位置追上目标，并且追踪器已经空闲，Core 才能暂停报时。弹簧有时需要多几次更新来收敛速度，所以“文字已全部显示”和“追踪器已空闲”不一定同时发生。通常保留内置实现、只调整参数就足够了。

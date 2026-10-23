@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "ticker",
+    "label": "Ticker"
+  },
+  {
+    "type": "file",
+    "name": "scheduler",
+    "label": "Scheduler"
+  }
+]

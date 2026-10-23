@@ -1,0 +1,77 @@
+import {
+  RepairIntroDemo,
+  SlotIntroDemo,
+  StreamingIntroDemo,
+} from '../../../components/demo/components/intro-demo';
+
+# 认识 Fluxdown
+
+一条 AI 回复还没生成完，读者就已经开始读了。文字有时几个字一起到，有时突然涌来一整段；加粗写了一半，链接还差后半截，代码块也没有收尾。
+
+Fluxdown 是为这种过程准备的 Markdown 渲染器。它修复未完成的语法，让断续到达的内容平滑地展开，也留出足够的定制空间，把代码、链接和正文接进你自己的界面。AI 对话、实时写作、流式报告，都可以从这里开始。
+
+## 语法没写完，也能先读
+
+普通 Markdown 渲染器面对 `**先保存`，可能会直接显示两个星号。等闭合符号到达，文字才突然变粗。这样的变化在短回复里不算明显，在持续生成的长文里却会反复打断阅读。
+
+Fluxdown 会识别这些临时状态：加粗和行内代码可以提前呈现，链接地址还没写完时先保留可读的文字。点一下「补齐语法」，看看同一段内容从片段变成完整句子的过程。
+
+<RepairIntroDemo />
+
+修复只影响展示，应用保存的 Markdown 原文不会被改写。内容接收完毕后，关闭流式模式，就会按最终文本呈现。除了这里的几个例子，内置修复还会照顾未完成的图片、代码围栏和列表标记。完整范围见 [Repair 插件](./core/plugins/repair.mdx)。
+
+## 内容按网络的节奏到达，按阅读的节奏出现
+
+服务端每次发来多少字，往往取决于网络和模型。直接显示这些片段，页面就会一顿一顿地增长。开启平滑化后，Fluxdown 会暂存已经收到的内容，再逐步显示出来；你的应用仍然只需传入累计收到的文本。
+
+下面左右两栏接收完全相同的六批内容。左边直接显示，右边平滑展开。切换特效再看一遍：平滑化决定文字何时出现，特效决定它出现时的样子。
+
+<StreamingIntroDemo />
+
+想让变化轻一点，可以用末尾渐变；想让新增文字更醒目，可以用逐字或分块入场。它们都可以单独开关。常见的组合只需要这样写：
+
+```tsx
+<Fluxdown text={text} streaming={pending && { smooth: true, effect: 'shad' }} />
+```
+
+`text` 是当前已经收到的完整文本，`pending` 表示是否还在接收。需要改变输出节奏时，可以继续看[平滑化](./common/streaming-effects/smoothing/index.mdx)；想挑选视觉效果，可以看[动画效果](./common/streaming-effects/animation/index.mdx)。
+
+## 保留熟悉的功能，加上自己的交互
+
+代码块有高亮和复制，链接、表格、列表也都有默认呈现。但产品通常还需要一点自己的东西：代码工具栏里的预览按钮、站内链接的跳转方式，或图片点击后的大图查看。
+
+这些位置都可以通过插槽定制。下面只替换了代码工具栏：显示文件名，增加一个「预览结果」按钮，同时保留原来的复制功能。点开按钮会显示这段示例的预设输出，不会执行代码。
+
+<SlotIntroDemo />
+
+每个插槽负责一小块界面。你可以包住原有组件，补一个按钮或改几个属性，也可以直接换成自己的组件。正文的解析和流式处理仍由 Fluxdown 负责。上面用的是 React 网页组件，具体写法见 [Slot 插件](./react/plugins/slot.md)；[React Native](./react-native/plugins/slot.md) 和 [Lynx](./lynx/plugins/slot.md) 也提供各自的插槽，用对应平台的组件接入交互。
+
+如果要在某句话后面插入来源、把一段文字换成业务标签，而不是修改一整类元素，可以用[位置插入](./common/patches.mdx)。颜色、字体和间距则交给[主题配置](./react/customization.md)。
+
+## 从一条回复，到更丰富的内容
+
+同一份 Markdown 里可以混排代码、表格、任务列表和图片；公式、脚注等能力按需开启。React 网页版提供[图表支持](./react/features/diagrams.mdx)，React Native Full 也提供代码高亮、SVG 公式和 Mermaid 图表。
+
+各端的预设按运行环境选择合适的能力。比如 Lynx Full 提供代码高亮、CJK 与 Emoji；开启公式解析后，默认展示公式源码，也可以通过插槽接入自己的排版。具体组合见 [React](./react/plugins/matrix.mdx)、[React Native](./react-native/plugins/matrix.mdx) 和 [Lynx](./lynx/plugins/matrix.mdx) 的插件矩阵。
+
+这些能力可以逐项使用。先把一条回复显示好，等产品需要公式、图表或自定义交互时，再加入相应配置与插件。
+
+## 一套核心，多种界面
+
+React、React Native 和 Lynx 已经提供可直接使用的组件。三端都把累计文本传给 `text`，用 `streaming` 控制流式状态。文本怎样解析、未完成的语法怎样修复、内容怎样逐步显示，都由框架无关的 Core 处理。
+
+到了界面这一层，React 使用网页元素，React Native 使用 `Text`、`View` 等原生组件，Lynx 使用 `text`、`view` 等 Lynx 元素。字体、布局、动画和交互由各端实现，插槽也使用对应平台的组件。
+
+可以打开 [React Native 对比演示](./react-native/comparison.mdx)和 [Lynx 对比演示](./lynx/comparison.mdx)，看看同一份内容在不同渲染器里的表现。站点分别通过 React Native Web 和 Lynx Web 运行这些预览。
+
+Core 用 [stative](../stative/index.md) 把输入、内容块和输出组织成相互连接的状态模块。React 与 React Native 还共用一层状态订阅和块组件，Lynx 则连接自己的运行环境。这些层怎样配合，可以继续读[架构介绍](./architecture.mdx)。
+
+## 开始使用
+
+| 你的需求                                       | 从这里开始                                                                        |
+| ---------------------------------------------- | --------------------------------------------------------------------------------- |
+| 在 React 网页中展示 Markdown 或流式回复        | [React 快速开始](./react/quick-start.md) · `fluxdown`                             |
+| 在 iOS、Android 或 React Native Web 中展示内容 | [React Native 快速开始](./react-native/quick-start.md) · `@fluxdown/react-native` |
+| 在 ReactLynx 项目中展示内容                    | [Lynx 快速开始](./lynx/quick-start.md) · `@fluxdown/lynx`                         |
+| 对接其他界面，或自行处理输出                   | [Core 快速开始](./core/quick-start.md)                                            |
+| 先试试自己的内容和配置                         | [在线演练场](../playground.mdx)                                                   |

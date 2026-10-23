@@ -6,6 +6,11 @@
     "collapsed": false
   },
   {
+    "type": "file",
+    "name": "patches",
+    "label": "Position inserts"
+  },
+  {
     "type": "dir",
     "name": "features",
     "label": "Other features",

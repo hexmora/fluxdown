@@ -1,0 +1,75 @@
+import { TimingDemo } from '../../../../../../components/demo/components/timing-demo';
+
+# Scheduler
+
+Received content leads the way; visible content follows behind. The scheduler decides how the visible position catches up. It can move at a steady speed or pick up the pace as more content waits.
+
+When the [ticker](./ticker.mdx) sends a timestamp, the scheduler calculates how far to advance. It does not schedule timers or update the page itself.
+
+## Two ways to catch up
+
+The left side uses the default spring scheduler, which speeds up as the buffer grows. The right side moves at a constant speed whenever content is available. Both receive the same text and use the same animation frames; only the scheduling strategy changes.
+
+<TimingDemo mode="scheduler" />
+
+A spring works well when arrival times are unpredictable, as with AI responses. Constant speed gives readers a steadier pace, but a long paragraph may take more time to drain from the buffer. Choose the tradeoff that fits your content and interface.
+
+## Make the spring run at a steady speed
+
+A different rhythm does not require a whole new algorithm. `SpringSmoothScheduler` lets you set the initial speed, buffer size, elasticity, resume speed, and maximum speed. Set elasticity to zero and make all three speeds equal to get the constant-speed behavior in the demo:
+
+```tsx
+import { SpringSmoothScheduler } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Fluxdown } from 'fluxdown';
+
+class SteadyScheduler extends SpringSmoothScheduler {
+  constructor() {
+    const speed = 32;
+    // Initial speed, buffer size, elasticity, resume speed, maximum speed
+    super([speed, 0, 0, speed, speed]);
+  }
+}
+
+<Fluxdown
+  text={text}
+  streaming={{
+    smooth: { enabled: true, ticker: 'raf', scheduler: SteadyScheduler },
+  }}
+/>;
+```
+
+This advances by 32 visible units per second. For ordinary text, think of them as characters. They are not characters in the Markdown source: formatting markers such as the asterisks around bold text do not count toward reading progress. The scheduler stops when it runs out of content and continues when more arrives.
+
+Speed is calculated from elapsed time. Progress smaller than one unit is carried into later updates, so changing the ticker or refresh rate does not turn the target speed into a fixed number of characters per frame.
+
+As with tickers, pass the class and define it outside the React component. To make the default spring faster or slower, use the same approach to adjust its parameters while keeping nonzero elasticity.
+
+## Take the same rhythm to another renderer
+
+`SteadyScheduler` only calculates time and progress. It has no dependency on browser or native views, so the same class and scheduler import work with [React Native](../../../react-native/streaming.md) and [Lynx](../../../lynx/streaming.md). Change the component import and choose a [ticker](./ticker.mdx#where-each-renderer-gets-its-clock) for the runtime.
+
+For example, use the `SteadyScheduler` defined above in Lynx with a timer supplying timestamps:
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+<Fluxdown
+  text={text}
+  streaming={{
+    smooth: { enabled: true, ticker: 'interval', scheduler: SteadyScheduler },
+  }}
+/>;
+```
+
+In React Native, import the component from `@fluxdown/react-native` to use the same configuration, or select the runtime's `'raf'` ticker. The tracking rule stays the same; each renderer handles the text and entrance effects.
+
+## Write a different tracking rule
+
+For a completely different algorithm, extend `BaseSmoothScheduler`. Think of it as a small record of progress:
+
+- `push(length)` adds newly available visible units to the target. The base class implements this.
+- `start(timestamp, index)` starts from the supplied position; `reset(index)` resets both progress and target.
+- `tick(timestamp)` returns **the distance to advance this time**, not the current position. Return a nonnegative integer, or `0` if less than one unit is ready.
+- `idle` says whether further updates are unnecessary. `resume(timestamp)` resumes timing without counting the wait for more content as forward progress.
+
+Core can pause the clock once the visible position reaches the target and the scheduler is idle. A spring may need a few more updates to settle its speed, so “all text is visible” and “the scheduler is idle” do not always happen together. In most cases, keeping the built-in implementation and adjusting its parameters is enough.

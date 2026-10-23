@@ -1,10 +1,10 @@
 # Meet Stative
 
-**Organize state flows into modules, just as React organizes the DOM.**
+**State is to Stative what components are to React.**
 
-Stative is a reactive state library, independent of any UI framework. Describe how your computations depend on their inputs, and the results follow those inputs as they change.
+React organizes interfaces with components. Stative organizes reactive state and state flows with composable state units. Describe how computations depend on their inputs, and the results follow those inputs as they change. Package, nest, and reuse those relationships to give complex data processing a clear structure.
 
-Use it to break connected data processing into small, reusable pieces: price calculations in a form, content analysis in an editor, or a streaming text pipeline. Fluxdown Core is built on Stative.
+Stative is independent of any UI framework. Use it for price calculations in a form, content analysis in an editor, or a streaming text pipeline. Fluxdown Core is built on Stative.
 
 ## Treat computations as reusable units
 

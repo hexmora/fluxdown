@@ -1,0 +1,247 @@
+.demo {
+  margin: 26px 0 32px;
+  overflow: hidden;
+  border: 1px solid var(--site-line);
+  border-radius: 12px;
+  background: var(--site-surface);
+  color: var(--site-ink);
+
+  button {
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--site-accent);
+      outline-offset: 3px;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.35;
+    }
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 54px;
+    padding: 10px 16px 10px 24px;
+    border-bottom: 1px solid var(--site-line);
+    color: var(--site-muted);
+    font-size: 12px;
+  }
+
+  .controls {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 4px;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+
+      &:hover:not(:disabled) {
+        background: var(--site-hover);
+        color: var(--site-ink);
+      }
+    }
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    padding: 24px 24px 0;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 6px;
+    border: 1px solid var(--site-line);
+    border-radius: 7px;
+    background: var(--site-paper);
+    color: var(--site-muted);
+    font: inherit;
+    font-size: 12px;
+    transition:
+      color 200ms,
+      border-color 200ms,
+      background-color 200ms;
+
+    &[data-reached="true"] {
+      color: var(--site-accent);
+    }
+
+    &[aria-current="step"] {
+      border-color: var(--site-accent);
+      background: var(--site-hover);
+    }
+  }
+
+  .number {
+    font-family: var(--rp-font-family-mono);
+    font-size: 10px;
+    opacity: 0.65;
+  }
+
+  .detail {
+    min-height: 150px;
+    padding: 22px 24px;
+
+    code {
+      display: block;
+      width: fit-content;
+      margin-bottom: 8px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--site-accent);
+      font-size: 11px;
+    }
+
+    strong {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 8px 0 0;
+      color: var(--site-muted);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+  }
+
+  .panels {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    border-block: 1px solid var(--site-line);
+  }
+
+  .source,
+  .preview {
+    min-width: 0;
+    padding: 20px 24px;
+  }
+
+  .source {
+    border-right: 1px solid var(--site-line);
+    background: var(--site-paper);
+
+    pre {
+      min-height: 86px;
+      margin: 15px 0;
+      padding: 0;
+      overflow-wrap: anywhere;
+      border: 0;
+      background: transparent;
+      color: var(--site-ink);
+      font-family: var(--rp-font-family-mono);
+      font-size: 12px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+  }
+
+  .rendered {
+    min-height: 116px;
+    font-size: 14px;
+  }
+
+  .label,
+  .status {
+    color: var(--site-muted);
+    font-size: 11px;
+  }
+
+  .label {
+    display: block;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    color: var(--site-muted);
+    font-size: 10px;
+
+    span {
+      padding: 3px 7px;
+      border: 1px solid var(--site-line);
+      border-radius: 4px;
+    }
+
+    [data-active="true"] {
+      border-color: var(--site-accent);
+      color: var(--site-accent);
+    }
+  }
+
+  .note {
+    margin: 0;
+    padding: 12px 24px;
+    color: var(--site-muted);
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 580px) {
+    .toolbar {
+      padding-inline: 16px 8px;
+    }
+
+    .steps {
+      gap: 5px;
+      padding: 16px 16px 0;
+    }
+
+    .step {
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .detail,
+    .source,
+    .preview {
+      padding: 18px 16px;
+    }
+
+    .detail {
+      min-height: 190px;
+    }
+
+    .panels {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .source {
+      border-right: 0;
+      border-bottom: 1px solid var(--site-line);
+    }
+
+    .note {
+      padding-inline: 16px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .step {
+      transition: none;
+    }
+  }
+}

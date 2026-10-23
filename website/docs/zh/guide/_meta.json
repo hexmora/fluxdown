@@ -5,6 +5,11 @@
     "label": "认识 Fluxdown"
   },
   {
+    "type": "file",
+    "name": "architecture",
+    "label": "架构介绍"
+  },
+  {
     "type": "dir-section-header",
     "name": "common",
     "label": "通用"

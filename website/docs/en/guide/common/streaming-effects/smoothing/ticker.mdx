@@ -1,0 +1,61 @@
+import { TimingDemo } from '../../../../../../components/demo/components/timing-demo';
+
+# Ticker
+
+Smoothing needs a clock. The ticker signals when the visible content can advance; the [scheduler](./scheduler.mdx) decides how far to go. Keeping those jobs separate lets you change the update frequency without rewriting the progress calculation.
+
+## Frequent updates or a longer interval
+
+Both sides below receive the same content and use the same constant-speed scheduler. The left follows animation frames; the right updates every 240 milliseconds. Watch the progress bars: their average speed is similar, but the right side reveals the progress accumulated between ticks all at once.
+
+<TimingDemo mode="ticker" />
+
+Fewer ticks do not necessarily mean slower reading. They change how finely the updates are spread out. The default `raf` is a good fit for web pages. Use `interval` for fixed-interval updates or an environment without animation frames.
+
+## Choose your own interval
+
+React, React Native, and Lynx all accept `'raf'`, `'interval'`, or a custom ticker class. This React example reuses the built-in timer with a 240-millisecond interval, matching the right side of the demo:
+
+```tsx
+import { IntervalSmoothTicker } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Fluxdown } from 'fluxdown';
+
+class ReadingTicker extends IntervalSmoothTicker {
+  constructor() {
+    super(240);
+  }
+}
+
+<Fluxdown
+  text={text}
+  streaming={{
+    smooth: { enabled: true, ticker: ReadingTicker, scheduler: 'spring' },
+  }}
+/>;
+```
+
+Pass the `ReadingTicker` class itself. Fluxdown creates instances where smoothing is needed and handles starting, stopping, and disposal. Define the class outside your component so a React render does not introduce a new ticker type.
+
+This integration example keeps the default spring speed. The demo uses the next page's [constant-speed scheduler](./scheduler.mdx#make-the-spring-run-at-a-steady-speed) to isolate the difference in update frequency. Either scheduler can work with either ticker.
+
+## Where each renderer gets its clock
+
+The ticker interface stays the same; the host supplies the clock:
+
+| Renderer                                           | Clock environment                                             | `Fluxdown` import        |
+| -------------------------------------------------- | ------------------------------------------------------------- | ------------------------ |
+| [React](../../../react/streaming.md)               | Browser animation frames                                      | `fluxdown`               |
+| [React Native](../../../react-native/streaming.md) | React Native runtime animation frames                         | `@fluxdown/react-native` |
+| [Lynx](../../../lynx/streaming.md)                 | Available animation frames or timers on the background thread | `@fluxdown/lynx`         |
+
+The default `smooth: true` checks for both animation-frame request and cancellation APIs, falling back to `interval` if either is unavailable. An explicit `ticker: 'raf'` selects animation frames without that fallback. Choose according to your runtime; a Lynx background thread without animation frames can use `'interval'` or the `ReadingTicker` above.
+
+Ticker classes for all three renderers come from `@fluxdown/core-plugins/plugins/mapper/smooth`. Change the component import to the appropriate entry above and keep the same `ReadingTicker` and `streaming.smooth` configuration.
+
+## Connect another clock
+
+If your application already has an animation loop, extend `BaseSmoothTicker`. Return the initial timestamp from `start()`, emit subsequent timestamps through `this.subject`, cancel pending updates in `stop()`, and report whether it is running through `running`. Timestamps are in milliseconds and must share the same clock; in a browser, that usually means `performance.now()`.
+
+The ticker only reports time. It does not need to know about Markdown, text length, or the visible position. Core stops it once the visible content reaches the target and the scheduler is idle, then starts it again when more content arrives. The base class also handles stopping and cleanup on disposal.
+
+Next, see how a [scheduler](./scheduler.mdx) gives the same clock a different reading rhythm.

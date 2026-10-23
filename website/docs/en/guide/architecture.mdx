@@ -1,0 +1,108 @@
+import { ArchitectureDemo } from '../../../components/demo/components/architecture-demo';
+
+# Architecture
+
+Fluxdown handles more than finished Markdown. Text is still arriving, the last marker may be incomplete, and the screen may be a few words behind what has already arrived.
+
+Core handles those changes. The interface layer receives the processed results and displays them. Follow a piece of new text through the React DOM integration below: select individual steps or play the whole sequence.
+
+<ArchitectureDemo />
+
+The demo presents each responsibility in order. At runtime, reactive state connects the layers: when an input changes, dependent computations update.
+
+## Organizing the flow with state closures
+
+Core is built on [Stative](../stative/index.md). A **state closure** packages a state flow: its inputs, the computation that produces its result, and the child computations and resources it manages.
+
+Think of it as a component for data processing. Splitting text is one unit, compilation is another, and smoothing can be another. Each has its own inputs and output; together, they form the Markdown processing flow.
+
+Here are the main layers, with plugin and configuration branches omitted. Indentation shows composition. Data generally flows from the inner input layers toward the outer output layer.
+
+```text
+Core
+└─ Renderer                 Output for the target interface
+   └─ MapperComposer        Compose smoothing and effects
+      └─ BlockCompiler      Manage compilation for each block
+         ├─ TextChunker     Split text into content sections
+         └─ CompiledBlockContent × multiple blocks
+            └─ BlockItem    Content, position, and visible range
+```
+
+Closures organize lifetimes as well as code. Removing a paragraph can end its child computations. Destroying Core releases the subscriptions and resources it owns, without the interface having to track each one separately.
+
+## From text to readable content
+
+### Splitting: keep changes within useful boundaries
+
+`TextChunker` takes the current full text and splits it according to Markdown structure. These sections differ from network chunks: a network chunk may cross several paragraphs, while one code block may take many network updates to complete.
+
+As the end of the text grows, unchanged sections can retain their existing results, giving compilation a chance to skip repeated work. New text can also change a boundary, for example by turning the preceding line into a heading. Core uses the updated structure to determine which sections are affected.
+
+This layer also assigns source positions from `patches` to their corresponding sections, ready for later insertion.
+
+### Compiling: understand Markdown and handle unfinished endings
+
+`BlockCompiler` creates a separate compilation state for each block. Markdown parsing, remark plugins, and rehype plugins produce a renderable content tree called HAST. Think of it as structured layout instructions: a paragraph here, a link there, and some bold text inside it.
+
+Syntax repair takes part in this process. When streaming repair is enabled, Core handles unfinished syntax in the final block while earlier, settled blocks follow normal rules. Repair affects the current presentation; it does not rewrite the application's input `text`.
+
+Each `BlockItem` also exposes its position, length, and visible range. Later stages can reuse the same content while changing how much is visible at a given moment.
+
+### Mapping: let content appear at its own pace
+
+`MapperComposer` composes enabled mappers in order. Smoothing, trailing fades, character entrance effects, and similar features join the flow here.
+
+Smoothing tracks how much content has arrived and how much is visible, then advances the visible range. Effects add information needed for presentation. Because these operations work on compiled blocks, a character fading in does not require parsing the entire Markdown document again.
+
+While smoothing remains enabled, content already received can keep appearing even when the network pauses between updates.
+
+## Connecting React to Core
+
+Core leaves the final step to `Renderer`. It receives processed blocks and render plugins, then chooses the output format for the target interface framework.
+
+The browser package, `fluxdown`, and the React Native integration share `@fluxdown/react-base`. This layer connects Core to React. Each platform adds its own container, theme, and presentation.
+
+Its `FluxdownBase` component connects four pieces:
+
+1. **Turn props into state.** Connect `text`, configuration, and plugins to Stative states. New props update existing inputs while keeping the same Core instance.
+2. **Create a React component for each block.** `ReactRenderer` produces a `BlockReconciler` for each block, using its identity as the key.
+3. **Subscribe to the relevant changes.** The root component watches the block list; each block component watches its own content. `@fluxdown/react-hooks` connects these subscriptions through React's `useSyncExternalStore`. Render plugins and slots produce the interface.
+4. **End the state flow on unmount.** The integration destroys Core and releases the computations and resources it owns.
+
+For example, while the final paragraph of a message is arriving, an earlier code block does not need to repeat its full parsing and rendering process on every text update. Existing results can be reused when inputs, compiled content, and block identity remain unchanged. Relevant computations still update when configuration or plugins change.
+
+`@fluxdown/react-base-plugins` supplies shared render logic and slot contracts for paragraphs, links, code blocks, and other content. Browser plugins turn a paragraph into a `<p>` element; React Native plugins use native components such as `Text` and `View`. React Base adds no host container or styles, allowing both interfaces to share block rendering and subscriptions.
+
+Applications can replace platform slots to give a code block a copy button or toolbar, or turn an inserted item into an interactive card.
+
+## What Stative's construction runtime does
+
+Core uses JSX to describe **state-flow composition**. Stative's own JSX runtime turns tags such as `TextChunker` and `BlockCompiler` into descriptors. `render(...)` creates the readable, subscribable root closure; the internal construction process connects those descriptors into a running state graph.
+
+That runtime has three main responsibilities:
+
+- **Connect inputs.** Plain values, reactive states, and child closures can feed a computation. Its result becomes the next layer's input.
+- **Keep the state flow alive.** A composition declared with `once` is set up on first access. Its internal reactive computations handle subsequent changes, so appending text does not require rebuilding the whole state tree.
+- **Track ownership and cleanup.** The runtime records which child closures and resources belong to a flow and cleans them up when replaced or destroyed. Externally supplied states may be shared elsewhere and remain the responsibility of their creator.
+
+Stative handles the connections and lifetimes between a description and a working data flow. Each Core layer can focus on its Markdown responsibilities.
+
+Here, “construction” means connecting the state graph. Fluxdown's `build` configuration controls Markdown parsing and compilation options.
+
+## One core, three interfaces
+
+React DOM, React Native, and ReactLynx are already connected to the same Core:
+
+```text
+@fluxdown/core
+├─ @fluxdown/react-base       Shared React rendering and subscriptions
+│  ├─ fluxdown               Browser DOM, CSS, and interactions
+│  └─ @fluxdown/react-native  Native Text, View, and styles
+└─ @fluxdown/lynx             ReactLynx text, view, and styles
+```
+
+ReactLynx connects to Core through its own `LynxRenderer`. Hooks in `@fluxdown/lynx-plugins`, built on `@lynx-js/react`, handle its state subscriptions and component lifetimes. This integration is independent of React Base, with Markdown parsing running on Lynx's background thread.
+
+Each platform supplies its own typography, layout, effects, and interactions through plugins. They reuse Core's splitting, syntax repair, and display progress while presenting the results in a way that fits the platform.
+
+Start with the quick start for your platform: [React DOM](./react/quick-start.md), [React Native](./react-native/quick-start.md), or [Lynx](./lynx/quick-start.md). To choose your own output format, continue with the [Core quick start](./core/quick-start.md). For the state-flow composition itself, see [Composing computations in Stative](../stative/composition.md).

@@ -1,0 +1,139 @@
+.demo {
+  margin: 24px 0 30px;
+  overflow: hidden;
+  border: 1px solid var(--site-line);
+  border-radius: 10px;
+  background: var(--site-surface);
+  color: var(--site-ink);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 54px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--site-line);
+  color: var(--site-muted);
+  font-size: 12px;
+}
+
+.options {
+  display: inline-flex;
+  gap: 3px;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid var(--site-line);
+  border-radius: 7px;
+
+  button {
+    padding: 5px 10px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--site-muted);
+    font: inherit;
+    cursor: pointer;
+
+    &[aria-pressed="true"] {
+      background: var(--site-hover);
+      color: var(--site-accent);
+    }
+  }
+}
+
+.preview {
+  display: grid;
+  align-items: center;
+  min-height: 132px;
+  padding: 24px 28px;
+
+  > div {
+    font-size: 16px;
+    line-height: 2;
+  }
+}
+
+.place,
+.citation {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--site-accent) 28%, transparent);
+  background: color-mix(in srgb, var(--site-accent) 9%, var(--site-surface));
+  color: var(--site-accent);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--site-accent) 18%, var(--site-surface));
+  }
+}
+
+.place {
+  gap: 6px;
+  margin: 0 3px;
+  padding: 1px 9px;
+  border-radius: 6px;
+  line-height: 1.6;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.citation {
+  min-width: 24px;
+  height: 24px;
+  margin: 0 4px;
+  padding: 0 5px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: 2px;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-height: 92px;
+  padding: 16px 28px;
+  border-top: 1px solid var(--site-line);
+  color: var(--site-muted);
+  font-size: 12px;
+  line-height: 1.7;
+
+  strong {
+    color: var(--site-ink);
+    font-weight: 500;
+  }
+}
+
+.streaming .preview {
+  min-height: 190px;
+  align-items: start;
+}
+
+@media (max-width: 480px) {
+  .toolbar,
+  .preview,
+  .detail {
+    padding-inline: 20px;
+  }
+
+  .streaming .preview {
+    min-height: 260px;
+  }
+
+  .options button {
+    min-height: 36px;
+  }
+}

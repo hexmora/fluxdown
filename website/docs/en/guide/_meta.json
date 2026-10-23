@@ -5,6 +5,11 @@
     "label": "Meet Fluxdown"
   },
   {
+    "type": "file",
+    "name": "architecture",
+    "label": "Architecture"
+  },
+  {
     "type": "dir-section-header",
     "name": "common",
     "label": "Common"

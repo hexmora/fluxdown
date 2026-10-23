@@ -1,0 +1,77 @@
+import {
+  RepairIntroDemo,
+  SlotIntroDemo,
+  StreamingIntroDemo,
+} from '../../../components/demo/components/intro-demo';
+
+# Meet Fluxdown
+
+People start reading an AI response before it finishes. A few words arrive, then a whole paragraph. Bold text is missing its closing markers, a link is halfway through its URL, and a code block is still open.
+
+Fluxdown is a Markdown renderer built for that process. It repairs unfinished syntax, reveals incoming text smoothly, and lets you fit code, links, and prose into your own interface. Use it for AI conversations, live writing, or streaming reports.
+
+## Read it before the syntax is finished
+
+A regular Markdown renderer may display the asterisks in `**save first` as plain text. Once the closing markers arrive, the words suddenly become bold. In a long response, these changes can keep interrupting the reader.
+
+Fluxdown recognizes these temporary states. Bold text and inline code can take shape early; an unfinished link can show readable text while its address catches up. Choose “Complete the syntax” to see each fragment become a finished sentence.
+
+<RepairIntroDemo />
+
+Repair changes the presentation, leaving the Markdown stored by your application untouched. When reception ends, turn off streaming mode to render the final text. Built-in repairs also cover unfinished images, code fences, and list markers. See [Repair plugins](./core/plugins/repair.mdx) for the full range.
+
+## Receive at the network's pace, reveal at a reading pace
+
+The size of each incoming chunk depends on the model and the connection. Showing chunks immediately makes the page grow in jumps. Smoothing buffers received content and reveals it gradually. Your application still passes the accumulated text, without splitting each chunk into characters.
+
+Both columns below receive the same six chunks. The left shows each arrival immediately; the right reveals it smoothly. Change the effect and replay: smoothing controls when text appears, while effects control how it enters.
+
+<StreamingIntroDemo />
+
+A trailing fade keeps the change subtle. Character and chunk entrance effects make new content more noticeable. Each can be enabled separately. A common combination takes just a few lines:
+
+```tsx
+<Fluxdown text={text} streaming={pending && { smooth: true, effect: 'shad' }} />
+```
+
+`text` contains everything received so far; `pending` indicates whether more is expected. Read [Smoothing](./common/streaming-effects/smoothing/index.mdx) to adjust the pace, or [Animation](./common/streaming-effects/animation/index.mdx) to choose an entrance effect.
+
+## Keep familiar features and add your own interactions
+
+Code blocks already have highlighting and copying. Links, tables, and lists have default components too. Your product may need a little more: a preview button beside code, your router for internal links, or an image viewer on click.
+
+Slots let you customize those places. This example replaces only the code toolbar: it adds a filename and a preview button while keeping the existing copy action. The button reveals a prepared output for this example; it does not execute code.
+
+<SlotIntroDemo />
+
+Each slot owns a small part of the interface. Wrap its existing component to add an action or change a few props, or replace it with your own. Fluxdown continues to handle parsing and streaming. The example above uses React DOM; see [Slot plugins](./react/plugins/slot.md) for its implementation. [React Native](./react-native/plugins/slot.md) and [Lynx](./lynx/plugins/slot.md) have their own slots for adding interactions with components from those platforms.
+
+To insert a source after a sentence or replace a particular phrase with a product label, use [Position inserts](./common/patches.mdx). For colors, typography, and spacing, use [themes](./react/customization.md).
+
+## Beyond a plain reply
+
+Markdown can mix code, tables, task lists, and images. Math and footnotes are available when enabled. React DOM supports [diagrams](./react/features/diagrams.mdx); React Native Full also provides code highlighting, SVG math, and Mermaid diagrams.
+
+Each platform chooses presets that fit its runtime. Lynx Full includes code highlighting, CJK, and Emoji support. When math parsing is enabled, it displays formula source by default; a custom slot can provide typesetting. See the plugin matrices for [React](./react/plugins/matrix.mdx), [React Native](./react-native/plugins/matrix.mdx), and [Lynx](./lynx/plugins/matrix.mdx) for the available combinations.
+
+Adopt these features as you need them. Start with a readable response, then add formulas, diagrams, or custom interactions when the product calls for them.
+
+## One core, different interfaces
+
+React, React Native, and Lynx have ready-to-use components. All three accept accumulated content through `text` and control streaming through `streaming`. Framework-independent Core handles parsing, unfinished syntax, and the progress of the visible content.
+
+The interface layer uses each platform's elements: DOM elements for React, native `Text` and `View` components for React Native, and `text` and `view` elements for Lynx. Typography, layout, animation, and interactions belong to those implementations, and custom slots use components from the same platform.
+
+Try the [React Native comparison](./react-native/comparison.mdx) and [Lynx comparison](./lynx/comparison.mdx) to see the same content in different renderers. These previews run through React Native Web and Lynx Web respectively.
+
+Core uses [stative](../stative/index.md) to organize inputs, content blocks, and output into connected state modules. React and React Native also share state subscriptions and block components; Lynx connects Core to its own runtime. The [architecture guide](./architecture.mdx) explains how these layers work together.
+
+## Get started
+
+| What you need                                        | Start here                                                                           |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Display Markdown or streaming responses in React DOM | [React quick start](./react/quick-start.md) · `fluxdown`                             |
+| Render on iOS, Android, or React Native Web          | [React Native quick start](./react-native/quick-start.md) · `@fluxdown/react-native` |
+| Render in a ReactLynx project                        | [Lynx quick start](./lynx/quick-start.md) · `@fluxdown/lynx`                         |
+| Connect another interface or handle output yourself  | [Core quick start](./core/quick-start.md)                                            |
+| Try your own content and configuration               | [Playground](../playground.mdx)                                                      |

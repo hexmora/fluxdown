@@ -1,4 +1,4 @@
-import { SpringDemo } from '../../../../../components';
+import { SpringDemo } from '../../../../../../components';
 
 # Smoothing
 
@@ -20,15 +20,13 @@ The scheduler calculates progress from elapsed time and carries fractional chara
 
 ## Use it in your application
 
-The following examples use the React component. Enabling `streaming` uses spring smoothing by default:
+React, React Native, and Lynx share this smoothing algorithm. The following examples use React in a browser. Enabling `streaming` uses spring smoothing by default:
 
 ```tsx
 <Fluxdown streaming={isStreaming} text={text} />
 ```
 
-You can also select the scheduler explicitly and add an [animation effect](./animation/index.mdx):
-
-The following example uses the React component:
+You can also select the scheduler explicitly and add an [animation effect](../animation/index.mdx):
 
 ```tsx
 <Fluxdown
@@ -42,4 +40,10 @@ The following example uses the React component:
 
 Always pass the complete text received so far to `text`. Setting `streaming` to `false` reveals the remaining buffer immediately. Keep smoothing enabled if you want the remaining content to finish appearing gradually.
 
-Core uses the same `Smooth` mapper to produce trimmed content blocks, so the renderer does not need to schedule character updates. See [Core state and updates](../../core/streaming.md#enable-smooth-output) for integration and [React configuration](../../react/configuration.md#streamingsmooth) for all options.
+All three use Core's `Smooth` mapper to produce trimmed content blocks, so the renderer does not need to schedule character updates. The clock comes from the host: browser animation frames on the web, runtime animation frames in React Native, and the available clock on the Lynx background thread. The default configuration falls back to a timer when animation frames are unavailable.
+
+See [React Native streaming](../../../react-native/streaming.md), [Lynx streaming](../../../lynx/streaming.md), and [Core state and updates](../../../core/streaming.md#enable-smooth-output) for integration. The shared options are listed in [React configuration](../../../react/configuration.md#streamingsmooth).
+
+## Set your own rhythm
+
+Smoothing has two parts: the [ticker](./ticker.mdx) decides when to update, and the [scheduler](./scheduler.mdx) decides how far to advance. Choose a fixed update interval, keep a constant speed, or let the pace respond to the buffer. Each page includes a comparison demo and a short customization example.
