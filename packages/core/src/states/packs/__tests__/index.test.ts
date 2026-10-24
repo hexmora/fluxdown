@@ -3,17 +3,17 @@ import type { Element, ElementContent, Parent, RootContent } from 'hast';
 import type { Root } from 'mdast';
 import type { Plugin } from 'unified';
 
-import { BaseRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/base';
-import { HoistFootnoteRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/hoist-footnote';
-import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/apply-repairs';
-import { BaseRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/base';
-import { PatchesRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/patches';
-import { SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-math';
-import { BaseRepairPlugin } from '@fluxdown/core-presets/plugins/repair/base';
-import { DanglingFootnoteRepairPlugin } from '@fluxdown/core-presets/plugins/repair/dangling-footnote';
-import { PRESET_REHYPE_PLUGINS } from '@fluxdown/core-presets/presets/rehype';
-import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-presets/presets/remark';
-import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-presets/presets/repair';
+import { BaseRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/base';
+import { HoistFootnoteRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/hoist-footnote';
+import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/apply-repairs';
+import { BaseRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/base';
+import { PatchesRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/patches';
+import { SyntaxMathRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-math';
+import { BaseRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/base';
+import { DanglingFootnoteRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/dangling-footnote';
+import { PRESET_REHYPE_PLUGINS } from '@fluxdown/core-plugins/presets/rehype';
+import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-plugins/presets/remark';
+import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-plugins/presets/repair';
 import {
   type IBasePluginConfig,
   type IPluggable,

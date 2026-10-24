@@ -5,12 +5,12 @@ import type {
   RuntimeSlotProps,
   SlotInputProps,
   SlotPositionType,
-} from '@fluxdown/react-presets/base';
+} from '@fluxdown/react-plugins/base';
 import type { Element } from 'hast';
 import type { ComponentType } from 'react';
 
-import { createTypeOfSlot, SlotProvider } from '@fluxdown/react-presets/base';
-import { PRESET_FULL_PLUGINS } from '@fluxdown/react-presets/full';
+import { createTypeOfSlot, SlotProvider } from '@fluxdown/react-plugins/base';
+import { PRESET_FULL_PLUGINS } from '@fluxdown/react-plugins/full';
 import { render, screen } from '@testing-library/react';
 import { expectTypeOf } from 'expect-type';
 

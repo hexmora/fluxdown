@@ -1,4 +1,4 @@
-import { PREFIX } from '@fluxdown/react-presets/base';
+import { PREFIX } from '@fluxdown/react-plugins/base';
 
 import type { ThemeTokens } from '../../types';
 

@@ -1,6 +1,6 @@
 import type { BaseBuildConfig, PartialThemeConfig, Theme } from 'fluxdown';
 
-import { BaseSlotPlugin } from '@fluxdown/react-presets/base';
+import { BaseSlotPlugin } from '@fluxdown/react-plugins/base';
 
 import type { Locale } from '../type';
 

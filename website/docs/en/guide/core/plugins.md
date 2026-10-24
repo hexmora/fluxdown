@@ -29,13 +29,13 @@ Pass `repairs` alongside `text` and `build` when [creating Core](./quick-start.m
 You can also configure a plugin by class:
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 ```
 
 ```ts
 import type { IPluggable, IRepairPlugin } from '@fluxdown/types';
 
-import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/plugins/repair/incomplete-image';
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/incomplete-image';
 
 type RepairPlugin = IPluggable<IRepairPlugin, unknown>;
 
@@ -76,4 +76,4 @@ Each guide includes a declaration and shows how to register it:
 
 Pass plugin classes or mapper functions; Core manages their lifecycle. Keep per-run data inside the transform or state flow so one declaration can serve multiple documents.
 
-> Import individual plugins from `@fluxdown/core-presets/plugins/[type]/[subpath]` and preset arrays from `@fluxdown/core-presets/presets/[type]`. Replace `[type]` with `remark`, `rehype`, `repair`, or `mapper`; each guide lists its plugin subpaths. The package has no root or plugin-category entry point.
+> Import individual plugins from `@fluxdown/core-plugins/plugins/[type]/[subpath]` and preset arrays from `@fluxdown/core-plugins/presets/[type]`. Replace `[type]` with `remark`, `rehype`, `repair`, or `mapper`; each guide lists its plugin subpaths. The package has no root or plugin-category entry point.

@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { compileString } from 'sass';
 
 const prefixPath = fileURLToPath(
-  new URL('../../packages/react-presets/src/styles/_prefix.scss', import.meta.url),
+  new URL('../../packages/react-plugins/src/styles/_prefix.scss', import.meta.url),
 );
 
 const transformer: ReturnType<typeof createTransformer> = {

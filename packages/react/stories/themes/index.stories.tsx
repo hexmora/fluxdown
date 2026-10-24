@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { SanitizerRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/sanitizer';
-import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-html-allowed';
+import { SanitizerRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/sanitizer';
+import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-html-allowed';
 
 import { Fluxdown } from '../../src/packs/full';
 import { THEME_MARKDOWN } from './consts';

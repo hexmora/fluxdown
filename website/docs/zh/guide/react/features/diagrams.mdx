@@ -51,10 +51,10 @@ SVG 随展示区域缩放。Pele 支持 Mermaid 12.1 的内置图表类型，布
 
 ## 在 React Lite 中按需接入
 
-React Lite 默认显示这两种代码块的源码。需要图表时，安装 `@fluxdown/react-presets` 并加入 `CodePelePlugin`：
+React Lite 默认显示这两种代码块的源码。需要图表时，安装 `@fluxdown/react-plugins` 并加入 `CodePelePlugin`：
 
 ```tsx
-import { CodePelePlugin } from '@fluxdown/react-presets/plugins/code-pele';
+import { CodePelePlugin } from '@fluxdown/react-plugins/plugins/code-pele';
 import { FluxdownLite } from 'fluxdown/lite';
 
 const plugins = [CodePelePlugin];

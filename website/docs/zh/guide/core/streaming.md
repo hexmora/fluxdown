@@ -74,7 +74,7 @@ build.next({ ...build.value, repairEnding: false });
 Core 默认包含 `Smooth`，但不会自动启用。先安装预设包，显式配置这个插件：
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 ```
 
 将以下配置加入创建 Core 时的输入对象：
@@ -82,7 +82,7 @@ pnpm add @fluxdown/core-presets
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
 
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { MutableState, toClosure } from 'stative';
 
 const smoothEnabled = MutableState.of(true);

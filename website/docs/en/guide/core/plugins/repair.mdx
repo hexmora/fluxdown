@@ -14,7 +14,7 @@ import type {
   RepairPluginSystemConfig,
 } from '@fluxdown/types';
 
-import { BaseRepairPlugin } from '@fluxdown/core-presets/plugins/repair/base';
+import { BaseRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/base';
 import { PluginPriority } from '@fluxdown/types';
 
 class StreamingIndicatorPlugin extends BaseRepairPlugin {
@@ -67,9 +67,9 @@ The built-in HTML processing already allows the `class` attribute on `span`. Wit
 
 ## Supported plugins
 
-Append a subpath from the table to `@fluxdown/core-presets/plugins/repair/` to import a plugin. For example, `incomplete-image` becomes `@fluxdown/core-presets/plugins/repair/incomplete-image`.
+Append a subpath from the table to `@fluxdown/core-plugins/plugins/repair/` to import a plugin. For example, `incomplete-image` becomes `@fluxdown/core-plugins/plugins/repair/incomplete-image`.
 
-A check marks plugins included in `PRESET_REPAIR_PLUGINS`, exported from `@fluxdown/core-presets/presets/repair`. Core registers these automatically; add plugins without a check explicitly.
+A check marks plugins included in `PRESET_REPAIR_PLUGINS`, exported from `@fluxdown/core-plugins/presets/repair`. Core registers these automatically; add plugins without a check explicitly.
 
 `build.repair` controls repairs. The first group below handles temporary states at the end of a stream and also requires `build.repairEnding`.
 

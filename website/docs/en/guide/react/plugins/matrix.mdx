@@ -15,7 +15,7 @@ For full control over plugin selection, use `FluxdownRaw` from `fluxdown/raw` an
 
 ## All plugins
 
-The table lists every composite plugin provided by `@fluxdown/react-presets`. A check means the component includes that plugin by default; an empty cell means it must be added explicitly.
+The table lists the composite plugins used by the React packs. A check means the component includes that plugin by default; an empty cell means it must be added explicitly.
 
 | Plugin                  |      Lite       |      Full       |
 | ----------------------- | :-------------: | :-------------: |
@@ -45,4 +45,4 @@ The table lists every composite plugin provided by `@fluxdown/react-presets`. A 
 | `TexKatexPlugin`        |                 |                 |
 | `TexMathjaxKatexPlugin` |                 | <PresetCheck /> |
 
-Import composite plugins from `@fluxdown/react-presets/plugins/<directory>`, for example `CodePlugin` from `@fluxdown/react-presets/plugins/code`. Add the plugins you need through `plugins`; see [Composite plugins](./aggregate.md) for declaration, composition, and configuration.
+Import `CjkPlugin`, `EmojiPlugin`, and `PatchPlugin` from `@fluxdown/react-base-plugins/plugins/<directory>` and DOM plugins from `@fluxdown/react-plugins/plugins/<directory>`, for example `CodePlugin` from `@fluxdown/react-plugins/plugins/code`. Add the plugins you need through `plugins`; see [Composite plugins](./aggregate.md) for declaration, composition, and configuration.

@@ -5,7 +5,7 @@ import { D, MutableState, render, S, toClosure } from 'stative';
 import type { HastRoot } from '../../typings';
 
 import { countStateObservers } from '../../../../../scripts/testing/state';
-import { ShadValue } from '../../../../core-presets/src/plugins/mapper/shad/states/shad-blocks/states/shad-block/states/shad-value';
+import { ShadValue } from '../../../../core-plugins/src/plugins/mapper/shad/states/shad-blocks/states/shad-block/states/shad-value';
 import { collectText, createBlock, paragraph } from '../smooth/utils';
 import { readParts } from './utils';
 

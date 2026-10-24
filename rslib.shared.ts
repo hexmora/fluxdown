@@ -92,7 +92,7 @@ export function packageConfig({ entry, react, jsxImportSource }: PackageOptions)
           resolve: {
             alias: {
               '@prefix': fileURLToPath(
-                new URL('./packages/react-presets/src/styles/_prefix.scss', import.meta.url),
+                new URL('./packages/react-plugins/src/styles/_prefix.scss', import.meta.url),
               ),
             },
           },

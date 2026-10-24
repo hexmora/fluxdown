@@ -16,9 +16,12 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/hast',
   '@fluxdown/mdast',
   '@fluxdown/types',
-  '@fluxdown/core-presets',
+  '@fluxdown/core-plugins',
   '@fluxdown/core',
-  '@fluxdown/react-presets',
+  '@fluxdown/react-hooks',
+  '@fluxdown/react-base',
+  '@fluxdown/react-base-plugins',
+  '@fluxdown/react-plugins',
   'fluxdown',
 ] as const;
 

@@ -1,5 +1,5 @@
-import { SyntaxStrikethroughRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-strikethrough';
-import { CjkPlugin } from '@fluxdown/react-presets/plugins/cjk';
+import { SyntaxStrikethroughRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-strikethrough';
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { render } from '@testing-library/react';
 
 import { Fluxdown } from '../packs/full';

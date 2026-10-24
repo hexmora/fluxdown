@@ -1,4 +1,4 @@
-import type { CodeHeaderProps } from '@fluxdown/react-presets/base';
+import type { CodeHeaderProps } from '@fluxdown/react-plugins/base';
 
 import { CopyButton } from '../../../copy-button';
 

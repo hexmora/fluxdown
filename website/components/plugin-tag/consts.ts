@@ -1,0 +1,10 @@
+export const PLUGIN_TAG_LABELS = {
+  render: 'Render',
+  slot: 'Slot',
+  remark: 'Remark',
+  rehype: 'Rehype',
+  repair: 'Repair',
+  mapper: 'Mapper',
+  'react-plugins': 'react-plugins',
+  'react-base-plugins': 'react-base-plugins',
+};

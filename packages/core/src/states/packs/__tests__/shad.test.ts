@@ -1,9 +1,9 @@
-import type { BaseShadConfig } from '@fluxdown/core-presets/plugins/mapper/shad';
-import type { BaseSmoothConfig } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import type { BaseShadConfig } from '@fluxdown/core-plugins/plugins/mapper/shad';
+import type { BaseSmoothConfig } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import type { IBlockState, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { ElementContent, Parent } from 'hast';
 
-import { Shad } from '@fluxdown/core-presets/plugins/mapper/shad';
+import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
 import { assert } from '@fluxdown/utils';
 import { last } from 'lodash-es';
 import {

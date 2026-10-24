@@ -27,13 +27,13 @@ React Full already includes `EmojiPlugin`, so no registration is needed. For Cor
 Install the Core presets package:
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 ```
 
 Add `EmojiRemarkPlugin` to the `remarks` input from the [Core quick start](../../core/quick-start.md):
 
 ```ts
-import { EmojiRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/emoji';
+import { EmojiRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/emoji';
 
 const remarks = [EmojiRemarkPlugin];
 ```
@@ -43,11 +43,11 @@ const remarks = [EmojiRemarkPlugin];
 Install the React presets package:
 
 ```sh
-pnpm add @fluxdown/react-presets
+pnpm add @fluxdown/react-base-plugins
 ```
 
 ```tsx
-import { EmojiPlugin } from '@fluxdown/react-presets/plugins/emoji';
+import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { FluxdownLite } from 'fluxdown/lite';
 
 export function Message({ text }: { text: string }) {
@@ -57,10 +57,10 @@ export function Message({ text }: { text: string }) {
 
 ## Disable conversion
 
-After installing `@fluxdown/react-presets`, include `EmojiPlugin` and `config` in the same plugin pack to keep shortcodes as text:
+After installing `@fluxdown/react-base-plugins`, include `EmojiPlugin` and `config` in the same plugin pack to keep shortcodes as text:
 
 ```tsx
-import { EmojiPlugin } from '@fluxdown/react-presets/plugins/emoji';
+import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { Fluxdown } from 'fluxdown';
 
 export function Message({ text }: { text: string }) {

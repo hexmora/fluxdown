@@ -1,11 +1,9 @@
-import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-presets/base';
+import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-plugins/base';
 import type { IPluggable, IPluggableConfig, IRemarkPlugin } from '@fluxdown/types';
 
-import { SyntaxSoftEndlineRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-soft-endline';
-import {
-  ParagraphRenderPlugin,
-  ParagraphSlotPlugin,
-} from '@fluxdown/react-presets/plugins/paragraph';
+import { SyntaxSoftEndlineRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-soft-endline';
+import { ParagraphRenderPlugin } from '@fluxdown/react-base-plugins/plugins/paragraph';
+import { ParagraphSlotPlugin } from '@fluxdown/react-plugins/plugins/paragraph';
 import { PluginPriority } from '@fluxdown/types';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { type ComponentType, createRef, type ReactNode, StrictMode } from 'react';

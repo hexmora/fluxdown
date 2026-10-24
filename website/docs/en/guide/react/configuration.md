@@ -84,7 +84,7 @@ Choose the clock that drives output: `'raf'` follows animation frames, `'interva
 
 Determine how much content to reveal on each update. Use `'spring'` for the built-in spring scheduler, or pass a custom scheduler class.
 
-> Usually, `smooth: true` is enough. Import `SmoothConfig` from `fluxdown`, and `SmoothTickerClass` and `SmoothSchedulerClass` from `@fluxdown/core-presets/plugins/mapper/smooth`.
+> Usually, `smooth: true` is enough. Import `SmoothConfig` from `fluxdown`, and `SmoothTickerClass` and `SmoothSchedulerClass` from `@fluxdown/core-plugins/plugins/mapper/smooth`.
 
 ### streaming.effect <span className="field-tag">Optional</span> {#streamingeffect}
 
@@ -94,7 +94,7 @@ Determine how much content to reveal on each update. Use `'spring'` for the buil
 
 Choose an animation effect or combine multiple effects. See [Animation](../common/streaming-effects/animation/index.mdx) for the supported input forms, available effects, live demos, and their configuration fields.
 
-> Import `EffectItem` from `fluxdown`. Effect configuration types come from their plugin entry points, such as `ScaleConfig` from `@fluxdown/core-presets/plugins/mapper/scale`. See [Mapper plugins](../core/plugins/mapper.mdx#supported-plugins) for the available subpaths.
+> Import `EffectItem` from `fluxdown`. Effect configuration types come from their plugin entry points, such as `ScaleConfig` from `@fluxdown/core-plugins/plugins/mapper/scale`. See [Mapper plugins](../core/plugins/mapper.mdx#supported-plugins) for the available subpaths.
 
 ## build <span className="field-tag">Optional</span> {#build}
 
@@ -214,7 +214,7 @@ Every group under `tokens` supports partial overrides:
 
 **Default:** `[]`
 
-> `IPluginItem` is exported from `@fluxdown/react-presets/typings`. Lite and Full merge supplied plugins with their presets, giving supplied plugins precedence. This prop is required for `FluxdownRaw`; see [Plugin matrix](./plugins/matrix.mdx) for entry point differences.
+> `IPluginItem` is exported from `@fluxdown/react-base-plugins/typings`. Lite and Full merge supplied plugins with their presets, giving supplied plugins precedence. This prop is required for `FluxdownRaw`; see [Plugin matrix](./plugins/matrix.mdx) for entry point differences.
 
 An object provides one plugin pack; an array combines several packs. Each pack can contain these lists:
 
@@ -231,7 +231,7 @@ An object provides one plugin pack; an array combines several packs. Each pack c
 Each list item can be a plugin or `[Plugin, options]`. With `config`, you can keep options out of the individual list entries:
 
 ```tsx
-import { CodeHeaderSlotPlugin } from '@fluxdown/react-presets/plugins/code';
+import { CodeHeaderSlotPlugin } from '@fluxdown/react-plugins/plugins/code';
 import { Fluxdown } from 'fluxdown';
 
 <Fluxdown

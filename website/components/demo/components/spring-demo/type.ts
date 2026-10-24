@@ -1,4 +1,4 @@
-import type { SpringSmoothScheduler } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import type { SpringSmoothScheduler } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 
 export type SpringCursorParams = {
   text: string;

@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@fluxdown/core": "workspace:^",
-    "@fluxdown/core-presets": "workspace:^",
-    "@fluxdown/react-presets": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/react-plugins": "workspace:^",
     "@fluxdown/utils": "workspace:^",
     "fluxdown": "workspace:^",
     "react": "catalog:",

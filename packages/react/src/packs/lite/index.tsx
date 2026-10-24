@@ -1,4 +1,4 @@
-import { PRESET_LIGHT_PLUGINS } from '@fluxdown/react-presets/lite';
+import { PRESET_LIGHT_PLUGINS } from '@fluxdown/react-plugins/lite';
 import { forwardRef, memo } from 'react';
 
 import type { FluxdownRef } from '../raw';

@@ -27,13 +27,13 @@ React Full 已内置 `EmojiPlugin`，无需手动注册。使用 Core 或 React 
 安装 Core 预设包：
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 ```
 
 在 [Core 快速开始](../../core/quick-start.md)的 `remarks` 输入中加入 `EmojiRemarkPlugin`：
 
 ```ts
-import { EmojiRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/emoji';
+import { EmojiRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/emoji';
 
 const remarks = [EmojiRemarkPlugin];
 ```
@@ -43,11 +43,11 @@ const remarks = [EmojiRemarkPlugin];
 安装 React 预设包：
 
 ```sh
-pnpm add @fluxdown/react-presets
+pnpm add @fluxdown/react-base-plugins
 ```
 
 ```tsx
-import { EmojiPlugin } from '@fluxdown/react-presets/plugins/emoji';
+import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { FluxdownLite } from 'fluxdown/lite';
 
 export function Message({ text }: { text: string }) {
@@ -57,10 +57,10 @@ export function Message({ text }: { text: string }) {
 
 ## 关闭转换
 
-安装 `@fluxdown/react-presets` 后，将 `EmojiPlugin` 与 `config` 放在同一个插件包中，即可按需保留短码原文：
+安装 `@fluxdown/react-base-plugins` 后，将 `EmojiPlugin` 与 `config` 放在同一个插件包中，即可按需保留短码原文：
 
 ```tsx
-import { EmojiPlugin } from '@fluxdown/react-presets/plugins/emoji';
+import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { Fluxdown } from 'fluxdown';
 
 export function Message({ text }: { text: string }) {

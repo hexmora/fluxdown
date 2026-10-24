@@ -1,11 +1,11 @@
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
 
-import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/apply-repairs';
-import { PatchesRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/patches';
-import { SyntaxFootnoteRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-footnote';
-import { SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-math';
-import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-policy';
-import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-presets/presets/remark';
+import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/apply-repairs';
+import { PatchesRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/patches';
+import { SyntaxFootnoteRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-footnote';
+import { SyntaxMathRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-math';
+import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-policy';
+import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-plugins/presets/remark';
 import { memoReturns } from 'stative';
 
 import type { RemarkPluggablesInputs } from './type';

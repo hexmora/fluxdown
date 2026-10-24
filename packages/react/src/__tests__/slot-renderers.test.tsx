@@ -1,11 +1,11 @@
 import type { Element } from 'hast';
 
-import { SlotProvider } from '@fluxdown/react-presets/base';
-import { PRESET_FULL_PLUGINS } from '@fluxdown/react-presets/full';
-import { CodeBlockSlotPlugin } from '@fluxdown/react-presets/plugins/code';
-import { HeadingSlotPlugin } from '@fluxdown/react-presets/plugins/heading';
-import { ImageSlotPlugin } from '@fluxdown/react-presets/plugins/image';
-import { LinkSlotPlugin } from '@fluxdown/react-presets/plugins/link';
+import { SlotProvider } from '@fluxdown/react-plugins/base';
+import { PRESET_FULL_PLUGINS } from '@fluxdown/react-plugins/full';
+import { CodeBlockSlotPlugin } from '@fluxdown/react-plugins/plugins/code';
+import { HeadingSlotPlugin } from '@fluxdown/react-plugins/plugins/heading';
+import { ImageSlotPlugin } from '@fluxdown/react-plugins/plugins/image';
+import { LinkSlotPlugin } from '@fluxdown/react-plugins/plugins/link';
 import { render, screen } from '@testing-library/react';
 
 import { Fluxdown } from '../packs/full';

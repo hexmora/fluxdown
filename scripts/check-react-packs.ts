@@ -12,33 +12,46 @@ const syntaxExtensions = [
   'micromark-extension-cjk-friendly-gfm-strikethrough',
 ];
 const dependencies = [...engines, ...syntaxExtensions];
+const domDependencies = ['react-dom', 'fluxdown', '@fluxdown/react-plugins'];
+const trackedDependencies = [
+  ...dependencies,
+  ...domDependencies,
+  '@fluxdown/react-base',
+  '@fluxdown/react-base-plugins',
+];
 
 export async function checkReactPacks(consumer: string): Promise<void> {
-  const entries = [
+  const entries: { specifier: string; allowed: string[]; headless?: boolean }[] = [
+    { specifier: '@fluxdown/react-hooks', allowed: [], headless: true },
+    { specifier: '@fluxdown/react-base', allowed: [], headless: true },
+    { specifier: '@fluxdown/react-base-plugins/base', allowed: [], headless: true },
+    { specifier: '@fluxdown/react-base-plugins/plugins/blockquote', allowed: [], headless: true },
+    { specifier: '@fluxdown/react-base-plugins/plugins/effect-scale', allowed: [], headless: true },
+    { specifier: '@fluxdown/react-base-plugins/plugins/fallback', allowed: [], headless: true },
     { specifier: 'fluxdown/raw', allowed: [] },
     { specifier: 'fluxdown/lite', allowed: [] },
     {
       specifier: 'fluxdown/full',
       allowed: ['shiki', '@shikijs', 'katex', '@mathjax', 'pele', ...syntaxExtensions],
     },
-    { specifier: '@fluxdown/react-presets/plugins/blockquote', allowed: [] },
-    { specifier: '@fluxdown/react-presets/plugins/emoji', allowed: ['remark-gemoji'] },
+    { specifier: '@fluxdown/react-plugins/plugins/blockquote', allowed: [] },
+    { specifier: '@fluxdown/react-base-plugins/plugins/emoji', allowed: ['remark-gemoji'] },
     {
-      specifier: '@fluxdown/react-presets/plugins/cjk',
+      specifier: '@fluxdown/react-base-plugins/plugins/cjk',
       allowed: [
         'micromark-extension-cjk-friendly',
         'micromark-extension-cjk-friendly-gfm-strikethrough',
       ],
     },
     {
-      specifier: '@fluxdown/react-presets/plugins/code-pele',
+      specifier: '@fluxdown/react-plugins/plugins/code-pele',
       allowed: ['pele'],
     },
-    { specifier: '@fluxdown/react-presets/plugins/code-prism', allowed: ['prismjs'] },
-    { specifier: '@fluxdown/react-presets/plugins/tex-katex', allowed: ['katex'] },
+    { specifier: '@fluxdown/react-plugins/plugins/code-prism', allowed: ['prismjs'] },
+    { specifier: '@fluxdown/react-plugins/plugins/tex-katex', allowed: ['katex'] },
   ];
 
-  for (const [index, { specifier, allowed }] of entries.entries()) {
+  for (const [index, { specifier, allowed, headless }] of entries.entries()) {
     for (const format of ['import', 'require'] as const) {
       const name = `pack-${index}-${format}`;
       const file = path.join(consumer, `${name}.${format === 'import' ? 'mjs' : 'cjs'}`);
@@ -80,6 +93,15 @@ export async function checkReactPacks(consumer: string): Promise<void> {
         const forbidden = new Set(
           dependencies.filter((dependency) => !allowed.includes(dependency)),
         );
+
+        if (headless) {
+          for (const dependency of domDependencies) forbidden.add(dependency);
+
+          if (specifier !== '@fluxdown/react-base') forbidden.add('@fluxdown/react-base');
+
+          if (specifier === '@fluxdown/react-hooks') forbidden.add('@fluxdown/react-base-plugins');
+        }
+
         const bundledDependencies = new Set<string>();
         const initialEngines = new Set<string>();
         const compilations = [stats, ...(stats.children ?? [])];
@@ -103,7 +125,7 @@ export async function checkReactPacks(consumer: string): Promise<void> {
             const moduleName = module.name?.replaceAll('\\', '/') ?? '';
 
             if (bundled)
-              for (const dependency of dependencies)
+              for (const dependency of trackedDependencies)
                 if (moduleName.includes(`/node_modules/${dependency}/`)) {
                   bundledDependencies.add(dependency);
 
@@ -135,6 +157,13 @@ export async function checkReactPacks(consumer: string): Promise<void> {
           );
 
         const assets = compilations.flatMap((child) => child.assets ?? []);
+
+        if (headless)
+          assert(
+            !assets.some((asset) => asset.name?.endsWith('.css')),
+            `${specifier} (${format}) includes DOM styles`,
+          );
+
         const jsBytes = assets
           .filter((asset) => asset.name?.endsWith('.js'))
           .reduce((total, asset) => total + asset.size, 0);

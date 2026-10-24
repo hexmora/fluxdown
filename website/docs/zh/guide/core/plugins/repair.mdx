@@ -14,7 +14,7 @@ import type {
   RepairPluginSystemConfig,
 } from '@fluxdown/types';
 
-import { BaseRepairPlugin } from '@fluxdown/core-presets/plugins/repair/base';
+import { BaseRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/base';
 import { PluginPriority } from '@fluxdown/types';
 
 class StreamingIndicatorPlugin extends BaseRepairPlugin {
@@ -67,9 +67,9 @@ const repairs = [StreamingIndicatorPlugin];
 
 ## 支持的插件
 
-将表中的子路径接在 `@fluxdown/core-presets/plugins/repair/` 后，即为插件的完整导入路径。例如，`incomplete-image` 对应 `@fluxdown/core-presets/plugins/repair/incomplete-image`。
+将表中的子路径接在 `@fluxdown/core-plugins/plugins/repair/` 后，即为插件的完整导入路径。例如，`incomplete-image` 对应 `@fluxdown/core-plugins/plugins/repair/incomplete-image`。
 
-勾选表示插件包含在 `PRESET_REPAIR_PLUGINS` 中，由 Core 自动注册；未勾选的插件需手动添加。预设数组从 `@fluxdown/core-presets/presets/repair` 导入。
+勾选表示插件包含在 `PRESET_REPAIR_PLUGINS` 中，由 Core 自动注册；未勾选的插件需手动添加。预设数组从 `@fluxdown/core-plugins/presets/repair` 导入。
 
 修复由 `build.repair` 控制。下表第一组面向生成过程中的临时末尾状态，还需要 `build.repairEnding`。
 

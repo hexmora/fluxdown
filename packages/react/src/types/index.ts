@@ -1,3 +1,3 @@
-export type * from '@fluxdown/react-presets/typings';
+export type * from '@fluxdown/react-base-plugins/typings';
 
 export * from './theme';

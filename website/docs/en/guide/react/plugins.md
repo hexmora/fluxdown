@@ -17,7 +17,7 @@ For a streaming visual effect, you can pass a mapper directly through [`streamin
 
 `plugins` accepts an `IPluginItem` or an array of them. A plugin pack can contain several lists: `slots`, `renders`, `remarks`, `rehypes`, `repairs`, and `mappers`.
 
-> Import the `IPluginItem` type from `@fluxdown/react-presets/typings`.
+> Import the `IPluginItem` type from `@fluxdown/react-base-plugins/typings`.
 
 ```tsx
 import { Fluxdown } from 'fluxdown';
@@ -59,7 +59,7 @@ export function Message({ text }: MessageProps) {
 List the preset you want to configure, then supply its options in `config`, keyed by the plugin’s `key`. For example, hide an image while its URL is still being generated:
 
 ```tsx
-import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/plugins/repair/incomplete-image';
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/incomplete-image';
 import { Fluxdown } from 'fluxdown';
 
 type MessageProps = {
@@ -82,6 +82,6 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
-> This example requires `pnpm add @fluxdown/core-presets`. The default image strategy is `placeholder`, which displays placeholder content.
+> This example requires `pnpm add @fluxdown/core-plugins`. The default image strategy is `placeholder`, which displays placeholder content.
 
 `config` applies to the plugins listed in the same pack. Other presets remain in place. See [Plugin matrix](./plugins/matrix.mdx) for built-in React plugins, and the [Core plugin guides](../core/plugins.md) for parsing and mapping presets. See [Configuration](./configuration.md#plugins) for the full prop.

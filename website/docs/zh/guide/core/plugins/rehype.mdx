@@ -9,7 +9,7 @@ Rehype 插件处理 Markdown 转换后的 HTML 语法树 HAST。适合在渲染�
 下面把图片说明同时用作悬停时显示的标题：
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 pnpm add -D @types/hast unified
 ```
 
@@ -17,7 +17,7 @@ pnpm add -D @types/hast unified
 import type { Root, RootContent } from 'hast';
 import type { Plugin } from 'unified';
 
-import { BaseRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/base';
+import { BaseRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/base';
 
 class ImageTitlesPlugin extends BaseRehypePlugin {
   static readonly key = 'rehype-image-titles';
@@ -77,8 +77,8 @@ const rehypes = toClosure<RehypeConfigs>({
 ```ts
 import type { IPluggable, IRehypePlugin, IRemarkPlugin } from '@fluxdown/types';
 
-import { SanitizerRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/sanitizer';
-import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-html-allowed';
+import { SanitizerRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/sanitizer';
+import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-html-allowed';
 
 type RemarkPlugin = IPluggable<IRemarkPlugin, unknown>;
 type RehypePlugin = IPluggable<IRehypePlugin, unknown>;
@@ -96,9 +96,9 @@ const rehypes: RehypePlugin[] = [
 
 ## 支持的插件
 
-将表中的子路径接在 `@fluxdown/core-presets/plugins/rehype/` 后，即为插件的完整导入路径。例如，`sanitizer` 对应 `@fluxdown/core-presets/plugins/rehype/sanitizer`。
+将表中的子路径接在 `@fluxdown/core-plugins/plugins/rehype/` 后，即为插件的完整导入路径。例如，`sanitizer` 对应 `@fluxdown/core-plugins/plugins/rehype/sanitizer`。
 
-勾选表示插件包含在 `PRESET_REHYPE_PLUGINS` 中，由 Core 自动注册；未勾选的插件需手动添加。预设数组从 `@fluxdown/core-presets/presets/rehype` 导入。
+勾选表示插件包含在 `PRESET_REHYPE_PLUGINS` 中，由 Core 自动注册；未勾选的插件需手动添加。预设数组从 `@fluxdown/core-plugins/presets/rehype` 导入。
 
 | 插件                        | 子路径           |    是否内置     | 作用                                                                 |
 | --------------------------- | ---------------- | :-------------: | -------------------------------------------------------------------- |

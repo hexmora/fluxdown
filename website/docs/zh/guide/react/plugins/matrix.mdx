@@ -1,4 +1,4 @@
-import { PresetCheck } from '../../../../../components';
+import { PluginTag, PresetCheck } from '../../../../../components';
 
 # 插件矩阵
 
@@ -15,34 +15,52 @@ React Lite 和 React Full 使用相同的组件 API，按需要选择默认能�
 
 ## 全部插件
 
-下表列出 `@fluxdown/react-presets` 提供的全部综合插件。勾选表示对应组件默认包含此插件，空白表示需要手动添加。
+下表列出 React 组件使用的综合插件。「组成」包含继承的子插件类型；勾选表示对应组件默认包含此插件，空白表示需要手动添加。
 
-| 插件                    |      Lite       |      Full       |
-| ----------------------- | :-------------: | :-------------: |
-| `BlockquotePlugin`      | <PresetCheck /> | <PresetCheck /> |
-| `BreakLinePlugin`       | <PresetCheck /> | <PresetCheck /> |
-| `CjkPlugin`             |                 | <PresetCheck /> |
-| `CodePlugin`            | <PresetCheck /> |                 |
-| `CodePelePlugin`        |                 | <PresetCheck /> |
-| `CodePrismPlugin`       |                 |                 |
-| `CodeShikiPlugin`       |                 | <PresetCheck /> |
-| `EffectChunkPlugin`     | <PresetCheck /> | <PresetCheck /> |
-| `EffectScalePlugin`     | <PresetCheck /> | <PresetCheck /> |
-| `EffectShadPlugin`      | <PresetCheck /> | <PresetCheck /> |
-| `EffectSuffixPlugin`    | <PresetCheck /> | <PresetCheck /> |
-| `EmojiPlugin`           |                 | <PresetCheck /> |
-| `EmphasisPlugin`        | <PresetCheck /> | <PresetCheck /> |
-| `FallbackPlugin`        | <PresetCheck /> | <PresetCheck /> |
-| `HeadingPlugin`         | <PresetCheck /> | <PresetCheck /> |
-| `ImagePlugin`           | <PresetCheck /> | <PresetCheck /> |
-| `LinkPlugin`            | <PresetCheck /> | <PresetCheck /> |
-| `ListPlugin`            | <PresetCheck /> | <PresetCheck /> |
-| `ParagraphPlugin`       | <PresetCheck /> | <PresetCheck /> |
-| `PatchPlugin`           | <PresetCheck /> | <PresetCheck /> |
-| `StrongPlugin`          | <PresetCheck /> | <PresetCheck /> |
-| `TablePlugin`           | <PresetCheck /> | <PresetCheck /> |
-| `TexPlugin`             | <PresetCheck /> |                 |
-| `TexKatexPlugin`        |                 |                 |
-| `TexMathjaxKatexPlugin` |                 | <PresetCheck /> |
+| 插件                    | 组成                                                  | 所在包                                  |      Lite       |      Full       |
+| ----------------------- | ----------------------------------------------------- | --------------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`             | <PluginTag type="remark" />                           | <PluginTag type="react-base-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> |                 |
+| `CodePelePlugin`        | <PluginTag type="slot" />                             | <PluginTag type="react-plugins" />      |                 | <PresetCheck /> |
+| `CodePrismPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      |                 |                 |
+| `CodeShikiPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="react-base-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PluginTag type="render" />                           | <PluginTag type="react-base-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      | <PresetCheck /> |                 |
+| `TexKatexPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      |                 |                 |
+| `TexMathjaxKatexPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-plugins" />      |                 | <PresetCheck /> |
 
-综合插件从 `@fluxdown/react-presets/plugins/<目录>` 导入，例如 `CodePlugin` 来自 `@fluxdown/react-presets/plugins/code`。通过 `plugins` 添加所需插件；声明、组合与配置方式见[综合插件](./aggregate.md)。
+### 所在包
+
+- <PluginTag type="react-plugins" /> 对应 `@fluxdown/react-plugins`，提供面向
+  React DOM 的综合插件。
+- <PluginTag type="react-base-plugins" /> 对应
+  `@fluxdown/react-base-plugins`，提供不依赖 DOM 的基础插件，可供其他 React
+  平台扩展。
+
+### 导入规则
+
+1. 按表格选择插件所在包，使用 `<包全名>/plugins/<插件目录>` 导入。
+2. 插件目录由导出名称去掉 `Plugin` 后缀，再转为小写中划线形式。例如，`CodePrismPlugin` 对应 `code-prism`，`TexMathjaxKatexPlugin` 对应 `tex-mathjax-katex`，`CjkPlugin` 对应 `cjk`。
+
+```tsx
+import { CodePrismPlugin } from '@fluxdown/react-plugins/plugins/code-prism';
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
+```
+
+通过组件的 `plugins` 参数添加所需插件；声明、组合与配置方式见[综合插件](./aggregate.md)。

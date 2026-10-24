@@ -1,12 +1,9 @@
-import type { ParagraphProps, ReactRenderParams } from '@fluxdown/react-presets/base';
+import type { ParagraphProps, ReactRenderParams } from '@fluxdown/react-plugins/base';
 
-import { CodeHeaderSlotPlugin, CodePlugin } from '@fluxdown/react-presets/plugins/code';
-import { FallbackPlugin } from '@fluxdown/react-presets/plugins/fallback';
-import {
-  ParagraphPlugin,
-  ParagraphRenderPlugin,
-  ParagraphSlotPlugin,
-} from '@fluxdown/react-presets/plugins/paragraph';
+import { ParagraphRenderPlugin } from '@fluxdown/react-base-plugins/plugins/paragraph';
+import { CodeHeaderSlotPlugin, CodePlugin } from '@fluxdown/react-plugins/plugins/code';
+import { FallbackPlugin } from '@fluxdown/react-plugins/plugins/fallback';
+import { ParagraphPlugin, ParagraphSlotPlugin } from '@fluxdown/react-plugins/plugins/paragraph';
 import { PluginPriority } from '@fluxdown/types';
 import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';

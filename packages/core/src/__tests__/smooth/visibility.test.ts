@@ -1,4 +1,4 @@
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { batch, ReactiveState, render, S } from 'stative';
 
 import type { HastRoot } from '../../typings';

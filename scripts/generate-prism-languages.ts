@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 
 const requirePrism = createRequire(
-  new URL('../packages/react-presets/package.json', import.meta.url),
+  new URL('../packages/react-plugins/package.json', import.meta.url),
 );
 const components = requirePrism('prismjs/components.json') as {
   languages: Record<string, unknown>;
@@ -21,7 +21,7 @@ const imports = getLoader(components, languages)
 
 await writeFile(
   new URL(
-    '../packages/react-presets/src/plugins/code-prism/slot/code-prism/renderer/languages.ts',
+    '../packages/react-plugins/src/plugins/code-prism/slot/code-prism/renderer/languages.ts',
     import.meta.url,
   ),
   [
