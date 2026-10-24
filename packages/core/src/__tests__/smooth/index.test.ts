@@ -2,7 +2,7 @@ import type {
   SmoothInputs,
   SmoothSchedulerClass,
   SmoothTickerClass,
-} from '@fluxdown/core-presets/plugins/mapper/smooth';
+} from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import type { IBlockState } from '@fluxdown/types';
 import type { IReactiveState, IReadableClosure } from 'stative';
 

@@ -1,7 +1,7 @@
 import type { IBlockState } from '@fluxdown/types';
 import type { Element, ElementContent, Parent, RootContent } from 'hast';
 
-import { Chunk, CHUNK_DATA_ATTR } from '@fluxdown/core-presets/plugins/mapper/chunk';
+import { Chunk, CHUNK_DATA_ATTR } from '@fluxdown/core-plugins/plugins/mapper/chunk';
 import { D, MutableState, render, S } from 'stative';
 
 import type { HastRoot } from '../../../typings';

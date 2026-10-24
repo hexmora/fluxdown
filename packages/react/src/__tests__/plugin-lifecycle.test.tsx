@@ -1,4 +1,4 @@
-import type { IReactRenderPluggable } from '@fluxdown/react-presets/base';
+import type { IReactRenderPluggable } from '@fluxdown/react-plugins/base';
 
 import { render, waitFor } from '@testing-library/react';
 

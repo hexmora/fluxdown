@@ -35,13 +35,13 @@ React Full 已内置 `CjkPlugin`，无需手动注册。使用 Core 或 React Li
 安装 Core 预设包：
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 ```
 
 在 [Core 快速开始](../../core/quick-start.md)的 `remarks` 输入中加入 `CjkRemarkPlugin`：
 
 ```ts
-import { CjkRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/cjk';
+import { CjkRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/cjk';
 
 const remarks = [CjkRemarkPlugin];
 ```
@@ -51,11 +51,11 @@ const remarks = [CjkRemarkPlugin];
 安装 React 预设包：
 
 ```sh
-pnpm add @fluxdown/react-presets
+pnpm add @fluxdown/react-base-plugins
 ```
 
 ```tsx
-import { CjkPlugin } from '@fluxdown/react-presets/plugins/cjk';
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { FluxdownLite } from 'fluxdown/lite';
 
 export function Message({ text }: { text: string }) {
@@ -65,10 +65,10 @@ export function Message({ text }: { text: string }) {
 
 ## 关闭 CJK 支持
 
-安装 `@fluxdown/react-presets` 后，将 `CjkPlugin` 与 `config` 放在同一个插件包中，即可按需恢复默认的 Markdown 标点处理：
+安装 `@fluxdown/react-base-plugins` 后，将 `CjkPlugin` 与 `config` 放在同一个插件包中，即可按需恢复默认的 Markdown 标点处理：
 
 ```tsx
-import { CjkPlugin } from '@fluxdown/react-presets/plugins/cjk';
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { Fluxdown } from 'fluxdown';
 
 export function Message({ text }: { text: string }) {

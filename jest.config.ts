@@ -27,9 +27,12 @@ const config: Config = {
     'hast',
     'mdast',
     'stative',
-    'core-presets',
+    'core-plugins',
     'core',
-    'react-presets',
+    'react-hooks',
+    'react-base',
+    'react-base-plugins',
+    'react-plugins',
     'react',
   ].map((name) => ({
     displayName: name,
@@ -38,18 +41,16 @@ const config: Config = {
     roots: ['<rootDir>/packages', '<rootDir>/scripts/testing'],
     modulePathIgnorePatterns: ['<rootDir>/packages/[^/]+/dist/'],
     testMatch: [`<rootDir>/packages/${name}/src/**/*.test.{ts,tsx}`],
-    testEnvironment:
-      name === 'react' || name === 'react-presets'
-        ? '<rootDir>/scripts/testing/jsdom-environment.ts'
-        : 'node',
-    setupFilesAfterEnv:
-      name === 'react' || name === 'react-presets'
-        ? [`<rootDir>/packages/${name}/jest.setup.ts`]
-        : [],
+    testEnvironment: name.startsWith('react')
+      ? '<rootDir>/scripts/testing/jsdom-environment.ts'
+      : 'node',
+    setupFilesAfterEnv: name.startsWith('react')
+      ? [`<rootDir>/packages/${name}/jest.setup.ts`]
+      : [],
     moduleNameMapper: { '^(.+\\.svg)\\?react$': '$1' },
     transform: {
       // A project may import another package's sources, so select JSX by source path.
-      '^.+/packages/(?:stative|core|core-presets)/.+\\.[jt]sx?$': swc('stative'),
+      '^.+/packages/(?:stative|core|core-plugins)/.+\\.[jt]sx?$': swc('stative'),
       '^.+\\.[cm]?[jt]sx?$': swc('react'),
       '^.+\\.(?:css|scss|sass|less|svg)$': '<rootDir>/scripts/testing/assets-transformer.ts',
     },

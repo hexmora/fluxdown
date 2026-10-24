@@ -86,7 +86,7 @@ export async function checkBrowserConsumer(
     const directory = path.join(consumer, 'node_modules', manifest.name);
     const style = resolveExport(manifest.exports?.['./styles.css'], ['browser', 'import']);
 
-    if (['fluxdown', '@fluxdown/react-presets'].includes(manifest.name)) {
+    if (['fluxdown', '@fluxdown/react-plugins'].includes(manifest.name)) {
       assert(style, `${manifest.name}: missing public stylesheet export`);
     }
 

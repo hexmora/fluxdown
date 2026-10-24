@@ -1,4 +1,4 @@
-import { SpringSmoothScheduler } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { SpringSmoothScheduler } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { useEffect, useRef, useState } from 'react';
 
 import type { SpringCursorParams, SpringPlayback } from './type';

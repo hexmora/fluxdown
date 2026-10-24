@@ -1,4 +1,4 @@
-import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-plugins/presets/mapper';
 import { isArray } from 'lodash-es';
 import { memoReturns } from 'stative';
 

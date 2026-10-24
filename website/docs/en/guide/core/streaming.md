@@ -71,10 +71,10 @@ build.next({ ...build.value, repairEnding: false });
 
 ## Enable smooth output
 
-Core includes `Smooth` but does not enable it automatically. Install `@fluxdown/core-presets` to configure this preset explicitly:
+Core includes `Smooth` but does not enable it automatically. Install `@fluxdown/core-plugins` to configure this preset explicitly:
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 ```
 
 Add this configuration to the inputs used to create Core:
@@ -82,7 +82,7 @@ Add this configuration to the inputs used to create Core:
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
 
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { MutableState, toClosure } from 'stative';
 
 const smoothEnabled = MutableState.of(true);

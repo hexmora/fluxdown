@@ -308,6 +308,7 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
         '--no-package-lock',
         'react@18.3.1',
         'react-dom@18.3.1',
+        '@types/node@22',
         '@types/react@18',
         '@types/react-dom@18',
       ],
@@ -354,7 +355,7 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
 
     let typeSmoke = '';
 
-    if (specifiers.includes('@fluxdown/core-presets/presets/remark')) {
+    if (specifiers.includes('@fluxdown/core-plugins/presets/remark')) {
       const presetSmoke = `
 if (!PRESET_REMARK_PLUGINS.includes(SyntaxMathRemarkPlugin)) {
   throw new Error('The remark preset and individual plugin entries do not share class identity');
@@ -364,16 +365,16 @@ if (!PRESET_MAPPER_PLUGINS.includes(Smooth)) {
 }
 `;
       esmSmoke += `
-import { SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-math';
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
-import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-presets/presets/remark';
-import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
+import { SyntaxMathRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-math';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-plugins/presets/remark';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-plugins/presets/mapper';
 ${presetSmoke}`;
       cjsSmoke += `
-const { SyntaxMathRemarkPlugin } = require('@fluxdown/core-presets/plugins/remark/syntax-math');
-const { Smooth } = require('@fluxdown/core-presets/plugins/mapper/smooth');
-const { PRESET_REMARK_PLUGINS } = require('@fluxdown/core-presets/presets/remark');
-const { PRESET_MAPPER_PLUGINS } = require('@fluxdown/core-presets/presets/mapper');
+const { SyntaxMathRemarkPlugin } = require('@fluxdown/core-plugins/plugins/remark/syntax-math');
+const { Smooth } = require('@fluxdown/core-plugins/plugins/mapper/smooth');
+const { PRESET_REMARK_PLUGINS } = require('@fluxdown/core-plugins/presets/remark');
+const { PRESET_MAPPER_PLUGINS } = require('@fluxdown/core-plugins/presets/mapper');
 ${presetSmoke}`;
     }
 
@@ -387,21 +388,53 @@ jsx(({ x }: { x: number }) => x, { x: D(42) });
 `;
     }
 
+    if (specifiers.includes('@fluxdown/react-base')) {
+      const baseRenderSmoke = `
+class TextRenderPlugin extends BaseReactRenderPlugin {
+  static key = 'render-text';
+  match() { return true; }
+  render({ node, renderChildren }) {
+    return node.type === 'text' ? node.value : renderChildren();
+  }
+}
+const baseOutput = renderToStaticMarkup(createBaseElement(FluxdownBase, {
+  text: 'headless consumer', plugins: { renders: [TextRenderPlugin] },
+}));
+if (baseOutput !== 'headless consumer') {
+  throw new Error('The published React base adds a host wrapper or ignores custom render plugins');
+}
+`;
+      esmSmoke += `
+import { createElement as createBaseElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { FluxdownBase } from '@fluxdown/react-base';
+import { BaseReactRenderPlugin } from '@fluxdown/react-base-plugins/base';
+${baseRenderSmoke}`;
+      cjsSmoke += `
+const { createElement: createBaseElement } = require('react');
+const { renderToStaticMarkup } = require('react-dom/server');
+const { FluxdownBase } = require('@fluxdown/react-base');
+const { BaseReactRenderPlugin } = require('@fluxdown/react-base-plugins/base');
+${baseRenderSmoke}`;
+    }
+
     if (specifiers.includes('fluxdown')) {
       typeSmoke += `\nimport { createElement } from 'react';\nimport { Fluxdown } from 'fluxdown';\ncreateElement(Fluxdown, { text: 'consumer', streaming: true });\n`;
       typeSmoke += `
 import { FluxdownLite } from 'fluxdown/lite';
 import { FluxdownRaw } from 'fluxdown/raw';
-import { PRESET_LIGHT_PLUGINS } from '@fluxdown/react-presets/lite';
-import { CodePrismPlugin } from '@fluxdown/react-presets/plugins/code-prism';
-import { TexKatexPlugin } from '@fluxdown/react-presets/plugins/tex-katex';
-import type { IPluginItem, PluginConfigs } from '@fluxdown/react-presets/typings';
+import { PRESET_LIGHT_PLUGINS } from '@fluxdown/react-plugins/lite';
+import { CodePrismPlugin } from '@fluxdown/react-plugins/plugins/code-prism';
+import { TexKatexPlugin } from '@fluxdown/react-plugins/plugins/tex-katex';
+import type { IPluginItem, PluginConfigs } from '@fluxdown/react-base-plugins/typings';
 const config: PluginConfigs = { 'slot-code-header': { disabled: true } };
 const plugin: IPluginItem = { ...CodePrismPlugin, config };
 createElement(FluxdownLite, { text: 'consumer', plugins: [plugin, TexKatexPlugin] });
 createElement(FluxdownRaw, { text: 'consumer', plugins: PRESET_LIGHT_PLUGINS });
 // @ts-expect-error Raw intentionally requires an explicit plugin selection.
 createElement(FluxdownRaw, { text: 'consumer' });
+// @ts-expect-error Raw supplies the DOM property conversion internally.
+createElement(FluxdownRaw, { text: 'consumer', plugins: [], getProps: () => ({}) });
 `;
 
       const renderSmoke = `
@@ -516,6 +549,48 @@ export type PresetConfigs = [
       run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.core.json')]);
     }
 
+    if (specifiers.includes('@fluxdown/react-base')) {
+      const baseTypes = `
+import { createElement } from 'react';
+import { FluxdownBase, type FluxdownBaseProps } from '@fluxdown/react-base';
+import { BaseReactRenderPlugin, type ReactRenderParams } from '@fluxdown/react-base-plugins/base';
+import { ParagraphPlugin } from '@fluxdown/react-base-plugins/plugins/paragraph';
+import { useStatic } from '@fluxdown/react-hooks';
+export const useHeadlessValue = () => useStatic(() => 1);
+class TextRenderPlugin extends BaseReactRenderPlugin {
+  static key = 'render-text';
+  match() { return true; }
+  render({ node, renderChildren }: ReactRenderParams) {
+    return node.type === 'text' ? node.value : renderChildren();
+  }
+}
+const props: FluxdownBaseProps = { text: 'native consumer', plugins: { renders: [TextRenderPlugin] } };
+createElement(FluxdownBase, props);
+createElement(FluxdownBase, { ...props, getProps: null });
+createElement(FluxdownBase, { ...props, getProps: (node) => ({ ...node?.properties }) });
+createElement(FluxdownBase, { text: 'native consumer', plugins: [ParagraphPlugin] });
+// @ts-expect-error Base requires an explicit plugin selection.
+createElement(FluxdownBase, { text: 'consumer' });
+// @ts-expect-error Host container classes belong to the DOM wrapper.
+createElement(FluxdownBase, { ...props, className: 'container' });
+// @ts-expect-error Host container styles belong to the DOM wrapper.
+createElement(FluxdownBase, { ...props, style: {} });
+// @ts-expect-error DOM themes belong to the DOM wrapper.
+createElement(FluxdownBase, { ...props, theme: 'light' });
+`;
+      await writeFile(path.join(consumer, '__tests__', 'react-base-types.mts'), baseTypes);
+      await writeFile(path.join(consumer, '__tests__', 'react-base-types.cts'), baseTypes);
+      await writeFile(
+        path.join(consumer, 'tsconfig.react-base.json'),
+        JSON.stringify({
+          extends: './tsconfig.json',
+          compilerOptions: { lib: ['ES2022'], types: ['node', 'react'] },
+          files: ['__tests__/react-base-types.mts', '__tests__/react-base-types.cts'],
+        }),
+      );
+      run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.react-base.json')]);
+    }
+
     console.log(
       `Isolated npm consumer OK: ${specifiers.length} ESM/CJS entry points and NodeNext declarations`,
     );
@@ -551,6 +626,8 @@ export type PresetConfigs = [
       run('node', ['__tests__/smoke.mjs'], { cwd: consumer });
       run('node', ['__tests__/smoke.cjs'], { cwd: consumer });
       run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')]);
+      if (specifiers.includes('@fluxdown/react-base'))
+        run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.react-base.json')]);
       console.log(
         'React 18/19 consumer OK: peer dependencies, entry points, and strict declarations',
       );
@@ -908,7 +985,7 @@ async function prepareRelease(options: ReturnType<typeof parseReleaseOptions>) {
       const destination = path.join(stage, 'packages', pkg.directory);
       const manifest = await readManifest(destination);
 
-      for (const field of dependencyFields) {
+      for (const field of [...dependencyFields, 'devDependencies'] as const) {
         for (const [name, range] of Object.entries(manifest[field] ?? {})) {
           const version = stagedVersions.get(name);
 

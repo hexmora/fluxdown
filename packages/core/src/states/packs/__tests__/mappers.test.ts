@@ -1,7 +1,7 @@
 import type { IBlockState, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { ElementContent, Parent, RootContent } from 'hast';
 
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { PluginPriority } from '@fluxdown/types';
 import { assert } from '@fluxdown/utils';
 import { first, last, reverse, take } from 'lodash-es';

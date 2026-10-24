@@ -7,12 +7,10 @@
 各列表都可省略，例如把引用块的渲染与组件组合起来：
 
 ```tsx
-import type { IPluginItem } from '@fluxdown/react-presets/typings';
+import type { IPluginItem } from '@fluxdown/react-base-plugins/typings';
 
-import {
-  BlockquoteRenderPlugin,
-  BlockquoteSlotPlugin,
-} from '@fluxdown/react-presets/plugins/blockquote';
+import { BlockquoteRenderPlugin } from '@fluxdown/react-base-plugins/plugins/blockquote';
+import { BlockquoteSlotPlugin } from '@fluxdown/react-plugins/plugins/blockquote';
 import { Fluxdown } from 'fluxdown';
 
 export const QuotePlugin: IPluginItem = {
@@ -25,7 +23,7 @@ export function Message({ text }: { text: string }) {
 }
 ```
 
-> `IPluginItem` 从 `@fluxdown/react-presets/typings` 导入。
+> `IPluginItem` 从 `@fluxdown/react-base-plugins/typings` 导入。
 
 还可加入 `remarks`、`rehypes`、`repairs` 和 `mappers`。编写其中的 React 插件时，分别继承 `BaseSlotPlugin` 或 `BaseReactRenderPlugin`，具体见 [Slot 插件](./slot.md)和 [Render 插件](./render.md)。
 
@@ -34,11 +32,11 @@ export function Message({ text }: { text: string }) {
 `pluginExtends` 接收两个或更多综合插件，返回一个 `IPluginItem`。先传基础插件，再追加需要覆盖的能力。例如，派生一个隐藏代码工具栏的插件：
 
 ```tsx
-import { pluginExtends } from '@fluxdown/react-presets/base';
+import { pluginExtends } from '@fluxdown/react-plugins/base';
 import {
   CodeHeaderSlotPlugin,
   CodePlugin,
-} from '@fluxdown/react-presets/plugins/code';
+} from '@fluxdown/react-plugins/plugins/code';
 import { FluxdownLite } from 'fluxdown/lite';
 
 export const CompactCodePlugin = /*#__PURE__*/ pluginExtends(CodePlugin, {
@@ -53,7 +51,7 @@ export function Message({ text }: { text: string }) {
 }
 ```
 
-> `pluginExtends` 从 `@fluxdown/react-presets/base` 导入。
+> `pluginExtends` 从 `@fluxdown/react-plugins/base` 导入。
 
 `config` 只配置当前对象列表中的插件，按插件的 `key` 匹配；它会覆盖列表项 `[Plugin, options]` 中的同名选项。上例显式列出 `CodeHeaderSlotPlugin`，关闭继承的工具栏，保留代码容器和源码显示。
 

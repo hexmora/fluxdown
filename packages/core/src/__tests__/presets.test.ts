@@ -1,15 +1,15 @@
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
 
-import { Chunk } from '@fluxdown/core-presets/plugins/mapper/chunk';
-import { Scale } from '@fluxdown/core-presets/plugins/mapper/scale';
-import { Shad } from '@fluxdown/core-presets/plugins/mapper/shad';
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
-import { Suffix } from '@fluxdown/core-presets/plugins/mapper/suffix';
-import { SyntaxMathRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-math';
-import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
-import { PRESET_REHYPE_PLUGINS } from '@fluxdown/core-presets/presets/rehype';
-import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-presets/presets/remark';
-import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-presets/presets/repair';
+import { Chunk } from '@fluxdown/core-plugins/plugins/mapper/chunk';
+import { Scale } from '@fluxdown/core-plugins/plugins/mapper/scale';
+import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Suffix } from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { SyntaxMathRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-math';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-plugins/presets/mapper';
+import { PRESET_REHYPE_PLUGINS } from '@fluxdown/core-plugins/presets/rehype';
+import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-plugins/presets/remark';
+import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-plugins/presets/repair';
 
 import { mergePluginPluggables } from '../states/base';
 

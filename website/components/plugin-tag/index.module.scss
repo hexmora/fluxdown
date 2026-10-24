@@ -1,0 +1,64 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin: 2px 4px 2px 0;
+  padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, var(--tag-color) 22%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tag-color) 9%, var(--site-surface));
+  color: var(--tag-color);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+
+  &:last-child {
+    margin-inline-end: 0;
+  }
+
+  &[data-type="render"] {
+    --tag-color: #2856ab;
+    --tag-dark-color: #a6c3ff;
+  }
+
+  &[data-type="slot"] {
+    --tag-color: #7644b2;
+    --tag-dark-color: #d1b4ff;
+  }
+
+  &[data-type="remark"] {
+    --tag-color: #93640f;
+    --tag-dark-color: #e8c075;
+  }
+
+  &[data-type="rehype"] {
+    --tag-color: #2c7044;
+    --tag-dark-color: #a2d7b2;
+  }
+
+  &[data-type="repair"] {
+    --tag-color: #ad3859;
+    --tag-dark-color: #f4acc0;
+  }
+
+  &[data-type="mapper"] {
+    --tag-color: #147185;
+    --tag-dark-color: #9bd5e1;
+  }
+
+  &[data-type="react-plugins"] {
+    --tag-color: #a14d28;
+    --tag-dark-color: #efb493;
+  }
+
+  &[data-type="react-base-plugins"] {
+    --tag-color: #52627b;
+    --tag-dark-color: #b8c8df;
+  }
+
+  :global(.dark) & {
+    --tag-color: var(--tag-dark-color);
+  }
+}

@@ -1,8 +1,8 @@
-import type { ReactRenderMatchParams, ReactRenderParams } from '@fluxdown/react-presets/base';
+import type { ReactRenderMatchParams, ReactRenderParams } from '@fluxdown/react-plugins/base';
 
-import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-presets/plugins/mapper/suffix';
-import { BaseReactRenderPlugin } from '@fluxdown/react-presets/base';
-import { SuffixRenderer } from '@fluxdown/react-presets/plugins/effect-suffix';
+import { isSuffixNode, SUFFIX_DATA_ATTR } from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { BaseReactRenderPlugin } from '@fluxdown/react-plugins/base';
+import { SuffixRenderer } from '@fluxdown/react-plugins/plugins/effect-suffix';
 
 export class SmileRenderPlugin extends BaseReactRenderPlugin {
   static readonly key = 'render-demo-smile';

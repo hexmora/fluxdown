@@ -1,4 +1,4 @@
-import { PREFIX } from '@fluxdown/react-presets/base';
+import { PREFIX } from '@fluxdown/react-plugins/base';
 import { render, renderHook } from '@testing-library/react';
 import { expectTypeOf } from 'expect-type';
 import { createRef } from 'react';

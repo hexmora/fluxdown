@@ -100,6 +100,26 @@
         "name": "stative",
         "directory": "packages/stative"
       }
+    },
+    {
+      "from": {
+        "name": "@fluxdown/react-presets",
+        "directory": "packages/react-presets"
+      },
+      "to": {
+        "name": "@fluxdown/react-base-plugins",
+        "directory": "packages/react-base-plugins"
+      }
+    },
+    {
+      "from": {
+        "name": "@fluxdown/core-presets",
+        "directory": "packages/core-presets"
+      },
+      "to": {
+        "name": "@fluxdown/core-plugins",
+        "directory": "packages/core-plugins"
+      }
     }
   ]
 }

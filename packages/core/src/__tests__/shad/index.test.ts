@@ -1,6 +1,6 @@
 import type { IBlockState, IRangeState } from '@fluxdown/types';
 
-import { Shad } from '@fluxdown/core-presets/plugins/mapper/shad';
+import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
 import { batch, MutableState, render, S } from 'stative';
 
 import type { HastRoot } from '../../typings';

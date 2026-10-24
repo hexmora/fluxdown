@@ -10,13 +10,13 @@ This example sends ordinary paragraphs starting with “Note:” to the blockquo
 import type {
   ReactRenderMatchParams,
   ReactRenderParams,
-} from '@fluxdown/react-presets/base';
+} from '@fluxdown/react-plugins/base';
 
 import {
   BaseReactRenderPlugin,
   createTypeOfSlot,
   isElementWithTag,
-} from '@fluxdown/react-presets/base';
+} from '@fluxdown/react-plugins/base';
 import { Fluxdown } from 'fluxdown';
 
 const Blockquote = createTypeOfSlot('Blockquote');
@@ -60,6 +60,6 @@ export function Note() {
 
 Lower `priority` values match first. With equal priorities, later render plugins match first, so this custom plugin takes precedence over the preset. Presets continue to handle unmatched nodes.
 
-> This example requires `pnpm add @fluxdown/react-presets`.
+> This example requires `pnpm add @fluxdown/react-plugins`.
 
 For component, style, or interaction changes, use a [slot plugin](./slot.md). To change HAST content before rendering, use a [rehype plugin](../../core/plugins/rehype.mdx).

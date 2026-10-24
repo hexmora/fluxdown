@@ -16,7 +16,7 @@ const config: StorybookConfig = {
       plugins: [svgr()],
       resolve: {
         alias: {
-          '@prefix': resolve(import.meta.dirname, '../../react-presets/src/styles/_prefix.scss'),
+          '@prefix': resolve(import.meta.dirname, '../../react-plugins/src/styles/_prefix.scss'),
         },
       },
       // Workspace packages use stative/jsx-runtime, which has no jsxDEV export.

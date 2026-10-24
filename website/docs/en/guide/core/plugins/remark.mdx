@@ -9,11 +9,11 @@ Remark plugins run while Markdown is parsed into its syntax tree, MDAST. Use the
 For example, `remark-cjk-friendly` improves emphasis parsing around Chinese, Japanese, and Korean punctuation:
 
 ```sh
-pnpm add @fluxdown/core-presets remark-cjk-friendly
+pnpm add @fluxdown/core-plugins remark-cjk-friendly
 ```
 
 ```ts
-import { BaseRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/base';
+import { BaseRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/base';
 import remarkCjkFriendly from 'remark-cjk-friendly';
 
 class CjkSyntaxPlugin extends BaseRemarkPlugin {
@@ -37,9 +37,9 @@ If your unified plugin needs options, accept them in the class constructor and c
 
 ## Supported plugins
 
-Append a subpath from the table to `@fluxdown/core-presets/plugins/remark/` to import a plugin. For example, `code-meta` becomes `@fluxdown/core-presets/plugins/remark/code-meta`.
+Append a subpath from the table to `@fluxdown/core-plugins/plugins/remark/` to import a plugin. For example, `code-meta` becomes `@fluxdown/core-plugins/plugins/remark/code-meta`.
 
-A check marks plugins included in `PRESET_REMARK_PLUGINS`, exported from `@fluxdown/core-presets/presets/remark`. Core registers these automatically; add plugins without a check explicitly.
+A check marks plugins included in `PRESET_REMARK_PLUGINS`, exported from `@fluxdown/core-plugins/presets/remark`. Core registers these automatically; add plugins without a check explicitly.
 
 | Plugin                            | Subpath                |    Built in     | Purpose                                                                                         |
 | --------------------------------- | ---------------------- | :-------------: | ----------------------------------------------------------------------------------------------- |

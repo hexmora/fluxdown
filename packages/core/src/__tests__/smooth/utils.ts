@@ -1,11 +1,11 @@
 import type {
   SmoothSchedulerClass,
   SmoothTickerClass,
-} from '@fluxdown/core-presets/plugins/mapper/smooth';
+} from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import type { IBlockMeta, IBlockState } from '@fluxdown/types';
 import type { Element, ElementContent, RootContent, Text } from 'hast';
 
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { first, last } from 'lodash-es';
 import { MutableState, render, S } from 'stative';
 
