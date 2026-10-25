@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/react-base-plugins",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Platform-independent React render plugins and slot infrastructure for Fluxdown.",
   "keywords": [
     "hast",
