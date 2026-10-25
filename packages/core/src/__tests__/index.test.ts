@@ -5,7 +5,7 @@ import {
   RafSmoothDriver,
   Smooth,
   SpringSmoothInterpolator,
-} from '@fluxdown/core-presets/plugins/mapper/smooth';
+} from '@fluxdown/core-plugins/plugins/mapper/smooth';
 
 import { BaseRenderer, BaseRenderPlugin } from '..';
 

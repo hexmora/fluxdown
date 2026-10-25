@@ -9,7 +9,7 @@ Rehype plugins post-process HAST, the HTML syntax tree produced from Markdown. U
 This plugin uses image descriptions as hover titles:
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 pnpm add -D @types/hast unified
 ```
 
@@ -17,7 +17,7 @@ pnpm add -D @types/hast unified
 import type { Root, RootContent } from 'hast';
 import type { Plugin } from 'unified';
 
-import { BaseRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/base';
+import { BaseRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/base';
 
 class ImageTitlesPlugin extends BaseRehypePlugin {
   static readonly key = 'rehype-image-titles';
@@ -77,8 +77,8 @@ You can express the same configuration as `[PluginClass, options]`. Core passes 
 ```ts
 import type { IPluggable, IRehypePlugin, IRemarkPlugin } from '@fluxdown/types';
 
-import { SanitizerRehypePlugin } from '@fluxdown/core-presets/plugins/rehype/sanitizer';
-import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-html-allowed';
+import { SanitizerRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/sanitizer';
+import { SyntaxHtmlAllowedRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-html-allowed';
 
 type RemarkPlugin = IPluggable<IRemarkPlugin, unknown>;
 type RehypePlugin = IPluggable<IRehypePlugin, unknown>;
@@ -96,9 +96,9 @@ Choose keyed options to keep built-in configuration together, or class tuples to
 
 ## Supported plugins
 
-Append a subpath from the table to `@fluxdown/core-presets/plugins/rehype/` to import a plugin. For example, `sanitizer` becomes `@fluxdown/core-presets/plugins/rehype/sanitizer`.
+Append a subpath from the table to `@fluxdown/core-plugins/plugins/rehype/` to import a plugin. For example, `sanitizer` becomes `@fluxdown/core-plugins/plugins/rehype/sanitizer`.
 
-A check marks plugins included in `PRESET_REHYPE_PLUGINS`, exported from `@fluxdown/core-presets/presets/rehype`. Core registers these automatically; add plugins without a check explicitly.
+A check marks plugins included in `PRESET_REHYPE_PLUGINS`, exported from `@fluxdown/core-plugins/presets/rehype`. Core registers these automatically; add plugins without a check explicitly.
 
 | Plugin                      | Subpath          |    Built in     | Purpose                                                                            |
 | --------------------------- | ---------------- | :-------------: | ---------------------------------------------------------------------------------- |

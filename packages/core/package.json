@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/core",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "description": "Headless pure-computation utilities for turning streaming Markdown strings into HAST structures.",
   "keywords": [
     "hast",
@@ -59,7 +59,7 @@
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },
   "dependencies": {
-    "@fluxdown/core-presets": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
     "@fluxdown/hast": "workspace:^",
     "@fluxdown/types": "workspace:^",
     "@fluxdown/utils": "workspace:^",

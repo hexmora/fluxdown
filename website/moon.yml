@@ -3,9 +3,9 @@ layer: application
 
 dependsOn:
   - core
-  - core-presets
+  - core-plugins
   - react
-  - react-presets
+  - react-plugins
   - stative
 
 fileGroups:

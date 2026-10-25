@@ -2,8 +2,8 @@ import type { Mapper, MapperInputs } from '@fluxdown/core';
 import type { MapperConfigInputs as ConfigInputs, MapperPluginConfig } from '@fluxdown/types';
 import type { IPluggableConfig } from '@fluxdown/types';
 
-import { Shad, SHAD_DATA_ATTR, SHAD_FADE_VALUE } from '@fluxdown/core-presets/plugins/mapper/shad';
-import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
+import { Shad, SHAD_DATA_ATTR, SHAD_FADE_VALUE } from '@fluxdown/core-plugins/plugins/mapper/shad';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-plugins/presets/mapper';
 import { PluginPriority } from '@fluxdown/types';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
 import { expectTypeOf } from 'expect-type';
@@ -24,7 +24,7 @@ import {
 import type { EffectItem, FluxdownRef, StreamingConfig } from '../packs/full';
 
 import { restoreGlobals } from '../../../../scripts/testing/globals';
-import scaleStyles from '../../../react-presets/src/plugins/effect-scale/render/effect-scale/renderer/index.module.scss';
+import scaleStyles from '../../../react-plugins/src/plugins/effect-scale/slot/effect-scale/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
 import { createRafClock } from './utils/raf';
 

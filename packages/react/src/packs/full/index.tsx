@@ -1,4 +1,4 @@
-import { PRESET_FULL_PLUGINS } from '@fluxdown/react-presets/full';
+import { PRESET_FULL_PLUGINS } from '@fluxdown/react-plugins/full';
 import { forwardRef, memo } from 'react';
 
 import type { FluxdownRef } from '../raw';

@@ -1,6 +1,6 @@
 import type { IBlockState, IRangeState } from '@fluxdown/types';
 
-import { Shad } from '@fluxdown/core-presets/plugins/mapper/shad';
+import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
 import {
   type IReactiveState,
   type IReadableClosure,

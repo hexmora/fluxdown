@@ -10,13 +10,13 @@ Render 插件将 HAST 节点渲染成插槽。它决定哪些节点交给哪个�
 import type {
   ReactRenderMatchParams,
   ReactRenderParams,
-} from '@fluxdown/react-presets/base';
+} from '@fluxdown/react-plugins/base';
 
 import {
   BaseReactRenderPlugin,
   createTypeOfSlot,
   isElementWithTag,
-} from '@fluxdown/react-presets/base';
+} from '@fluxdown/react-plugins/base';
 import { Fluxdown } from 'fluxdown';
 
 const Blockquote = createTypeOfSlot('Blockquote');
@@ -60,6 +60,6 @@ export function Note() {
 
 更小的 `priority` 更早匹配；相同优先级下，后面的 render 插件先匹配，因此传入的自定义插件优先于预设。未匹配的节点继续由预设处理。
 
-> 这个例子需要 `pnpm add @fluxdown/react-presets`。
+> 这个例子需要 `pnpm add @fluxdown/react-plugins`。
 
 只想修改组件、样式或交互时，使用 [Slot 插件](./slot.md) 更直接。要先修改 HAST 内容，使用 [Rehype 插件](../../core/plugins/rehype.mdx)。

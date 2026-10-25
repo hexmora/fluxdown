@@ -1,8 +1,8 @@
 import type { MapperInputs, MapperPluggable } from '@fluxdown/core';
 import type { MapperConfigInputs as ConfigInputs, MapperPluginConfig } from '@fluxdown/types';
 
-import { Shad } from '@fluxdown/core-presets/plugins/mapper/shad';
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
 import { first, reverse } from 'lodash-es';
 import { createRef, StrictMode } from 'react';
@@ -19,7 +19,7 @@ import {
 
 import type { FluxdownRef, IPluginItem } from '../packs/full';
 
-import styles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
+import styles from '../../../react-plugins/src/plugins/effect-shad/slot/effect-shad/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
 import { createManualDriver, createStepInterpolator } from './utils/smooth';
 

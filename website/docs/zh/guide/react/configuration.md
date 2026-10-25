@@ -88,7 +88,7 @@
 
 把经过的时间换算成显示进度。`'spring'` 使用内置的弹簧精确解，也可以传自定义插值类。
 
-> 通常直接使用 `smooth: true` 即可。`SmoothConfig` 从 `fluxdown` 导入；`SmoothDriverClass` 和 `SmoothInterpolatorClass` 从 `@fluxdown/core-presets/plugins/mapper/smooth` 导入。旧名称 `ticker` 和 `scheduler` 在下一个版本前仍可使用，但已弃用。
+> 通常直接使用 `smooth: true` 即可。`SmoothConfig` 从 `fluxdown` 导入；`SmoothDriverClass` 和 `SmoothInterpolatorClass` 从 `@fluxdown/core-plugins/plugins/mapper/smooth` 导入。旧名称 `ticker` 和 `scheduler` 在下一个版本前仍可使用，但已弃用。
 
 ### streaming.effect <span className="field-tag">可选</span> {#streamingeffect}
 
@@ -98,7 +98,7 @@
 
 选择动画效果，也可以组合多个效果。支持的输入形式、内置效果、实时演示与配置字段见[动画效果](../common/streaming-effects/animation/index.mdx)。
 
-> `EffectItem` 从 `fluxdown` 导入。效果配置类型从对应插件入口导入，例如 `ScaleConfig` 来自 `@fluxdown/core-presets/plugins/mapper/scale`。完整子路径见 [Mapper 插件](../core/plugins/mapper.mdx#支持的插件)。
+> `EffectItem` 从 `fluxdown` 导入。效果配置类型从对应插件入口导入，例如 `ScaleConfig` 来自 `@fluxdown/core-plugins/plugins/mapper/scale`。完整子路径见 [Mapper 插件](../core/plugins/mapper.mdx#支持的插件)。
 
 ## build <span className="field-tag">可选</span> {#build}
 
@@ -218,7 +218,7 @@ Markdown 内的 HTML 会经过标签检查与清理，默认允许 `span`、`u`�
 
 **默认值：** `[]`
 
-> `IPluginItem` 从 `@fluxdown/react-presets/typings` 导出。Lite 和 Full 会合并预设与传入的插件，传入的优先级更高。`FluxdownRaw` 的此参数必填，入口区别见[插件矩阵](./plugins/matrix.mdx)。
+> `IPluginItem` 从 `@fluxdown/react-base-plugins/typings` 导出。Lite 和 Full 会合并预设与传入的插件，传入的优先级更高。`FluxdownRaw` 的此参数必填，入口区别见[插件矩阵](./plugins/matrix.mdx)。
 
 一个对象表示一个插件包；数组组合多个插件包。每个包可以提供以下列表：
 
@@ -235,7 +235,7 @@ Markdown 内的 HTML 会经过标签检查与清理，默认允许 `span`、`u`�
 列表项可以是插件本身，也可以是 `[插件, 选项]`。使用 `config` 时，不需要把选项重复写进各个列表项：
 
 ```tsx
-import { CodeHeaderSlotPlugin } from '@fluxdown/react-presets/plugins/code';
+import { CodeHeaderSlotPlugin } from '@fluxdown/react-plugins/plugins/code';
 import { Fluxdown } from 'fluxdown';
 
 <Fluxdown

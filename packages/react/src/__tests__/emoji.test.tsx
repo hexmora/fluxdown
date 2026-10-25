@@ -1,5 +1,5 @@
-import { EmojiPlugin, EmojiRemarkPlugin } from '@fluxdown/react-presets/plugins/emoji';
-import { FallbackPlugin } from '@fluxdown/react-presets/plugins/fallback';
+import { EmojiPlugin, EmojiRemarkPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
+import { FallbackPlugin } from '@fluxdown/react-plugins/plugins/fallback';
 import { render } from '@testing-library/react';
 
 import type { IPluginItem } from '../packs/full';

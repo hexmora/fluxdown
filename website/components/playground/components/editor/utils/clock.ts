@@ -1,7 +1,7 @@
 import {
   BaseSmoothDriver,
   type SmoothDriverClass,
-} from '@fluxdown/core-presets/plugins/mapper/smooth';
+} from '@fluxdown/core-plugins/plugins/mapper/smooth';
 
 /**
  * Virtual time that advances at an adjustable rate. Changing the rate keeps the current reading,

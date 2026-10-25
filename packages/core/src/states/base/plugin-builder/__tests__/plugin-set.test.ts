@@ -1,13 +1,13 @@
 import type { IPluggable, IRemarkPlugin, PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { IReadableClosure } from 'stative';
 
-import { Chunk } from '@fluxdown/core-presets/plugins/mapper/chunk';
-import { Scale } from '@fluxdown/core-presets/plugins/mapper/scale';
-import { Shad } from '@fluxdown/core-presets/plugins/mapper/shad';
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
-import { Suffix } from '@fluxdown/core-presets/plugins/mapper/suffix';
-import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/syntax-policy';
-import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-presets/presets/mapper';
+import { Chunk } from '@fluxdown/core-plugins/plugins/mapper/chunk';
+import { Scale } from '@fluxdown/core-plugins/plugins/mapper/scale';
+import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Suffix } from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-policy';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-plugins/presets/mapper';
 import { PluginPriority } from '@fluxdown/types';
 import { expectTypeOf } from 'expect-type';
 import { once, render } from 'stative';

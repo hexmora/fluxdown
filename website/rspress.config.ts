@@ -66,7 +66,7 @@ export default defineConfig({
         react: fileURLToPath(new URL('./node_modules/react', import.meta.url)),
         'react-dom': fileURLToPath(new URL('./node_modules/react-dom', import.meta.url)),
         '@prefix': fileURLToPath(
-          new URL('../packages/react-presets/src/styles/_prefix.scss', import.meta.url),
+          new URL('../packages/react-plugins/src/styles/_prefix.scss', import.meta.url),
         ),
       },
     },

@@ -7,9 +7,9 @@ Slot plugins render slots. Content such as code, links, and headings is already 
 This example hides the code toolbar while keeping the default highlighting and code styles:
 
 ```tsx
-import type { CodeBlockProps } from '@fluxdown/react-presets/base';
+import type { CodeBlockProps } from '@fluxdown/react-plugins/base';
 
-import { BaseSlotPlugin } from '@fluxdown/react-presets/base';
+import { BaseSlotPlugin } from '@fluxdown/react-plugins/base';
 import { Fluxdown } from 'fluxdown';
 
 function CompactCodeBlock({ Raw, ...props }: CodeBlockProps) {
@@ -35,7 +35,7 @@ export function Message({ text }: MessageProps) {
 
 `key` identifies the plugin, `type` selects the slot, and `Component` provides its component. Add the plugin class to `slots`; Fluxdown manages its creation and cleanup.
 
-> Import base classes and prop types from `@fluxdown/react-presets/base`. Install the extension package with `pnpm add @fluxdown/react-presets` first.
+> Import base classes and prop types from `@fluxdown/react-plugins/base`. Install the extension package with `pnpm add @fluxdown/react-plugins` first.
 
 ## Keep the defaults
 

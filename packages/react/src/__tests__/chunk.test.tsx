@@ -1,11 +1,11 @@
-import { Chunk } from '@fluxdown/core-presets/plugins/mapper/chunk';
-import { PREFIX } from '@fluxdown/react-presets/base';
+import { Chunk } from '@fluxdown/core-plugins/plugins/mapper/chunk';
+import { PREFIX } from '@fluxdown/react-plugins/base';
 import { act, cleanup, render } from '@testing-library/react';
 import { MutableState, toClosure } from 'stative';
 
 import type { EffectItem } from '../packs/full';
 
-import styles from '../../../react-presets/src/plugins/effect-chunk/render/effect-chunk/renderer/index.module.scss';
+import styles from '../../../react-plugins/src/plugins/effect-chunk/slot/effect-chunk/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
 import { createManualDriver, createStepInterpolator } from './utils/smooth';
 

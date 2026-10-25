@@ -1,0 +1,41 @@
+import { defineConfig } from '@rslib/core';
+import { readdirSync } from 'node:fs';
+
+import { packageConfig } from '../../rslib.shared';
+
+const pluginEntries = Object.fromEntries(
+  readdirSync(new URL('./src/plugins', import.meta.url), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map(({ name }) => [`plugins/${name}`, `./src/plugins/${name}/index.ts`]),
+);
+
+const config = packageConfig({
+  entry: {
+    base: './src/base/index.ts',
+    ...pluginEntries,
+  },
+  jsxImportSource: 'react',
+});
+
+export default defineConfig({
+  ...config,
+  lib: config.lib?.map((lib) => ({
+    ...lib,
+    output: {
+      ...lib.output,
+      copy: [
+        {
+          from: './src/typings/plugins/plugins.d.ts',
+          to: `typings/plugins/plugins.d.${lib.format === 'cjs' ? 'cts' : 'ts'}`,
+          transform: (content: Buffer) =>
+            content
+              .toString()
+              .replace(
+                /import '(\.\.\/\.\.\/plugins\/[^']+)';/g,
+                `import '$1/index.${lib.format === 'cjs' ? 'cjs' : 'js'}';`,
+              ),
+        },
+      ],
+    },
+  })),
+});

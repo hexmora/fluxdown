@@ -1,6 +1,7 @@
 ---
-"@fluxdown/core-presets": minor
-"@fluxdown/react-presets": minor
+"@fluxdown/core-plugins": minor
+"@fluxdown/react-base-plugins": minor
+"@fluxdown/react-plugins": minor
 "@fluxdown/core": patch
 "fluxdown": minor
 ---

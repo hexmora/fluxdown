@@ -1,14 +1,14 @@
 import type { IRemarkPlugin } from '@fluxdown/types';
 
-import { BaseRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/base';
+import { BaseRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/base';
 import { act, cleanup, render } from '@testing-library/react';
 import { createRef } from 'react';
 
 import type { FluxdownProps, FluxdownRef } from '../packs/full';
 
 import { restoreGlobals } from '../../../../scripts/testing/globals';
-import scaleStyles from '../../../react-presets/src/plugins/effect-scale/render/effect-scale/renderer/index.module.scss';
-import styles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
+import scaleStyles from '../../../react-plugins/src/plugins/effect-scale/slot/effect-scale/renderer/index.module.scss';
+import styles from '../../../react-plugins/src/plugins/effect-shad/slot/effect-shad/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
 import { createRafClock } from './utils/raf';
 

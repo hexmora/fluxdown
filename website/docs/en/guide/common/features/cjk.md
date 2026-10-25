@@ -35,13 +35,13 @@ React Full already includes `CjkPlugin`, so no registration is needed. For Core 
 Install the Core presets package:
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 ```
 
 Add `CjkRemarkPlugin` to the `remarks` input from the [Core quick start](../../core/quick-start.md):
 
 ```ts
-import { CjkRemarkPlugin } from '@fluxdown/core-presets/plugins/remark/cjk';
+import { CjkRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/cjk';
 
 const remarks = [CjkRemarkPlugin];
 ```
@@ -51,11 +51,11 @@ const remarks = [CjkRemarkPlugin];
 Install the React presets package:
 
 ```sh
-pnpm add @fluxdown/react-presets
+pnpm add @fluxdown/react-base-plugins
 ```
 
 ```tsx
-import { CjkPlugin } from '@fluxdown/react-presets/plugins/cjk';
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { FluxdownLite } from 'fluxdown/lite';
 
 export function Message({ text }: { text: string }) {
@@ -65,10 +65,10 @@ export function Message({ text }: { text: string }) {
 
 ## Disable CJK support
 
-After installing `@fluxdown/react-presets`, include `CjkPlugin` and `config` in the same plugin pack to restore default Markdown punctuation handling:
+After installing `@fluxdown/react-base-plugins`, include `CjkPlugin` and `config` in the same plugin pack to restore default Markdown punctuation handling:
 
 ```tsx
-import { CjkPlugin } from '@fluxdown/react-presets/plugins/cjk';
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { Fluxdown } from 'fluxdown';
 
 export function Message({ text }: { text: string }) {

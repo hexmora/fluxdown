@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import type { FluxdownRef } from '../packs/full';
 
-import styles from '../../../react-presets/src/plugins/effect-shad/render/effect-shad/renderer/index.module.scss';
+import styles from '../../../react-plugins/src/plugins/effect-shad/slot/effect-shad/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
 import { createManualDriver, createStepInterpolator } from './utils/smooth';
 

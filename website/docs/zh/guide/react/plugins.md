@@ -17,7 +17,7 @@
 
 `plugins` 接收一个 `IPluginItem`，也可以接收它的数组。一个插件包可以包含 `slots`、`renders`、`remarks`、`rehypes`、`repairs` 和 `mappers` 中的多个列表。
 
-> `IPluginItem` 类型从 `@fluxdown/react-presets/typings` 导入。
+> `IPluginItem` 类型从 `@fluxdown/react-base-plugins/typings` 导入。
 
 ```tsx
 import { Fluxdown } from 'fluxdown';
@@ -59,7 +59,7 @@ export function Message({ text }: MessageProps) {
 在相应列表中指定预设，再通过 `config` 按插件的 `key` 提供选项。例如，图片地址尚未生成完成时，先隐藏它：
 
 ```tsx
-import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/plugins/repair/incomplete-image';
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/incomplete-image';
 import { Fluxdown } from 'fluxdown';
 
 type MessageProps = {
@@ -82,6 +82,6 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
-> 这个例子需要 `pnpm add @fluxdown/core-presets`。默认图片策略是 `placeholder`，会先显示占位内容。
+> 这个例子需要 `pnpm add @fluxdown/core-plugins`。默认图片策略是 `placeholder`，会先显示占位内容。
 
 `config` 作用于同一个插件包里列出的插件。其他预设会继续保留。内置 React 插件见[插件矩阵](./plugins/matrix.mdx)，解析与映射预设见 [Core 插件](../core/plugins.md)。完整属性见[自定义配置](./configuration.md#plugins)。

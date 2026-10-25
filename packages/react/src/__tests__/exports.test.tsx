@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
 
-import { PRESET_FULL_PLUGINS } from '@fluxdown/react-presets/full';
-import { EffectShadRenderPlugin } from '@fluxdown/react-presets/plugins/effect-shad';
+import { EffectShadRenderPlugin } from '@fluxdown/react-base-plugins/plugins/effect-shad';
+import { PRESET_FULL_PLUGINS } from '@fluxdown/react-plugins/full';
 import { expectTypeOf } from 'expect-type';
 import * as ReactEntry from 'fluxdown';
 import * as FullEntry from 'fluxdown/full';

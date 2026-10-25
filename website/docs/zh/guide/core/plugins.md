@@ -29,13 +29,13 @@ const repairs: RepairOptions = [
 也可以直接导入插件类并配置：
 
 ```sh
-pnpm add @fluxdown/core-presets
+pnpm add @fluxdown/core-plugins
 ```
 
 ```ts
 import type { IPluggable, IRepairPlugin } from '@fluxdown/types';
 
-import { IncompleteImageRepairPlugin } from '@fluxdown/core-presets/plugins/repair/incomplete-image';
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/incomplete-image';
 
 type RepairPlugin = IPluggable<IRepairPlugin, unknown>;
 
@@ -76,4 +76,4 @@ remark 和 rehype 插件用于接入 unified 插件；repair 插件访问并修�
 
 传入插件类或 mapper 函数即可，由 Core 管理生命周期。每次运行的数据应留在转换函数或状态流内，让同一个声明可以用于多份内容。
 
-> 单个插件从 `@fluxdown/core-presets/plugins/[type]/[子路径]` 导入，预设数组从 `@fluxdown/core-presets/presets/[type]` 导入。`[type]` 为 `remark`、`rehype`、`repair` 或 `mapper`，子路径见各类插件文档。包根路径和插件分类路径不提供统一入口。
+> 单个插件从 `@fluxdown/core-plugins/plugins/[type]/[子路径]` 导入，预设数组从 `@fluxdown/core-plugins/presets/[type]` 导入。`[type]` 为 `remark`、`rehype`、`repair` 或 `mapper`，子路径见各类插件文档。包根路径和插件分类路径不提供统一入口。

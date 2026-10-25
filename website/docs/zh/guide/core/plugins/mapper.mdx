@@ -39,9 +39,9 @@ const mappers: MapperPluggable<PreviewConfig>[] = [[Preview, { count: 3 }]];
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
-import type { SmoothConfig } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import type { SmoothConfig } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 
-import { Smooth } from '@fluxdown/core-presets/plugins/mapper/smooth';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { MutableState, toClosure } from 'stative';
 
 const enabled = MutableState.of(true);
@@ -56,9 +56,9 @@ const mappers: MapperPluggable<SmoothConfig>[] = [
 
 ## 支持的插件
 
-将表中的子路径接在 `@fluxdown/core-presets/plugins/mapper/` 后，即为插件的完整导入路径。例如，`smooth` 对应 `@fluxdown/core-presets/plugins/mapper/smooth`。
+将表中的子路径接在 `@fluxdown/core-plugins/plugins/mapper/` 后，即为插件的完整导入路径。例如，`smooth` 对应 `@fluxdown/core-plugins/plugins/mapper/smooth`。
 
-勾选表示插件包含在 `PRESET_MAPPER_PLUGINS` 中，由 Core 自动注册；未勾选的插件需手动添加。预设数组从 `@fluxdown/core-presets/presets/mapper` 导入。
+勾选表示插件包含在 `PRESET_MAPPER_PLUGINS` 中，由 Core 自动注册；未勾选的插件需手动添加。预设数组从 `@fluxdown/core-plugins/presets/mapper` 导入。
 
 | 插件     | 子路径   |    是否内置     | 作用                                                       |
 | -------- | -------- | :-------------: | ---------------------------------------------------------- |

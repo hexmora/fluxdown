@@ -1,0 +1,79 @@
+{
+  "name": "@fluxdown/react-hooks",
+  "version": "0.1.0",
+  "description": "Shared React hooks for reactive Fluxdown rendering.",
+  "keywords": [
+    "hooks",
+    "react",
+    "reactive"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/react-hooks"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "publishConfig": {
+    "main": "./dist/cjs/index.cjs",
+    "module": "./dist/esm/index.js",
+    "types": "./dist/esm/index.d.ts",
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/esm/index.d.ts",
+          "default": "./dist/esm/index.js"
+        },
+        "require": {
+          "types": "./dist/cjs/index.d.cts",
+          "default": "./dist/cjs/index.cjs"
+        }
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rslib build",
+    "lint": "oxlint .",
+    "test": "jest --config ../../jest.config.ts --selectProjects react-hooks --runInBand",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/utils": "workspace:^",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@rslib/core": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "oxlint": "catalog:",
+    "react-dom": "catalog:react-peer",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:react-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
