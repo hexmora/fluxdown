@@ -52,7 +52,7 @@ function expandExports(manifest: PackageManifest, files: string[]) {
       // Declarations preserve internal directories too; enumerate public runtime wrappers.
       const targets = exportTargets(value);
       const pattern =
-        targets.find((target) => target.includes('*') && /\.[cm]?js$/.test(target)) ??
+        targets.find((target) => target.includes('*') && /\.[cm]?jsx?$/.test(target)) ??
         targets.find((target) => target.includes('*'));
 
       assert(pattern, `${manifest.name}: export pattern has no matching target: ${key}`);
@@ -79,7 +79,7 @@ export function publicEntries(
   return expandExports(manifest, files).filter(
     ([key, value]) =>
       key.startsWith('.') &&
-      exportTargets(value).some((target) => /\.(?:mjs|cjs|js)$/.test(target)),
+      exportTargets(value).some((target) => /\.(?:mjs|cjs|jsx?)$/.test(target)),
   );
 }
 
@@ -105,6 +105,10 @@ export function resolveExport(
   return undefined;
 }
 
+export function isLynxPackage(name: string): boolean {
+  return name === '@fluxdown/lynx' || name === '@fluxdown/lynx-plugins';
+}
+
 export async function readManifest(directory: string): Promise<PackageManifest> {
   return JSON.parse(
     await readFile(path.join(directory, 'package.json'), 'utf8'),
@@ -128,7 +132,7 @@ async function checkExports(directory: string, source = false): Promise<PackageM
 
   assert(
     manifest.exports && publicEntries(manifest, files).length,
-    `${label}: missing dual-format exports`,
+    `${label}: missing runtime exports`,
   );
 
   const targets = new Set([
@@ -160,6 +164,17 @@ async function checkExports(directory: string, source = false): Promise<PackageM
   }
 
   for (const [entry, value] of publicEntries(manifest, files)) {
+    if (isLynxPackage(manifest.name)) {
+      assert(
+        resolveExport(value, ['import'])?.endsWith('.jsx'),
+        `${label}${entry}: Lynx libraries must preserve JSX for the app compiler`,
+      );
+      assert(
+        resolveExport(value, ['types', 'import'])?.endsWith('.d.ts'),
+        `${label}${entry}: missing Lynx declarations`,
+      );
+      continue;
+    }
     for (const environment of ['node', 'browser']) {
       for (const [format, extension, declaration] of [
         ['import', '.js', '.d.ts'],

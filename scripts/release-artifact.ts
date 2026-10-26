@@ -18,6 +18,8 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/types',
   '@fluxdown/core-plugins',
   '@fluxdown/core',
+  '@fluxdown/lynx-plugins',
+  '@fluxdown/lynx',
   '@fluxdown/react-hooks',
   '@fluxdown/react-base',
   '@fluxdown/react-base-plugins',

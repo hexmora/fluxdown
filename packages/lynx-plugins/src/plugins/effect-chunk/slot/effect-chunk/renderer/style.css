@@ -1,0 +1,16 @@
+/* Inline native text is a styled span, so animate its paint color instead of view opacity. */
+@keyframes fluxdown-chunk-appear {
+  from {
+    color: transparent;
+  }
+  to {
+    color: var(--fluxdown-text-color);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fluxdown-chunk-active,
+  .fluxdown-chunk-active text {
+    animation-name: none !important;
+  }
+}

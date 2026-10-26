@@ -1,0 +1,9 @@
+language: typescript
+layer: library
+
+tasks:
+  test:
+    inputs:
+      - rstest.config.ts
+      - rstest.setup.ts
+      - /scripts/build/**/*

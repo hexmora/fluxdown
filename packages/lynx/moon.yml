@@ -1,0 +1,20 @@
+language: typescript
+layer: library
+
+tasks:
+  test:
+    inputs:
+      - rstest.config.ts
+      - rstest.setup.ts
+      - /scripts/build/**/*
+  dev:
+    command: pnpm run dev
+    preset: server
+  build-storybook:
+    command: pnpm run build:storybook
+    deps: ["^:build"]
+    inputs:
+      - "**/*"
+      - /packages/*/src/**/*
+      - /pnpm-lock.yaml
+    outputs: [storybook-static, dist/preview]
