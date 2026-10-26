@@ -13,7 +13,7 @@ export const StreamingFrame = ({ label, caption, controls, children }: Streaming
   return (
     <section aria-label={label} className={styles.demo}>
       <div className={styles.toolbar}>
-        <div className={styles.caption}>{caption}</div>
+        {caption ? <div className={styles.caption}>{caption}</div> : null}
         <div className={styles.controls}>
           {!controls.complete && (
             <button

@@ -5,13 +5,25 @@ import assert from 'node:assert/strict';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-const engines = ['shiki', '@shikijs', 'prismjs', 'katex', '@mathjax', 'pele'];
+import { reactNativeWebPlugin } from './build/react-native-web.ts';
+
+const nativeEngines = [
+  'mathjax-full',
+  'react-native-code-highlighter',
+  'react-syntax-highlighter',
+  '@osuki-dev/skia-diagrams',
+];
+
+const engines = ['shiki', '@shikijs', 'prismjs', 'katex', '@mathjax', 'pele', ...nativeEngines];
+
 const syntaxExtensions = [
   'remark-gemoji',
   'micromark-extension-cjk-friendly',
   'micromark-extension-cjk-friendly-gfm-strikethrough',
 ];
-const dependencies = [...engines, ...syntaxExtensions];
+
+const dependencies = [...engines, ...syntaxExtensions, 'react-native-svg'];
+
 const domDependencies = ['react-dom', 'fluxdown', '@fluxdown/react-plugins'];
 const trackedDependencies = [
   ...dependencies,
@@ -20,7 +32,7 @@ const trackedDependencies = [
   '@fluxdown/react-base-plugins',
 ];
 
-export async function checkReactPacks(consumer: string): Promise<void> {
+export async function checkReactPacks(consumer: string, native = false): Promise<void> {
   const entries: { specifier: string; allowed: string[]; headless?: boolean }[] = [
     { specifier: '@fluxdown/react-hooks', allowed: [], headless: true },
     { specifier: '@fluxdown/react-base', allowed: [], headless: true },
@@ -51,7 +63,37 @@ export async function checkReactPacks(consumer: string): Promise<void> {
     { specifier: '@fluxdown/react-plugins/plugins/tex-katex', allowed: ['katex'] },
   ];
 
+  if (native)
+    entries.push(
+      { specifier: '@fluxdown/react-native/raw', allowed: [] },
+      { specifier: '@fluxdown/react-native/lite', allowed: ['react-native-svg'] },
+      {
+        specifier: '@fluxdown/react-native/full',
+        allowed: [...nativeEngines, ...syntaxExtensions, 'react-native-svg'],
+      },
+      { specifier: '@fluxdown/react-native-plugins/plugins/paragraph', allowed: [] },
+      {
+        specifier: '@fluxdown/react-native-plugins/plugins/tex-svg',
+        allowed: ['mathjax-full', 'react-native-svg'],
+      },
+      { specifier: '@fluxdown/react-native-plugins/plugins/effect-chunk', allowed: [] },
+      {
+        specifier: '@fluxdown/react-native-plugins/plugins/effect-scale',
+        allowed: ['react-native-svg'],
+      },
+      {
+        specifier: '@fluxdown/react-native-plugins/plugins/effect-shad',
+        allowed: ['react-native-svg'],
+      },
+      {
+        specifier: '@fluxdown/react-native-plugins/plugins/effect-suffix',
+        allowed: [],
+      },
+    );
+
   for (const [index, { specifier, allowed, headless }] of entries.entries()) {
+    const nativeEntry = specifier.startsWith('@fluxdown/react-native');
+
     for (const format of ['import', 'require'] as const) {
       const name = `pack-${index}-${format}`;
       const file = path.join(consumer, `${name}.${format === 'import' ? 'mjs' : 'cjs'}`);
@@ -66,6 +108,7 @@ export async function checkReactPacks(consumer: string): Promise<void> {
         cwd: consumer,
         config: {
           mode: 'production',
+          plugins: nativeEntry ? [reactNativeWebPlugin(consumer)] : [],
           source: { entry: { index: file } },
           output: {
             target: 'web',
@@ -93,6 +136,12 @@ export async function checkReactPacks(consumer: string): Promise<void> {
         const forbidden = new Set(
           dependencies.filter((dependency) => !allowed.includes(dependency)),
         );
+
+        if (nativeEntry) {
+          forbidden.add('fluxdown');
+
+          forbidden.add('@fluxdown/react-plugins');
+        }
 
         if (headless) {
           for (const dependency of domDependencies) forbidden.add(dependency);

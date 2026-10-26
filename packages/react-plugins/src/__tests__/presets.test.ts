@@ -4,7 +4,7 @@ import type { Element, Text } from 'hast';
 import type { AnySlotPlugin, IReactRenderPlugin, SlotType } from '../base';
 
 import { PRESET_FULL_PLUGINS } from '../presets/full';
-import { PRESET_LIGHT_PLUGINS } from '../presets/lite';
+import { PRESET_LITE_PLUGINS } from '../presets/lite';
 
 const EXPECTED_SLOT_TYPES: SlotType[] = [
   'Blockquote',
@@ -38,7 +38,7 @@ const createMath = (tagName: string): Element => ({
 });
 
 describe.each([
-  ['lite', PRESET_LIGHT_PLUGINS],
+  ['lite', PRESET_LITE_PLUGINS],
   ['full', PRESET_FULL_PLUGINS],
 ] as const)('%s plugin preset', (_name, plugins) => {
   const renderPlugins = plugins.flatMap(

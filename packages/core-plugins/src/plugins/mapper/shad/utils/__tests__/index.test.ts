@@ -50,6 +50,22 @@ const getParts = (output: Root) => {
 };
 
 describe('createShadRoot', () => {
+  test('keeps the shaded tail offset relative to its parent across earlier siblings and graphemes', () => {
+    const source = root([
+      element('p', [
+        text('AB'),
+        element('a', [text('link')]),
+        text('👩‍💻é文字自然展开，阅读不必等待。Streaming'),
+      ]),
+    ]);
+
+    const output = createShadRoot({ root: source, length: 10, activeLength: 10 });
+
+    expect(getHost(output)?.properties.dataShadOffset).toBe(20);
+
+    expect(getParts(output)).toEqual(['待', '。Streaming']);
+  });
+
   test.each([
     { maskWidth: undefined, expected: 15 },
     { maskWidth: 0, expected: 0 },
@@ -65,7 +81,7 @@ describe('createShadRoot', () => {
 
     expect(getHost(output)?.properties.dataShadMaskWidth).toBe(expected);
 
-    expect(getParts(output)).toEqual(['d', 'ef']);
+    expect(getParts(output)).toEqual(['abcd', 'ef']);
 
     expect(getText(output)).toBe(getText(source));
 
@@ -79,20 +95,22 @@ describe('createShadRoot', () => {
   });
 
   test.each([
-    { activeLength: 0, expected: ['def', ''] },
-    { activeLength: 1, expected: ['de', 'f'] },
-    { activeLength: 2, expected: ['d', 'ef'] },
-    { activeLength: 3, expected: ['', 'def'] },
-    { activeLength: 8, expected: ['', 'def'] },
-    { activeLength: -1, expected: ['def', ''] },
-    { activeLength: Number.NaN, expected: ['def', ''] },
+    { activeLength: 0, expected: ['abcdef', ''] },
+    { activeLength: 1, expected: ['abcde', 'f'] },
+    { activeLength: 2, expected: ['abcd', 'ef'] },
+    { activeLength: 3, expected: ['abc', 'def'] },
+    { activeLength: 8, expected: ['abc', 'def'] },
+    { activeLength: -1, expected: ['abcdef', ''] },
+    { activeLength: Number.NaN, expected: ['abcdef', ''] },
   ])('keeps a stable host with activeLength $activeLength', ({ activeLength, expected }) => {
     const source = root([element('p', [text('abcdef')])]);
     const output = createShadRoot({ root: source, length: 3, activeLength });
 
     expect(getParts(output)).toEqual(expected);
     expect(output.children[0]).toMatchObject({
-      children: [text('abc'), { properties: { [SHAD_DATA_ATTR]: SHAD_HOST_VALUE } }],
+      children: [
+        { data: { renderKey: 'shad' }, properties: { [SHAD_DATA_ATTR]: SHAD_HOST_VALUE } },
+      ],
     });
     expect(getText(output)).toBe(getText(source));
     expect(sizeOfHast(output)).toBe(sizeOfHast(source));
@@ -102,8 +120,10 @@ describe('createShadRoot', () => {
     const source = root([text('A👨‍👩‍👧‍👦e\u0301🇨🇳')]);
     const output = createShadRoot({ root: source, length: 3, activeLength: 2 });
 
-    expect(output.children[0]).toEqual(text('A'));
-    expect(getParts(output)).toEqual(['👨‍👩‍👧‍👦', 'e\u0301🇨🇳']);
+    expect(output.children[0]).toBe(getHost(output));
+
+    expect(getParts(output)).toEqual(['A👨‍👩‍👧‍👦', 'e\u0301🇨🇳']);
+
     expect(sizeOfHast(output)).toBe(4);
   });
 
@@ -125,16 +145,21 @@ describe('createShadRoot', () => {
     expect(sizeOfHast(output)).toBe(sizeOfHast(source));
   });
 
-  test('keeps the host inside the deepest parent that can provide the configured tail', () => {
+  test('keeps the host outside inline formatting while retaining each part of that formatting', () => {
     const prefix = text('prefix ');
     const source = root([element('p', [prefix, element('em', [text('abcdef')])])]);
     const output = createShadRoot({ root: source, length: 3, activeLength: 2 });
     const paragraph = output.children[0] as Element;
-    const emphasis = paragraph.children[1] as Element;
-
     expect(paragraph.children[0]).toBe(prefix);
-    expect(emphasis.children[1]).toBe(getHost(output));
-    expect(getParts(output)).toEqual(['d', 'ef']);
+
+    expect(paragraph.children[1]).toBe(getHost(output));
+
+    expect(getParts(output)).toEqual(['abcd', 'ef']);
+
+    expect(getHost(output)?.children).toMatchObject([
+      { children: [{ tagName: 'em', children: [text('abcd')] }] },
+      { children: [{ tagName: 'em', children: [text('ef')] }] },
+    ]);
   });
 
   test.each(['annotation', 'code', 'math', 'pre', 'svg'])(
@@ -153,8 +178,10 @@ describe('createShadRoot', () => {
       const source = root([element('p', [text('abc'), trailing])]);
       const output = createShadRoot({ root: source, length: 2, activeLength: 1 });
 
-      expect(getParts(output)).toEqual(['b', 'c']);
-      expect((output.children[0] as Element).children[2]).toBe(trailing);
+      expect(getParts(output)).toEqual(['ab', 'c']);
+
+      expect((output.children[0] as Element).children[1]).toBe(trailing);
+
       expect(sizeOfHast(output)).toBe(sizeOfHast(source));
     },
   );
@@ -164,8 +191,9 @@ describe('createShadRoot', () => {
     const source = root([element('p', [text('abc'), trailing])]);
     const output = createShadRoot({ root: source, length: 2, activeLength: 1 });
 
-    expect(getParts(output)).toEqual(['b', 'c']);
-    expect((output.children[0] as Element).children[2]).toBe(trailing);
+    expect(getParts(output)).toEqual(['ab', 'c']);
+
+    expect((output.children[0] as Element).children[1]).toBe(trailing);
   });
 
   test.each(['tex', 'x-label'])(
@@ -312,8 +340,10 @@ describe('createShadRoot', () => {
     const source = root([element('p', [text('tail'), image]), formatting]);
     const output = createShadRoot({ root: source, length: 3, activeLength: 2 });
 
-    expect(getParts(output)).toEqual(['a', 'il']);
-    expect((output.children[0] as Element).children[2]).toBe(image);
+    expect(getParts(output)).toEqual(['ta', 'il']);
+
+    expect((output.children[0] as Element).children[1]).toBe(image);
+
     expect(output.children[1]).toBe(formatting);
     expect(sizeOfHast(output)).toBe(sizeOfHast(source));
   });
@@ -338,9 +368,12 @@ describe('createShadRoot', () => {
     const output = createShadRoot({ root: source, length: 3, activeLength: 2 });
     const paragraph = output.children[0] as Element;
 
-    expect(getParts(output)).toEqual(['B', 'CD']);
-    expect(paragraph.children[2]).toMatchObject({ tagName: 'em', children: [image] });
-    expect((paragraph.children[2] as Element).children[0]).toBe(image);
+    expect(getParts(output)).toEqual(['AB', 'CD']);
+
+    expect(paragraph.children[1]).toMatchObject({ tagName: 'em', children: [image] });
+
+    expect((paragraph.children[1] as Element).children[0]).toBe(image);
+
     expect(sizeOfHast(output)).toBe(sizeOfHast(source));
   });
 

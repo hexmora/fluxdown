@@ -20,7 +20,7 @@ import { StrongPlugin } from '../../plugins/strong';
 import { TablePlugin } from '../../plugins/table';
 import { TexPlugin } from '../../plugins/tex';
 
-export const PRESET_LIGHT_PLUGINS: IPluginItem[] = [
+export const PRESET_LITE_PLUGINS: IPluginItem[] = [
   PatchPlugin,
   EffectShadPlugin,
   EffectScalePlugin,

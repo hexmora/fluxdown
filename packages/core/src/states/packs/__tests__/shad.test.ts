@@ -168,7 +168,7 @@ describe('Core shad pipeline', () => {
     view.mappers.next([[Shad, { enabled: ReactiveState.of(true) }]]);
 
     expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
-      leading: 'cdefghijkl',
+      leading: 'abcdefghijkl',
       active: '',
     });
 
@@ -179,9 +179,18 @@ describe('Core shad pipeline', () => {
     view.text.next('abcdefghijklm');
 
     expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
-      leading: 'defghijkl',
+      leading: 'abcdefghijkl',
       active: 'm',
     });
+
+    view.text.next('abcdefghijklmnopqrstuvwxyz');
+
+    expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
+      leading: 'abcdefghijklmnop',
+      active: 'qrstuvwxyz',
+    });
+
+    expect(view.read()).toEqual(['abcdefghijklmnopqrstuvwxyz']);
   });
 
   test('overrides the Shad preset through a public mapper tuple and restores its configuration', () => {
@@ -198,7 +207,7 @@ describe('Core shad pipeline', () => {
     view.mappers.next(undefined);
 
     expect(readParts(firstBlock(view.core.value.value).value.value)).toEqual({
-      leading: 'de',
+      leading: 'abcde',
       active: '',
     });
 
@@ -231,15 +240,15 @@ describe('Core shad pipeline', () => {
 
     let fork = firstBlock(view.core.value.value);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: '' });
 
     view.text.next('abcde');
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: 'e' });
 
     view.shad.next({ ...enabled, length: 4 });
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'bcd', active: 'e' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: 'e' });
 
     view.shad.next(disabled);
 
@@ -257,7 +266,7 @@ describe('Core shad pipeline', () => {
 
     expect(Object.is(fork, previous)).toBe(false);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcde', active: '' });
   });
 
   test('updates mask width without replacing blocks or restarting the active tail', () => {
@@ -269,7 +278,7 @@ describe('Core shad pipeline', () => {
 
     view.text.next('abcde');
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: 'e' });
 
     jest.advanceTimersByTime(100);
 
@@ -279,11 +288,11 @@ describe('Core shad pipeline', () => {
 
     expect(findHost(fork.value.value)?.properties.dataShadMaskWidth).toBe(6.5);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: 'e' });
 
     jest.advanceTimersByTime(100);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcde', active: '' });
 
     view.shad.next({ ...enabled, maskWidth: 0 });
 
@@ -291,7 +300,7 @@ describe('Core shad pipeline', () => {
 
     expect(findHost(fork.value.value)?.properties.dataShadMaskWidth).toBe(0);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcde', active: '' });
 
     expect(jest.getTimerCount()).toBe(0);
   });
@@ -331,7 +340,7 @@ describe('Core shad pipeline', () => {
 
     view.tick(48);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'b', active: 'c' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'ab', active: 'c' });
 
     expect(fork.length.value).toBe(3);
 
@@ -339,7 +348,7 @@ describe('Core shad pipeline', () => {
 
     expect(view.read()).toEqual(['abcd']);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'cd' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'ab', active: 'cd' });
   });
 
   test.each([disabled, enabled, { ...enabled, length: 3 }])(
@@ -367,7 +376,7 @@ describe('Core shad pipeline', () => {
       expect(collectText(block.value.value)).toBe('ready');
 
       expect(readParts(block.value.value)).toEqual(
-        shad.enabled ? { leading: shad.length === 2 ? 'dy' : 'ady', active: '' } : undefined,
+        shad.enabled ? { leading: 'ready', active: '' } : undefined,
       );
 
       expect(core.value.closed).toBe(true);
@@ -381,7 +390,7 @@ describe('Core shad pipeline', () => {
 
     const fork = firstBlock(view.core.value.value);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'bc', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abc', active: '' });
 
     view.text.next('abcd');
 
@@ -391,13 +400,13 @@ describe('Core shad pipeline', () => {
 
     view.mappers.complete();
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'c', active: 'd' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abc', active: 'd' });
 
     expect(fork.value.closed).toBe(false);
 
     jest.advanceTimersByTime(200);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: '' });
 
     expect(view.core.value.closed).toBe(true);
 

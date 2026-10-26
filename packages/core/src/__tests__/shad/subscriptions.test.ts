@@ -52,11 +52,11 @@ test('only the current tail subscribes to shading progress and mask width', () =
 
   expect(countStateObservers(width)).toBe(1);
 
-  expect(readParts(state.value.value)).toEqual({ leading: 'cd', active: '' });
+  expect(readParts(state.value.value)).toEqual({ leading: 'abcd', active: '' });
 
   input.next({ length: 2, activeLength: 1 });
 
-  expect(readParts(state.value.value)).toEqual({ leading: 'c', active: 'd' });
+  expect(readParts(state.value.value)).toEqual({ leading: 'abc', active: 'd' });
 
   tail.next(last.block);
 

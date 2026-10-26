@@ -3,7 +3,7 @@ import type { RsbuildPlugin, Rspack } from '@rslib/core';
 import { createHash } from 'node:crypto';
 import { posix } from 'node:path';
 
-/** Split styles by module so a light entry never inherits another entry's CSS. */
+/** Split styles by module so a lite entry never inherits another entry's CSS. */
 export function styleChunkName(module: Rspack.Module): string {
   const id = module.identifier().replaceAll(process.cwd(), '');
 

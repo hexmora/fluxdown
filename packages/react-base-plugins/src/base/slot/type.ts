@@ -183,6 +183,8 @@ export type ShadProps = SlotBaseProps<{
   active: ReactNode;
   isActive: boolean;
   maskWidth: number;
+  /** Grapheme offset of the shaded tail within its parent. */
+  offset?: number;
 }>;
 
 export type SuffixProps = SlotBaseProps<{ type: SuffixType }, true>;

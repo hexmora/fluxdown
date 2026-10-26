@@ -111,6 +111,7 @@ const createScaleText = (
   node: Text,
   characters: ScaleCharacter[],
   config: ScaleRootConfig,
+  textOffset: number,
 ): ElementContent[] => {
   const isSettled = ({ start }: ScaleCharacter) =>
     start < 0 || start + config.duration <= config.start;
@@ -130,6 +131,8 @@ const createScaleText = (
 
     const selected = characters.slice(offset, offset + length);
 
+    const wordOffset = textOffset + offset;
+
     offset += length;
 
     if (/^\s+$/.test(word) || selected.every(isSettled)) {
@@ -147,10 +150,12 @@ const createScaleText = (
     children.push({
       type: 'element',
       tagName: SCALE_TAG_NAME,
+      data: { renderKey: `scale-word:${wordOffset}:${selected[0]?.start}` },
       properties: { [SCALE_DATA_ATTR]: SCALE_WORD_VALUE },
-      children: selected.map(({ text, start }) => ({
+      children: selected.map(({ text, start }, index) => ({
         type: 'element',
         tagName: SCALE_TAG_NAME,
+        data: { renderKey: `scale-char:${wordOffset + index}:${start}` },
         properties: {
           [SCALE_DATA_ATTR]: SCALE_CHAR_VALUE,
           dataScaleStart: start,
@@ -193,9 +198,11 @@ export const createScaleRoot = (
 
       const selected = characters.slice(offset, offset + length);
 
+      const textOffset = offset;
+
       offset += length;
 
-      return createScaleText(node, selected, config);
+      return createScaleText(node, selected, config, textOffset);
     }
 
     if (node.type !== 'element' || isForbidden(node)) {

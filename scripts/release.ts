@@ -21,6 +21,7 @@ import type { PackageArtifact, WorkspacePackage } from './types.ts';
 
 import { checkBrowserConsumer } from './check-browser.ts';
 import { checkPackage, publicEntries, readManifest } from './check-package.ts';
+import { checkReactNativePacks, REACT_NATIVE_PACKAGES } from './check-react-native-packs.ts';
 import { checkReactPacks } from './check-react-packs.ts';
 import {
   assertPublishEnvironment,
@@ -279,6 +280,14 @@ async function validateDependencies(selected: PackageArtifact[]) {
 }
 
 async function verifyConsumer(artifacts: PackageArtifact[]) {
+  const nativeArtifacts = artifacts.filter(({ manifest }) =>
+    REACT_NATIVE_PACKAGES.includes(manifest.name),
+  );
+
+  const nodeArtifacts = artifacts.filter(
+    ({ manifest }) => !REACT_NATIVE_PACKAGES.includes(manifest.name),
+  );
+
   const consumer = await mkdtemp(path.join(tmpdir(), 'fluxdown-consumer-'));
 
   try {
@@ -290,7 +299,7 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
         private: true,
         type: 'module',
         dependencies: Object.fromEntries(
-          artifacts.map((artifact) => [artifact.manifest.name, `file:${artifact.tarball}`]),
+          nodeArtifacts.map((artifact) => [artifact.manifest.name, `file:${artifact.tarball}`]),
         ),
         overrides: Object.fromEntries(
           artifacts.map((artifact) => [artifact.manifest.name, `$${artifact.manifest.name}`]),
@@ -339,7 +348,7 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
 
     checkInstalled(installed.dependencies);
 
-    const specifiers = artifacts.flatMap(({ manifest, files }) =>
+    const specifiers = nodeArtifacts.flatMap(({ manifest, files }) =>
       publicEntries(manifest, files).map(
         ([entry]) => manifest.name + (entry === '.' ? '' : entry.slice(1)),
       ),
@@ -423,14 +432,16 @@ ${baseRenderSmoke}`;
       typeSmoke += `
 import { FluxdownLite } from 'fluxdown/lite';
 import { FluxdownRaw } from 'fluxdown/raw';
-import { PRESET_LIGHT_PLUGINS } from '@fluxdown/react-plugins/lite';
+import { PRESET_LITE_PLUGINS } from '@fluxdown/react-plugins/lite';
 import { CodePrismPlugin } from '@fluxdown/react-plugins/plugins/code-prism';
 import { TexKatexPlugin } from '@fluxdown/react-plugins/plugins/tex-katex';
 import type { IPluginItem, PluginConfigs } from '@fluxdown/react-base-plugins/typings';
 const config: PluginConfigs = { 'slot-code-header': { disabled: true } };
 const plugin: IPluginItem = { ...CodePrismPlugin, config };
 createElement(FluxdownLite, { text: 'consumer', plugins: [plugin, TexKatexPlugin] });
-createElement(FluxdownRaw, { text: 'consumer', plugins: PRESET_LIGHT_PLUGINS });
+
+createElement(FluxdownRaw, { text: 'consumer', plugins: PRESET_LITE_PLUGINS });
+
 // @ts-expect-error Raw intentionally requires an explicit plugin selection.
 createElement(FluxdownRaw, { text: 'consumer' });
 // @ts-expect-error Raw supplies the DOM property conversion internally.
@@ -597,9 +608,7 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
 
     const browser = await checkBrowserConsumer(consumer, artifacts);
 
-    if (specifiers.includes('fluxdown/lite')) await checkReactPacks(consumer);
-
-    if (specifiers.includes('fluxdown')) {
+    if (specifiers.includes('fluxdown') || nativeArtifacts.length) {
       run(
         'npm',
         [
@@ -632,6 +641,35 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
         'React 18/19 consumer OK: peer dependencies, entry points, and strict declarations',
       );
     }
+
+    if (nativeArtifacts.length) {
+      run(
+        'npm',
+        [
+          'install',
+          '--ignore-scripts',
+          '--no-audit',
+          '--no-fund',
+          '--no-package-lock',
+          ...nativeArtifacts.map(({ tarball }) => tarball),
+          'react-native-web@^0.21.4',
+          'react-native-svg@^15.16.0',
+        ],
+        { cwd: consumer },
+      );
+
+      checkInstalled(
+        JSON.parse(run('npm', ['ls', '--all', '--json'], { cwd: consumer, capture: true }).stdout)
+          .dependencies,
+      );
+
+      await checkReactNativePacks(consumer, nativeArtifacts);
+
+      run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.native.json')]);
+    }
+
+    if (specifiers.includes('fluxdown/lite'))
+      await checkReactPacks(consumer, nativeArtifacts.length > 0);
 
     return { nodeEntries: specifiers.length, browser };
   } finally {

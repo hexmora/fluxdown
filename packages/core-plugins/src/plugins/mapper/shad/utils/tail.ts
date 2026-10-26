@@ -1,6 +1,6 @@
 import type { Element, Root as HastRoot, RootContent } from 'hast';
 
-import { getTextUnits, isHiddenTagName, sizeOfHast } from '@fluxdown/hast';
+import { getTextUnits, getTextWordStart, isHiddenTagName, sizeOfHast } from '@fluxdown/hast';
 
 import { BLOCK_TAG_NAMES, BOUNDARY_TAG_NAMES, FORBIDDEN_TAG_NAMES } from './consts';
 
@@ -141,7 +141,9 @@ export const getTailRange = (root: HastRoot, length: number) => {
         }
 
         frame.hasSuffix = true;
-        first = { path: [...path, index], offset: start };
+
+        first = { path: [...path, index], offset: getTextWordStart(units, start) };
+
         last ??= { path: [...path, index], offset: units.length };
       }
 
@@ -180,15 +182,26 @@ export const getTailRange = (root: HastRoot, length: number) => {
   let depth = 0;
   let parent: HastRoot | Element = root;
 
-  while (depth < first.path.length - 1 && first.path[depth] === last.path[depth]) {
-    const child: RootContent | undefined = parent.children[first.path[depth] ?? -1];
+  let common: HastRoot | Element = root;
+
+  for (
+    let index = 0;
+    index < first.path.length - 1 && first.path[index] === last.path[index];
+    index += 1
+  ) {
+    const child: RootContent | undefined = common.children[first.path[index] ?? -1];
 
     if (child?.type !== 'element') {
       break;
     }
 
-    parent = child;
-    depth += 1;
+    common = child;
+
+    if (isBlock(child) || isBoundary(child) || child.tagName === 'td' || child.tagName === 'th') {
+      parent = child;
+
+      depth = index + 1;
+    }
   }
 
   const startIndex = first.path[depth] ?? 0;

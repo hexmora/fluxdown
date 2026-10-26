@@ -4,14 +4,13 @@ import { PresetCheck } from '../../../../../components';
 
 ## Component variants
 
-React Lite and React Full share the same component API. Choose the defaults that suit your app:
+All three entry points share the same component API. Choose the defaults that suit your app:
 
 | Component      | Import path                   | Purpose                                                                                     |
 | -------------- | ----------------------------- | ------------------------------------------------------------------------------------------- |
-| `FluxdownLite` | `fluxdown/lite`               | Keeps the bundle small with basic Markdown rendering, ready for features you add as needed. |
 | `Fluxdown`     | `fluxdown` or `fluxdown/full` | Provides more complete Markdown functionality and richer presentation out of the box.       |
-
-For full control over plugin selection, use `FluxdownRaw` from `fluxdown/raw` and supply `plugins`.
+| `FluxdownLite` | `fluxdown/lite`               | Keeps the bundle small with basic Markdown rendering, ready for features you add as needed. |
+| `FluxdownRaw`  | `fluxdown/raw`                | Supply the complete `plugins` set and choose every feature.                                 |
 
 ## All plugins
 
@@ -45,4 +44,4 @@ The table lists the composite plugins used by the React packs. A check means the
 | `TexKatexPlugin`        |                 |                 |
 | `TexMathjaxKatexPlugin` |                 | <PresetCheck /> |
 
-Import `CjkPlugin`, `EmojiPlugin`, and `PatchPlugin` from `@fluxdown/react-base-plugins/plugins/<directory>` and DOM plugins from `@fluxdown/react-plugins/plugins/<directory>`, for example `CodePlugin` from `@fluxdown/react-plugins/plugins/code`. Add the plugins you need through `plugins`; see [Composite plugins](./aggregate.md) for declaration, composition, and configuration.
+> Import `CjkPlugin`, `EmojiPlugin`, and `PatchPlugin` from `@fluxdown/react-base-plugins/plugins/<directory>` and DOM plugins from `@fluxdown/react-plugins/plugins/<directory>`, for example `CodePlugin` from `@fluxdown/react-plugins/plugins/code`. Add the plugins you need through `plugins`; see [Composite plugins](./aggregate.md) for declaration, composition, and configuration.

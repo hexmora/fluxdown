@@ -34,6 +34,10 @@ export class EffectScaleRenderPlugin extends BaseReactRenderPlugin {
       return <ScaleWord>{children}</ScaleWord>;
     }
 
-    return <Scale {...getScaleConfig(node)}>{children}</Scale>;
+    return (
+      <Scale {...getScaleConfig(node)}>
+        {Array.isArray(children) && children.length === 1 ? children[0] : children}
+      </Scale>
+    );
   }
 }
