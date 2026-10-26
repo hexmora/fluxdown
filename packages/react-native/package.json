@@ -1,0 +1,121 @@
+{
+  "name": "@fluxdown/react-native",
+  "version": "0.1.0",
+  "description": "React Native components for streaming Markdown.",
+  "keywords": [
+    "hast",
+    "llm",
+    "markdown",
+    "react",
+    "react-native",
+    "renderer",
+    "streaming"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/react-native"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/packs/full/index.tsx",
+  "module": "./src/packs/full/index.tsx",
+  "types": "./src/packs/full/index.tsx",
+  "exports": {
+    ".": "./src/packs/full/index.tsx",
+    "./*": "./src/packs/*/index.tsx"
+  },
+  "publishConfig": {
+    "main": "./dist/cjs/full.cjs",
+    "module": "./dist/esm/full.js",
+    "types": "./dist/esm/packs/full/index.d.ts",
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/esm/packs/full/index.d.ts",
+          "default": "./dist/esm/full.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/full/index.d.cts",
+          "default": "./dist/cjs/full.cjs"
+        }
+      },
+      "./full": {
+        "import": {
+          "types": "./dist/esm/packs/full/index.d.ts",
+          "default": "./dist/esm/full.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/full/index.d.cts",
+          "default": "./dist/cjs/full.cjs"
+        }
+      },
+      "./lite": {
+        "import": {
+          "types": "./dist/esm/packs/lite/index.d.ts",
+          "default": "./dist/esm/lite.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/lite/index.d.cts",
+          "default": "./dist/cjs/lite.cjs"
+        }
+      },
+      "./raw": {
+        "import": {
+          "types": "./dist/esm/packs/raw/index.d.ts",
+          "default": "./dist/esm/raw.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/raw/index.d.cts",
+          "default": "./dist/cjs/raw.cjs"
+        }
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rslib build",
+    "lint": "oxlint .",
+    "test": "jest --config ../../jest.config.ts --selectProjects react-native --runInBand",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/react-base": "workspace:^",
+    "@fluxdown/react-base-plugins": "workspace:^",
+    "@fluxdown/react-native-plugins": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "lodash-es": "catalog:"
+  },
+  "devDependencies": {
+    "@rslib/core": "catalog:",
+    "@testing-library/react-native": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "oxlint": "catalog:",
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "react-native-svg": "catalog:",
+    "test-renderer": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:react-native-peer",
+    "react-native": "catalog:react-native-peer",
+    "react-native-svg": ">=15.16.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

@@ -58,7 +58,11 @@ pnpm add @fluxdown/react-base-plugins
 import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { FluxdownLite } from 'fluxdown/lite';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={CjkPlugin} text={text} />;
 }
 ```
@@ -71,7 +75,11 @@ After installing `@fluxdown/react-base-plugins`, include `CjkPlugin` and `config
 import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { Fluxdown } from 'fluxdown';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       plugins={{

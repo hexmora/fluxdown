@@ -6,10 +6,11 @@ Use it for AI conversations, live writing, streaming reports, or any interface w
 
 ## Where to start
 
-| What you need                                             | Start here                                                   |
-| --------------------------------------------------------- | ------------------------------------------------------------ |
-| Display Markdown and streaming responses in a React app   | [React quick start](./react/quick-start.md) · `fluxdown`     |
-| Use another framework or control how content is presented | [Core quick start](./core/quick-start.md) · `@fluxdown/core` |
+| What you need                                             | Start here                                                                           |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Display Markdown and streaming responses in a React app   | [React quick start](./react/quick-start.md) · `fluxdown`                             |
+| Render on iOS, Android, or React Native Web               | [React Native quick start](./react-native/quick-start.md) · `@fluxdown/react-native` |
+| Use another framework or control how content is presented | [Core quick start](./core/quick-start.md) · `@fluxdown/core`                         |
 
 React provides a ready-to-use presentation layer. Core handles Markdown independently of any UI framework. Both share the same syntax, repair, and streaming capabilities.
 
@@ -23,6 +24,6 @@ React provides a ready-to-use presentation layer. Core handles Markdown independ
 
 ## One core, different interfaces
 
-Fluxdown is built on [stative](../stative/index.md), which connects text, configuration, and output in a single reactive data flow. React is the currently available framework integration. React Native, Vue 3, Svelte, and React Lynx are planned directions.
+Fluxdown is built on [stative](../stative/index.md), which connects text, configuration, and output in a single reactive data flow. React and React Native have ready-to-use integrations.
 
 Start with the [React quick start](./react/quick-start.md). Explore Core when you need to handle the output yourself.

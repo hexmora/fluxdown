@@ -1,4 +1,4 @@
-import { PRESET_LIGHT_PLUGINS } from '@fluxdown/react-plugins/lite';
+import { PRESET_LITE_PLUGINS } from '@fluxdown/react-plugins/lite';
 import { forwardRef, memo } from 'react';
 
 import type { FluxdownRef } from '../raw';
@@ -24,7 +24,7 @@ export const FluxdownLite = /*#__PURE__*/ memo(
     { plugins, ...props },
     ref,
   ) {
-    const merged = useMergePlugins(PRESET_LIGHT_PLUGINS, plugins);
+    const merged = useMergePlugins(PRESET_LITE_PLUGINS, plugins);
 
     return <FluxdownRaw {...props} plugins={merged} ref={ref} />;
   }),

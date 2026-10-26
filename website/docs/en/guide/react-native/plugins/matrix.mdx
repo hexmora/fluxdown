@@ -1,0 +1,64 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# Plugin matrix
+
+## Choose a component
+
+| Component      | Entry                                                     | Default features                                                                           |
+| -------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `Fluxdown`     | `@fluxdown/react-native` or `@fluxdown/react-native/full` | Adds syntax highlighting, Mermaid diagrams, SVG math, CJK, and Emoji.                      |
+| `FluxdownLite` | `@fluxdown/react-native/lite`                             | Basic Markdown, tables, images, and streaming effects; code and math display their source. |
+| `FluxdownRaw`  | `@fluxdown/react-native/raw`                              | Provide the complete `plugins` set yourself.                                               |
+
+Full uses [`react-native-code-highlighter`](https://github.com/gmsgowtham/react-native-code-highlighter) for code, the parser and layout from [`@osuki-dev/skia-diagrams`](https://github.com/osuki-dev/skia-diagrams) for diagrams, and MathJax 3 SVG output for math. [`react-native-svg`](https://github.com/software-mansion/react-native-svg) draws diagrams and formulas.
+
+Math requires `build.tex`, which defaults to `false`. Use fenced code blocks marked `mermaid` for diagrams. Unsupported diagram types retain their source.
+
+Full and Lite require `react-native-svg` 15.16 or later for streaming effects. Raw uses the plugins you supply; install it when adding these effects, math, or diagram plugins.
+
+## All plugins
+
+Composition includes inherited plugin types. A check marks a direct preset entry. Full's highlighter and formula plugins inherit the basic Code and Tex behavior.
+
+| Plugin                | Composition                                           | Package                                   |      Lite       |      Full       |
+| --------------------- | ----------------------------------------------------- | ----------------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="react-base-plugins" />   |                 | <PresetCheck /> |
+| `CodePlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> |                 |
+| `CodeHighlightPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> |                 | <PresetCheck /> |
+| `CodeMermaidPlugin`   | <PluginTag type="slot" />                             | <PluginTag type="react-native-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`         | <PluginTag type="remark" />                           | <PluginTag type="react-base-plugins" />   |                 | <PresetCheck /> |
+| `EmphasisPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`         | <PluginTag type="render" />                           | <PluginTag type="react-base-plugins" />   | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> |                 |
+| `TexSvgPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> |                 | <PresetCheck /> |
+
+### Packages and imports
+
+- <PluginTag type="react-native-plugins" /> means
+  `@fluxdown/react-native-plugins`, with native slots and their composite
+  plugins.
+- <PluginTag type="react-base-plugins" /> means `@fluxdown/react-base-plugins`,
+  with plugins independent of the presentation platform.
+
+> Import from `<package>/plugins/<plugin-directory>`. Remove `Plugin` from the export name and convert it to lowercase words separated by hyphens: `CodeHighlightPlugin` becomes `code-highlight`.
+
+```tsx
+import { CodeHighlightPlugin } from '@fluxdown/react-native-plugins/plugins/code-highlight';
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
+```
+
+Extend either preset through the `plugins` prop. See [composite plugins](./aggregate.md) for configuration and composition.

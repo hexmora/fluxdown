@@ -1,5 +1,6 @@
 import type { Element, ElementContent, Root as HastRoot, RootContent } from 'hast';
 
+import { sizeOfHast } from '@fluxdown/hast';
 import { clamp, floor } from 'lodash-es';
 
 import { SHAD_DATA_ATTR, SHAD_HOST_VALUE, SHAD_TAG_NAME } from './consts';
@@ -54,7 +55,12 @@ export const createShadRoot = ({ root, ...params }: CreateShadRootParams): HastR
     parent = copy;
   }
 
-  const activeLength = clamp(floor(params.activeLength) || 0, 0, range.end - range.start);
+  const activeLength = clamp(
+    floor(params.activeLength) || 0,
+    0,
+    Math.min(length, range.end - range.start),
+  );
+
   const affected = parent.children.slice(range.startIndex, range.endIndex);
   const [prefix, rest] = splitChildren(affected, range.start);
   const [leading, tail] = splitChildren(rest, range.end - range.start - activeLength);
@@ -65,9 +71,13 @@ export const createShadRoot = ({ root, ...params }: CreateShadRootParams): HastR
   const host: Element = {
     type: 'element',
     tagName: SHAD_TAG_NAME,
+    data: { renderKey: 'shad' },
     properties: {
       [SHAD_DATA_ATTR]: SHAD_HOST_VALUE,
       dataShadMaskWidth: Number.isFinite(maskWidth) ? Math.max(0, maskWidth) : 15,
+      dataShadOffset:
+        sizeOfHast({ type: 'root', children: parent.children.slice(0, range.startIndex) }) +
+        range.start,
     },
     children: [createPart(leading), createPart(active)],
   };

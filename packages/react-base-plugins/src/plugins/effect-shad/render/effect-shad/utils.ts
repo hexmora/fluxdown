@@ -18,5 +18,10 @@ export const isShadNode = (node: ElementContent): node is Element => {
 export const getShadConfig = ({ properties }: Element) => {
   const maskWidth = toNumber(properties.dataShadMaskWidth);
 
-  return { maskWidth: Number.isFinite(maskWidth) ? Math.max(0, maskWidth) : 15 };
+  const offset = toNumber(properties.dataShadOffset);
+
+  return {
+    maskWidth: Number.isFinite(maskWidth) ? Math.max(0, maskWidth) : 15,
+    offset: Number.isFinite(offset) ? Math.max(0, offset) : 0,
+  };
 };

@@ -59,7 +59,11 @@ import { FluxdownLite } from 'fluxdown/lite';
 
 const plugins = [CodePelePlugin];
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={plugins} text={text} />;
 }
 ```

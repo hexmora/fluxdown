@@ -15,11 +15,15 @@
   "dependencies": {
     "@fluxdown/core": "workspace:^",
     "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/react-native": "workspace:^",
+    "@fluxdown/react-native-plugins": "workspace:^",
     "@fluxdown/react-plugins": "workspace:^",
     "@fluxdown/utils": "workspace:^",
     "fluxdown": "workspace:^",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-native-svg": "catalog:",
+    "react-native-web": "catalog:",
     "stative": "workspace:^"
   },
   "devDependencies": {

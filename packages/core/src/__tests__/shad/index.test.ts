@@ -59,11 +59,11 @@ describe('Shad', () => {
 
     expect(Object.is(harness.state.value.value, output)).toBe(false);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: '' });
 
     block.source.next(paragraph('abcde'));
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: 'e' });
 
     expect(jest.getTimerCount()).toBe(1);
 
@@ -87,11 +87,11 @@ describe('Shad', () => {
 
     expect(Object.is(fork, previous)).toBe(false);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'ef', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcdef', active: '' });
 
     block.source.next(paragraph('abcdefg'));
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'f', active: 'g' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcdef', active: 'g' });
   });
 
   test.each([false, true])(
@@ -121,19 +121,19 @@ describe('Shad', () => {
 
       expect(Object.is(harness.state.value.value, output)).toBe(false);
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'bc', active: '' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'abc', active: '' });
 
       expect(jest.getTimerCount()).toBe(0);
 
       block.source.next(paragraph('abcd'));
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'c', active: 'd' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'abc', active: 'd' });
 
       expect(jest.getTimerCount()).toBe(1);
 
       jest.advanceTimersByTime(200);
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: '' });
     },
   );
 
@@ -146,7 +146,7 @@ describe('Shad', () => {
 
     const fork = firstBlock(output.value);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: '' });
 
     expect(fork.length.value).toBe(4);
 
@@ -156,7 +156,7 @@ describe('Shad', () => {
 
     expect(firstBlock(output.value)).toBe(fork);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: 'e' });
 
     expect(fork.length.value).toBe(5);
 
@@ -164,7 +164,7 @@ describe('Shad', () => {
 
     block.source.next(paragraph('abcdef'));
 
-    expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'ef' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: 'ef' });
 
     jest.advanceTimersByTime(199);
 
@@ -172,11 +172,11 @@ describe('Shad', () => {
 
     jest.advanceTimersByTime(1);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'ef', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcdef', active: '' });
 
     block.source.next(paragraph('abcdefg'));
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'f', active: 'g' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcdef', active: 'g' });
 
     expect(fork.length.value).toBe(7);
   });
@@ -188,29 +188,29 @@ describe('Shad', () => {
 
     const fork = firstBlock(harness.state.value.value);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'bc', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abc', active: '' });
 
     block.source.next(paragraph('abc*d'));
 
-    expect(readParts(fork.value.value)).toEqual({ leading: '', active: '*d' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abc', active: '*d' });
 
     block.source.next(paragraph('abcd'));
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'c', active: 'd' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abc', active: 'd' });
 
     jest.advanceTimersByTime(100);
 
     block.source.next(paragraph('wxyz'));
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'y', active: 'z' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'wxy', active: 'z' });
 
     jest.advanceTimersByTime(100);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'yz', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'wxyz', active: '' });
 
     block.source.next(paragraph('same'));
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'me', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'same', active: '' });
 
     expect(jest.getTimerCount()).toBe(0);
   });
@@ -240,17 +240,17 @@ describe('Shad', () => {
 
     last.source.next(paragraph('cde'));
 
-    expect(readParts(lastFork.value.value)).toEqual({ leading: '', active: 'de' });
+    expect(readParts(lastFork.value.value)).toEqual({ leading: 'c', active: 'de' });
 
     jest.advanceTimersByTime(200);
 
     first.source.next(paragraph('abcd'));
 
-    expect(readParts(lastFork.value.value)).toEqual({ leading: 'de', active: '' });
+    expect(readParts(lastFork.value.value)).toEqual({ leading: 'cde', active: '' });
 
     harness.source.next([first.block, last.block]);
 
-    expect(readParts(lastFork.value.value)).toEqual({ leading: 'd', active: 'e' });
+    expect(readParts(lastFork.value.value)).toEqual({ leading: 'cd', active: 'e' });
   });
 
   test.each(['enabled', 'length'] as const)(
@@ -288,11 +288,11 @@ describe('Shad', () => {
 
       fork = firstBlock(harness.state.value.value);
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: '' });
 
       block.source.next(paragraph('abcde'));
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'd', active: 'e' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: 'e' });
 
       jest.advanceTimersByTime(199);
 
@@ -300,7 +300,7 @@ describe('Shad', () => {
 
       jest.advanceTimersByTime(1);
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'de', active: '' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'abcde', active: '' });
 
       expect(jest.getTimerCount()).toBe(0);
     },
@@ -314,7 +314,7 @@ describe('Shad', () => {
       const harness = setup([block.block]);
 
       expect(readParts(firstBlock(harness.state.value.value).value.value)).toEqual({
-        leading: 'bc',
+        leading: 'abc',
         active: '',
       });
 
@@ -340,15 +340,15 @@ describe('Shad', () => {
 
       block.source.next(paragraph('xyzw'));
 
-      expect(readParts(fork.value.value)).toEqual({ leading: '', active: 'zw' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'xy', active: 'zw' });
 
       jest.advanceTimersByTime(200);
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'zw', active: '' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'xyzw', active: '' });
 
       block.source.next(paragraph('xyzwt'));
 
-      expect(readParts(fork.value.value)).toEqual({ leading: 'w', active: 't' });
+      expect(readParts(fork.value.value)).toEqual({ leading: 'xyzw', active: 't' });
     },
   );
 
@@ -359,13 +359,13 @@ describe('Shad', () => {
 
     let fork = firstBlock(harness.state.value.value);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: '' });
 
     block.source.next(paragraph('abcde'));
 
     harness.length.next(4);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'bcd', active: 'e' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: 'e' });
 
     harness.enabled.next(false);
 
@@ -381,11 +381,11 @@ describe('Shad', () => {
 
     fork = firstBlock(harness.state.value.value);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'cdef', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcdef', active: '' });
 
     block.source.next(paragraph('abcdefg'));
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'def', active: 'g' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcdef', active: 'g' });
 
     harness.length.next(0);
 
@@ -393,7 +393,7 @@ describe('Shad', () => {
 
     harness.length.next(2);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'fg', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcdefg', active: '' });
 
     expect(firstBlock(harness.state.value.value)).toBe(fork);
   });
@@ -419,7 +419,7 @@ describe('Shad', () => {
 
     expect(readParts(oldFork.value.value)).toBeUndefined();
 
-    expect(readParts(lastFork.value.value)).toEqual({ leading: 'il', active: '' });
+    expect(readParts(lastFork.value.value)).toEqual({ leading: 'tail', active: '' });
 
     harness.source.next([replacement.block, last.block]);
 
@@ -437,7 +437,7 @@ describe('Shad', () => {
 
     expect(firstBlock(output.value)).toBe(newFork);
 
-    expect(readParts(newFork.value.value)).toEqual({ leading: 'ew', active: '' });
+    expect(readParts(newFork.value.value)).toEqual({ leading: 'new', active: '' });
 
     expect(destroyLast).toHaveBeenCalledTimes(1);
 
@@ -447,7 +447,10 @@ describe('Shad', () => {
 
     harness.source.next([last.block]);
 
-    expect(readParts(firstBlock(output.value).value.value)).toEqual({ leading: '', active: 'il' });
+    expect(readParts(firstBlock(output.value).value.value)).toEqual({
+      leading: 'ta',
+      active: 'il',
+    });
 
     expect(first.source.closed).toBe(false);
 
@@ -485,7 +488,7 @@ describe('Shad', () => {
 
     expect(fork.range.value).toEqual({ start: 0, end: 4 });
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'C', active: 'D' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'ABC', active: 'D' });
 
     expect(fork.length.value).toBe(previous.length.value);
   });
@@ -513,7 +516,7 @@ describe('Shad', () => {
 
     expect(readParts(firstFork.value.value)).toBeUndefined();
 
-    expect(readParts(secondFork.value.value)).toEqual({ leading: 'ef', active: '' });
+    expect(readParts(secondFork.value.value)).toEqual({ leading: 'def', active: '' });
 
     harness.source.next([second.block, first.block]);
 
@@ -523,7 +526,7 @@ describe('Shad', () => {
 
     expect(readParts(secondFork.value.value)).toBeUndefined();
 
-    expect(readParts(firstFork.value.value)).toEqual({ leading: 'bc', active: '' });
+    expect(readParts(firstFork.value.value)).toEqual({ leading: 'abc', active: '' });
 
     expect(destroyFirst).not.toHaveBeenCalled();
 
@@ -571,7 +574,7 @@ describe('Shad', () => {
 
     const destroySource = jest.spyOn(block.block, 'destroy');
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'bc', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abc', active: '' });
 
     block.source.next(paragraph('abcd'));
 
@@ -627,7 +630,7 @@ describe('Shad', () => {
       harness.length.complete();
     });
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'c', active: 'd' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abc', active: 'd' });
 
     expect(fork.value.closed).toBe(false);
 
@@ -635,7 +638,7 @@ describe('Shad', () => {
 
     jest.advanceTimersByTime(200);
 
-    expect(readParts(fork.value.value)).toEqual({ leading: 'cd', active: '' });
+    expect(readParts(fork.value.value)).toEqual({ leading: 'abcd', active: '' });
 
     expect(fork.value.closed).toBe(true);
 

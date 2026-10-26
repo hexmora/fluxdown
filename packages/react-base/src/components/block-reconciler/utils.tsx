@@ -24,6 +24,10 @@ const getChildKey = (node: RootContent, fallbackIndex: number) => {
     return `patch:${node.properties.dataPatchKey}`;
   }
 
+  if (isString(node.data?.renderKey)) {
+    return `render:${node.data.renderKey}`;
+  }
+
   const tagName = node.type === 'element' ? `:${node.tagName}` : '';
 
   return `${fallbackIndex}:${node.type}${tagName}`;

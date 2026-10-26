@@ -1,0 +1,63 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# 插件矩阵
+
+## 组件分化
+
+| 组件           | 入口                                                      | 默认能力                                                         |
+| -------------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/react-native` 或 `@fluxdown/react-native/full` | 在基础能力上加入代码高亮、Mermaid 图表、SVG 公式、CJK 与 Emoji。 |
+| `FluxdownLite` | `@fluxdown/react-native/lite`                             | 基础 Markdown、表格、图片与流式效果；代码与公式显示源码。        |
+| `FluxdownRaw`  | `@fluxdown/react-native/raw`                              | 自行传入完整的 `plugins`。                                       |
+
+Full 的代码高亮使用 [`react-native-code-highlighter`](https://github.com/gmsgowtham/react-native-code-highlighter)，图表使用 [`@osuki-dev/skia-diagrams`](https://github.com/osuki-dev/skia-diagrams) 的解析与布局能力，公式使用 MathJax 3 的 SVG 输出。图表与公式最终由 [`react-native-svg`](https://github.com/software-mansion/react-native-svg) 绘制。
+
+`build.tex` 默认为 `false`，需要公式时显式开启。Mermaid 使用标记为 `mermaid` 的围栏代码块；未支持的图表类型保留源码。
+
+Full 和 Lite 都需要 `react-native-svg` 15.16 或更新版本，用于流式效果。Raw 按传入的插件组合能力；添加这些效果、公式或图表插件时也需要安装。
+
+## 全部插件
+
+「组成」包含继承的插件类型；勾选表示预设直接包含。Full 中的高亮与公式插件分别继承基础的 Code 与 Tex 能力。
+
+| 插件                  | 组成                                                  | 所在包                                    |      Lite       |      Full       |
+| --------------------- | ----------------------------------------------------- | ----------------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="react-base-plugins" />   |                 | <PresetCheck /> |
+| `CodePlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> |                 |
+| `CodeHighlightPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> |                 | <PresetCheck /> |
+| `CodeMermaidPlugin`   | <PluginTag type="slot" />                             | <PluginTag type="react-native-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`         | <PluginTag type="remark" />                           | <PluginTag type="react-base-plugins" />   |                 | <PresetCheck /> |
+| `EmphasisPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`         | <PluginTag type="render" />                           | <PluginTag type="react-base-plugins" />   | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> | <PresetCheck /> |                 |
+| `TexSvgPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-native-plugins" /> |                 | <PresetCheck /> |
+
+### 所在包与导入
+
+- <PluginTag type="react-native-plugins" />
+  ：`@fluxdown/react-native-plugins`，包含原生插槽与对应综合插件。
+- <PluginTag type="react-base-plugins" />
+  ：`@fluxdown/react-base-plugins`，包含不依赖具体界面的基础插件。
+
+> 使用 `<包全名>/plugins/<插件目录>` 导入。目录名取导出名称，去掉 `Plugin` 后转成小写中划线形式，例如 `CodeHighlightPlugin` 对应 `code-highlight`。
+
+```tsx
+import { CodeHighlightPlugin } from '@fluxdown/react-native-plugins/plugins/code-highlight';
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
+```
+
+组件的 `plugins` 参数可以继续扩展任意预设。配置与组合方式见[综合插件](./aggregate.md)。

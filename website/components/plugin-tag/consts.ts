@@ -6,5 +6,6 @@ export const PLUGIN_TAG_LABELS = {
   repair: 'Repair',
   mapper: 'Mapper',
   'react-plugins': 'react-plugins',
+  'react-native-plugins': 'react-native-plugins',
   'react-base-plugins': 'react-base-plugins',
 };

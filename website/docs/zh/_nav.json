@@ -6,6 +6,12 @@
     "position": "left"
   },
   {
+    "text": "Native",
+    "link": "/guide/react-native/quick-start",
+    "activeMatch": "/guide/react-native/",
+    "position": "left"
+  },
+  {
     "text": "Core",
     "link": "/guide/core/quick-start",
     "activeMatch": "/guide/core/",

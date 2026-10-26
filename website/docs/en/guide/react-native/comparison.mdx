@@ -1,0 +1,19 @@
+import { NativeDemo } from '../../../../components';
+
+# Compare with React
+
+Both columns receive the same Markdown, incoming chunks, and streaming options. Switch between static and streaming content to compare layout and the four trailing effects.
+
+<NativeDemo />
+
+## Use it on the web
+
+The preview renders native components through [React Native Web](https://necolas.github.io/react-native-web/). Components and slots share their source with iOS and Android.
+
+Expo Web handles the basic platform setup. With another web bundler, install React Native Web and React DOM, then add an exact alias from `react-native` to `react-native-web`. This repository's [shared web configuration](https://github.com/hexmora/fluxdown/blob/main/scripts/build/react-native-web.ts) also prioritizes `.web.*` files and handles the current `react-native-svg` asset registry and native sound module compatibility issues. Refer to it when using Full or Lite on the web.
+
+## Expected differences
+
+Headings, body text, spacing, and colors aim to stay close. System fonts, line wrapping, native Text layout, and animation primitives can differ slightly. Highlighting, formulas, and diagrams also use different rendering libraries.
+
+A web preview helps compare identical inputs but does not replace device testing. Check fonts, wide tables, images, and link interactions on your target devices before shipping.

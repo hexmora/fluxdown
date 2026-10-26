@@ -5,3 +5,4 @@ export * from './diagram-demo';
 export * from './pack-demo';
 export * from './spring-demo';
 export * from './suffix-demo';
+export * from './native-demo';

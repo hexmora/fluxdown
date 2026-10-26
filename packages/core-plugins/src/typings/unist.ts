@@ -9,5 +9,8 @@ declare module 'unist' {
 
     /** Footnote section detached from the HAST content stream. */
     footnote?: RootContent;
+
+    /** Stable identity of generated nodes across streaming tree updates. */
+    renderKey?: string;
   }
 }
