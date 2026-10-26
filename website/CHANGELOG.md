@@ -1,5 +1,23 @@
 # @fluxdown/website
 
+## 0.0.8
+
+### Patch Changes
+
+- 8691710: Rename lite plugin presets consistently, expose native theme types from the plugins package, and refine documentation, locale preferences, navigation, and renderer comparisons.
+- 8691710: Align Native streaming effects with the React renderer through shared drawing and animation logic, preserving text layout, inherited typography, animation progress, and SVG blur updates. Require react-native-svg for the shared effect presets and update installation guidance. Validate shared effects on Android, preserve native text baselines, and use Metro-compatible MathJax modules for formulas.
+- 8691710: Add React Native components and plugin presets, with shared base rendering, native streaming effects, syntax highlighting, SVG formulas and Mermaid diagrams, and a React Native Web documentation preview.
+- Updated dependencies [8691710]
+- Updated dependencies [8691710]
+- Updated dependencies [8691710]
+- Updated dependencies [8691710]
+  - @fluxdown/react-plugins@0.12.0
+  - @fluxdown/react-native-plugins@0.2.0
+  - fluxdown@0.14.1
+  - @fluxdown/react-native@0.2.0
+  - @fluxdown/core-plugins@0.12.1
+  - @fluxdown/core@0.12.5
+
 ## 0.0.7
 
 ### Patch Changes
