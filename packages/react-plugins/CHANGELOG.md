@@ -1,5 +1,16 @@
 # @fluxdown/react-plugins
 
+## 0.12.0
+
+### Minor Changes
+
+- 8691710: Rename lite plugin presets consistently, expose native theme types from the plugins package, and refine documentation, locale preferences, navigation, and renderer comparisons.
+
+### Patch Changes
+
+- Updated dependencies [8691710]
+  - @fluxdown/react-base-plugins@0.11.1
+
 ## 0.11.0
 
 ### Minor Changes
