@@ -21,6 +21,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "lynx",
+    "label": "Lynx"
+  },
+  {
+    "type": "dir-section-header",
     "name": "core",
     "label": "Core"
   }

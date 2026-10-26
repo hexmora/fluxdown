@@ -104,6 +104,10 @@ export const Home = () => {
               <strong>React Native</strong>
               <span>{copy.react}</span>
             </a>
+            <a className={styles.frameworkCard} href={href('/guide/lynx/quick-start')}>
+              <strong>Lynx</strong>
+              <span>{copy.react}</span>
+            </a>
             {UPCOMING_FRAMEWORKS.map((framework) => (
               <div className={styles.frameworkCard} data-upcoming key={framework}>
                 <strong>{framework}</strong>

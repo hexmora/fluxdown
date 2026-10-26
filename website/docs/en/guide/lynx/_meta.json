@@ -1,0 +1,33 @@
+[
+  {
+    "type": "file",
+    "name": "quick-start",
+    "label": "Quick start"
+  },
+  {
+    "type": "file",
+    "name": "streaming",
+    "label": "Streaming content"
+  },
+  {
+    "type": "file",
+    "name": "customization",
+    "label": "Styling"
+  },
+  {
+    "type": "file",
+    "name": "configuration",
+    "label": "Configuration"
+  },
+  {
+    "type": "dir",
+    "name": "plugins",
+    "label": "Using and writing plugins",
+    "collapsed": false
+  },
+  {
+    "type": "file",
+    "name": "comparison",
+    "label": "Compare with React"
+  }
+]

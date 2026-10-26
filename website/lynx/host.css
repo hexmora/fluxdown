@@ -1,0 +1,13 @@
+html {
+  background: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+}
+
+lynx-view {
+  display: block;
+  width: 100%;
+}
