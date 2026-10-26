@@ -48,6 +48,11 @@
     --tag-dark-color: #9bd5e1;
   }
 
+  &[data-type="lynx-plugins"] {
+    --tag-color: #147b70;
+    --tag-dark-color: #92dacf;
+  }
+
   &[data-type="react-plugins"] {
     --tag-color: #a14d28;
     --tag-dark-color: #efb493;

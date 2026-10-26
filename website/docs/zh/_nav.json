@@ -12,6 +12,12 @@
     "position": "left"
   },
   {
+    "text": "Lynx",
+    "link": "/guide/lynx/quick-start",
+    "activeMatch": "/guide/lynx/",
+    "position": "left"
+  },
+  {
     "text": "Core",
     "link": "/guide/core/quick-start",
     "activeMatch": "/guide/core/",

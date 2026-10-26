@@ -1,0 +1,59 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# 插件矩阵
+
+## 组件分化
+
+| 组件           | 入口                                      | 默认能力                                        |
+| -------------- | ----------------------------------------- | ----------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/lynx` 或 `@fluxdown/lynx/full` | 在基础能力上加入 Shiki 代码高亮、CJK 与 Emoji。 |
+| `FluxdownLite` | `@fluxdown/lynx/lite`                     | 基础 Markdown、表格、图片与流式效果。           |
+| `FluxdownRaw`  | `@fluxdown/lynx/raw`                      | 自行传入完整的 `plugins`。                      |
+
+Full 的高亮支持 Bash、CSS、HTML、JavaScript、JSON、Python 和 TypeScript；未识别的语言保留纯文本。Lite 的代码块显示源码。
+
+两个预设都提供 `Tex` 插槽。`build.tex` 默认为 `false`，开启后显示公式源码；需要公式排版时可以提供自己的插槽。
+
+## 全部插件
+
+「组成」包含继承的插件类型；勾选表示预设直接包含。Full 的 `CodeShikiPlugin` 继承 `CodePlugin` 的基础能力。
+
+| 插件                 | 组成                                                  | 所在包                            |      Lite       |      Full       |
+| -------------------- | ----------------------------------------------------- | --------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`          | <PluginTag type="remark" />                           | <PluginTag type="lynx-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> |                 |
+| `CodeShikiPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`        | <PluginTag type="remark" />                           | <PluginTag type="lynx-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`        | <PluginTag type="render" />                           | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+
+## 所在包与导入
+
+<PluginTag type="lynx-plugins" /> 对应 `@fluxdown/lynx-plugins`，包含 Lynx
+的综合插件、render 和 slot。
+
+> 使用 `@fluxdown/lynx-plugins/plugins/<插件目录>` 导入。目录名取导出名称，去掉 `Plugin` 后转成小写中划线形式，例如 `CodeShikiPlugin` 对应 `code-shiki`。
+
+```tsx
+import { CodeShikiPlugin } from '@fluxdown/lynx-plugins/plugins/code-shiki';
+import { HeadingPlugin } from '@fluxdown/lynx-plugins/plugins/heading';
+```
+
+> 预置列表 `PRESET_FULL_PLUGINS`、`PRESET_LITE_PLUGINS` 分别从 `@fluxdown/lynx-plugins/full`、`@fluxdown/lynx-plugins/lite` 导入，可直接传给 `FluxdownRaw`。
+
+组件的 `plugins` 参数可以继续扩展任意预设。配置与组合方式见[综合插件](./aggregate.md)。

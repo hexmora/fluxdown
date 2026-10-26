@@ -1,7 +1,32 @@
 [
-  { "type": "file", "name": "index", "label": "Meet Fluxdown" },
-  { "type": "dir-section-header", "name": "common", "label": "Common" },
-  { "type": "dir-section-header", "name": "react", "label": "React" },
-  { "type": "dir-section-header", "name": "react-native", "label": "React Native" },
-  { "type": "dir-section-header", "name": "core", "label": "Core" }
+  {
+    "type": "file",
+    "name": "index",
+    "label": "Meet Fluxdown"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "common",
+    "label": "Common"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "react",
+    "label": "React"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "react-native",
+    "label": "React Native"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "lynx",
+    "label": "Lynx"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "core",
+    "label": "Core"
+  }
 ]
