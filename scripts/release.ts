@@ -20,7 +20,7 @@ import type {
 import type { PackageArtifact, WorkspacePackage } from './types.ts';
 
 import { checkBrowserConsumer } from './check-browser.ts';
-import { checkPackage, publicEntries, readManifest } from './check-package.ts';
+import { checkPackage, isLynxPackage, publicEntries, readManifest } from './check-package.ts';
 import { checkReactNativePacks, REACT_NATIVE_PACKAGES } from './check-react-native-packs.ts';
 import { checkReactPacks } from './check-react-packs.ts';
 import {
@@ -348,11 +348,13 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
 
     checkInstalled(installed.dependencies);
 
-    const specifiers = nodeArtifacts.flatMap(({ manifest, files }) =>
-      publicEntries(manifest, files).map(
-        ([entry]) => manifest.name + (entry === '.' ? '' : entry.slice(1)),
-      ),
-    );
+    const specifiers = nodeArtifacts
+      .filter(({ manifest }) => !isLynxPackage(manifest.name))
+      .flatMap(({ manifest, files }) =>
+        publicEntries(manifest, files).map(
+          ([entry]) => manifest.name + (entry === '.' ? '' : entry.slice(1)),
+        ),
+      );
 
     let esmSmoke = specifiers
       .map((specifier) => `await import(${JSON.stringify(specifier)});`)

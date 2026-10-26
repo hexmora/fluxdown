@@ -1,0 +1,111 @@
+{
+  "name": "@fluxdown/lynx-plugins",
+  "version": "0.1.0",
+  "description": "Lynx elements and render plugins for Fluxdown.",
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/lynx-plugins"
+  },
+  "files": [
+    "dist/esm",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./src/presets/full/index.ts",
+  "module": "./src/presets/full/index.ts",
+  "types": "./src/presets/full/index.ts",
+  "exports": {
+    ".": "./src/presets/full/index.ts",
+    "./full": "./src/presets/full/index.ts",
+    "./lite": "./src/presets/lite/index.ts",
+    "./base": "./src/base/index.ts",
+    "./typings": "./src/typings/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts"
+  },
+  "publishConfig": {
+    "main": "./dist/esm/presets/full/index.jsx",
+    "module": "./dist/esm/presets/full/index.jsx",
+    "types": "./dist/esm/presets/full/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/esm/presets/full/index.d.ts",
+        "default": "./dist/esm/presets/full/index.jsx"
+      },
+      "./full": {
+        "types": "./dist/esm/presets/full/index.d.ts",
+        "default": "./dist/esm/presets/full/index.jsx"
+      },
+      "./lite": {
+        "types": "./dist/esm/presets/lite/index.d.ts",
+        "default": "./dist/esm/presets/lite/index.jsx"
+      },
+      "./base": {
+        "types": "./dist/esm/base/index.d.ts",
+        "default": "./dist/esm/base/index.jsx"
+      },
+      "./typings": {
+        "types": "./dist/esm/typings/index.d.ts",
+        "default": "./dist/esm/typings/index.jsx"
+      },
+      "./plugins/*": {
+        "types": "./dist/esm/plugins/*/index.d.ts",
+        "default": "./dist/esm/plugins/*/index.jsx"
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rslib build",
+    "lint": "oxlint .",
+    "test": "rstest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@types/hast": "catalog:",
+    "lodash-es": "catalog:",
+    "shallow-equal": "catalog:",
+    "shiki": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@lynx-js/react": "catalog:",
+    "@lynx-js/react-rsbuild-plugin": "catalog:",
+    "@lynx-js/types": "catalog:",
+    "@rsbuild/core": "catalog:",
+    "@rsbuild/plugin-react": "catalog:",
+    "@rslib/core": "catalog:",
+    "@rstest/adapter-rslib": "catalog:",
+    "@rstest/core": "catalog:",
+    "@testing-library/dom": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@lynx-js/react": "catalog:lynx-peer",
+    "@lynx-js/types": "catalog:lynx-peer",
+    "@types/react": "^18 || ^19"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

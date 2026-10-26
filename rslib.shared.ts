@@ -13,9 +13,15 @@ interface PackageOptions {
   entry: Record<string, string>;
   react?: boolean;
   jsxImportSource?: string;
+  bundleDependencies?: string[];
 }
 
-export function packageConfig({ entry, react, jsxImportSource }: PackageOptions) {
+export function packageConfig({
+  entry,
+  react,
+  jsxImportSource,
+  bundleDependencies,
+}: PackageOptions) {
   return defineConfig({
     source: { tsconfigPath: './tsconfig.build.json' },
     lib: [
@@ -80,7 +86,10 @@ export function packageConfig({ entry, react, jsxImportSource }: PackageOptions)
       },
     ],
     syntax: 'es2022',
-    output: { target: react ? 'web' : 'node' },
+    output: {
+      target: react ? 'web' : 'node',
+      ...(bundleDependencies ? { autoExternal: { exclude: bundleDependencies } } : {}),
+    },
     plugins: [
       ...(react || jsxImportSource
         ? [pluginReact({ swcReactOptions: { importSource: jsxImportSource, development: false } })]

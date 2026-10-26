@@ -1,3 +1,4 @@
+import { getTime } from '@fluxdown/utils';
 import { once, useClearable, useMap } from 'stative';
 
 import type { ScaleCharacter } from '../../../../../../utils';
@@ -22,7 +23,7 @@ export const ScaleValue = /*#__PURE__*/ once(function ScaleValue({
   return useMap([previous.value, _duration, _from, _blur], ([root, duration, from, blur]) => {
     const result = createScaleRoot(root, characters, {
       initial: first && initial,
-      start: performance.now(),
+      start: getTime(),
       duration,
       from,
       blur,
