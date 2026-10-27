@@ -5,7 +5,7 @@ import { CopyButton } from '../copy-button';
 import { useLocale } from '../hooks';
 import { ArrowIcon, ReactIcon } from '../icons';
 import { FeatureIcon, StreamingDemo } from './components';
-import { COPY, INSTALL_COMMAND, UPCOMING_FRAMEWORKS } from './consts';
+import { COPY, INSTALL_COMMAND } from './consts';
 import styles from './index.module.scss';
 import { getQuickStart } from './utils';
 
@@ -106,6 +106,10 @@ export const Home = () => {
               <strong>Vue 3</strong>
               <span>{copy.react}</span>
             </a>
+            <a className={styles.frameworkCard} href={href('/guide/svelte/quick-start')}>
+              <strong>Svelte</strong>
+              <span>{copy.react}</span>
+            </a>
             <a className={styles.frameworkCard} href={href('/guide/react-native/quick-start')}>
               <strong>React Native</strong>
               <span>{copy.react}</span>
@@ -122,12 +126,6 @@ export const Home = () => {
               <strong>Taro</strong>
               <span>{copy.react}</span>
             </a>
-            {UPCOMING_FRAMEWORKS.map((framework) => (
-              <div className={styles.frameworkCard} data-upcoming key={framework}>
-                <strong>{framework}</strong>
-                <span>{copy.soon}</span>
-              </div>
-            ))}
           </div>
           <div className={styles.branch} aria-hidden="true" />
           <a

@@ -20,6 +20,7 @@
     "@fluxdown/react-native-plugins": "workspace:^",
     "@fluxdown/react-plugins": "workspace:^",
     "@fluxdown/solid": "workspace:^",
+    "@fluxdown/svelte": "workspace:^",
     "@fluxdown/taro": "workspace:^",
     "@fluxdown/utils": "workspace:^",
     "@fluxdown/vue": "workspace:^",
@@ -32,6 +33,7 @@
     "react-native-web": "catalog:",
     "solid-js": "catalog:",
     "stative": "workspace:^",
+    "svelte": "catalog:",
     "vue": "catalog:"
   },
   "devDependencies": {
@@ -43,6 +45,7 @@
     "@rsbuild/core": "catalog:",
     "@rsbuild/plugin-less": "catalog:",
     "@rsbuild/plugin-sass": "catalog:",
+    "@rsbuild/plugin-svelte": "catalog:",
     "@rsbuild/plugin-svgr": "catalog:",
     "@rspress/core": "catalog:",
     "@tarojs/components-react": "catalog:",

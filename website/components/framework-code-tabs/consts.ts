@@ -2,6 +2,7 @@ export const CODE_FRAMEWORKS = [
   'Core',
   'React',
   'Vue',
+  'Svelte',
   'React Native',
   'Lynx',
   'Solid',

@@ -3,13 +3,14 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["node"],
+    "types": ["node", "svelte"],
     "paths": {
       "@fluxdown/vue": ["../packages/vue/dist/esm/packs/full/index.d.ts"],
       "@fluxdown/vue-plugins/typings": ["../packages/vue-plugins/dist/esm/typings/index.d.ts"],
       "@fluxdown/solid": ["../packages/solid/dist/esm/packs/full/index.d.ts"],
       "@fluxdown/solid-plugins/typings": ["../packages/solid-plugins/dist/esm/typings/index.d.ts"]
-    }
+    },
+    "customConditions": ["svelte"]
   },
   "include": ["docs", "components", "theme", "rspress.config.ts", "env.d.ts"]
 }

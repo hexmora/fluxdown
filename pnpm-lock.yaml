@@ -66,6 +66,9 @@ catalogs:
     '@rsbuild/plugin-sass':
       specifier: 2.0.1
       version: 2.0.1
+    '@rsbuild/plugin-svelte':
+      specifier: 2.0.1
+      version: 2.0.1
     '@rsbuild/plugin-svgr':
       specifier: 2.0.5
       version: 2.0.5
@@ -2398,6 +2401,9 @@ importers:
       '@fluxdown/solid':
         specifier: workspace:^
         version: link:../packages/solid
+      '@fluxdown/svelte':
+        specifier: workspace:^
+        version: link:../packages/svelte
       '@fluxdown/taro':
         specifier: workspace:^
         version: link:../packages/taro
@@ -2434,6 +2440,9 @@ importers:
       stative:
         specifier: workspace:^
         version: link:../packages/stative
+      svelte:
+        specifier: 'catalog:'
+        version: 5.57.3(@typescript-eslint/types@8.63.0)
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@7.0.2)
@@ -2462,6 +2471,9 @@ importers:
       '@rsbuild/plugin-sass':
         specifier: 'catalog:'
         version: 2.0.1(@rsbuild/core@2.2.3(core-js@3.51.0))
+      '@rsbuild/plugin-svelte':
+        specifier: 'catalog:'
+        version: 2.0.1(@babel/core@7.29.7)(@rsbuild/core@2.2.3(core-js@3.51.0))(less@4.9.1)(postcss@8.5.31)(pug@3.0.4)(sass@1.103.1)(stylus@0.64.0)(svelte@5.57.3(@typescript-eslint/types@8.63.0))(typescript@7.0.2)
       '@rsbuild/plugin-svgr':
         specifier: 'catalog:'
         version: 2.0.5(@rsbuild/core@2.2.3(core-js@3.51.0))(@rspack/core@2.2.9(@swc/helpers@0.5.23))(typescript@7.0.2)
@@ -5396,6 +5408,15 @@ packages:
     resolution: {integrity: sha512-BZRpVTZW+za+sv84nYYdIjR7XwVqyS8+1wAha/7BvQ1igdzlmT6xPd6h4jTWfNzdHuzIHZsuWY7kPS/ybzcndA==}
     peerDependencies:
       '@rsbuild/core': ^2.0.0
+    peerDependenciesMeta:
+      '@rsbuild/core':
+        optional: true
+
+  '@rsbuild/plugin-svelte@2.0.1':
+    resolution: {integrity: sha512-N4KWWD5ZLYHn2tFP5fkJmI587/5/TI+hcJC62GGkzPknVkmQWoMitXML71LDpWn4yUoDIWo3ImfZGVtcTVr4vg==}
+    peerDependencies:
+      '@rsbuild/core': ^2.0.0
+      svelte: ^5.0.0
     peerDependenciesMeta:
       '@rsbuild/core':
         optional: true
@@ -13273,6 +13294,20 @@ packages:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: ^5.0.0 || ^6.0.0
 
+  svelte-dev-helper@1.1.9:
+    resolution: {integrity: sha512-oU+Xv7Dl4kRU2kdFjsoPLfJfnt5hUhsFUZtuzI3Ku/f2iAFZqBoEuXOqK3N9ngD4dxQOmN4OKWPHVi3NeAeAfQ==}
+
+  svelte-hmr@0.14.12:
+    resolution: {integrity: sha512-4QSW/VvXuqVcFZ+RhxiR8/newmwOCTlbYIezvkeN6302YFRE8cXy0naamHcjz8Y9Ce3ITTZtrHrIL0AGfyo61w==}
+    engines: {node: ^12.20 || ^14.13.1 || >= 16}
+    peerDependencies:
+      svelte: '>=3.19.0'
+
+  svelte-loader@3.2.4:
+    resolution: {integrity: sha512-e0HdDnkYH/MDx4/IfTSka5AOFg9yYJcPuoZJB5x0l60fkHjVjNvrrxr+rJegDG9J7ZymmdHt00/hdLw+QF299w==}
+    peerDependencies:
+      svelte: ^3.0.0 || ^4.0.0-next.0 || ^5.0.0-next.1
+
   svelte-preprocess@6.0.5:
     resolution: {integrity: sha512-sgwew5yV/2eMeQobIWgAxCNarKwiTUDIc3siAUbq3sp0G6ONtzk0W+wJihMdqjbYb3iGU3ubpGv0usnnuXT3qg==}
     engines: {node: '>= 18.0.0'}
@@ -17318,6 +17353,25 @@ snapshots:
       sass-embedded: 1.104.0
     optionalDependencies:
       '@rsbuild/core': 2.2.3(core-js@3.51.0)
+
+  '@rsbuild/plugin-svelte@2.0.1(@babel/core@7.29.7)(@rsbuild/core@2.2.3(core-js@3.51.0))(less@4.9.1)(postcss@8.5.31)(pug@3.0.4)(sass@1.103.1)(stylus@0.64.0)(svelte@5.57.3(@typescript-eslint/types@8.63.0))(typescript@7.0.2)':
+    dependencies:
+      svelte: 5.57.3(@typescript-eslint/types@8.63.0)
+      svelte-loader: 3.2.4(svelte@5.57.3(@typescript-eslint/types@8.63.0))
+      svelte-preprocess: 6.0.5(@babel/core@7.29.7)(less@4.9.1)(postcss@8.5.31)(pug@3.0.4)(sass@1.103.1)(stylus@0.64.0)(svelte@5.57.3(@typescript-eslint/types@8.63.0))(typescript@7.0.2)
+    optionalDependencies:
+      '@rsbuild/core': 2.2.3(core-js@3.51.0)
+    transitivePeerDependencies:
+      - '@babel/core'
+      - coffeescript
+      - less
+      - postcss
+      - postcss-load-config
+      - pug
+      - sass
+      - stylus
+      - sugarss
+      - typescript
 
   '@rsbuild/plugin-svgr@2.0.5(@rsbuild/core@2.2.3(core-js@3.51.0))(@rspack/core@2.2.9(@swc/helpers@0.5.23))(typescript@7.0.2)':
     dependencies:
@@ -27401,6 +27455,19 @@ snapshots:
     transitivePeerDependencies:
       - picomatch
 
+  svelte-dev-helper@1.1.9: {}
+
+  svelte-hmr@0.14.12(svelte@5.57.3(@typescript-eslint/types@8.63.0)):
+    dependencies:
+      svelte: 5.57.3(@typescript-eslint/types@8.63.0)
+
+  svelte-loader@3.2.4(svelte@5.57.3(@typescript-eslint/types@8.63.0)):
+    dependencies:
+      loader-utils: 2.0.4
+      svelte: 5.57.3(@typescript-eslint/types@8.63.0)
+      svelte-dev-helper: 1.1.9
+      svelte-hmr: 0.14.12(svelte@5.57.3(@typescript-eslint/types@8.63.0))
+
   svelte-preprocess@6.0.5(@babel/core@7.29.7)(@typescript/typescript6@6.0.2)(less@4.9.1)(postcss@8.5.31)(pug@3.0.4)(sass@1.103.1)(stylus@0.64.0)(svelte@5.57.3(@typescript-eslint/types@8.63.0)):
     dependencies:
       svelte: 5.57.3(@typescript-eslint/types@8.63.0)
@@ -27412,6 +27479,18 @@ snapshots:
       sass: 1.103.1
       stylus: 0.64.0
       typescript: '@typescript/typescript6@6.0.2'
+
+  svelte-preprocess@6.0.5(@babel/core@7.29.7)(less@4.9.1)(postcss@8.5.31)(pug@3.0.4)(sass@1.103.1)(stylus@0.64.0)(svelte@5.57.3(@typescript-eslint/types@8.63.0))(typescript@7.0.2):
+    dependencies:
+      svelte: 5.57.3(@typescript-eslint/types@8.63.0)
+    optionalDependencies:
+      '@babel/core': 7.29.7
+      less: 4.9.1
+      postcss: 8.5.31
+      pug: 3.0.4
+      sass: 1.103.1
+      stylus: 0.64.0
+      typescript: 7.0.2
 
   svelte2tsx@0.7.62(@typescript/typescript6@6.0.2)(svelte@5.57.3(@typescript-eslint/types@8.63.0)):
     dependencies:
