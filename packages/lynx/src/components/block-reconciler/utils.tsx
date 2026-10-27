@@ -1,11 +1,10 @@
 import type { IRenderPatchItem } from '@fluxdown/core';
 import type { ILynxRenderPlugin } from '@fluxdown/lynx-plugins/base';
-import type { GetPropsFunction } from '@fluxdown/lynx-plugins/typings';
 import type { ReactNode } from '@lynx-js/react';
 import type { Element, ElementContent, Parent, RootContent } from 'hast';
 import type { IReactiveState } from 'stative';
 
-import { isHastElement, isHastParent } from '@fluxdown/lynx-plugins/base';
+import { getLynxProps, isHastElement, isHastParent } from '@fluxdown/lynx-plugins/base';
 import { PluginPriority } from '@fluxdown/types';
 import { Fragment } from '@lynx-js/react';
 import { isObject, isString } from 'lodash-es';
@@ -38,14 +37,13 @@ export const renderParentChildren = (
   parents: Parent[],
   patches: IReactiveState<IRenderPatchItem<ReactNode>[]>,
   plugins: ILynxRenderPlugin[],
-  getProps: GetPropsFunction | undefined | null,
 ): ReactNode[] =>
   parent.children.map((child, index) => {
     if (!isElementContent(child)) {
       return null;
     }
 
-    const node = renderNode({ node: child, parents, patches, plugins, getProps });
+    const node = renderNode({ node: child, parents, patches, plugins });
 
     if (isObject(node)) {
       return <Fragment key={getChildKey(child, index)}>{node}</Fragment>;
@@ -54,17 +52,11 @@ export const renderParentChildren = (
     return node;
   });
 
-const renderNode = ({
-  node,
-  parents,
-  patches,
-  plugins,
-  getProps: getNodeProps,
-}: RenderNodeParams): ReactNode => {
+const renderNode = ({ node, parents, patches, plugins }: RenderNodeParams): ReactNode => {
   const childParents = isHastParent(node) ? [...parents, node] : parents;
 
   const render = (child: ElementContent) =>
-    renderNode({ node: child, parents: childParents, patches, plugins, getProps: getNodeProps });
+    renderNode({ node: child, parents: childParents, patches, plugins });
 
   const renderChildren = (target?: Parent) => {
     const parent = target ?? (isHastParent(node) ? node : null);
@@ -75,17 +67,13 @@ const renderNode = ({
 
     const nextParents = parent === node ? childParents : [...childParents, parent];
 
-    return renderParentChildren(parent, nextParents, patches, plugins, getNodeProps);
+    return renderParentChildren(parent, nextParents, patches, plugins);
   };
 
   const getProps = (target?: Element) => {
-    if (getNodeProps === null) {
-      return {};
-    }
-
     const current = target ?? (isHastElement(node) ? node : undefined);
 
-    return getNodeProps ? getNodeProps(current) : { ...current?.properties };
+    return getLynxProps(current);
   };
 
   let matched: ILynxRenderPlugin | undefined;

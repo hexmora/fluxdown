@@ -5,7 +5,7 @@ import type {
   SmoothTickerClass,
   TickerType,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
-import type { GetPropsFunction, IPluginItem, Theme } from '@fluxdown/lynx-plugins/typings';
+import type { IPluginItem, Theme } from '@fluxdown/lynx-plugins/typings';
 import type { IPluggableConfig } from '@fluxdown/types';
 import type { ReactNode } from '@lynx-js/react';
 import type { CSSProperties } from '@lynx-js/types';
@@ -92,11 +92,6 @@ export interface FluxdownRawProps {
    * One plugin pack or an ordered list extending the compiler and Lynx renderer.
    */
   plugins: IPluginItem | IPluginItem[];
-
-  /**
-   * Convert syntax-tree properties, or pass null to omit them.
-   */
-  getProps?: GetPropsFunction | null;
 }
 
 export type FluxdownRef = IReadableClosure<ReactNode[]>;

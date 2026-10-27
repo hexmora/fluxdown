@@ -229,9 +229,11 @@ const mappers: MapperOptions = [[], { smooth: { enabled: toClosure(true) } }];
 
 Nested mapper options are passed to the mapper directly. Built-in reactive options accept readable closures; `toClosure` converts a static value or an external state into one.
 
-## Plugin input forms
+## plugins {#plugins}
 
-`PluginSet<T, C>` — `T[] | C | [T[], C]`
+**Type:** `PluginSet<T, C>` — `T[] | Partial<C> | [T[], Partial<C>]`
+
+`plugins` here describes the shared configuration of `renders`, `remarks`, `rehypes`, `repairs`, and `mappers`. Pass these as separate fields to Core.
 
 All five plugin inputs accept a list, a keyed configuration object, or both. Within a list, a class plugin can be `PluginClass` or `[PluginClass, options]`; a mapper can be a mapper function or `[Mapper, options]`.
 
@@ -251,7 +253,7 @@ repairs.next({
 
 You can also pass a static keyed object to `S` as a readable input with `toClosure(config)`. See [Allow additional HTML tags](./plugins/rehype.mdx#allow-additional-html-tags). A configuration by key only adjusts plugins that are already present; use a list to register a new plugin.
 
-## Plugin options.disabled <span className="field-tag">Optional</span> {#plugin-optionsdisabled}
+### disabled <span className="field-tag">Optional</span> {#disabled}
 
 **Type:** `boolean | undefined`
 
@@ -259,7 +261,7 @@ You can also pass a static keyed object to `S` as a readable input with `toClosu
 
 Excludes a plugin without constructing it. Omitted or `false` keeps it enabled. For example, `{ disabled: true }` removes a preset from its configured group.
 
-## Plugin options.priority <span className="field-tag">Optional</span> {#plugin-optionspriority}
+### priority <span className="field-tag">Optional</span> {#priority}
 
 **Type:** `PluginPriority | number | undefined`
 

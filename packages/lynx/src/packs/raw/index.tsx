@@ -6,13 +6,11 @@ import type { ReactNode } from '@lynx-js/react';
 import { Core, isPluggablesEqual, isPluginSetEqual } from '@fluxdown/core';
 import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-plugins/presets/mapper';
 import {
-  getLynxProps,
   getTextStyle,
   mapTokensToStyles,
   SlotProvider,
   ThemeProvider,
   useDeferredUnmount,
-  useLatestFn,
   useStateOf,
   useStatic,
   useThemeConfig,
@@ -26,7 +24,6 @@ import type { FluxdownRawProps, FluxdownRef } from './type';
 
 import { RootReconciler } from '../../components';
 import { EL, EO } from '../../consts';
-import { RenderProvider } from '../../context';
 import { usePlugins } from '../../hooks';
 import { LynxRenderer } from '../../modules';
 import { ensureRuntime } from '../../modules/runtime';
@@ -60,13 +57,10 @@ const Renderer = __BACKGROUND__
           className,
           style,
           theme = 'light',
-          getProps: _getProps = getLynxProps,
         },
         ref,
       ) {
         const { repairEnding, smooth: _smooth, effect } = toStreamingConfig(streaming);
-
-        const getProps = useLatestFn(_getProps);
 
         const themeConfig = useThemeConfig(theme);
 
@@ -152,9 +146,7 @@ const Renderer = __BACKGROUND__
               style={rootStyle}
             >
               <SlotProvider plugins={slots}>
-                <RenderProvider value={{ getProps }}>
-                  <RootReconciler>{core.value}</RootReconciler>
-                </RenderProvider>
+                <RootReconciler>{core.value}</RootReconciler>
               </SlotProvider>
             </view>
           </ThemeProvider>

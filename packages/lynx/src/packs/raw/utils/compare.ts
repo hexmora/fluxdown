@@ -28,7 +28,6 @@ export const isPropsEqual = (left: ComparableProps, right: ComparableProps): boo
     left.className === right.className,
     shallowEqual(left.style ?? EO, right.style ?? EO),
     isEqual(left.theme ?? 'light', right.theme ?? 'light'),
-    left.getProps === right.getProps,
     shallowEqual(left.build ?? EO, right.build ?? EO),
     leftStreaming.repairEnding === rightStreaming.repairEnding,
     isPluginConfigEqual(leftStreaming.smooth, rightStreaming.smooth),
