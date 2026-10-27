@@ -316,6 +316,7 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
         '--no-audit',
         '--no-fund',
         '--no-package-lock',
+        'vue@^3.5.0',
         'react@18.3.1',
         'react-dom@18.3.1',
         '@types/node@22',

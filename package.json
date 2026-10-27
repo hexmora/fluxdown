@@ -29,7 +29,7 @@
     "format:check": "moon run workspace:format-check",
     "lint": "moon run :lint",
     "prepare": "husky",
-    "test": "pnpm run test:react && pnpm run test:lynx",
+    "test": "pnpm run test:react && pnpm run test:lynx && pnpm run test:vue",
     "typecheck": "moon run :typecheck",
     "check": "moon run --concurrency 4 :typecheck :lint :test",
     "changeset": "changeset",
@@ -40,7 +40,8 @@
     "release": "moon run workspace:release-publish --",
     "release:prepare": "moon run workspace:release-prepare --",
     "test:lynx": "pnpm --filter @fluxdown/lynx --filter @fluxdown/lynx-plugins test",
-    "test:react": "jest --config jest.config.ts"
+    "test:react": "jest --config jest.config.ts",
+    "test:vue": "pnpm --filter @fluxdown/vue --filter @fluxdown/vue-plugins test"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",
@@ -65,6 +66,7 @@
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
+    "@vitejs/plugin-vue-jsx": "catalog:",
     "babel-jest": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "expect-type": "catalog:",
@@ -77,6 +79,8 @@
     "semver": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
     "yaml": "catalog:"
   },
   "engines": {
