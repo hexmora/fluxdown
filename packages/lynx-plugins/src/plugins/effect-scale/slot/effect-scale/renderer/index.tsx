@@ -1,3 +1,5 @@
+import type { ReactNode } from '@lynx-js/react';
+
 import { useMemo } from '@lynx-js/react';
 
 import type { ScaleProps } from '../../../../../base';
@@ -7,6 +9,15 @@ import { getAppearKeyframes, useScaleAnimation } from './animation';
 import './style.scss';
 
 export type ScaleRendererProps = Omit<ScaleProps, 'Raw'> & { Raw?: ScaleProps['Raw'] };
+
+const isTextOnly = (children: ReactNode): boolean =>
+  Array.isArray(children)
+    ? children.every(isTextOnly)
+    : children === null ||
+      children === undefined ||
+      typeof children === 'string' ||
+      typeof children === 'number' ||
+      typeof children === 'boolean';
 
 export const ScaleRenderer = ({
   Raw: _Raw,
@@ -46,7 +57,9 @@ export const ScaleRenderer = ({
       style={textStyle}
     >
       <view className="fluxdown-scale-glyph" main-thread:ref={growRef} style={textStyle}>
-        <AnimatedText style={textStyle}>{children}</AnimatedText>
+        <AnimatedText measureLayout={!isTextOnly(children)} style={textStyle}>
+          {children}
+        </AnimatedText>
       </view>
     </view>
   );
