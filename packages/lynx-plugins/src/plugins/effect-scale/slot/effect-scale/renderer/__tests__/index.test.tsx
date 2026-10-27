@@ -1,8 +1,8 @@
-import { cleanup, render } from '@lynx-js/react/testing-library';
+import { act, cleanup, fireEvent, render } from '@lynx-js/react/testing-library';
 import { afterEach, expect, rstest, test } from '@rstest/core';
 
 import { ScaleRenderer } from '..';
-import { TextStyleProvider } from '../../../../../../base';
+import { TextStyleProvider, useTextLayoutWidth } from '../../../../../../base';
 
 afterEach(() => {
   cleanup();
@@ -15,6 +15,8 @@ const content = (children: string) => (
     {children}
   </ScaleRenderer>
 );
+
+const Width = () => <text id="width">{String(useTextLayoutWidth())}</text>;
 
 test('resumes numeric native keyframes without restarting settled glyphs', () => {
   const now = rstest.spyOn(performance, 'now').mockReturnValue(1100);
@@ -113,4 +115,20 @@ test('carries heading typography into each inline view and its actual text', () 
   )) {
     expect(element.getAttribute('style')).toContain('font-size: 32px');
   }
+});
+
+test('keeps width measurement for custom glyph children', async () => {
+  const view = render(
+    <ScaleRenderer start={-1} duration={200} from={0} blur={0.08}>
+      <Width />
+    </ScaleRenderer>,
+  );
+  const text = view.container.querySelector('.fluxdown-scale-glyph > text')!;
+  await act(() => {
+    fireEvent(
+      text,
+      new CustomEvent('bindEvent:layoutchange', { detail: { width: 24, height: 30 } }),
+    );
+  });
+  expect(view.container.querySelector('#width')?.textContent).toBe('24');
 });

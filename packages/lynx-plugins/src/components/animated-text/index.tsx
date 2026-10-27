@@ -6,13 +6,19 @@ import { useCallback, useMainThreadRef, useState } from '@lynx-js/react';
 import { useTextStyle } from '../../base/theme';
 import { TextLayoutWidthProvider, useTextAnimation, useTextLayoutWidth } from '../../context';
 
+type AnimatedTextProps = ComponentProps<'text'> & {
+  /** Leaf glyphs can inherit the surrounding text width without reporting their own layout. */
+  measureLayout?: boolean;
+};
+
 /** Native inline text cannot animate opacity; animate each resolved foreground instead. */
 export const AnimatedText = ({
   children,
   style,
   bindlayoutchange,
+  measureLayout = true,
   ...props
-}: ComponentProps<'text'>) => {
+}: AnimatedTextProps) => {
   const animation = useTextAnimation();
 
   const parentWidth = useTextLayoutWidth();
@@ -78,12 +84,12 @@ export const AnimatedText = ({
   );
 
   return (
-    <TextLayoutWidthProvider value={layoutWidth ?? parentWidth}>
+    <TextLayoutWidthProvider value={measureLayout ? (layoutWidth ?? parentWidth) : parentWidth}>
       <text
         text-fake-bold={true}
         {...props}
-        bindlayoutchange={onLayoutChange}
-        main-thread:ref={ref}
+        bindlayoutchange={measureLayout ? onLayoutChange : bindlayoutchange}
+        main-thread:ref={native ? ref : undefined}
         style={style}
       >
         {children}
