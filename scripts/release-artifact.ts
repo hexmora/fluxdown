@@ -6,7 +6,7 @@ import path from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import semver from 'semver';
 
-import type { BrowserCheckResult } from './types.ts';
+import type { BrowserCheckResult, LynxCheckResult } from './types.ts';
 
 export const RELEASE_REPOSITORY = 'hexmora/fluxdown';
 export const RELEASE_REGISTRY = 'https://registry.npmjs.org/';
@@ -63,7 +63,7 @@ export interface ReleaseArtifactManifest {
   publishable: boolean;
   tools: { node: string; npm: string; pnpm: string; changesets: string };
   candidate?: StableCandidate;
-  verification: { nodeEntries: number; browser: BrowserCheckResult[] };
+  verification: { nodeEntries: number; browser: BrowserCheckResult[]; lynx?: LynxCheckResult };
   packages: ArtifactPackage[];
 }
 
@@ -152,6 +152,36 @@ export function betaSuffix(sourceSha: string, runId: string, datetime: string): 
   return `beta.${datetime}.g${sourceSha}.r${runId}.a1`;
 }
 
+function validateLynxVerification(value: unknown, packages: string[]): void {
+  const verification = record(value, 'Lynx verification');
+  const { specifiers, typeEntries } = verification;
+
+  assert(Array.isArray(specifiers) && specifiers.length > 0, 'Missing Lynx entry verification');
+  assert.equal(new Set(specifiers).size, specifiers.length, 'Duplicate Lynx entry verification');
+
+  for (const specifier of specifiers) {
+    nonempty(specifier, 'Lynx entry specifier');
+
+    const name = packages.find((pkg) => specifier === pkg || specifier.startsWith(`${pkg}/`));
+
+    assert(name, `Lynx entry does not belong to an artifact package: ${specifier}`);
+    if (specifier !== name) safeRelativePath(specifier.slice(name.length + 1));
+  }
+
+  for (const name of packages)
+    assert(specifiers.includes(name), `Missing Lynx package verification: ${name}`);
+
+  assert.equal(typeEntries, specifiers.length, 'Incomplete Lynx declaration verification');
+
+  for (const field of ['nativeAssets', 'webAssets']) {
+    const assets = verification[field];
+
+    assert(Array.isArray(assets) && assets.length > 0, `Missing Lynx ${field}`);
+    assert.equal(new Set(assets).size, assets.length, `Duplicate Lynx ${field}`);
+    assets.forEach(safeRelativePath);
+  }
+}
+
 export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest {
   const manifest = record(value, 'release artifact manifest');
 
@@ -172,8 +202,8 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
   const verification = record(manifest.verification, 'artifact verification');
 
   assert(
-    Number.isSafeInteger(verification.nodeEntries) && Number(verification.nodeEntries) > 0,
-    'Missing consumer verification',
+    Number.isSafeInteger(verification.nodeEntries) && Number(verification.nodeEntries) >= 0,
+    'Invalid Node consumer entry count',
   );
   assert(Array.isArray(verification.browser), 'Missing browser verification');
   assert(Array.isArray(manifest.packages) && manifest.packages.length > 0, 'Empty artifact');
@@ -227,6 +257,19 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
     assert(files.includes('package.json'), 'Archive has no package.json');
     assert.deepEqual(files, files.toSorted(), 'Archive file list is not sorted');
   }
+
+  const lynxPackages = [...names].filter(
+    (name) => name === '@fluxdown/lynx' || name === '@fluxdown/lynx-plugins',
+  );
+
+  if (verification.lynx !== undefined) validateLynxVerification(verification.lynx, lynxPackages);
+
+  // Existing artifacts predate Lynx evidence and remain valid for recovery.
+  assert(
+    Number(verification.nodeEntries) > 0 ||
+      (lynxPackages.length === names.size && verification.lynx !== undefined),
+    'Missing consumer verification',
+  );
 
   if (manifest.channel === 'beta') {
     assert.deepEqual(

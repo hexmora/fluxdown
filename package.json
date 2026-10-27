@@ -48,6 +48,7 @@
     "@changesets/read": "catalog:",
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
+    "@lynx-js/react-rsbuild-plugin": "catalog:",
     "@moonrepo/cli": "catalog:",
     "@react-native/babel-preset": "catalog:",
     "@react-native/jest-preset": "catalog:",
