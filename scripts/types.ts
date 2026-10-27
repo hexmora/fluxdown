@@ -43,3 +43,10 @@ export interface BrowserCheckResult {
   selectors: number;
   cssBytes: number;
 }
+
+export interface LynxCheckResult {
+  specifiers: string[];
+  typeEntries: number;
+  nativeAssets: string[];
+  webAssets: string[];
+}

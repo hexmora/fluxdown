@@ -33,6 +33,12 @@ tasks:
       - tsconfig.base.json
       - package.json
       - pnpm-lock.yaml
+  test:
+    command: tsx --test scripts/*.test.ts
+    inputs:
+      - scripts/**/*
+      - package.json
+      - pnpm-lock.yaml
   version:
     script: pnpm exec changeset version && pnpm install --no-frozen-lockfile
     env:

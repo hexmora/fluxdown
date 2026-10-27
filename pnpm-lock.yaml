@@ -375,6 +375,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: 'catalog:'
         version: 21.0.2
+      '@lynx-js/react-rsbuild-plugin':
+        specifier: 'catalog:'
+        version: 0.22.0(@lynx-js/lynx-core@0.1.4)(@lynx-js/react@0.129.0(@lynx-js/types@4.3.0)(@types/react@18.3.31))(@rsbuild/core@2.2.3(core-js@3.51.0))(esbuild@0.28.2)(tslib@2.8.1)(webpack@5.112.2(@swc/core@1.16.2(@swc/helpers@0.5.23))(esbuild@0.28.2)(postcss@8.5.15))
       '@moonrepo/cli':
         specifier: 'catalog:'
         version: 2.5.4
