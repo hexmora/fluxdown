@@ -22,6 +22,8 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/react-base',
   '@fluxdown/react-base-plugins',
   '@fluxdown/react-plugins',
+  '@fluxdown/react-native-plugins',
+  '@fluxdown/react-native',
   'fluxdown',
 ] as const;
 

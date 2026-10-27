@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/website",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "private": true,
   "homepage": "https://hexmora.github.io/fluxdown/",
   "type": "module",
@@ -15,11 +15,15 @@
   "dependencies": {
     "@fluxdown/core": "workspace:^",
     "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/react-native": "workspace:^",
+    "@fluxdown/react-native-plugins": "workspace:^",
     "@fluxdown/react-plugins": "workspace:^",
     "@fluxdown/utils": "workspace:^",
     "fluxdown": "workspace:^",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-native-svg": "catalog:",
+    "react-native-web": "catalog:",
     "stative": "workspace:^"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/react-base",
-  "version": "0.13.0",
+  "version": "0.14.1",
   "description": "Platform-independent React renderer for Fluxdown.",
   "keywords": [
     "hast",

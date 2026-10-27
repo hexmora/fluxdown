@@ -18,7 +18,11 @@ export const QuotePlugin: IPluginItem = {
   slots: [BlockquoteSlotPlugin],
 };
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <Fluxdown plugins={QuotePlugin} text={text} />;
 }
 ```
@@ -46,7 +50,11 @@ export const CompactCodePlugin = /*#__PURE__*/ pluginExtends(CodePlugin, {
   },
 });
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={CompactCodePlugin} text={text} />;
 }
 ```

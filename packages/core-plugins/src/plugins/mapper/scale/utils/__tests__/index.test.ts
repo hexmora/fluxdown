@@ -193,6 +193,36 @@ test('collapses settled words into one text prefix while retaining the active en
   expect(continued.characters.slice(0, finished.characters.length)).toEqual(finished.characters);
 });
 
+test('keeps generated word and character keys stable when settled siblings collapse', () => {
+  const initial = createScaleRoot(paragraph('same same'), [], config);
+
+  const root = paragraph('same same same');
+
+  const appended = createScaleRoot(root, initial.characters, { ...config, start: 1199 });
+
+  const settled = createScaleRoot(root, appended.characters, { ...config, start: 1200 });
+
+  const before = (appended.root.children[0] as Element).children.filter(
+    (node): node is Element => node.type === 'element',
+  );
+
+  const after = (settled.root.children[0] as Element).children[1] as Element;
+
+  expect(new Set(before.map((node) => node.data?.renderKey)).size).toBe(3);
+
+  expect(after.data?.renderKey).toBe(before[2]?.data?.renderKey);
+
+  expect(after.children.map((node) => node.data?.renderKey)).toEqual(
+    before[2]?.children.map((node) => node.data?.renderKey),
+  );
+
+  const characters = readCharacters(appended.root);
+
+  expect(new Set(characters.map((node) => node.data?.renderKey)).size).toBe(characters.length);
+
+  expect(characters.every((node) => !('renderKey' in node.properties))).toBe(true);
+});
+
 test('keeps punctuation attached to words and normalizes invalid animation values', () => {
   const result = createScaleRoot(paragraph('hello, world! 中文，测试。'), [], {
     ...config,

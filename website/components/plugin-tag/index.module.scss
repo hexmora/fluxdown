@@ -53,6 +53,11 @@
     --tag-dark-color: #efb493;
   }
 
+  &[data-type="react-native-plugins"] {
+    --tag-color: #216e61;
+    --tag-dark-color: #93d9c9;
+  }
+
   &[data-type="react-base-plugins"] {
     --tag-color: #52627b;
     --tag-dark-color: #b8c8df;

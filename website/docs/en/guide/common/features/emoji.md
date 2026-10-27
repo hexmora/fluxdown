@@ -50,7 +50,11 @@ pnpm add @fluxdown/react-base-plugins
 import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { FluxdownLite } from 'fluxdown/lite';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={EmojiPlugin} text={text} />;
 }
 ```
@@ -63,7 +67,11 @@ After installing `@fluxdown/react-base-plugins`, include `EmojiPlugin` and `conf
 import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { Fluxdown } from 'fluxdown';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       plugins={{

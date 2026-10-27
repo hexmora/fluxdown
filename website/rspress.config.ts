@@ -4,7 +4,9 @@ import { pluginSvgr } from '@rsbuild/plugin-svgr';
 import { defineConfig, normalizeHref } from '@rspress/core';
 import { fileURLToPath } from 'node:url';
 
+import { reactNativeWebPlugin } from '../scripts/build/react-native-web';
 import { sessionAppearance } from './theme/appearance/plugin';
+import { sessionLocale } from './theme/locale/plugin';
 
 export default defineConfig({
   root: 'docs',
@@ -32,7 +34,7 @@ export default defineConfig({
   icon: '/logo.svg',
   logo: '/logo.svg',
   // Publish real HTML URLs so direct visits work without server rewrites.
-  route: { cleanUrls: false, localeRedirect: 'auto' },
+  route: { cleanUrls: false, localeRedirect: 'never' },
   plugins: [
     {
       name: 'static-search-links',
@@ -59,7 +61,14 @@ export default defineConfig({
     socialLinks: [{ icon: 'github', mode: 'link', content: 'https://github.com/hexmora/fluxdown' }],
   },
   builderConfig: {
-    plugins: [pluginLess(), pluginSass(), pluginSvgr(), sessionAppearance()],
+    plugins: [
+      pluginLess(),
+      pluginSass(),
+      pluginSvgr(),
+      sessionAppearance(),
+      sessionLocale('/fluxdown/'),
+      reactNativeWebPlugin(fileURLToPath(new URL('.', import.meta.url))),
+    ],
     resolve: {
       alias: {
         // Workspace demos share the same React instance as the documentation theme.

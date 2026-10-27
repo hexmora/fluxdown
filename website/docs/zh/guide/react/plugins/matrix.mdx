@@ -4,14 +4,13 @@ import { PluginTag, PresetCheck } from '../../../../../components';
 
 ## 组件分化
 
-React Lite 和 React Full 使用相同的组件 API，按需要选择默认能力：
+三个入口使用相同的组件 API，按需要选择默认能力：
 
 | 组件           | 导入入口                      | 定位                                                         |
 | -------------- | ----------------------------- | ------------------------------------------------------------ |
-| `FluxdownLite` | `fluxdown/lite`               | 尽量减小体积，提供基础 Markdown 展示，适合按需添加能力。     |
 | `Fluxdown`     | `fluxdown` 或 `fluxdown/full` | 提供更完善的 Markdown 功能和展示效果，适合直接获得完整体验。 |
-
-需要自行选择全部插件时，使用 `fluxdown/raw` 的 `FluxdownRaw`，并传入 `plugins`。
+| `FluxdownLite` | `fluxdown/lite`               | 尽量减小体积，提供基础 Markdown 展示，适合按需添加能力。     |
+| `FluxdownRaw`  | `fluxdown/raw`                | 自行传入完整的 `plugins`，按需组合全部能力。                 |
 
 ## 全部插件
 

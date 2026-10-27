@@ -1,0 +1,130 @@
+{
+  "name": "@fluxdown/react-native-plugins",
+  "version": "0.2.0",
+  "description": "React Native render slots and plugin presets for Fluxdown.",
+  "keywords": [
+    "hast",
+    "markdown",
+    "plugins",
+    "react",
+    "react-native",
+    "renderer",
+    "streaming"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/react-native-plugins"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    "./typings": "./src/typings/index.ts",
+    "./base": "./src/base/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts",
+    "./*": "./src/presets/*/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      "./typings": {
+        "import": {
+          "types": "./dist/esm/typings/index.d.ts"
+        },
+        "require": {
+          "types": "./dist/cjs/typings/index.d.cts"
+        }
+      },
+      "./base": {
+        "import": {
+          "types": "./dist/esm/base/index.d.ts",
+          "default": "./dist/esm/base.js"
+        },
+        "require": {
+          "types": "./dist/cjs/base/index.d.cts",
+          "default": "./dist/cjs/base.cjs"
+        }
+      },
+      "./plugins/*": {
+        "import": {
+          "types": "./dist/esm/plugins/*/index.d.ts",
+          "default": "./dist/esm/plugins/*.js"
+        },
+        "require": {
+          "types": "./dist/cjs/plugins/*/index.d.cts",
+          "default": "./dist/cjs/plugins/*.cjs"
+        }
+      },
+      "./*": {
+        "import": {
+          "types": "./dist/esm/presets/*/index.d.ts",
+          "default": "./dist/esm/presets/*.js"
+        },
+        "require": {
+          "types": "./dist/cjs/presets/*/index.d.cts",
+          "default": "./dist/cjs/presets/*.cjs"
+        }
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rslib build",
+    "lint": "oxlint .",
+    "test": "jest --config ../../jest.config.ts --selectProjects react-native-plugins --runInBand",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/hast": "workspace:^",
+    "@fluxdown/react-base-plugins": "workspace:^",
+    "@fluxdown/react-hooks": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@osuki-dev/skia-diagrams": "catalog:",
+    "@types/hast": "catalog:",
+    "lodash-es": "catalog:",
+    "mathjax-full": "catalog:",
+    "react-native-code-highlighter": "catalog:",
+    "react-syntax-highlighter": "catalog:"
+  },
+  "devDependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@rslib/core": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/react-syntax-highlighter": "catalog:",
+    "expect-type": "catalog:",
+    "oxlint": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-native": "catalog:",
+    "react-native-svg": "catalog:",
+    "react-native-web": "catalog:",
+    "stative": "workspace:^",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:react-native-peer",
+    "react-native": "catalog:react-native-peer",
+    "react-native-svg": ">=15.16.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
