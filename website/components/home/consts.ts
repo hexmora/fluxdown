@@ -1,6 +1,6 @@
 export const INSTALL_COMMAND = 'pnpm install fluxdown';
 
-export const UPCOMING_FRAMEWORKS = ['Vue 3', 'Svelte'];
+export const UPCOMING_FRAMEWORKS = ['Svelte'];
 
 export const COPY = {
   zh: {
@@ -41,7 +41,7 @@ export const COPY = {
       {
         title: '不被框架限制',
         description:
-          '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React、React Native 与 Lynx 组件开始。',
+          '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React、React Native、Lynx 与 Vue 组件开始。',
         link: '认识 Fluxdown Core',
         path: '/guide/core/quick-start',
       },
@@ -108,7 +108,7 @@ export const COPY = {
       {
         title: 'Free to choose a framework',
         description:
-          'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React, React Native and Lynx components.',
+          'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React, React Native, Lynx and Vue components.',
         link: 'Meet Fluxdown Core',
         path: '/guide/core/quick-start',
       },

@@ -3,7 +3,15 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@fluxdown/vue": ["../packages/vue/dist/esm/packs/full/index.d.ts"],
+      "@fluxdown/vue/*": ["../packages/vue/dist/esm/packs/*/index.d.ts"],
+      "@fluxdown/vue-plugins/base": ["../packages/vue-plugins/dist/esm/base/index.d.ts"],
+      "@fluxdown/vue-plugins/typings": ["../packages/vue-plugins/dist/esm/typings/index.d.ts"],
+      "@fluxdown/vue-plugins/plugins/*": ["../packages/vue-plugins/dist/esm/plugins/*/index.d.ts"],
+      "@fluxdown/vue-plugins/*": ["../packages/vue-plugins/dist/esm/presets/*/index.d.ts"]
+    }
   },
   "include": ["docs", "components", "theme", "rspress.config.ts", "env.d.ts"]
 }

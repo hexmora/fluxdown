@@ -8,6 +8,8 @@ dependsOn:
   - react
   - react-plugins
   - stative
+  - vue
+  - vue-plugins
 
 fileGroups:
   sources:
@@ -16,6 +18,7 @@ fileGroups:
     - theme/**/*
     - lynx/**/*
     - /scripts/build/lynx-workspace.ts
+    - /scripts/build/vue.ts
     - rspress.config.ts
     - env.d.ts
     - tsconfig.json
@@ -27,21 +30,28 @@ fileGroups:
     - /tsconfig.base.json
     - /packages/*/package.json
     - /packages/*/tsconfig*.json
+    - /packages/vue*/vite.config.ts
     - /packages/*/src/**/*
 
 tasks:
   dev:
-    command: pnpm run dev
+    command: pnpm exec rspress dev --host 127.0.0.1
     preset: server
+    deps: ["vue:build"]
   build:
-    command: pnpm run build
+    command: pnpm exec rspress build
+    deps: ["vue:build"]
     inputs: ["@group(sources)"]
     outputs: [doc_build]
   preview:
     command: pnpm run preview
     preset: server
   typecheck:
-    command: pnpm run typecheck
+    command: pnpm exec tsc --noEmit
+    deps: ["vue:build", typecheck-lynx]
+    inputs: ["@group(sources)"]
+  typecheck-lynx:
+    command: pnpm exec tsc --noEmit -p lynx/tsconfig.json
     inputs: ["@group(sources)"]
   lint:
     command: pnpm run lint

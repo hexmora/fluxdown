@@ -72,10 +72,34 @@ export default defineConfig({
       reactNativeWebPlugin(fileURLToPath(new URL('.', import.meta.url))),
     ],
     resolve: {
+      aliasStrategy: 'prefer-alias',
       alias: {
         // Workspace demos share the same React instance as the documentation theme.
         react: fileURLToPath(new URL('./node_modules/react', import.meta.url)),
         'react-dom': fileURLToPath(new URL('./node_modules/react-dom', import.meta.url)),
+        vue: fileURLToPath(new URL('./node_modules/vue', import.meta.url)),
+        // Vue JSX is compiled by its package build before Rspress handles the demo.
+        '@fluxdown/vue$': fileURLToPath(
+          new URL('../packages/vue/dist/esm/full.browser.js', import.meta.url),
+        ),
+        '@fluxdown/vue/full$': fileURLToPath(
+          new URL('../packages/vue/dist/esm/full.browser.js', import.meta.url),
+        ),
+        '@fluxdown/vue/lite$': fileURLToPath(
+          new URL('../packages/vue/dist/esm/lite.browser.js', import.meta.url),
+        ),
+        '@fluxdown/vue/raw$': fileURLToPath(
+          new URL('../packages/vue/dist/esm/raw.browser.js', import.meta.url),
+        ),
+        '@fluxdown/vue-plugins/base$': fileURLToPath(
+          new URL('../packages/vue-plugins/dist/esm/base.browser.js', import.meta.url),
+        ),
+        '@fluxdown/vue-plugins/full$': fileURLToPath(
+          new URL('../packages/vue-plugins/dist/esm/presets/full.browser.js', import.meta.url),
+        ),
+        '@fluxdown/vue-plugins/lite$': fileURLToPath(
+          new URL('../packages/vue-plugins/dist/esm/presets/lite.browser.js', import.meta.url),
+        ),
         '@prefix': fileURLToPath(
           new URL('../packages/react-plugins/src/styles/_prefix.scss', import.meta.url),
         ),
