@@ -12,6 +12,12 @@
     "position": "left"
   },
   {
+    "text": "Svelte",
+    "link": "/guide/svelte/quick-start",
+    "activeMatch": "/guide/svelte/",
+    "position": "left"
+  },
+  {
     "text": "Native",
     "link": "/guide/react-native/quick-start",
     "activeMatch": "/guide/react-native/",

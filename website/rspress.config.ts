@@ -1,5 +1,6 @@
 import { pluginLess } from '@rsbuild/plugin-less';
 import { pluginSass } from '@rsbuild/plugin-sass';
+import { pluginSvelte } from '@rsbuild/plugin-svelte';
 import { pluginSvgr } from '@rsbuild/plugin-svgr';
 import { defineConfig, normalizeHref } from '@rspress/core';
 import { fileURLToPath } from 'node:url';
@@ -69,6 +70,7 @@ export default defineConfig({
       pluginLess(),
       pluginSass(),
       pluginSvgr(),
+      pluginSvelte({ preprocessOptions: { typescript: false } }),
       sessionAppearance(),
       sessionLocale('/fluxdown/'),
       reactNativeWebPlugin(fileURLToPath(new URL('.', import.meta.url))),

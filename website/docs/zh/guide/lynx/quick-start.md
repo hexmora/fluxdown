@@ -45,4 +45,4 @@ export default function App() {
 - [流式内容](./streaming.md)：控制平滑输出与末尾效果。
 - [样式指南](./customization.md)：调整颜色、字体和间距。
 - [插件矩阵](./plugins/matrix.mdx)：选择 Full、Lite 或自己组装。
-- [横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、React Native、Lynx、Solid 和 Taro 的静态与流式表现。
+- [横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、Svelte、React Native、Lynx、Solid 和 Taro 的静态与流式表现。

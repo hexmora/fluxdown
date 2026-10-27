@@ -1,0 +1,61 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# Plugin matrix
+
+## Component variants
+
+The three entry points share the same component API with different default capabilities:
+
+| Component      | Import                                        | Purpose                                                          |
+| -------------- | --------------------------------------------- | ---------------------------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/svelte` or `@fluxdown/svelte/full` | Full Markdown presentation with highlighting, math and diagrams. |
+| `FluxdownLite` | `@fluxdown/svelte/lite`                       | Basic presentation, ready for selected additions.                |
+| `FluxdownRaw`  | `@fluxdown/svelte/raw`                        | Takes the complete `plugins` list you supply.                    |
+
+## All plugins
+
+Composition includes inherited plugin types. A check means the component includes the plugin by default; a blank means it can be added manually.
+
+| Plugin                  | Composition     | Package         | Lite | Full |
+| ----------------------- | --------------- | --------------- | :--: | :--: |
+| `BlockquotePlugin`      | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`             |                 | <PresetCheck /> |
+| `CodePlugin`            | <PresetCheck /> |                 |
+| `CodePelePlugin`        |                 | <PresetCheck /> |
+| `CodePrismPlugin`       |                 |                 |
+| `CodeShikiPlugin`       |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`           |                 | <PresetCheck /> |
+| `EmphasisPlugin`        | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PresetCheck /> |                 |
+| `TexKatexPlugin`        |                 |                 |
+| `TexMathjaxKatexPlugin` |                 | <PresetCheck /> |
+
+## Package and imports
+
+<PluginTag type="svelte-plugins" /> refers to `@fluxdown/svelte-plugins`,
+containing Svelte plugin packs, render plugins and slots.
+
+> Import from `@fluxdown/svelte-plugins/plugins/<plugin-directory>`. Remove the `Plugin` suffix from the export name and convert it to kebab case: `CodeShikiPlugin` becomes `code-shiki`.
+
+```ts
+import { CodeShikiPlugin } from '@fluxdown/svelte-plugins/plugins/code-shiki';
+import { HeadingPlugin } from '@fluxdown/svelte-plugins/plugins/heading';
+```
+
+> Import `PRESET_FULL_PLUGINS` and `PRESET_LITE_PLUGINS` from `@fluxdown/svelte-plugins/full` and `@fluxdown/svelte-plugins/lite` respectively. Both can be passed directly to `FluxdownRaw`.
+
+The component's `plugins` prop can extend either preset. See [plugin packs](./aggregate.md) for configuration and composition.

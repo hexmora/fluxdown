@@ -1,0 +1,61 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# 插件矩阵
+
+## 组件分化
+
+三个入口使用相同的组件 API，按需要选择默认能力：
+
+| 组件           | 导入入口                                      | 定位                                         |
+| -------------- | --------------------------------------------- | -------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/svelte` 或 `@fluxdown/svelte/full` | 完整的 Markdown 展示，包含高亮、公式和图表。 |
+| `FluxdownLite` | `@fluxdown/svelte/lite`                       | 基础展示，适合按需添加能力。                 |
+| `FluxdownRaw`  | `@fluxdown/svelte/raw`                        | 自行传入完整的 `plugins`。                   |
+
+## 全部插件
+
+「组成」包含继承的子插件类型；勾选表示对应组件默认包含此插件，空白表示需要手动添加。
+
+| 插件                    | 组成                                                  | 所在包                              |      Lite       |      Full       |
+| ----------------------- | ----------------------------------------------------- | ----------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`             | <PluginTag type="remark" />                           | <PluginTag type="svelte-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> |                 |
+| `CodePelePlugin`        | <PluginTag type="slot" />                             | <PluginTag type="svelte-plugins" /> |                 | <PresetCheck /> |
+| `CodePrismPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> |                 |                 |
+| `CodeShikiPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="svelte-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PluginTag type="render" />                           | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> | <PresetCheck /> |                 |
+| `TexKatexPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> |                 |                 |
+| `TexMathjaxKatexPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="svelte-plugins" /> |                 | <PresetCheck /> |
+
+## 所在包与导入
+
+<PluginTag type="svelte-plugins" /> 对应 `@fluxdown/svelte-plugins`，包含 Svelte
+的综合插件、render 和 slot。
+
+> 使用 `@fluxdown/svelte-plugins/plugins/<插件目录>` 导入。目录名取导出名称，去掉 `Plugin` 后转成小写中划线形式，例如 `CodeShikiPlugin` 对应 `code-shiki`。
+
+```ts
+import { CodeShikiPlugin } from '@fluxdown/svelte-plugins/plugins/code-shiki';
+import { HeadingPlugin } from '@fluxdown/svelte-plugins/plugins/heading';
+```
+
+> 预置列表 `PRESET_FULL_PLUGINS`、`PRESET_LITE_PLUGINS` 分别从 `@fluxdown/svelte-plugins/full`、`@fluxdown/svelte-plugins/lite` 导入，可直接传给 `FluxdownRaw`。
+
+组件的 `plugins` 参数可以继续扩展任意预设。配置与组合方式见[综合插件](./aggregate.md)。

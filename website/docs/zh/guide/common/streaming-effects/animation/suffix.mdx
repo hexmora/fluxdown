@@ -13,7 +13,7 @@ import { SuffixDemo } from '../../../../../../components';
 
 选择对应框架查看代码。Core 示例中的 `mappers` 传入 [Core 输入](../../../core/quick-start.md)，并显式启用 mapper；组件通过 `streaming.effect` 启用相同效果，并内置视觉渲染器。
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -56,6 +56,23 @@ defineProps<{ text: string }>();
     :text="text"
   />
 </template>
+```
+
+```svelte
+<script lang="ts">
+  import { Fluxdown } from '@fluxdown/svelte';
+
+  type MessageProps = {
+    text: string;
+  };
+
+  let { text }: MessageProps = $props();
+</script>
+
+<Fluxdown
+  streaming={{ effect: ['suffix', { type: 'cursor' }] }}
+  {text}
+/>
 ```
 
 ```tsx
@@ -132,7 +149,7 @@ export function Message({ text }: MessageProps) {
 
 只要 effect 启用，标记就会保持显示。响应完成后，将 `streaming` 设为 `false`；如果需要继续保留其他流式行为，也可以只把 suffix 的 `enabled` 设为 `false`：
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -186,6 +203,27 @@ defineProps<{ text: string; isStreaming: boolean }>();
     :text="text"
   />
 </template>
+```
+
+```svelte
+<script lang="ts">
+  import { Fluxdown } from '@fluxdown/svelte';
+
+  type MessageProps = {
+    text: string;
+    isStreaming: boolean;
+  };
+
+  let { text, isStreaming }: MessageProps = $props();
+</script>
+
+<Fluxdown
+  streaming={{
+    smooth: true,
+    effect: ['suffix', { type: 'dot', enabled: isStreaming }],
+  }}
+  {text}
+/>
 ```
 
 ```tsx
@@ -276,7 +314,7 @@ export function Message({ text, isStreaming }: MessageProps) {
 
 将标记和入场效果一起使用：
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -321,6 +359,23 @@ defineProps<{ text: string }>();
     :text="text"
   />
 </template>
+```
+
+```svelte
+<script lang="ts">
+  import { Fluxdown } from '@fluxdown/svelte';
+
+  type MessageProps = {
+    text: string;
+  };
+
+  let { text }: MessageProps = $props();
+</script>
+
+<Fluxdown
+  streaming={{ effect: ['scale', ['suffix', { type: 'dot' }]] }}
+  {text}
+/>
 ```
 
 ```tsx
@@ -397,7 +452,7 @@ export function Message({ text }: MessageProps) {
 
 `type` 的类型是 `'cursor' | 'dot' | (string & {})`。所有值都会生成相同结构的 HAST 节点：一个 `span`，其 `dataFluxdownSuffix` 属性保存类型。默认 renderer 只识别 `cursor` 和 `dot`，遇到其他值直接返回 `null`。未知类型是提供给 renderer 的信息，不会作为文字显示。
 
-通过各框架的渲染插件显示一个笑脸。`SuffixRenderer` 复用内置标记的布局与呼吸动画；Vue 使用 `h`，Lynx 将 JSX 渲染函数放在插件类外：
+通过各框架的渲染插件显示一个笑脸。`SuffixRenderer` 复用内置标记的布局与呼吸动画；Vue 使用 `h`，Svelte 使用 `createElement`，Lynx 将 JSX 渲染函数放在插件类外：
 
 <FrameworkCodeTabs>
 
@@ -489,6 +544,53 @@ defineProps<{ text: string }>();
     :text="text"
   />
 </template>
+```
+
+```svelte
+<script lang="ts">
+  import type {
+    SvelteRenderMatchParams,
+    SvelteRenderParams,
+  } from '@fluxdown/svelte-plugins/base';
+
+  import {
+    isSuffixNode,
+    SUFFIX_DATA_ATTR,
+  } from '@fluxdown/core-plugins/plugins/mapper/suffix';
+  import { BaseSvelteRenderPlugin, createElement } from '@fluxdown/svelte-plugins/base';
+  import { SuffixRenderer } from '@fluxdown/svelte-plugins/plugins/effect-suffix';
+  import { Fluxdown } from '@fluxdown/svelte';
+
+  class SmileRenderPlugin extends BaseSvelteRenderPlugin {
+    static readonly key = 'render-smile';
+
+    match({ node }: SvelteRenderMatchParams) {
+      return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
+    }
+
+    render({ node }: SvelteRenderParams) {
+      if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
+        return null;
+      }
+
+      return createElement(SuffixRenderer, { type: 'smile' }, '🙂');
+    }
+  }
+
+  const plugins = { renders: [SmileRenderPlugin] };
+
+  type MessageProps = {
+    text: string;
+  };
+
+  let { text }: MessageProps = $props();
+</script>
+
+<Fluxdown
+  {plugins}
+  streaming={{ effect: ['suffix', { type: 'smile' }] }}
+  {text}
+/>
 ```
 
 ```tsx

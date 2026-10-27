@@ -9,6 +9,7 @@ import type { RendererPreviewProps } from './type';
 import { useLocale } from '../../../hooks';
 import { LynxPreview } from './components/lynx-preview';
 import { SolidPreview } from './components/solid-preview';
+import { SveltePreview } from './components/svelte-preview';
 import { TaroPreview } from './components/taro-preview';
 import { VuePreview } from './components/vue-preview';
 
@@ -61,6 +62,10 @@ export const RendererPreview = ({
 
   if (renderer === 'vue') {
     return <VuePreview key={cycle} {...props} />;
+  }
+
+  if (renderer === 'svelte') {
+    return <SveltePreview key={cycle} {...props} />;
   }
 
   if (renderer === 'taro') {

@@ -1,7 +1,5 @@
 export const INSTALL_COMMAND = 'pnpm install fluxdown';
 
-export const UPCOMING_FRAMEWORKS = ['Svelte'];
-
 export const COPY = {
   zh: {
     description: '为 AI 流式输出而生的 Markdown 渲染器。',
@@ -41,7 +39,7 @@ export const COPY = {
       {
         title: '不被框架限制',
         description:
-          '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React、Vue、React Native、Lynx、Solid 与 Taro 组件开始。',
+          '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React、Vue、Svelte、React Native、Lynx、Solid 与 Taro 组件开始。',
         link: '认识 Fluxdown Core',
         path: '/guide/core/quick-start',
       },
@@ -65,7 +63,6 @@ export const COPY = {
     foundation: '响应式状态与组合',
     core: '框架无关的 Markdown 引擎',
     react: '开箱即用',
-    soon: '即将推出',
     finalTitle: '让下一个答案，自然展开。',
     finalButton: '开始使用 Fluxdown',
     footer: '一切皆响应式。',
@@ -108,7 +105,7 @@ export const COPY = {
       {
         title: 'Free to choose a framework',
         description:
-          'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React, Vue, React Native, Lynx, Solid and Taro components.',
+          'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React, Vue, Svelte, React Native, Lynx, Solid and Taro components.',
         link: 'Meet Fluxdown Core',
         path: '/guide/core/quick-start',
       },
@@ -134,7 +131,6 @@ export const COPY = {
     foundation: 'Reactive state and composition',
     core: 'A framework-independent Markdown engine',
     react: 'Ready to use',
-    soon: 'Coming soon',
     finalTitle: 'Give your next answer room to unfold.',
     finalButton: 'Get started with Fluxdown',
     footer: 'Everything is reactive.',
