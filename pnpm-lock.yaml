@@ -820,6 +820,9 @@ importers:
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1
+      mathjax-full:
+        specifier: 'catalog:'
+        version: 3.2.2
       shallow-equal:
         specifier: 'catalog:'
         version: 3.1.0
