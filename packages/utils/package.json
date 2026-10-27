@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/utils",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Shared utility helpers for Fluxdown packages.",
   "keywords": [
     "llm",
