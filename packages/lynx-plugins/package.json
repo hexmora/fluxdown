@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/lynx-plugins",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Lynx elements and render plugins for Fluxdown.",
   "homepage": "https://hexmora.github.io/fluxdown/",
   "bugs": {
