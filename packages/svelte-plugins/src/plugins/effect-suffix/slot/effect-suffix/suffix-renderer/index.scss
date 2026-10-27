@@ -1,0 +1,59 @@
+:global(.fluxdown-svelte-effect-suffix) {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 1lh;
+  vertical-align: top;
+  pointer-events: none;
+  user-select: none;
+
+  .marker {
+    position: absolute;
+    inset-inline-start: 0.18em;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: fluxdown-svelte-suffix-breathe 1s ease-in-out infinite;
+  }
+
+  .cursor {
+    width: calc(1lh * 0.39 / 1.65);
+    height: 1em;
+    border-radius: 0.06em;
+    background: currentColor;
+  }
+
+  .dot {
+    width: 0.624em;
+    height: 0.624em;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .custom {
+    top: 0;
+    transform: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1lh;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marker {
+      animation: none;
+    }
+  }
+}
+
+@keyframes -global-fluxdown-svelte-suffix-breathe {
+  0%,
+  33.333333%,
+  100% {
+    opacity: 1;
+  }
+
+  50%,
+  83.333333% {
+    opacity: 0;
+  }
+}

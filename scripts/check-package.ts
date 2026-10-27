@@ -113,6 +113,10 @@ export function isTaroPackage(name: string): boolean {
   return name === '@fluxdown/taro' || name === '@fluxdown/taro-plugins';
 }
 
+export function isSveltePackage(name: string): boolean {
+  return name === '@fluxdown/svelte' || name === '@fluxdown/svelte-plugins';
+}
+
 export async function readManifest(directory: string): Promise<PackageManifest> {
   return JSON.parse(
     await readFile(path.join(directory, 'package.json'), 'utf8'),
@@ -168,6 +172,20 @@ async function checkExports(directory: string, source = false): Promise<PackageM
   }
 
   for (const [entry, value] of publicEntries(manifest, files)) {
+    if (isSveltePackage(manifest.name)) {
+      assert(
+        resolveExport(value, ['svelte', 'import'])?.endsWith('.js'),
+        `${label}${entry}: missing Svelte module entry`,
+      );
+
+      assert(
+        resolveExport(value, ['types', 'import'])?.endsWith('.d.ts'),
+        `${label}${entry}: missing Svelte declarations`,
+      );
+
+      continue;
+    }
+
     if (isLynxPackage(manifest.name)) {
       assert(
         resolveExport(value, ['import'])?.endsWith('.jsx'),

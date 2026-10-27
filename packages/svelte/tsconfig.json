@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "vitest/globals", "vite/client"],
+    "verbatimModuleSyntax": false,
+    "jsx": "preserve"
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.svelte",
+    "stories/**/*.ts",
+    "stories/**/*.svelte",
+    ".storybook/**/*.ts",
+    "*.config.ts",
+    "vitest.setup.ts"
+  ]
+}
