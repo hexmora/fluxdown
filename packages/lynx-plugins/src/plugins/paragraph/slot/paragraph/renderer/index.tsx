@@ -1,6 +1,6 @@
 import type { ParagraphProps } from '../../../../../base';
 
-import { joinClassNames, useBlockStyle, useTextStyle } from '../../../../../base';
+import { AnimatedText, joinClassNames, useBlockStyle, useTextStyle } from '../../../../../base';
 
 export const ParagraphRenderer = ({
   Raw: _Raw,
@@ -17,12 +17,12 @@ export const ParagraphRenderer = ({
   const textStyle = useTextStyle();
 
   return (
-    <text
+    <AnimatedText
       {...elementProps}
       className={joinClassNames('fluxdown-paragraph', className)}
       style={{ ...textStyle, ...blockStyle, ...style }}
     >
       {children}
-    </text>
+    </AnimatedText>
   );
 };

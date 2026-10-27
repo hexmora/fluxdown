@@ -6,6 +6,7 @@ import { isEqual } from 'lodash-es';
 
 import type { Theme, ThemeConfig } from './type';
 
+import { useTextAnimation } from '../../context';
 import { useMemoValue } from '../hooks';
 import { LIGHT_THEME } from './presets/light';
 import { resolveTheme } from './utils';
@@ -17,8 +18,6 @@ export * from './utils';
 const ThemeContext = /*#__PURE__*/ createContext<ThemeConfig>(LIGHT_THEME);
 
 const TextStyleContext = /*#__PURE__*/ createContext<CSSProperties | null>(null);
-
-const TextAnimationContext = /*#__PURE__*/ createContext<CSSProperties | null>(null);
 
 export const useThemeConfig = (theme: Theme = 'light'): ThemeConfig => {
   const stableTheme = useMemoValue({ theme }, isEqual).theme;
@@ -40,20 +39,18 @@ export const getTextStyle = ({ tokens }: ThemeConfig): CSSProperties => ({
 export const useTextStyle = (override?: CSSProperties): CSSProperties => {
   const inherited = useContext(TextStyleContext);
 
-  const animation = useContext(TextAnimationContext);
+  const animation = useTextAnimation();
 
   const theme = useTheme();
 
   const resolved = { ...(inherited ?? getTextStyle(theme)), ...override };
 
-  return animation
+  return animation && !('arrival' in animation)
     ? ({ ...resolved, ...animation, '--fluxdown-text-color': resolved.color } as CSSProperties)
     : resolved;
 };
 
 export const TextStyleProvider = TextStyleContext.Provider;
-
-export const TextAnimationProvider = TextAnimationContext.Provider;
 
 export const ThemeProvider = ({ children, value }: PropsWithChildren<{ value: ThemeConfig }>) => {
   const textStyle = useMemo(() => getTextStyle(value), [value]);

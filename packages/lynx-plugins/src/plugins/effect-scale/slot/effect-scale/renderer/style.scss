@@ -1,0 +1,19 @@
+.fluxdown-scale {
+  &,
+  &-glyph {
+    overflow: visible;
+    vertical-align: baseline;
+    animation-play-state: running;
+  }
+
+  &-glyph {
+    transform-origin: center bottom;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    &-glyph {
+      animation-play-state: paused;
+    }
+  }
+}

@@ -125,6 +125,8 @@ catalog:
 
   "@svgr/core": 8.1.0
   "@svgr/plugin-jsx": 8.1.0
+  core-js: ^3.51.0
+  background-only: 0.0.1
 
 catalogs:
   react-native-peer:
@@ -155,5 +157,6 @@ overrides:
 allowBuilds:
   "@swc/core": true
   "@parcel/watcher": true
+  core-js: false
   esbuild: true
   unrs-resolver: true

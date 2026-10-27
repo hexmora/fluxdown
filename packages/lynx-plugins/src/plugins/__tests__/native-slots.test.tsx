@@ -183,6 +183,86 @@ test('nested lists reuse rendered children once while preserving loose blocks an
   }
 });
 
+test('inline code resolves theme references and relative box lengths for native text', () => {
+  const theme = resolveTheme({
+    tokens: {
+      typography: { fontSize: { md: '20px' }, fontMono: 'monospace' },
+      colors: { border: '#123456', surfaceMuted: '#ffeecc' },
+      radius: { sm: '6px' },
+    },
+  });
+
+  const view = render(
+    <ThemeProvider value={theme}>
+      <ElementRenderer Raw={null} {...nodeProps} tagName="code">
+        inline code
+      </ElementRenderer>
+    </ThemeProvider>,
+  );
+
+  const code = view.container.querySelector('.fluxdown-inline-code');
+  const fragments = code?.querySelectorAll('view');
+
+  expect(code?.textContent).toBe('inline code');
+  expect(fragments).toHaveLength(2);
+  expect(fragments?.[0].style).toMatchObject({
+    fontSize: '17.5px',
+    fontFamily: 'monospace',
+    background: 'rgb(255, 238, 204)',
+    borderTop: '1px solid rgb(18, 52, 86)',
+    borderLeftWidth: '1px',
+    borderRightStyle: 'none',
+    borderTopLeftRadius: '6px',
+    borderTopRightRadius: '0px',
+    marginBottom: '-3.125px',
+    paddingLeft: '6.125px',
+    paddingRight: '0px',
+    paddingTop: '2.625px',
+    paddingBottom: '2.625px',
+  });
+});
+
+test('Web inline code retains spaces in one inline text box without native attachments', () => {
+  const runtimes = [
+    globalThis.lynxTestingEnv.mainThread,
+    globalThis.lynxTestingEnv.backgroundThread,
+  ];
+  const originalSystemInfo = runtimes.map((runtime) => runtime['SystemInfo']);
+
+  for (const runtime of runtimes) {
+    runtime['SystemInfo'] = { platform: 'web' };
+  }
+
+  try {
+    const theme = resolveTheme({
+      tokens: { typography: { fontSize: { md: '20px' }, fontMono: 'monospace' } },
+    });
+
+    const view = render(
+      <ThemeProvider value={theme}>
+        <ElementRenderer Raw={null} {...nodeProps} tagName="code">
+          inline code
+        </ElementRenderer>
+      </ThemeProvider>,
+    );
+
+    const code = view.container.querySelector('.fluxdown-inline-code');
+
+    expect(code?.textContent).toBe('inline code');
+    expect(code?.querySelectorAll('view')).toHaveLength(0);
+    expect((code as HTMLElement).style).toMatchObject({
+      fontSize: '17.5px',
+      fontFamily: 'monospace',
+      padding: '2.625px 6.125px',
+      whiteSpace: 'normal',
+    });
+  } finally {
+    runtimes.forEach((runtime, index) => {
+      runtime['SystemInfo'] = originalSystemInfo[index];
+    });
+  }
+});
+
 test('theme overrides reach inline code, dividers and footnote text', () => {
   const theme = resolveTheme({
     tokens: {
@@ -237,12 +317,12 @@ test('theme overrides reach inline code, dividers and footnote text', () => {
     </ThemeProvider>,
   );
 
-  expect(view.getByText('inline').style).toMatchObject({
+  expect(view.getByText('inline').closest('view')?.style).toMatchObject({
     fontSize: '18px',
     fontFamily: 'monospace',
     background: 'rgb(255, 238, 204)',
-    border: '2px solid rgb(18, 52, 86)',
-    borderRadius: '6px',
+    borderTop: '2px solid rgb(18, 52, 86)',
+    borderTopLeftRadius: '6px',
     whiteSpace: 'nowrap',
   });
 
@@ -411,7 +491,10 @@ test('task and ordered list markers preserve their semantic state without HTML i
 
   expect(view.container.textContent).toBe('3.third');
 
-  expect(view.container.querySelector('.fluxdown-list-item > text')).not.toBeNull();
+  // Lynx's test renderer exposes the component boundary as a transparent wrapper.
+  expect(view.container.querySelector('.fluxdown-list-item > wrapper > text')?.textContent).toBe(
+    '3.',
+  );
 
   view.rerender(
     <ElementRenderer

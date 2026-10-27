@@ -29,7 +29,8 @@ import { EL, EO } from '../../consts';
 import { RenderProvider } from '../../context';
 import { usePlugins } from '../../hooks';
 import { LynxRenderer } from '../../modules';
-import styles from '../../styles/index.module.css';
+import { ensureRuntime } from '../../modules/runtime';
+import styles from '../../styles/index.module.scss';
 import {
   isPatchesEqual,
   isPropsEqual,
@@ -41,6 +42,10 @@ import {
 } from './utils';
 
 let instanceCount = 0;
+
+if (__BACKGROUND__) {
+  ensureRuntime();
+}
 
 // Keep parser dependencies out of the main-thread build, including this module.
 const Renderer = __BACKGROUND__

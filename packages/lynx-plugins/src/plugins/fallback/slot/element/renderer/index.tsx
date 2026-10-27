@@ -2,13 +2,15 @@ import type { ReactNode } from '@lynx-js/react';
 import type { CSSProperties } from '@lynx-js/types';
 import type { ElementContent } from 'hast';
 
-import type { ElementProps } from '../../../../../base';
+import type { ElementProps, ThemeTokens } from '../../../../../base';
 
 import {
+  AnimatedText,
   isBlockElement,
   isElementWithTag,
   isHastElement,
   joinClassNames,
+  mapTokensToStyles,
   TextStyleProvider,
   useBlockStyle,
   useTextStyle,
@@ -19,6 +21,60 @@ const getFontSize = (size: string, parentSize: CSSProperties['fontSize']): strin
   /^\d*\.?\d+em$/.test(size) && typeof parentSize === 'string' && parentSize.endsWith('px')
     ? `${parseFloat(size) * parseFloat(parentSize)}px`
     : size;
+
+const getInlineCodeStyle = (
+  tokens: ThemeTokens,
+  parentSize: CSSProperties['fontSize'],
+): CSSProperties => {
+  const variables = mapTokensToStyles(tokens);
+
+  const resolve = (value: string): string =>
+    value.replace(/var\((--[\w-]+)\)/g, (reference, name: keyof CSSProperties) =>
+      String(variables[name] ?? reference),
+    );
+
+  const fontSize = getFontSize(resolve(tokens.inlineCode.fontSize), parentSize);
+
+  return {
+    fontFamily: resolve(tokens.inlineCode.fontFamily),
+    fontSize,
+    background: resolve(tokens.inlineCode.background),
+    border: resolve(tokens.inlineCode.border),
+    borderRadius: resolve(tokens.inlineCode.borderRadius),
+    padding: `${getFontSize(resolve(tokens.inlineCode.paddingBlock), fontSize)} ${getFontSize(resolve(tokens.inlineCode.paddingInline), fontSize)}`,
+    whiteSpace: tokens.inlineCode.whiteSpace === 'nowrap' ? 'nowrap' : 'normal',
+  };
+};
+
+const getLineHeight = ({ fontSize, lineHeight }: CSSProperties): number => {
+  if (!/^\d+(?:\.\d+)?(?:px)?$/.test(String(fontSize))) return Number.NaN;
+
+  const size = parseFloat(String(fontSize));
+
+  return typeof lineHeight === 'string' && lineHeight.endsWith('px')
+    ? parseFloat(lineHeight)
+    : size * Number(lineHeight);
+};
+
+const getInlineBoxMargin = (inline: CSSProperties, parent: CSSProperties): string | undefined => {
+  const padding = String(inline.padding).split(/\s+/);
+
+  const lengths = [
+    padding[0] ?? '0',
+    padding[2] ?? padding[0] ?? '0',
+    inline.border === 'none' ? '0' : String(inline.border).split(/\s+/)[0]!,
+  ];
+
+  if (!lengths.every((length) => /^\d+(?:\.\d+)?(?:px)?$/.test(length))) return undefined;
+
+  const [top, bottom, border] = lengths.map(parseFloat) as [number, number, number];
+
+  const excess = getLineHeight(inline) + top + bottom + 2 * border - getLineHeight(parent);
+
+  // Inline padding paints outside a Web line box. Native attachments include
+  // their box in line height, so remove only the excess over the parent line.
+  return Number.isFinite(excess) ? `${-Math.max(0, excess)}px` : undefined;
+};
 
 export const ElementRenderer = ({
   Raw: _Raw,
@@ -110,9 +166,9 @@ export const ElementRenderer = ({
       }
 
       content.push(
-        <text key={`inline-${content.length}`} style={textStyle}>
+        <AnimatedText key={`inline-${content.length}`} style={textStyle}>
           {inline}
-        </text>,
+        </AnimatedText>,
       );
 
       inline = [];
@@ -153,7 +209,7 @@ export const ElementRenderer = ({
           ...style,
         }}
       >
-        <text
+        <AnimatedText
           style={{
             ...textStyle,
             color: checkbox ? tokens.colors.accent : tokens.colors.fgMuted,
@@ -164,7 +220,7 @@ export const ElementRenderer = ({
           }}
         >
           {marker}
-        </text>
+        </AnimatedText>
         <view
           style={{
             display: 'flex',
@@ -243,17 +299,7 @@ export const ElementRenderer = ({
 
   const inlineStyle: CSSProperties =
     tagName === 'code'
-      ? {
-          ...textStyle,
-          fontFamily: tokens.inlineCode.fontFamily,
-          fontSize: getFontSize(tokens.inlineCode.fontSize, textStyle.fontSize),
-          background: tokens.inlineCode.background,
-          border: tokens.inlineCode.border,
-          borderRadius: tokens.inlineCode.borderRadius,
-          padding: `${tokens.inlineCode.paddingBlock} ${tokens.inlineCode.paddingInline}`,
-          whiteSpace: tokens.inlineCode.whiteSpace === 'nowrap' ? 'nowrap' : 'normal',
-          ...style,
-        }
+      ? { ...textStyle, ...getInlineCodeStyle(tokens, textStyle.fontSize), ...style }
       : tagName === 'del' || tagName === 's'
         ? {
             ...textStyle,
@@ -267,11 +313,80 @@ export const ElementRenderer = ({
       ? { ...textStyle, fontFamily: inlineStyle.fontFamily, fontSize: inlineStyle.fontSize }
       : inlineStyle;
 
+  // Web paints inline text boxes and preserves their word boundaries. Native
+  // text needs attachments for padding and borders.
+  if (
+    tagName === 'code' &&
+    !(typeof SystemInfo !== 'undefined' && String(SystemInfo.platform) === 'web')
+  ) {
+    const parts = Array.isArray(children) ? children : [children];
+
+    if (parts.every((part) => typeof part === 'string')) {
+      const value = parts.join('');
+
+      const fragments =
+        inlineStyle.whiteSpace === 'nowrap' ? [value] : (value.match(/\S+\s*|\s+/g) ?? []);
+
+      const { border, borderRadius, ...fragmentStyle } = inlineStyle;
+
+      const marginBottom = inlineStyle.marginBottom ?? getInlineBoxMargin(inlineStyle, textStyle);
+
+      return (
+        <TextStyleProvider value={childTextStyle}>
+          <AnimatedText
+            {...elementProps}
+            className={joinClassNames('fluxdown-inline-code', className)}
+            style={childTextStyle}
+          >
+            {fragments.map((fragment, index) => (
+              <view
+                key={index}
+                style={{
+                  ...fragmentStyle,
+                  borderTop: border,
+                  borderBottom: border,
+                  borderLeft: index === 0 ? border : 'none',
+                  borderRight: index === fragments.length - 1 ? border : 'none',
+                  borderTopLeftRadius: index === 0 ? borderRadius : '0px',
+                  borderBottomLeftRadius: index === 0 ? borderRadius : '0px',
+                  borderTopRightRadius: index === fragments.length - 1 ? borderRadius : '0px',
+                  borderBottomRightRadius: index === fragments.length - 1 ? borderRadius : '0px',
+                  marginBottom,
+                  verticalAlign: 'baseline',
+                  overflow: 'visible',
+                  maxWidth: '100%',
+                  ...(index > 0
+                    ? {
+                        paddingLeft: '0px',
+                      }
+                    : undefined),
+                  ...(index < fragments.length - 1
+                    ? {
+                        paddingRight: '0px',
+                      }
+                    : undefined),
+                }}
+              >
+                <AnimatedText style={childTextStyle}>{fragment}</AnimatedText>
+              </view>
+            ))}
+          </AnimatedText>
+        </TextStyleProvider>
+      );
+    }
+  }
+
   return (
     <TextStyleProvider value={childTextStyle}>
-      <text {...elementProps} className={className} style={inlineStyle}>
+      <AnimatedText
+        {...elementProps}
+        className={
+          tagName === 'code' ? joinClassNames('fluxdown-inline-code', className) : className
+        }
+        style={inlineStyle}
+      >
         {children}
-      </text>
+      </AnimatedText>
     </TextStyleProvider>
   );
 };

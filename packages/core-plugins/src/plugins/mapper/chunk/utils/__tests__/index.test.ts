@@ -60,6 +60,112 @@ test('groups each incoming batch into one inline span, including whitespace and 
   expect(readChunks(next.root).map((node) => node.properties.dataChunkStart)).toEqual([1000, 1100]);
 });
 
+test.each(['ul', 'ol'])('keeps %s structural whitespace outside animation spans', (tagName) => {
+  const list: Element = {
+    type: 'element',
+    tagName,
+    properties: {},
+    children: [
+      { type: 'text', value: '\n' },
+      {
+        type: 'element',
+        tagName: 'li',
+        properties: {},
+        children: [{ type: 'text', value: 'First' }],
+      },
+      { type: 'text', value: '\n' },
+      {
+        type: 'element',
+        tagName: 'li',
+        properties: {},
+        children: [{ type: 'text', value: 'Second' }],
+      },
+      { type: 'text', value: '\n' },
+    ],
+  };
+
+  const root: HastRoot = { type: 'root', children: [list] };
+
+  const active = createChunkRoot(root, [], config);
+
+  const activeList = active.root.children[0] as Element;
+
+  for (const index of [0, 2, 4]) {
+    expect(activeList.children[index]).toBe(list.children[index]);
+  }
+
+  expect(readChunks(active.root).map(readText)).toEqual(['First', 'Second']);
+  expect(readText(active.root)).toBe('\nFirst\nSecond\n');
+  expect(active.characters.map(({ text }) => text).join('')).toBe(readText(root));
+  expect(active.characters.every(({ start }) => start === 1000)).toBe(true);
+
+  const settled = createChunkRoot(root, active.characters, { ...config, start: 1400 });
+
+  expect(settled.root).toBe(root);
+  expect(readText(settled.root)).toBe(readText(active.root));
+});
+
+test('preserves standalone whitespace and its offsets between animated inline words', () => {
+  const space = { type: 'text', value: ' \t ' } as const;
+
+  const root: HastRoot = {
+    type: 'root',
+    children: [
+      {
+        type: 'element',
+        tagName: 'p',
+        properties: {},
+        children: [
+          {
+            type: 'element',
+            tagName: 'strong',
+            properties: {},
+            children: [{ type: 'text', value: 'one' }],
+          },
+          space,
+          {
+            type: 'element',
+            tagName: 'em',
+            properties: {},
+            children: [{ type: 'text', value: 'two' }],
+          },
+        ],
+      },
+    ],
+  };
+
+  const active = createChunkRoot(root, [], config);
+
+  expect((active.root.children[0] as Element).children[1]).toBe(space);
+  expect(readText(active.root)).toBe('one \t two');
+  expect(readChunks(active.root).map(readText)).toEqual(['one', 'two']);
+
+  const appended = createChunkRoot(paragraph('one \t two three'), active.characters, {
+    ...config,
+    start: 1100,
+  });
+
+  expect(readChunks(appended.root).map(readText)).toEqual(['one \t two', ' three']);
+  expect(readChunks(appended.root).map((node) => node.properties.dataChunkStart)).toEqual([
+    1000, 1100,
+  ]);
+});
+
+test('preserves literal paragraph newlines while only animating visible text', () => {
+  const blank = paragraph('\n\n');
+
+  const activeBlank = createChunkRoot(blank, [], config);
+
+  expect(activeBlank.root).toBe(blank);
+  expect(readText(activeBlank.root)).toBe('\n\n');
+  expect(activeBlank.characters).toHaveLength(2);
+
+  const content = createChunkRoot(paragraph('first\nsecond\n'), [], config);
+
+  expect(readText(content.root)).toBe('first\nsecond\n');
+  expect(readChunks(content.root).map(readText)).toEqual(['first\nsecond\n']);
+});
+
 test('preserves batch start times across inline Markdown reparsing and delimiter removal', () => {
   const initial = createChunkRoot(paragraph('*hello world'), [], config);
   const formatted: HastRoot = {

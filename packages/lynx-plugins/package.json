@@ -18,7 +18,8 @@
   ],
   "type": "module",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "**/*.scss"
   ],
   "main": "./src/presets/full/index.ts",
   "module": "./src/presets/full/index.ts",
@@ -73,6 +74,7 @@
   "dependencies": {
     "@fluxdown/core": "workspace:^",
     "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/hast": "workspace:^",
     "@fluxdown/types": "workspace:^",
     "@fluxdown/utils": "workspace:^",
     "@types/hast": "catalog:",
@@ -87,6 +89,7 @@
     "@lynx-js/types": "catalog:",
     "@rsbuild/core": "catalog:",
     "@rsbuild/plugin-react": "catalog:",
+    "@rsbuild/plugin-sass": "catalog:",
     "@rslib/core": "catalog:",
     "@rstest/adapter-rslib": "catalog:",
     "@rstest/core": "catalog:",

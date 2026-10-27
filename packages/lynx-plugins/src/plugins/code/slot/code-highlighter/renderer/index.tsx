@@ -2,7 +2,13 @@ import type { ReactNode } from '@lynx-js/react';
 
 import type { CodeHighlighterProps } from '../../../../../base';
 
-import { joinClassNames, TextStyleProvider, useTextStyle, useTheme } from '../../../../../base';
+import {
+  AnimatedText,
+  joinClassNames,
+  TextStyleProvider,
+  useTextStyle,
+  useTheme,
+} from '../../../../../base';
 
 export const CodeHighlighterRenderer = ({
   Raw: _Raw,
@@ -42,10 +48,10 @@ export const CodeHighlighterRenderer = ({
           }}
         >
           {lines.map((line, index) => (
-            <text key={index} style={{ ...textStyle, whiteSpace: 'nowrap' }}>
+            <AnimatedText key={index} style={{ ...textStyle, whiteSpace: 'nowrap' }}>
               {line || '\u200b'}
               {index === lines.length - 1 ? suffix : null}
-            </text>
+            </AnimatedText>
           ))}
         </view>
       </scroll-view>

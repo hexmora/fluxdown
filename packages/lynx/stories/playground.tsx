@@ -5,7 +5,7 @@ import { root, useEffect, useInitData, useState } from '@lynx-js/react';
 import type { PlaygroundArgs } from './consts';
 
 import { STORY_MARKDOWN } from './consts';
-import './playground.css';
+import './playground.scss';
 
 function Playground() {
   const args = useInitData() as Partial<PlaygroundArgs>;

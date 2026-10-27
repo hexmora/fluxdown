@@ -1,6 +1,7 @@
 import type { LinkProps } from '../../../../../base';
 
 import {
+  AnimatedText,
   joinClassNames,
   normalizePublicUrl,
   TextStyleProvider,
@@ -33,7 +34,7 @@ export const LinkRenderer = ({
 
   return (
     <TextStyleProvider value={textStyle}>
-      <text
+      <AnimatedText
         {...elementProps}
         className={joinClassNames('fluxdown-link', className)}
         style={textStyle}
@@ -42,7 +43,7 @@ export const LinkRenderer = ({
         }
       >
         {children}
-      </text>
+      </AnimatedText>
     </TextStyleProvider>
   );
 };

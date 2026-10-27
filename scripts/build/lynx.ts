@@ -1,4 +1,5 @@
 import { pluginReact } from '@rsbuild/plugin-react';
+import { pluginSass } from '@rsbuild/plugin-sass';
 import { defineConfig } from '@rslib/core';
 
 export function lynxPackageConfig() {
@@ -24,7 +25,7 @@ export function lynxPackageConfig() {
     },
     // The consuming app compiles JSX for both Lynx threads. A generic React
     // transform here would erase the element information that compiler needs.
-    plugins: [pluginReact({ swcReactOptions: { runtime: 'preserve' } })],
+    plugins: [pluginReact({ swcReactOptions: { runtime: 'preserve' } }), pluginSass()],
     tools: {
       swc: { jsc: { transform: { useDefineForClassFields: true } } },
     },
