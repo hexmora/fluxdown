@@ -1,74 +1,40 @@
 # Configuration
 
-Component props control content, streaming, styling and plugins.
+Basic usage follows [React](../react/configuration.md). The table links to the full reference for each prop; platform-specific `style` usage is covered below.
 
-| Prop        | Type                           | Default and purpose                                |
-| ----------- | ------------------------------ | -------------------------------------------------- |
-| `text`      | `string`                       | Required; the complete current Markdown.           |
-| `streaming` | `boolean \| StreamingConfig`   | `false`; trailing repair, smoothing and effects.   |
-| `build`     | `BaseBuildConfig`              | `{}`; parsing features such as footnotes and math. |
-| `theme`     | `Theme`                        | `'light'`; a preset or partial overrides.          |
-| `className` | `string`                       | Class name on the outer `view`.                    |
-| `style`     | `CSSProperties`                | Styles on the outer `view`.                        |
-| `plugins`   | `IPluginItem \| IPluginItem[]` | Extends the preset; required for Raw.              |
-| `patches`   | `IPatchItem<ReactNode>[]`      | Inserts or replaces text with Lynx content.        |
-| `getProps`  | `GetPropsFunction \| null`     | Converts element properties from the syntax tree.  |
-| `ref`       | `Ref<FluxdownRef>`             | A handle to the reactive rendered result.          |
+| Prop                                               | Type                           | Default and purpose                                                                    |
+| -------------------------------------------------- | ------------------------------ | -------------------------------------------------------------------------------------- |
+| [`text`](../react/configuration.md#text)           | `string`                       | Required. The complete current Markdown.                                               |
+| [`streaming`](../react/configuration.md#streaming) | `boolean \| StreamingConfig`   | `false`. Ending repair, smoothing, and effects.                                        |
+| [`build`](../react/configuration.md#build)         | `BaseBuildConfig`              | `{}`. Parsing features such as math and footnotes.                                     |
+| [`theme`](../react/configuration.md#theme)         | `Theme`                        | `'light'`. A preset or partial overrides; see the [styling guide](./customization.md). |
+| [`plugins`](../react/configuration.md#plugins)     | `IPluginItem \| IPluginItem[]` | `[]`. Extends this platform’s preset; required for Raw.                                |
+| [`patches`](../react/configuration.md#patches)     | `IPatchItem<ReactNode>[]`      | `[]`. Inserts or replaces text with ReactLynx content.                                 |
+| [`className`](../react/configuration.md#classname) | `string`                       | `undefined`. Class name on the outer `view`.                                           |
+| [`style`](../react/configuration.md#style)         | `CSSProperties`                | `undefined`. Lynx styles on the outer `view`.                                          |
+| [`ref`](../react/configuration.md#ref)             | `Ref<FluxdownRef>`             | `undefined`. A handle to reactive render output, not a native view reference.          |
 
-> Import `BaseBuildConfig`, `StreamingConfig` and `FluxdownRef` from `@fluxdown/lynx`; `Theme`, `IPluginItem` and `GetPropsFunction` from `@fluxdown/lynx-plugins/typings`; `CSSProperties` from `@lynx-js/types`; and `ReactNode` from `@lynx-js/react`.
+<details>
+<summary>Imports</summary>
 
-## Compilation and streaming
+Import `BaseBuildConfig`, `StreamingConfig` and `FluxdownRef` from `@fluxdown/lynx`; `Theme` and `IPluginItem` from `@fluxdown/lynx-plugins/typings`; `CSSProperties` from `@lynx-js/types`; and `ReactNode` from `@lynx-js/react`.
 
-`build`, `streaming` and `patches` use Core's processing pipeline. See [React configuration](../react/configuration.md) for shared fields, defaults and range rules. The [plugin matrix](./plugins/matrix.mdx) describes the presentation supported by Lynx.
+</details>
 
-`build.tex` defaults to `false`. Enabling it parses math syntax; the built-in `Tex` slot displays the source. Replace that slot to provide typeset math.
+## style <span className="field-tag">Optional</span> {#style}
 
-## Insert interactive content
+**Type:** `CSSProperties`
 
-A patch's `render` returns ReactLynx content. Use a `text` element for text inserted into a paragraph:
+**Default:** `undefined`
+
+A Lynx style object on the outer `view`. Properties and values follow Lynx CSS. Use `className` to apply styles from your app:
 
 ```tsx
 <Fluxdown
-  patches={[
-    {
-      key: 'person-ada',
-      range: [6, 10],
-      render: () => <text bindtap={() => openProfile('ada')}>@Ada</text>,
-    },
-  ]}
-  text="Hello @Ada."
+  className="conversation-message"
+  style={{ padding: '16px', maxWidth: '720px' }}
+  text={text}
 />
 ```
 
-Your app supplies `openProfile`. Positions use indices into the original string. A range includes its start, excludes its end and should stay within one content block.
-
-## Element properties
-
-By default, `getProps` converts supported properties such as `id`, `className`, dimensions, list state and `data-*`. Pass a function to replace this conversion, or `null` to forward no element properties from the syntax tree.
-
-```tsx
-<Fluxdown getProps={null} text={text} />
-```
-
-Prefer the [theme](./customization.md) for internal fonts and spacing. Use [slot plugins](./plugins/slot.md) for interactions such as navigation and code copying.
-
-## Read the rendered result
-
-`FluxdownRef` is a handle to the reactive rendered result, not a `view` reference. Normal rendering does not require it. Cancel any subscriptions you create yourself.
-
-```tsx
-import type { FluxdownRef } from '@fluxdown/lynx';
-
-import { Fluxdown } from '@fluxdown/lynx';
-import { useRef } from '@lynx-js/react';
-
-type MessageProps = {
-  text: string;
-};
-
-export function Message({ text }: MessageProps) {
-  const content = useRef<FluxdownRef>(null);
-
-  return <Fluxdown ref={content} text={text} />;
-}
-```
+See the [styling guide](./customization.md) for colors and typography within the content, and [slot plugins](./plugins/slot.md) to change components or interactions.

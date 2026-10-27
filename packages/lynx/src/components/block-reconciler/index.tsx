@@ -4,7 +4,6 @@ import { toState } from 'stative';
 
 import type { BlockReconcilerProps } from './type';
 
-import { useRender } from '../../context';
 import { renderParentChildren } from './utils';
 
 export const BlockReconciler = /*#__PURE__*/ memo(function BlockReconciler({
@@ -15,8 +14,6 @@ export const BlockReconciler = /*#__PURE__*/ memo(function BlockReconciler({
   last = false,
   previous,
 }: BlockReconcilerProps) {
-  const { getProps } = useRender();
-
   const root = useStateValue(block.value);
 
   const previousState = useMemo(() => toState(previous?.value ?? null), [previous]);
@@ -36,7 +33,7 @@ export const BlockReconciler = /*#__PURE__*/ memo(function BlockReconciler({
 
   return (
     <BlockLayoutProvider value={layout}>
-      {renderParentChildren(root, [root], patchState, renderPlugins, getProps)}
+      {renderParentChildren(root, [root], patchState, renderPlugins)}
     </BlockLayoutProvider>
   );
 });

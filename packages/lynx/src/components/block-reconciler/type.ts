@@ -1,6 +1,5 @@
 import type { IRenderPatchItem } from '@fluxdown/core';
 import type { ILynxRenderPlugin } from '@fluxdown/lynx-plugins/base';
-import type { GetPropsFunction } from '@fluxdown/lynx-plugins/typings';
 import type { IBlockState } from '@fluxdown/types';
 import type { ReactNode } from '@lynx-js/react';
 import type { ElementContent, Parent, Root } from 'hast';
@@ -28,6 +27,4 @@ export interface RenderNodeParams {
   patches: IReactiveState<IRenderPatchItem<ReactNode>[]>;
 
   plugins: ILynxRenderPlugin[];
-
-  getProps: GetPropsFunction | undefined | null;
 }
