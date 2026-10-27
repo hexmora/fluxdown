@@ -29,7 +29,7 @@
     "format:check": "moon run workspace:format-check",
     "lint": "moon run :lint",
     "prepare": "husky",
-    "test": "jest --config jest.config.ts",
+    "test": "pnpm run test:react && pnpm run test:lynx",
     "typecheck": "moon run :typecheck",
     "check": "moon run --concurrency 4 :typecheck :lint :test",
     "changeset": "changeset",
@@ -38,7 +38,9 @@
     "release:version": "moon run workspace:version",
     "publish:dry-run": "moon run workspace:publish-dry-run --",
     "release": "moon run workspace:release-publish --",
-    "release:prepare": "moon run workspace:release-prepare --"
+    "release:prepare": "moon run workspace:release-prepare --",
+    "test:lynx": "pnpm --filter @fluxdown/lynx --filter @fluxdown/lynx-plugins test",
+    "test:react": "jest --config jest.config.ts"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",

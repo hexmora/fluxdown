@@ -121,7 +121,8 @@ const createText = (
   characters: EntranceCharacter[],
   { start: now, wrap, isWrapper }: EntranceOptions,
 ): ElementContent[] => {
-  if (characters.every((character) => isSettled(character, now))) {
+  // Preserve structural whitespace without creating an animated text box around it.
+  if (!node.value.trim() || characters.every((character) => isSettled(character, now))) {
     return [node];
   }
 

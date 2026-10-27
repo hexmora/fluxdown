@@ -5,6 +5,7 @@ import { defineConfig, normalizeHref } from '@rspress/core';
 import { fileURLToPath } from 'node:url';
 
 import { reactNativeWebPlugin } from '../scripts/build/react-native-web';
+import { lynxDemo } from './lynx/plugin';
 import { sessionAppearance } from './theme/appearance/plugin';
 import { sessionLocale } from './theme/locale/plugin';
 
@@ -36,6 +37,7 @@ export default defineConfig({
   // Publish real HTML URLs so direct visits work without server rewrites.
   route: { cleanUrls: false, localeRedirect: 'never' },
   plugins: [
+    lynxDemo(),
     {
       name: 'static-search-links',
       modifySearchIndexData(pages) {

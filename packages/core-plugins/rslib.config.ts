@@ -14,6 +14,18 @@ const entries = Object.fromEntries(
 const config = packageConfig({
   entry: entries,
   jsxImportSource: 'stative',
+  // These parser chains reach a browser-only entity decoder. Keep unified and
+  // vfile external so their host-specific Node adapters are never bundled.
+  bundleDependencies: [
+    'mdast-util-from-markdown',
+    'mdast-util-gfm-footnote',
+    'mdast-util-gfm-strikethrough',
+    'mdast-util-gfm-table',
+    'mdast-util-gfm-task-list-item',
+    'mdast-util-math',
+    'mdast-util-to-markdown',
+    'micromark-extension-gfm-footnote',
+  ],
 });
 
 export default defineConfig({

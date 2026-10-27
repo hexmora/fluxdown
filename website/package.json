@@ -10,7 +10,7 @@
     "preview": "rspress preview --host 127.0.0.1",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run build",
     "lint": "oxlint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p lynx/tsconfig.json"
   },
   "dependencies": {
     "@fluxdown/core": "workspace:^",
@@ -27,6 +27,12 @@
     "stative": "workspace:^"
   },
   "devDependencies": {
+    "@fluxdown/lynx": "workspace:^",
+    "@lynx-js/react": "catalog:",
+    "@lynx-js/react-rsbuild-plugin": "catalog:",
+    "@lynx-js/types": "catalog:",
+    "@lynx-js/web-core": "catalog:",
+    "@rsbuild/core": "catalog:",
     "@rsbuild/plugin-less": "catalog:",
     "@rsbuild/plugin-sass": "catalog:",
     "@rsbuild/plugin-svgr": "catalog:",

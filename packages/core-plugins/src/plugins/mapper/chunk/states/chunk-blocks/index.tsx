@@ -1,7 +1,6 @@
-/**
- * @jsxImportSource stative
- */
+/** @jsxImportSource stative */
 
+import { getTime } from '@fluxdown/utils';
 import { D, mapClosure, once, useMapKeyed, useSwitchMap } from 'stative';
 
 import type { ChunkBlocksInputs } from './type';
@@ -17,7 +16,7 @@ export const ChunkBlocks = /*#__PURE__*/ once(function ChunkBlocks({
   const clock = useSwitchMap(source, (blocks) =>
     mapClosure(
       blocks.map((block) => block.value),
-      () => performance.now(),
+      () => getTime(),
     ),
   );
 

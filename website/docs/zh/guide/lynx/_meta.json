@@ -1,0 +1,33 @@
+[
+  {
+    "type": "file",
+    "name": "quick-start",
+    "label": "快速开始"
+  },
+  {
+    "type": "file",
+    "name": "streaming",
+    "label": "流式内容"
+  },
+  {
+    "type": "file",
+    "name": "customization",
+    "label": "样式指南"
+  },
+  {
+    "type": "file",
+    "name": "configuration",
+    "label": "自定义配置"
+  },
+  {
+    "type": "dir",
+    "name": "plugins",
+    "label": "使用与编写插件",
+    "collapsed": false
+  },
+  {
+    "type": "file",
+    "name": "comparison",
+    "label": "对比 React"
+  }
+]

@@ -1,7 +1,6 @@
-/**
- * @jsxImportSource stative
- */
+/** @jsxImportSource stative */
 
+import { getTime } from '@fluxdown/utils';
 import { D, mapClosure, once, useMapKeyed, useSwitchMap } from 'stative';
 
 import type { ShadBlocksInputs } from './type';
@@ -23,7 +22,7 @@ export const ShadBlocks = /*#__PURE__*/ once(function ShadBlocks({
   const clock = useSwitchMap(source, (blocks) =>
     mapClosure(
       blocks.map((block) => block.value),
-      () => performance.now(),
+      () => getTime(),
     ),
   );
 

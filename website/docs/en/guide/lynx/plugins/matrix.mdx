@@ -1,0 +1,59 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# Plugin matrix
+
+## Component variants
+
+| Component      | Entry                                     | Included features                                            |
+| -------------- | ----------------------------------------- | ------------------------------------------------------------ |
+| `Fluxdown`     | `@fluxdown/lynx` or `@fluxdown/lynx/full` | Adds Shiki highlighting, CJK and Emoji to the base features. |
+| `FluxdownLite` | `@fluxdown/lynx/lite`                     | Basic Markdown, tables, images and streaming effects.        |
+| `FluxdownRaw`  | `@fluxdown/lynx/raw`                      | Requires your complete `plugins` list.                       |
+
+Full highlights Bash, CSS, HTML, JavaScript, JSON, Python and TypeScript. Unrecognized languages remain plain text. Lite displays code as source text.
+
+Both presets provide a `Tex` slot. `build.tex` defaults to `false`; enabling it displays formula source. Supply your own slot for typeset math.
+
+## All plugins
+
+Composition includes inherited plugin types. A check means the preset directly includes that plugin. Full's `CodeShikiPlugin` inherits the base features of `CodePlugin`.
+
+| Plugin               | Composition                                           | Package                           |      Lite       |      Full       |
+| -------------------- | ----------------------------------------------------- | --------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`          | <PluginTag type="remark" />                           | <PluginTag type="lynx-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> |                 |
+| `CodeShikiPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`        | <PluginTag type="remark" />                           | <PluginTag type="lynx-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`        | <PluginTag type="render" />                           | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+
+## Package and imports
+
+<PluginTag type="lynx-plugins" /> is `@fluxdown/lynx-plugins`, which provides
+Lynx composite plugins, render plugins and slots.
+
+> Import from `@fluxdown/lynx-plugins/plugins/<plugin-directory>`. Remove the `Plugin` suffix from the export name and convert it to lowercase hyphenated words: `CodeShikiPlugin` becomes `code-shiki`.
+
+```tsx
+import { CodeShikiPlugin } from '@fluxdown/lynx-plugins/plugins/code-shiki';
+import { HeadingPlugin } from '@fluxdown/lynx-plugins/plugins/heading';
+```
+
+> Import `PRESET_FULL_PLUGINS` from `@fluxdown/lynx-plugins/full`, or `PRESET_LITE_PLUGINS` from `@fluxdown/lynx-plugins/lite`, to pass a preset directly to `FluxdownRaw`.
+
+The component's `plugins` prop can extend any preset. See [composite plugins](./aggregate.md) for configuration and composition.

@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "@lynx-js/react",
+    "types": ["node", "@lynx-js/types", "@rsbuild/core/types", "@testing-library/jest-dom"],
+    "lib": ["ES2022"]
+  },
+  "include": [
+    "src",
+    "rslib.config.ts",
+    "rstest.config.ts",
+    "rstest.setup.ts",
+    "stories",
+    ".storybook/**/*"
+  ]
+}
