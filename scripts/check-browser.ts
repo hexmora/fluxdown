@@ -3,6 +3,7 @@
 import { createRsbuild } from '@rsbuild/core';
 import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
 import type { BrowserCheckResult, PackageArtifact } from './types.ts';
@@ -13,7 +14,13 @@ async function readStylesheet(file: string): Promise<string> {
   const css = await readFile(file, 'utf8');
   const imports = [...css.matchAll(/@import\s+['"]([^'"]+)['"];?/g)];
   const nested = await Promise.all(
-    imports.map(([, target]) => readStylesheet(path.resolve(path.dirname(file), target))),
+    imports.map(([, target]) =>
+      readStylesheet(
+        target.startsWith('.')
+          ? path.resolve(path.dirname(file), target)
+          : createRequire(file).resolve(target),
+      ),
+    ),
   );
 
   return [css, ...nested].join('\n');
@@ -26,7 +33,13 @@ async function entryStylesheet(directory: string, entry: string): Promise<string
 
   return (
     await Promise.all(
-      imports.map(([, target]) => readStylesheet(path.resolve(path.dirname(file), target))),
+      imports.map(([, target]) =>
+        readStylesheet(
+          target.startsWith('.')
+            ? path.resolve(path.dirname(file), target)
+            : createRequire(file).resolve(target),
+        ),
+      ),
     )
   ).join('\n');
 }
@@ -86,7 +99,11 @@ export async function checkBrowserConsumer(
     const directory = path.join(consumer, 'node_modules', manifest.name);
     const style = resolveExport(manifest.exports?.['./styles.css'], ['browser', 'import']);
 
-    if (['fluxdown', '@fluxdown/react-plugins'].includes(manifest.name)) {
+    if (
+      ['fluxdown', '@fluxdown/react-plugins', '@fluxdown/vue', '@fluxdown/vue-plugins'].includes(
+        manifest.name,
+      )
+    ) {
       assert(style, `${manifest.name}: missing public stylesheet export`);
     }
 
