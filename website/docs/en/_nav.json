@@ -18,6 +18,12 @@
     "position": "left"
   },
   {
+    "text": "Vue",
+    "link": "/guide/vue/quick-start",
+    "activeMatch": "/guide/vue/",
+    "position": "left"
+  },
+  {
     "text": "Core",
     "link": "/guide/core/quick-start",
     "activeMatch": "/guide/core/",

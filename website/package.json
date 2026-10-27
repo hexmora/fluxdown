@@ -5,12 +5,13 @@
   "homepage": "https://hexmora.github.io/fluxdown/",
   "type": "module",
   "scripts": {
-    "dev": "rspress dev --host 127.0.0.1",
-    "build": "rspress build",
+    "dev": "pnpm run build:vue && rspress dev --host 127.0.0.1",
+    "build": "pnpm run build:vue && rspress build",
     "preview": "rspress preview --host 127.0.0.1",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run build",
     "lint": "oxlint .",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p lynx/tsconfig.json"
+    "typecheck": "pnpm run build:vue && tsc --noEmit && tsc --noEmit -p lynx/tsconfig.json",
+    "build:vue": "pnpm --filter @fluxdown/vue-plugins --filter @fluxdown/vue build"
   },
   "dependencies": {
     "@fluxdown/core": "workspace:^",
@@ -19,12 +20,14 @@
     "@fluxdown/react-native-plugins": "workspace:^",
     "@fluxdown/react-plugins": "workspace:^",
     "@fluxdown/utils": "workspace:^",
+    "@fluxdown/vue": "workspace:^",
     "fluxdown": "workspace:^",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-native-svg": "catalog:",
     "react-native-web": "catalog:",
-    "stative": "workspace:^"
+    "stative": "workspace:^",
+    "vue": "catalog:"
   },
   "devDependencies": {
     "@fluxdown/lynx": "workspace:^",
