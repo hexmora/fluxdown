@@ -83,6 +83,11 @@
     --tag-dark-color: #b8c8df;
   }
 
+  &[data-type="svelte-plugins"] {
+    --tag-color: #b44520;
+    --tag-dark-color: #ffb59b;
+  }
+
   :global(.dark) & {
     --tag-color: var(--tag-dark-color);
   }

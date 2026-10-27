@@ -489,19 +489,10 @@
     font-size: 14px;
   }
 
-  &:not([data-upcoming]) {
-    border-color: var(--site-accent-line);
+  border-color: var(--site-accent-line);
 
-    span {
-      color: var(--site-accent);
-    }
-  }
-
-  &[data-upcoming] {
-    border-style: dashed;
-    border-color: var(--site-line-strong);
-    background: transparent;
-    color: var(--site-muted);
+  span {
+    color: var(--site-accent);
   }
 
   &::after {

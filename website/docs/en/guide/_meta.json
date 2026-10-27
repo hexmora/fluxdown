@@ -24,6 +24,12 @@
   },
   {
     "type": "dir",
+    "name": "svelte",
+    "label": "Svelte",
+    "collapsed": true
+  },
+  {
+    "type": "dir",
     "name": "react-native",
     "label": "React Native",
     "collapsed": true
