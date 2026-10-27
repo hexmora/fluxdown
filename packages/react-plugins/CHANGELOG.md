@@ -1,5 +1,11 @@
 # @fluxdown/react-plugins
 
+## 0.12.1
+
+### Patch Changes
+
+- cd5b1f8: Stabilize syntax-highlighter verification for cold language loads and tokenization under CI load. Runtime highlighting behavior is unchanged.
+
 ## 0.12.0
 
 ### Minor Changes
