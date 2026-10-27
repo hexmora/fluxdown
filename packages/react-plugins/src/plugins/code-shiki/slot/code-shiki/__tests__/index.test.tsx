@@ -7,7 +7,9 @@ import { highlightCode } from '../renderer/utils';
 describe('code highlighting', () => {
   test('loads language aliases and uses the runtime theme tokens', async () => {
     const source = 'const answer: number = 42;';
-    const tokens = await highlightCode(source, 'TS');
+    // Test token colors independently of Shiki's wall-clock tokenization budget.
+    const now = jest.spyOn(Date, 'now').mockReturnValue(0);
+    const tokens = await highlightCode(source, 'TS').finally(() => now.mockRestore());
 
     expect(
       tokens
