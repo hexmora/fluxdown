@@ -12,7 +12,7 @@ import { PluginTag, PresetCheck } from '../../../../../components';
 
 Full 的高亮支持 Bash、CSS、HTML、JavaScript、JSON、Python 和 TypeScript；未识别的语言保留纯文本。Lite 的代码块显示源码。
 
-两个预设都提供 `Tex` 插槽。`build.tex` 默认为 `false`，开启后显示公式源码；需要公式排版时可以提供自己的插槽。
+两个预设都提供 `Tex` 插槽。`build.tex` 默认为 `false`，开启后显示公式源码；需要公式排版时，添加 `TexSvgPlugin`，并在宿主接入 SVG XElement。
 
 ## 全部插件
 
@@ -41,6 +41,7 @@ Full 的高亮支持 Bash、CSS、HTML、JavaScript、JSON、Python 和 TypeScri
 | `StrongPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `TablePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexSvgPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> |                 |                 |
 
 ## 所在包与导入
 

@@ -79,6 +79,7 @@
     "@fluxdown/utils": "workspace:^",
     "@types/hast": "catalog:",
     "lodash-es": "catalog:",
+    "mathjax-full": "catalog:",
     "shallow-equal": "catalog:",
     "shiki": "catalog:",
     "stative": "workspace:^"
