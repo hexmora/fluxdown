@@ -7,13 +7,9 @@ import { highlightCode } from '../renderer/utils';
 describe('code highlighting', () => {
   test('loads language aliases and uses the runtime theme tokens', async () => {
     const source = 'const answer: number = 42;';
-
-    // Shiki stops tokenizing a line after 500 ms and returns the rest as one plain token. The
-    // first TypeScript line also compiles the grammar, which can pass that limit on a loaded
-    // runner. Fake timers freeze `performance.now()`, so the limit never trips here.
-    jest.useFakeTimers();
-
-    const tokens = await highlightCode(source, 'TS').finally(() => jest.useRealTimers());
+    // Test token colors independently of Shiki's wall-clock tokenization budget.
+    const now = jest.spyOn(Date, 'now').mockReturnValue(0);
+    const tokens = await highlightCode(source, 'TS').finally(() => now.mockRestore());
 
     expect(
       tokens
