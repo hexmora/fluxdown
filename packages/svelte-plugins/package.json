@@ -1,0 +1,118 @@
+{
+  "name": "@fluxdown/svelte-plugins",
+  "version": "0.0.0",
+  "description": "Svelte render slots and plugin presets for Fluxdown.",
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/svelte-plugins"
+  },
+  "files": [
+    "dist/esm",
+    "!dist/esm/**/__tests__/**",
+    "!dist/esm/**/*.test.*",
+    "!dist/esm/**/*.scss",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss"
+  ],
+  "exports": {
+    "./base": {
+      "types": "./src/base/index.ts",
+      "svelte": "./src/base/index.ts"
+    },
+    "./typings": {
+      "types": "./src/typings/index.ts",
+      "svelte": "./src/typings/index.ts"
+    },
+    "./plugins/*": {
+      "types": "./src/plugins/*/index.ts",
+      "svelte": "./src/plugins/*/index.ts"
+    },
+    "./*": {
+      "types": "./src/presets/*/index.ts",
+      "svelte": "./src/presets/*/index.ts"
+    }
+  },
+  "publishConfig": {
+    "exports": {
+      "./base": {
+        "types": "./dist/esm/base/index.d.ts",
+        "svelte": "./dist/esm/base/index.js",
+        "default": "./dist/esm/base/index.js"
+      },
+      "./typings": {
+        "types": "./dist/esm/typings/index.d.ts",
+        "svelte": "./dist/esm/typings/index.js",
+        "default": "./dist/esm/typings/index.js"
+      },
+      "./plugins/*": {
+        "types": "./dist/esm/plugins/*/index.d.ts",
+        "svelte": "./dist/esm/plugins/*/index.js",
+        "default": "./dist/esm/plugins/*/index.js"
+      },
+      "./*": {
+        "types": "./dist/esm/presets/*/index.d.ts",
+        "svelte": "./dist/esm/presets/*/index.js",
+        "default": "./dist/esm/presets/*/index.js"
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "svelte-package -i src -o dist/esm --tsconfig tsconfig.build.json",
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@mathjax/mathjax-tex-font": "catalog:",
+    "@mathjax/src": "catalog:",
+    "@types/hast": "catalog:",
+    "katex": "catalog:",
+    "lodash-es": "catalog:",
+    "pele": "catalog:",
+    "prismjs": "catalog:",
+    "shiki": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@sveltejs/package": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/svelte": "catalog:",
+    "@types/katex": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/prismjs": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "sass": "catalog:",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "svelte-preprocess": "catalog:",
+    "typescript": "catalog:svelte",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "svelte": "catalog:svelte-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

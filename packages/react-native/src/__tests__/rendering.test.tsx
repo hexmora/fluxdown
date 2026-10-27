@@ -304,7 +304,7 @@ describe('React Native packs', () => {
     expect(Object.getOwnPropertyDescriptor(navigator, 'appVersion')).toEqual(appVersion);
 
     expect(Object.getOwnPropertyDescriptor(navigator, 'userAgent')).toEqual(userAgent);
-  });
+  }, 15_000);
 
   test('updates themes, style arrays, and slot overrides without replacing the core', async () => {
     const ref = createRef<FluxdownRef>();

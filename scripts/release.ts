@@ -24,6 +24,7 @@ import { checkLynxConsumer } from './check-lynx-consumer.ts';
 import {
   checkPackage,
   isLynxPackage,
+  isSveltePackage,
   isTaroPackage,
   publicEntries,
   readManifest,
@@ -360,7 +361,12 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
     checkInstalled(installed.dependencies);
 
     const specifiers = nodeArtifacts
-      .filter(({ manifest }) => !isLynxPackage(manifest.name) && !isTaroPackage(manifest.name))
+      .filter(
+        ({ manifest }) =>
+          !isLynxPackage(manifest.name) &&
+          !isSveltePackage(manifest.name) &&
+          !isTaroPackage(manifest.name),
+      )
       .flatMap(({ manifest, files }) =>
         publicEntries(manifest, files).map(
           ([entry]) => manifest.name + (entry === '.' ? '' : entry.slice(1)),

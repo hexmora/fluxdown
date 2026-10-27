@@ -1,0 +1,22 @@
+:global(.fluxdown-svelte-effect-chunk) {
+  // Incoming batches wrap naturally across lines, including their whitespace.
+  display: inline;
+
+  &.active {
+    animation: fluxdown-svelte-chunk-appear var(--fluxdown-chunk-duration) ease-out forwards;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes -global-fluxdown-svelte-chunk-appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
