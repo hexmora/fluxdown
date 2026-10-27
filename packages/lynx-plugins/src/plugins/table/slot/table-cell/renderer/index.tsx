@@ -1,6 +1,7 @@
 import type { TableCellProps } from '../../../../../base';
 
 import {
+  AnimatedText,
   isHastElement,
   joinClassNames,
   TextStyleProvider,
@@ -56,7 +57,7 @@ export const TableCellRenderer = ({
           ...style,
         }}
       >
-        <text style={textStyle}>{children}</text>
+        <AnimatedText style={textStyle}>{children}</AnimatedText>
       </view>
     </TextStyleProvider>
   );

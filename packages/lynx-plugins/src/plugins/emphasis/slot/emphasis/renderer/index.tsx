@@ -1,6 +1,6 @@
 import type { EmphasisProps } from '../../../../../base';
 
-import { joinClassNames, TextStyleProvider, useTextStyle } from '../../../../../base';
+import { AnimatedText, joinClassNames, TextStyleProvider, useTextStyle } from '../../../../../base';
 
 export const EmphasisRenderer = ({
   Raw: _Raw,
@@ -16,13 +16,13 @@ export const EmphasisRenderer = ({
 
   return (
     <TextStyleProvider value={textStyle}>
-      <text
+      <AnimatedText
         {...elementProps}
         className={joinClassNames('fluxdown-emphasis', className)}
         style={textStyle}
       >
         {children}
-      </text>
+      </AnimatedText>
     </TextStyleProvider>
   );
 };

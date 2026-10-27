@@ -2,6 +2,7 @@ import type { RspressPlugin } from '@rspress/core';
 
 import { pluginReactLynx } from '@lynx-js/react-rsbuild-plugin';
 import { createRsbuild } from '@rsbuild/core';
+import { pluginSass } from '@rsbuild/plugin-sass';
 import { fileURLToPath } from 'node:url';
 
 import { lynxWorkspacePlugin } from '../../scripts/build/lynx-workspace';
@@ -24,6 +25,7 @@ export function lynxDemo(): RspressPlugin {
           mode: 'production',
           source: { entry: { index: `${cwd}/lynx/host.ts` } },
           html: { title: 'Fluxdown · Lynx' },
+          plugins: [pluginSass()],
           output,
         },
       });
@@ -36,7 +38,7 @@ export function lynxDemo(): RspressPlugin {
           mode: 'production',
           source: { entry: { main: `${cwd}/lynx/app.tsx` } },
           environments: { web: {} },
-          plugins: [pluginReactLynx(), lynxWorkspacePlugin()],
+          plugins: [pluginReactLynx(), pluginSass(), lynxWorkspacePlugin()],
           output: { ...output, cleanDistPath: false },
         },
       });

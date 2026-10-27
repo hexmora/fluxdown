@@ -4,7 +4,7 @@ import '@lynx-js/web-core/client';
 
 import type { LynxDemoData } from './type';
 
-import './host.css';
+import './host.scss';
 
 let view: LynxViewElement | undefined;
 

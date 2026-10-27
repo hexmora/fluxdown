@@ -3,7 +3,7 @@ import { afterEach, expect, test } from '@rstest/core';
 
 import { SuffixRenderer } from '..';
 import { TextStyleProvider } from '../../../../../../base';
-import { getSuffixGeometry } from '../utils';
+import { getInlineSuffixGeometry, getSuffixGeometry } from '../utils';
 
 afterEach(cleanup);
 
@@ -37,16 +37,55 @@ test('uses current foreground and line height without inserting a visible suffix
   expect(view.container.textContent).toBe('text');
 
   expect(view.container.querySelector('.fluxdown-suffix')?.getAttribute('style')).toContain(
-    'height: 40px',
+    'height: 32px',
   );
+
+  expect(view.container.querySelector('.fluxdown-suffix')?.getAttribute('style')).toContain(
+    'margin: 4px',
+  );
+
+  expect(view.container.querySelector('.fluxdown-suffix view')).toBeNull();
 
   expect(view.container.querySelector('.fluxdown-suffix-cursor')?.getAttribute('style')).toContain(
     'background-color: rgb(18, 52, 86)',
   );
 });
 
-test('wraps custom content in a native text element', () => {
+test('paints built-in native markers with Web geometry and a positive subpixel advance', () => {
+  for (const type of ['cursor', 'dot'] as const) {
+    const geometry = getInlineSuffixGeometry({ fontSize: '20px', lineHeight: 1.5 }, type);
+
+    const advance =
+      parseFloat(geometry.width) +
+      parseFloat(geometry.marginLeft) +
+      parseFloat(geometry.marginRight);
+
+    expect(advance).toBeGreaterThan(0);
+
+    expect(advance).toBeLessThan(0.002);
+
+    expect(
+      parseFloat(geometry.height) +
+        parseFloat(geometry.marginTop) +
+        parseFloat(geometry.marginBottom),
+    ).toBeCloseTo(30);
+
+    expect(parseFloat(geometry.width)).toBeCloseTo(type === 'cursor' ? (30 * 0.39) / 1.65 : 12.48);
+
+    expect(geometry.height).toBe(type === 'cursor' ? '20px' : '12.48px');
+  }
+});
+
+test('keeps custom content visible on one native text line', () => {
   const view = render(<SuffixRenderer type="custom">...</SuffixRenderer>);
 
   expect(view.container.querySelector('.fluxdown-suffix-custom text')?.textContent).toBe('...');
+
+  expect(
+    view.container.querySelector('.fluxdown-suffix-custom text')?.getAttribute('style'),
+  ).toContain('white-space: nowrap');
+
+  expect(view.container.querySelector('.fluxdown-suffix')?.getAttribute('style')).toContain(
+    'margin-right: 0.0009765625px',
+  );
 });

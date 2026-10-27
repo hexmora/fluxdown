@@ -1,0 +1,8 @@
+.fluxdown-chunk-active {
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    text {
+      animation-play-state: paused;
+    }
+  }
+}

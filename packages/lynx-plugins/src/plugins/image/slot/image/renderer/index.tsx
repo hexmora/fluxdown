@@ -1,6 +1,11 @@
 import type { ImageProps } from '../../../../../base';
 
-import { joinClassNames, normalizePublicUrl, useTextStyle } from '../../../../../base';
+import {
+  AnimatedText,
+  joinClassNames,
+  normalizePublicUrl,
+  useTextStyle,
+} from '../../../../../base';
 
 export const ImageRenderer = ({
   Raw: _Raw,
@@ -23,9 +28,9 @@ export const ImageRenderer = ({
 
   if (!safeSrc) {
     return alt ? (
-      <text {...elementProps} className={className} style={{ ...textStyle, ...style }}>
+      <AnimatedText {...elementProps} className={className} style={{ ...textStyle, ...style }}>
         {alt}
-      </text>
+      </AnimatedText>
     ) : null;
   }
 

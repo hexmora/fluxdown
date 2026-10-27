@@ -1,0 +1,53 @@
+.fluxdown-suffix {
+  position: relative;
+  width: 0px;
+  overflow: visible;
+  vertical-align: top;
+  pointer-events: none;
+
+  &-marker {
+    animation: fluxdown-suffix-breathe 1s ease-in-out infinite;
+  }
+
+  &-nested-marker {
+    position: absolute;
+    left: 0.18em;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &-cursor {
+    height: 1em;
+    border-radius: 0.06em;
+  }
+
+  &-dot {
+    width: 0.624em;
+    height: 0.624em;
+    border-radius: 50%;
+  }
+
+  &-custom {
+    top: 0px;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &-marker {
+      animation-name: none;
+    }
+  }
+}
+
+@keyframes fluxdown-suffix-breathe {
+  0%,
+  33.333333%,
+  100% {
+    opacity: 1;
+  }
+
+  50%,
+  83.333333% {
+    opacity: 0;
+  }
+}

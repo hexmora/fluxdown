@@ -1,6 +1,12 @@
 import type { TexProps } from '../../../../../base';
 
-import { joinClassNames, useBlockStyle, useTextStyle, useTheme } from '../../../../../base';
+import {
+  AnimatedText,
+  joinClassNames,
+  useBlockStyle,
+  useTextStyle,
+  useTheme,
+} from '../../../../../base';
 
 /** TeX source is preserved until an application supplies a native math slot. */
 export const TexRenderer = ({
@@ -24,7 +30,7 @@ export const TexRenderer = ({
   });
 
   return (
-    <text
+    <AnimatedText
       {...elementProps}
       className={joinClassNames('fluxdown-tex', className)}
       style={{
@@ -34,6 +40,6 @@ export const TexRenderer = ({
       }}
     >
       {tex}
-    </text>
+    </AnimatedText>
   );
 };

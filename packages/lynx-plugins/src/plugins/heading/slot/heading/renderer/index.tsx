@@ -3,6 +3,7 @@ import type { CSSProperties } from '@lynx-js/types';
 import type { HeadingProps } from '../../../../../base';
 
 import {
+  AnimatedText,
   joinClassNames,
   TextStyleProvider,
   useBlockStyle,
@@ -40,13 +41,13 @@ export const HeadingRenderer = ({
 
   return (
     <TextStyleProvider value={textStyle}>
-      <text
+      <AnimatedText
         {...elementProps}
         className={joinClassNames('fluxdown-heading', `fluxdown-heading-h${safeLevel}`, className)}
         style={{ ...blockStyle, ...textStyle }}
       >
         {children}
-      </text>
+      </AnimatedText>
     </TextStyleProvider>
   );
 };

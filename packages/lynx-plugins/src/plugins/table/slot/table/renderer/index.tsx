@@ -1,6 +1,7 @@
 import type { TableProps } from '../../../../../base';
 
 import { joinClassNames, useBlockStyle, useTheme } from '../../../../../base';
+import './style.scss';
 
 export const TableRenderer = ({
   Raw: _Raw,
@@ -23,7 +24,6 @@ export const TableRenderer = ({
       scroll-x
       className={joinClassNames('fluxdown-table', className)}
       style={{
-        width: '100%',
         ...blockStyle,
         border: `1px solid ${tokens.colors.border}`,
         borderRadius: tokens.radius.lg,
@@ -31,12 +31,8 @@ export const TableRenderer = ({
       }}
     >
       <view
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${columns}, auto)`,
-          width: 'max-content',
-          minWidth: '100%',
-        }}
+        className="fluxdown-table-grid"
+        style={{ gridTemplateColumns: `repeat(${columns}, auto)` }}
       >
         {children}
       </view>

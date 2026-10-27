@@ -2,7 +2,13 @@ import type { CSSProperties } from '@lynx-js/types';
 
 import type { StrongProps } from '../../../../../base';
 
-import { joinClassNames, TextStyleProvider, useTextStyle, useTheme } from '../../../../../base';
+import {
+  AnimatedText,
+  joinClassNames,
+  TextStyleProvider,
+  useTextStyle,
+  useTheme,
+} from '../../../../../base';
 
 export const StrongRenderer = ({
   Raw: _Raw,
@@ -23,13 +29,13 @@ export const StrongRenderer = ({
 
   return (
     <TextStyleProvider value={textStyle}>
-      <text
+      <AnimatedText
         {...elementProps}
         className={joinClassNames('fluxdown-strong', className)}
         style={textStyle}
       >
         {children}
-      </text>
+      </AnimatedText>
     </TextStyleProvider>
   );
 };

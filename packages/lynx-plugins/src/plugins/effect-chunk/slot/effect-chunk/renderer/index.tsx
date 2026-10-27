@@ -1,12 +1,15 @@
-import type { CSSProperties } from '@lynx-js/types';
-
 import { getTime } from '@fluxdown/utils';
 import { useMemo } from '@lynx-js/react';
 
 import type { ChunkProps } from '../../../../../base';
 
-import { joinClassNames, TextAnimationProvider, useTextStyle } from '../../../../../base';
-import './style.css';
+import {
+  AnimatedText,
+  joinClassNames,
+  TextAnimationProvider,
+  useTextStyle,
+} from '../../../../../base';
+import './style.scss';
 
 export type ChunkRendererProps = Omit<ChunkProps, 'Raw'> & { Raw?: ChunkProps['Raw'] };
 
@@ -26,35 +29,24 @@ export const ChunkRenderer = ({
 
   const active = start >= 0 && delay > -duration;
 
-  const animationStyle: CSSProperties | null = active
-    ? {
-        animationName: 'fluxdown-chunk-appear',
-        animationDuration: `${duration}ms`,
-        animationDelay: `${delay}ms`,
-        animationTimingFunction: 'cubic-bezier(0, 0, 0.58, 1)',
-        animationFillMode: 'both',
-      }
-    : null;
+  const animation = useMemo(
+    () => (start >= 0 ? { arrival: Date.now() + start - getTime(), duration } : null),
+    [start, duration],
+  );
 
   return (
-    <TextAnimationProvider value={animationStyle}>
-      <text
+    <TextAnimationProvider value={animation}>
+      <AnimatedText
         {...elementProps}
         className={joinClassNames(
           active ? 'fluxdown-chunk fluxdown-chunk-active' : 'fluxdown-chunk',
           className,
         )}
         key={start}
-        style={
-          {
-            ...textStyle,
-            ...animationStyle,
-            '--fluxdown-text-color': textStyle.color,
-          } as CSSProperties
-        }
+        style={textStyle}
       >
         {children}
-      </text>
+      </AnimatedText>
     </TextAnimationProvider>
   );
 };

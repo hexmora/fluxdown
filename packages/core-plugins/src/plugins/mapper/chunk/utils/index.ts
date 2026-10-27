@@ -71,7 +71,11 @@ const createChunkText = (
   characters: ChunkCharacter[],
   now: number,
 ): ElementContent[] => {
-  if (characters.every(({ start, duration }) => start < 0 || start + duration <= now)) {
+  // Preserve structural whitespace without creating an animated text box around it.
+  if (
+    !node.value.trim() ||
+    characters.every(({ start, duration }) => start < 0 || start + duration <= now)
+  ) {
     return [node];
   }
 

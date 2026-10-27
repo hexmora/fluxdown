@@ -2,14 +2,16 @@ import { createElement, isValidElement, useRef, useState } from '@lynx-js/react'
 
 import type { CodeHeaderAction, CodeHeaderProps } from '../../../../../base';
 
-import { joinClassNames, useTextStyle, useTheme } from '../../../../../base';
+import { AnimatedText, joinClassNames, useTextStyle, useTheme } from '../../../../../base';
 
 const renderAction = ({ key, target }: CodeHeaderAction) => {
   if (typeof target === 'function') {
     return <view key={key}>{createElement(target)}</view>;
   }
 
-  return <view key={key}>{isValidElement(target) ? target : <text>{target}</text>}</view>;
+  return (
+    <view key={key}>{isValidElement(target) ? target : <AnimatedText>{target}</AnimatedText>}</view>
+  );
 };
 
 export const CodeHeaderRenderer = ({
@@ -62,14 +64,14 @@ export const CodeHeaderRenderer = ({
         {
           key: 'copy',
           target: (
-            <text
+            <AnimatedText
               style={textStyle}
               bindtap={() => {
                 void copy();
               }}
             >
               {copying ? 'Copying…' : 'Copy'}
-            </text>
+            </AnimatedText>
           ),
         },
       ]
@@ -94,7 +96,7 @@ export const CodeHeaderRenderer = ({
         ...style,
       }}
     >
-      <text style={textStyle}>{left ?? language ?? 'text'}</text>
+      <AnimatedText style={textStyle}>{left ?? language ?? 'text'}</AnimatedText>
       <view style={{ display: 'flex', flexDirection: 'row', gap: tokens.spacing.sm }}>
         {resolved.map(renderAction)}
       </view>

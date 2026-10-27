@@ -4,7 +4,13 @@ import { useMemo } from '@lynx-js/react';
 
 import type { CodeHighlighterProps } from '../../../../../base';
 
-import { useDeferredUnmount, useStatic, useTextStyle, useTheme } from '../../../../../base';
+import {
+  AnimatedText,
+  useDeferredUnmount,
+  useStatic,
+  useTextStyle,
+  useTheme,
+} from '../../../../../base';
 import { CodeHighlighterRenderer } from '../../../../code/slot/code-highlighter/renderer';
 import { createCodeHighlighter, createCodeTheme } from './utils';
 
@@ -36,11 +42,11 @@ export const CodeShikiRenderer = ({
   return (
     <CodeHighlighterRenderer {...props} code={code} language={language}>
       {lines.map((line, lineIndex) => (
-        <text key={lineIndex} style={textStyle}>
+        <AnimatedText key={lineIndex} style={textStyle}>
           {line.length === 0
             ? '\u200b'
             : line.map((token, tokenIndex) => (
-                <text
+                <AnimatedText
                   key={tokenIndex}
                   style={
                     {
@@ -55,9 +61,9 @@ export const CodeShikiRenderer = ({
                   }
                 >
                   {token.content}
-                </text>
+                </AnimatedText>
               ))}
-        </text>
+        </AnimatedText>
       ))}
     </CodeHighlighterRenderer>
   );
