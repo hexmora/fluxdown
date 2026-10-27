@@ -1,0 +1,24 @@
+:global(.fluxdown-svelte-effect-shad) {
+  display: inline;
+
+  .leading {
+    display: inline;
+  }
+
+  .active {
+    display: inline;
+    mask-image: linear-gradient(to right, #000, transparent);
+  }
+
+  .mask,
+  .mask-hidden {
+    position: relative;
+    display: inline-block;
+    background-image: linear-gradient(to right, transparent, var(--fluxdown-colors-bg));
+    pointer-events: none;
+  }
+
+  .mask-hidden {
+    opacity: 0;
+  }
+}
