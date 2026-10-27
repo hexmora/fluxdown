@@ -1,5 +1,11 @@
 # @fluxdown/lynx-plugins
 
+## 0.3.0
+
+### Minor Changes
+
+- 53d58c8: Add an opt-in TexSvgPlugin that typesets TeX with MathJax and native Lynx SVG elements. Support inline and display formulas, theme colors, horizontal overflow, and source fallback for unfinished or invalid input.
+
 ## 0.2.0
 
 ### Minor Changes
