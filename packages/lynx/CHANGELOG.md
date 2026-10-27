@@ -1,5 +1,16 @@
 # @fluxdown/lynx
 
+## 0.3.0
+
+### Minor Changes
+
+- 3efd67a: Remove the component-level getProps option and consistently use the built-in Lynx attribute mapping. Customize native attributes and interactions through render or slot plugins; render plugins retain their getProps helper.
+
+### Patch Changes
+
+- Updated dependencies [53d58c8]
+  - @fluxdown/lynx-plugins@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

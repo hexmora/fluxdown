@@ -1,5 +1,11 @@
 # @fluxdown/website
 
+## 0.0.9
+
+### Patch Changes
+
+- 3efd67a: Link native configuration fields to the React reference, keep import guidance concise, and remove extra table spacing in the comparison demos.
+
 ## 0.0.8
 
 ### Patch Changes
