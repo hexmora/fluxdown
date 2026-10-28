@@ -8,5 +8,10 @@
     "type": "file",
     "name": "cjk",
     "label": "CJK 支持"
+  },
+  {
+    "type": "file",
+    "name": "renderers",
+    "label": "横向演示"
   }
 ]

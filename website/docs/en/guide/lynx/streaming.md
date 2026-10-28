@@ -47,4 +47,4 @@ Parsing and streaming scheduling run on the background thread; Lynx elements pre
 
 Set `streaming` to `false` when the request completes, is cancelled or fails. The component displays all text received so far and clears trailing effects.
 
-[Compare with React](./comparison.mdx) lets you switch between all four effects on the same content.
+[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, React Native, and Lynx together.

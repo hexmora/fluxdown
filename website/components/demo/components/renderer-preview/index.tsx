@@ -1,0 +1,65 @@
+import type { Theme } from 'fluxdown';
+
+import { Fluxdown as FluxdownNative } from '@fluxdown/react-native';
+import { Fluxdown } from 'fluxdown';
+import { useMemo } from 'react';
+
+import type { RendererPreviewProps } from './type';
+
+import { useLocale } from '../../../hooks';
+import { LynxPreview } from './components/lynx-preview';
+import { VuePreview } from './components/vue-preview';
+
+export const RendererPreview = ({
+  renderer,
+  text,
+  streaming = false,
+  build,
+  dark,
+  cycle = 0,
+  reducedMotion = false,
+}: RendererPreviewProps) => {
+  const { lang } = useLocale();
+  const theme = useMemo(
+    () => [dark ? 'dark' : 'light', { tokens: { colors: { bg: 'transparent' } } }] satisfies Theme,
+    [dark],
+  );
+  const data = useMemo(
+    () => ({
+      text,
+      options: JSON.stringify({ streaming, build }),
+      dark,
+      cycle,
+      reducedMotion,
+      follow: !!streaming,
+    }),
+    [text, streaming, build, dark, cycle, reducedMotion],
+  );
+  const props = { text, streaming, build, theme };
+
+  if (renderer === 'lynx') {
+    return (
+      <LynxPreview
+        data={data}
+        errorLabel={
+          lang === 'zh'
+            ? 'Lynx 预览加载失败，请刷新页面重试。'
+            : 'The Lynx preview could not load. Refresh the page to try again.'
+        }
+      />
+    );
+  }
+
+  if (renderer === 'vue') {
+    return <VuePreview key={cycle} {...props} />;
+  }
+
+  if (renderer === 'react-native') {
+    return <FluxdownNative key={cycle} {...props} />;
+  }
+
+  return <Fluxdown key={cycle} {...props} />;
+};
+
+export * from './consts';
+export type * from './type';

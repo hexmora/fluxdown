@@ -33,6 +33,13 @@ export const LynxPreview = ({ data, errorLabel }: LynxPreviewProps) => {
 
     window.addEventListener('message', receive);
 
+    // The prerendered iframe can finish loading before React hydrates this component.
+    // Ask for readiness as well as listening for the host's initial announcement.
+    frameRef.current?.contentWindow?.postMessage(
+      { type: 'lynx-demo:connect' },
+      window.location.origin,
+    );
+
     return () => window.removeEventListener('message', receive);
   }, []);
 

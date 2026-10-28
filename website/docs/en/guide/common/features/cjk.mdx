@@ -1,0 +1,214 @@
+import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs';
+
+# CJK support
+
+`CjkPlugin` improves Markdown parsing for Chinese, Japanese, and Korean text. It recognizes emphasis, strong emphasis, and strikethrough next to CJK punctuation, and keeps that punctuation out of bare URLs. The Full components for React, Vue, React Native, and Lynx include it by default; Lite components can add it as needed.
+
+<FrameworkCodeTabs>
+
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+export function Message() {
+  return <Fluxdown text="这是**加粗。**文字。" />;
+}
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+</script>
+
+<template>
+  <Fluxdown text="这是**加粗。**文字。" />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message() {
+  return <Fluxdown text="这是**加粗。**文字。" />;
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message() {
+  return <Fluxdown text="这是**加粗。**文字。" />;
+}
+```
+
+</FrameworkCodeTabs>
+
+The text `加粗。` is bold, without requiring spaces around the delimiters.
+
+## Supported content
+
+Markdown delimiters can appear next to CJK punctuation:
+
+```md
+这是**加粗。**文字。
+これは*強調。*です。
+이것은~~삭제。~~입니다.
+```
+
+Bare URLs end before `。．，、？！：；（）【】「」『』〈〉《》`. For example, `https://example.com。` links to `https://example.com`, leaving the final `。` as ordinary text.
+
+Explicit Markdown links and code preserve their content. The URL in `[link](https://example.com/路径。)` stays unchanged, as does punctuation inside inline code and fenced code blocks.
+
+## Import the plugin
+
+All Full components include `CjkPlugin` without manual registration. For Core or a Lite component, install the matching plugin package:
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```sh
+pnpm add @fluxdown/core-plugins
+```
+
+```sh
+pnpm add @fluxdown/react-base-plugins
+```
+
+```sh
+pnpm add @fluxdown/vue-plugins
+```
+
+```sh
+pnpm add @fluxdown/react-base-plugins
+```
+
+```sh
+pnpm add @fluxdown/lynx-plugins
+```
+
+</FrameworkCodeTabs>
+
+For Core, add `CjkRemarkPlugin` to the `remarks` input in the [quick start](../../core/quick-start.md). Components extend their presets through `plugins`:
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import { CjkRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/cjk';
+
+const remarks = [CjkRemarkPlugin];
+```
+
+```tsx
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
+import { FluxdownLite } from 'fluxdown/lite';
+
+export function Message({ text }: { text: string }) {
+  return <FluxdownLite plugins={CjkPlugin} text={text} />;
+}
+```
+
+```vue
+<script setup lang="ts">
+import { CjkPlugin } from '@fluxdown/vue-plugins/plugins/cjk';
+import { FluxdownLite } from '@fluxdown/vue/lite';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <FluxdownLite :plugins="CjkPlugin" :text="text" />
+</template>
+```
+
+```tsx
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
+import { FluxdownLite } from '@fluxdown/react-native/lite';
+
+export function Message({ text }: { text: string }) {
+  return <FluxdownLite plugins={CjkPlugin} text={text} />;
+}
+```
+
+```tsx
+import { CjkPlugin } from '@fluxdown/lynx-plugins/plugins/cjk';
+import { FluxdownLite } from '@fluxdown/lynx/lite';
+
+export function Message({ text }: { text: string }) {
+  return <FluxdownLite plugins={CjkPlugin} text={text} />;
+}
+```
+
+</FrameworkCodeTabs>
+
+## Disable CJK support
+
+Include `CjkPlugin` and `config` in the same plugin pack to disable this behavior. Core uses a remark plugin entry with `disabled` set:
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
+
+import { CjkRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/cjk';
+
+const remarks: IPluggable<IRemarkPlugin, unknown>[] = [
+  [CjkRemarkPlugin, { disabled: true }],
+];
+```
+
+```tsx
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      plugins={{ ...CjkPlugin, config: { 'remark-cjk': { disabled: true } } }}
+      text={text}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { CjkPlugin } from '@fluxdown/vue-plugins/plugins/cjk';
+import { Fluxdown } from '@fluxdown/vue';
+
+const plugins = { ...CjkPlugin, config: { 'remark-cjk': { disabled: true } } };
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown :plugins="plugins" :text="text" />
+</template>
+```
+
+```tsx
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      plugins={{ ...CjkPlugin, config: { 'remark-cjk': { disabled: true } } }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import { CjkPlugin } from '@fluxdown/lynx-plugins/plugins/cjk';
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      plugins={{ ...CjkPlugin, config: { 'remark-cjk': { disabled: true } } }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>

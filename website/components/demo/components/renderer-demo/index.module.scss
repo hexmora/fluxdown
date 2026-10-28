@@ -1,0 +1,147 @@
+.demo {
+  --preview-height: min(620px, 65vh);
+
+  :global(svg) {
+    display: inline-block;
+  }
+
+  :global(h2)::before {
+    content: none;
+  }
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--site-line);
+  font-size: 12px;
+}
+
+.modes {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--site-inset);
+
+  button {
+    border: 0;
+    background: transparent;
+    border-radius: 6px;
+    padding: 7px 14px;
+    color: var(--site-muted);
+    font: inherit;
+    cursor: pointer;
+
+    &[aria-pressed="true"] {
+      background: var(--site-surface);
+      color: var(--site-ink);
+      box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+    }
+  }
+}
+
+.effect {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-inline-start: auto;
+  color: var(--site-muted);
+}
+
+.select {
+  position: relative;
+  display: flex;
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    width: 6px;
+    height: 6px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    content: "";
+    pointer-events: none;
+    transform: translateY(-70%) rotate(45deg);
+  }
+
+  select {
+    appearance: none;
+    min-width: 112px;
+    min-height: 34px;
+    padding: 7px 36px 7px 12px;
+    border: 1px solid var(--site-line);
+    border-radius: 6px;
+    background: var(--site-surface);
+    color: var(--site-ink);
+    font: inherit;
+    cursor: pointer;
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(230px, 1fr));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.panel {
+  min-width: 0;
+  & + & {
+    border-left: 1px solid var(--site-line);
+  }
+}
+
+.label {
+  margin: 0 !important;
+  padding: 14px 20px !important;
+  border-bottom: 1px solid var(--site-line) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: var(--site-muted);
+}
+
+.viewport,
+.lynx {
+  height: var(--preview-height);
+  min-height: 360px;
+}
+
+.viewport {
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.content {
+  padding: 20px;
+}
+
+.footer {
+  padding: 12px 24px;
+  border-top: 1px solid var(--site-line);
+  color: var(--site-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .options {
+    padding-inline: 16px;
+  }
+  .footer {
+    padding-inline: 16px;
+  }
+}
+
+.modes button:focus-visible,
+.select select:focus-visible {
+  outline: 2px solid var(--site-accent) !important;
+  outline-offset: 2px;
+}

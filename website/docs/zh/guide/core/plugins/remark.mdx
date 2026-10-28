@@ -41,20 +41,20 @@ const remarks = [CjkSyntaxPlugin];
 
 勾选表示插件包含在 `PRESET_REMARK_PLUGINS` 中，由 Core 自动注册；未勾选的插件需手动添加。预设数组从 `@fluxdown/core-plugins/presets/remark` 导入。
 
-| 插件                              | 子路径                 |    是否内置     | 作用                                                                      |
-| --------------------------------- | ---------------------- | :-------------: | ------------------------------------------------------------------------- |
-| `ApplyRepairsRemarkPlugin`        | `apply-repairs`        | <PresetCheck /> | 应用修复插件，让未完成的 Markdown 适合当前展示阶段。                      |
-| `CjkRemarkPlugin`                 | `cjk`                  |                 | 改善 [CJK 标点](../../common/features/cjk.md)附近的强调语法与裸链接解析。 |
-| `CodeMetaRemarkPlugin`            | `code-meta`            | <PresetCheck /> | 保留围栏代码块语言后面的附加信息，供渲染器使用。                          |
-| `EmojiRemarkPlugin`               | `emoji`                |                 | 将 [emoji 短码](../../common/features/emoji.md)转换为 Unicode 表情。      |
-| `PatchesRemarkPlugin`             | `patches`              | <PresetCheck /> | 标记需要由应用替换呈现的文本范围。                                        |
-| `SyntaxAutolinkRemarkPlugin`      | `syntax-autolink`      | <PresetCheck /> | 把可识别的网址、邮箱等文字转换为链接。                                    |
-| `SyntaxFootnoteRemarkPlugin`      | `syntax-footnote`      | <PresetCheck /> | 支持脚注引用与定义；需要 `build.footnote`。                               |
-| `SyntaxHtmlAllowedRemarkPlugin`   | `syntax-html-allowed`  | <PresetCheck /> | 控制 Markdown 中允许哪些原始 HTML 标签，其他标签按文字处理。              |
-| `SyntaxMathRemarkPlugin`          | `syntax-math`          | <PresetCheck /> | 支持数学公式及流式公式的中间状态；需要 `build.tex`。                      |
-| `SyntaxPolicyRemarkPlugin`        | `syntax-policy`        | <PresetCheck /> | 控制缩进代码块与 Setext 标题是否启用。                                    |
-| `SyntaxSoftEndlineRemarkPlugin`   | `syntax-soft-endline`  | <PresetCheck /> | 将普通换行显示为换行。                                                    |
-| `SyntaxStrikethroughRemarkPlugin` | `syntax-strikethrough` | <PresetCheck /> | 支持删除线。                                                              |
-| `SyntaxTableRemarkPlugin`         | `syntax-table`         | <PresetCheck /> | 支持 Markdown 表格。                                                      |
-| `SyntaxTaskListRemarkPlugin`      | `syntax-task-list`     | <PresetCheck /> | 支持带复选框的任务列表。                                                  |
-| `TableNoralizerRemarkPlugin`      | `table-noralizer`      | <PresetCheck /> | 补全表格列的对齐信息，适应行列数变化。                                    |
+| 插件                              | 子路径                 |    是否内置     | 作用                                                                       |
+| --------------------------------- | ---------------------- | :-------------: | -------------------------------------------------------------------------- |
+| `ApplyRepairsRemarkPlugin`        | `apply-repairs`        | <PresetCheck /> | 应用修复插件，让未完成的 Markdown 适合当前展示阶段。                       |
+| `CjkRemarkPlugin`                 | `cjk`                  |                 | 改善 [CJK 标点](../../common/features/cjk.mdx)附近的强调语法与裸链接解析。 |
+| `CodeMetaRemarkPlugin`            | `code-meta`            | <PresetCheck /> | 保留围栏代码块语言后面的附加信息，供渲染器使用。                           |
+| `EmojiRemarkPlugin`               | `emoji`                |                 | 将 [emoji 短码](../../common/features/emoji.mdx)转换为 Unicode 表情。      |
+| `PatchesRemarkPlugin`             | `patches`              | <PresetCheck /> | 标记需要由应用替换呈现的文本范围。                                         |
+| `SyntaxAutolinkRemarkPlugin`      | `syntax-autolink`      | <PresetCheck /> | 把可识别的网址、邮箱等文字转换为链接。                                     |
+| `SyntaxFootnoteRemarkPlugin`      | `syntax-footnote`      | <PresetCheck /> | 支持脚注引用与定义；需要 `build.footnote`。                                |
+| `SyntaxHtmlAllowedRemarkPlugin`   | `syntax-html-allowed`  | <PresetCheck /> | 控制 Markdown 中允许哪些原始 HTML 标签，其他标签按文字处理。               |
+| `SyntaxMathRemarkPlugin`          | `syntax-math`          | <PresetCheck /> | 支持数学公式及流式公式的中间状态；需要 `build.tex`。                       |
+| `SyntaxPolicyRemarkPlugin`        | `syntax-policy`        | <PresetCheck /> | 控制缩进代码块与 Setext 标题是否启用。                                     |
+| `SyntaxSoftEndlineRemarkPlugin`   | `syntax-soft-endline`  | <PresetCheck /> | 将普通换行显示为换行。                                                     |
+| `SyntaxStrikethroughRemarkPlugin` | `syntax-strikethrough` | <PresetCheck /> | 支持删除线。                                                               |
+| `SyntaxTableRemarkPlugin`         | `syntax-table`         | <PresetCheck /> | 支持 Markdown 表格。                                                       |
+| `SyntaxTaskListRemarkPlugin`      | `syntax-task-list`     | <PresetCheck /> | 支持带复选框的任务列表。                                                   |
+| `TableNoralizerRemarkPlugin`      | `table-noralizer`      | <PresetCheck /> | 补全表格列的对齐信息，适应行列数变化。                                     |

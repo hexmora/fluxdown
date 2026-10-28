@@ -1,15 +1,8 @@
-export type DemoEffect = 'scale' | 'shad' | 'chunk' | 'suffix';
-
 export type LynxDemoData = {
   text: string;
-
-  streaming: boolean;
-
-  effect: DemoEffect;
-
-  smooth: boolean;
-
+  options: string;
   dark: boolean;
-
   cycle: number;
+  reducedMotion: boolean;
+  follow: boolean;
 };

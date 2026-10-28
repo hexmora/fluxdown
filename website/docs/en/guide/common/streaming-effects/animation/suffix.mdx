@@ -1,3 +1,4 @@
+import { FrameworkCodeTabs } from '../../../../../../components/framework-code-tabs';
 import { SuffixDemo } from '../../../../../../components';
 
 # Suffix
@@ -10,42 +11,264 @@ Switch the content type to inspect different endings. Pause or replay the stream
 
 ## Usage
 
-The following examples use the React component:
+Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Suffix } from '@fluxdown/core-plugins/plugins/mapper/suffix';
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: true }],
+  [Suffix, { enabled: true, type: 'cursor' }],
+];
+```
 
 ```tsx
-<Fluxdown streaming={{ effect: ['suffix', { type: 'cursor' }] }} text={text} />
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ effect: ['suffix', { type: 'cursor' }] }}
+      text={text}
+    />
+  );
+}
 ```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['suffix', { type: 'cursor' }] }"
+    :text="text"
+  />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ effect: ['suffix', { type: 'cursor' }] }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ effect: ['suffix', { type: 'cursor' }] }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>
 
 Use `type: 'dot'` for a circular marker. `effect: 'suffix'` uses the block cursor by default. Both shapes inherit the current text color and scale with the text. Their breathing animation respects `prefers-reduced-motion`.
 
 The marker remains visible while the effect is enabled. Set `streaming` to `false` when the response finishes, or set the suffix's `enabled` option to `false` to keep other streaming behavior active:
 
-The following example uses the React component:
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
 
-```tsx
-<Fluxdown
-  streaming={{
-    smooth: true,
-    effect: ['suffix', { type: 'dot', enabled: isStreaming }],
-  }}
-  text={text}
-/>
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Suffix } from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { MutableState, toClosure } from 'stative';
+
+const isStreaming = MutableState.of(true);
+const active = toClosure(isStreaming);
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: true }],
+  [Suffix, { enabled: active, type: 'dot' }],
+];
 ```
 
-The following React component example combines the marker with an entrance effect:
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+export function Message({
+  text,
+  isStreaming,
+}: {
+  text: string;
+  isStreaming: boolean;
+}) {
+  return (
+    <Fluxdown
+      streaming={{
+        smooth: true,
+        effect: ['suffix', { type: 'dot', enabled: isStreaming }],
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string; isStreaming: boolean }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{
+      smooth: true,
+      effect: ['suffix', { type: 'dot', enabled: isStreaming }],
+    }"
+    :text="text"
+  />
+</template>
+```
 
 ```tsx
-<Fluxdown
-  streaming={{ effect: ['scale', ['suffix', { type: 'dot' }]] }}
-  text={text}
-/>
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({
+  text,
+  isStreaming,
+}: {
+  text: string;
+  isStreaming: boolean;
+}) {
+  return (
+    <Fluxdown
+      streaming={{
+        smooth: true,
+        effect: ['suffix', { type: 'dot', enabled: isStreaming }],
+      }}
+      text={text}
+    />
+  );
+}
 ```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({
+  text,
+  isStreaming,
+}: {
+  text: string;
+  isStreaming: boolean;
+}) {
+  return (
+    <Fluxdown
+      streaming={{
+        smooth: true,
+        effect: ['suffix', { type: 'dot', enabled: isStreaming }],
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>
+
+Combine the marker with an entrance effect:
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Scale } from '@fluxdown/core-plugins/plugins/mapper/scale';
+import { Suffix } from '@fluxdown/core-plugins/plugins/mapper/suffix';
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: true }],
+  [Scale, { enabled: true }],
+  [Suffix, { enabled: true, type: 'dot' }],
+];
+```
+
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ effect: ['scale', ['suffix', { type: 'dot' }]] }}
+      text={text}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['scale', ['suffix', { type: 'dot' }]] }"
+    :text="text"
+  />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ effect: ['scale', ['suffix', { type: 'dot' }]] }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ effect: ['scale', ['suffix', { type: 'dot' }]] }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>
 
 ## Render a custom type
 
 The `type` option is `'cursor' | 'dot' | (string & {})`. Every value uses the same HAST node: a `span` whose `dataFluxdownSuffix` property contains that type. The built-in renderer recognizes only `cursor` and `dot`; it returns `null` for every other value. An unknown type is metadata for your renderer, not text to display.
 
-The following example uses the React component and a [render plugin](../../../react/plugins/render.md) to display a smile. `SuffixRenderer` shares the built-in marker layout and breathing animation:
+Use a render plugin for your framework to display a smile. `SuffixRenderer` shares the built-in marker layout and breathing animation. Vue uses `h`; Lynx keeps its JSX rendering function outside the plugin class:
+
+<FrameworkCodeTabs>
 
 ```tsx
 import type {
@@ -77,14 +300,155 @@ class SmileRenderPlugin extends BaseReactRenderPlugin {
   }
 }
 
-<Fluxdown
-  plugins={{ renders: [SmileRenderPlugin] }}
-  streaming={{ effect: ['suffix', { type: 'smile' }] }}
-  text={text}
-/>;
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      plugins={{ renders: [SmileRenderPlugin] }}
+      streaming={{ effect: ['suffix', { type: 'smile' }] }}
+      text={text}
+    />
+  );
+}
 ```
 
+```vue
+<script setup lang="ts">
+import type {
+  VueRenderMatchParams,
+  VueRenderParams,
+} from '@fluxdown/vue-plugins/base';
+
+import {
+  isSuffixNode,
+  SUFFIX_DATA_ATTR,
+} from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { BaseVueRenderPlugin } from '@fluxdown/vue-plugins/base';
+import { SuffixRenderer } from '@fluxdown/vue-plugins/plugins/effect-suffix';
+import { Fluxdown } from '@fluxdown/vue';
+import { h } from 'vue';
+
+class SmileRenderPlugin extends BaseVueRenderPlugin {
+  static readonly key = 'render-smile';
+
+  match({ node }: VueRenderMatchParams) {
+    return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
+  }
+
+  render({ node }: VueRenderParams) {
+    if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
+      return null;
+    }
+
+    return h(SuffixRenderer, { type: 'smile', children: '🙂' });
+  }
+}
+
+const plugins = { renders: [SmileRenderPlugin] };
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :plugins="plugins"
+    :streaming="{ effect: ['suffix', { type: 'smile' }] }"
+    :text="text"
+  />
+</template>
+```
+
+```tsx
+import type {
+  ReactRenderMatchParams,
+  ReactRenderParams,
+} from '@fluxdown/react-native-plugins/base';
+
+import {
+  isSuffixNode,
+  SUFFIX_DATA_ATTR,
+} from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { BaseReactRenderPlugin } from '@fluxdown/react-native-plugins/base';
+import { SuffixRenderer } from '@fluxdown/react-native-plugins/plugins/effect-suffix';
+import { Fluxdown } from '@fluxdown/react-native';
+
+class SmileRenderPlugin extends BaseReactRenderPlugin {
+  static readonly key = 'render-smile';
+
+  match({ node }: ReactRenderMatchParams) {
+    return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
+  }
+
+  render({ node }: ReactRenderParams) {
+    if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
+      return null;
+    }
+
+    return (
+      <SuffixRenderer Raw={null} type="smile">
+        🙂
+      </SuffixRenderer>
+    );
+  }
+}
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      plugins={{ renders: [SmileRenderPlugin] }}
+      streaming={{ effect: ['suffix', { type: 'smile' }] }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import type {
+  LynxRenderMatchParams,
+  LynxRenderParams,
+} from '@fluxdown/lynx-plugins/base';
+
+import {
+  isSuffixNode,
+  SUFFIX_DATA_ATTR,
+} from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { BaseLynxRenderPlugin } from '@fluxdown/lynx-plugins/base';
+import { SuffixRenderer } from '@fluxdown/lynx-plugins/plugins/effect-suffix';
+import { Fluxdown } from '@fluxdown/lynx';
+
+function renderSmile({ node }: LynxRenderParams) {
+  if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
+    return null;
+  }
+
+  return <SuffixRenderer type="smile">🙂</SuffixRenderer>;
+}
+
+class SmileRenderPlugin extends BaseLynxRenderPlugin {
+  static readonly key = 'render-smile';
+
+  match({ node }: LynxRenderMatchParams) {
+    return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
+  }
+
+  readonly render = renderSmile;
+}
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      plugins={{ renders: [SmileRenderPlugin] }}
+      streaming={{ effect: ['suffix', { type: 'smile' }] }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>
+
 At the same priority, the supplied renderer handles `smile` before the preset renderer. Other types continue to use the presets. The demo uses this same plugin and animation.
+
+The reactive Core example owns its `MutableState`: call `isStreaming.next(false)` when receiving finishes, then dispose `active` and `isStreaming` with `.destroy()` after destroying Core.
 
 ## Code blocks and Core
 
