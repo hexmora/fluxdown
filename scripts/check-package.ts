@@ -109,6 +109,10 @@ export function isLynxPackage(name: string): boolean {
   return name === '@fluxdown/lynx' || name === '@fluxdown/lynx-plugins';
 }
 
+export function isTaroPackage(name: string): boolean {
+  return name === '@fluxdown/taro' || name === '@fluxdown/taro-plugins';
+}
+
 export async function readManifest(directory: string): Promise<PackageManifest> {
   return JSON.parse(
     await readFile(path.join(directory, 'package.json'), 'utf8'),

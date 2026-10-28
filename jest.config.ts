@@ -41,6 +41,8 @@ const config: Config = {
     'react-native-plugins',
     'react-native',
     'react',
+    'taro',
+    'taro-plugins',
   ].map((name) => ({
     displayName: name,
     rootDir,
@@ -49,10 +51,11 @@ const config: Config = {
     modulePathIgnorePatterns: ['<rootDir>/packages/[^/]+/dist/'],
     testMatch: [`<rootDir>/packages/${name}/src/**/*.test.{ts,tsx}`],
     ...(name === 'react-native' ? nativePreset : {}),
+    ...(name.startsWith('taro') ? { globals: { DEPRECATED_ADAPTER_COMPONENT: false } } : {}),
     testEnvironment:
       name === 'react-native'
         ? nativePreset.testEnvironment
-        : name.startsWith('react')
+        : name.startsWith('react') || name.startsWith('taro')
           ? '<rootDir>/scripts/testing/jsdom-environment.ts'
           : 'node',
     ...(name === 'react-native-plugins'
@@ -74,10 +77,22 @@ const config: Config = {
           ],
         }
       : {}),
-    setupFilesAfterEnv: name.startsWith('react')
-      ? [`<rootDir>/packages/${name}/jest.setup.ts`]
-      : [],
+    setupFilesAfterEnv:
+      name.startsWith('react') || name.startsWith('taro')
+        ? [`<rootDir>/packages/${name}/jest.setup.ts`]
+        : [],
     moduleNameMapper: {
+      ...(name.startsWith('taro')
+        ? {
+            '^@tarojs/components$':
+              '<rootDir>/packages/taro/node_modules/@tarojs/components/lib/react/index.js',
+            '^@tarojs/taro$': '<rootDir>/packages/taro/node_modules/@tarojs/taro-h5/dist/index.js',
+            '^react$': '<rootDir>/packages/taro/node_modules/react',
+            '^react/(.*)$': '<rootDir>/packages/taro/node_modules/react/$1',
+            '^react-dom$': '<rootDir>/packages/taro/node_modules/react-dom',
+            '^react-dom/(.*)$': '<rootDir>/packages/taro/node_modules/react-dom/$1',
+          }
+        : {}),
       '^(.+\\.svg)\\?react$': '$1',
       ...(name === 'react-native' ? nativePreset.moduleNameMapper : {}),
       ...(name === 'react-native-plugins'

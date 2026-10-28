@@ -1,0 +1,5 @@
+@use "@taro-prefix" as *;
+
+:export {
+  prefix: $prefix;
+}

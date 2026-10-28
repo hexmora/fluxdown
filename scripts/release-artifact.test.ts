@@ -175,3 +175,54 @@ test('validates supplied Lynx evidence even when Node checks passed', () => {
 
   assert.throws(() => validateReleaseManifest(artifact), /Missing Lynx webAssets/);
 });
+
+function taroVerification(names = ['@fluxdown/taro', '@fluxdown/taro-plugins']) {
+  return names.flatMap((name) =>
+    (['import', 'require'] as const).map((format) => ({
+      specifier: name === '@fluxdown/taro-plugins' ? `${name}/lite` : name,
+      format,
+      cssAssets: ['static/css/consumer.css'],
+      selectors: 4,
+      cssBytes: 120,
+    })),
+  );
+}
+
+test('accepts Taro-only artifacts after both browser module formats load their styles', () => {
+  const artifact = manifest(['@fluxdown/taro', '@fluxdown/taro-plugins']);
+
+  artifact.verification = { nodeEntries: 0, browser: taroVerification() };
+
+  assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+test('requires browser evidence for each Taro package even when Node entries passed', () => {
+  const artifact = manifest(['fluxdown', '@fluxdown/taro', '@fluxdown/taro-plugins']);
+
+  artifact.verification = { nodeEntries: 1, browser: taroVerification(['@fluxdown/taro']) };
+
+  assert.throws(() => validateReleaseManifest(artifact), /Missing Taro browser verification/);
+});
+
+test('Taro browser evidence cannot replace Node verification for another renderer', () => {
+  const artifact = manifest(['fluxdown', '@fluxdown/taro']);
+
+  artifact.verification = { nodeEntries: 0, browser: taroVerification(['@fluxdown/taro']) };
+
+  assert.throws(() => validateReleaseManifest(artifact), /Missing consumer verification/);
+});
+
+for (const field of ['cssBytes', 'selectors', 'cssAssets', 'format'] as const) {
+  test(`rejects incomplete Taro browser evidence: ${field}`, () => {
+    const artifact = manifest(['@fluxdown/taro']);
+
+    const browser = taroVerification(['@fluxdown/taro']);
+
+    artifact.verification = {
+      nodeEntries: 0,
+      browser: browser.map((entry) => ({ ...entry, [field]: undefined })),
+    };
+
+    assert.throws(() => validateReleaseManifest(artifact), /Missing Taro browser verification/);
+  });
+}

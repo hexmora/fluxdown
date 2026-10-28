@@ -8,7 +8,8 @@ import path from 'node:path';
 
 import type { BrowserCheckResult, PackageArtifact } from './types.ts';
 
-import { publicEntries, resolveExport } from './check-package.ts';
+import { taroWebDefines } from './build/taro-web.ts';
+import { isTaroPackage, publicEntries, resolveExport } from './check-package.ts';
 
 async function readStylesheet(file: string): Promise<string> {
   const css = await readFile(file, 'utf8');
@@ -47,6 +48,7 @@ async function entryStylesheet(directory: string, entry: string): Promise<string
 function cssClassNames(css: string): string[] {
   const plain = css
     .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/@import[^;]+;/g, '')
     .replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, '');
 
   const classes = new Set<string>();
@@ -107,6 +109,8 @@ export async function checkBrowserConsumer(
         '@fluxdown/solid-plugins',
         '@fluxdown/vue',
         '@fluxdown/vue-plugins',
+        '@fluxdown/taro',
+        '@fluxdown/taro-plugins',
       ].includes(manifest.name)
     ) {
       assert(style, `${manifest.name}: missing public stylesheet export`);
@@ -136,13 +140,19 @@ export async function checkBrowserConsumer(
 
         const filename = path.join(consumer, `${name}.${format === 'import' ? 'mjs' : 'cjs'}`);
 
-        // The fixture imports JavaScript only. CSS must enter through the package itself.
+        // Fluxdown CSS must enter through its JavaScript. Taro also needs its host stylesheet.
         const source =
           format === 'import'
             ? `import * as api from ${JSON.stringify(specifier)}; globalThis[${JSON.stringify(name)}] = api;`
             : `globalThis[${JSON.stringify(name)}] = require(${JSON.stringify(specifier)});`;
 
-        await writeFile(filename, source);
+        const hostStyles = isTaroPackage(manifest.name)
+          ? format === 'import'
+            ? "import '@tarojs/components-react/dist/index.css';"
+            : "require('@tarojs/components-react/dist/index.css');"
+          : '';
+
+        await writeFile(filename, [hostStyles, source].filter(Boolean).join('\n'));
 
         entries[name] = filename;
 
@@ -155,11 +165,23 @@ export async function checkBrowserConsumer(
 
   const output = path.join(consumer, 'browser-dist');
 
+  const hasTaro = artifacts.some(({ manifest }) => isTaroPackage(manifest.name));
+
+  const require = createRequire(path.join(consumer, 'package.json'));
+
+  const taroAliases: Record<string, string> = hasTaro
+    ? {
+        '@tarojs/components$': require.resolve('@tarojs/components-react'),
+        '@tarojs/taro$': require.resolve('@tarojs/taro-h5'),
+      }
+    : {};
+
   const rsbuild = await createRsbuild({
     cwd: consumer,
     config: {
       mode: 'production',
-      source: { entry: entries },
+      source: { entry: entries, define: hasTaro ? taroWebDefines : undefined },
+      resolve: { alias: taroAliases },
       output: { target: 'web', distPath: { root: output }, polyfill: 'off' },
       performance: { printFileSize: false },
     },

@@ -11,6 +11,10 @@ const prefixPath = fileURLToPath(
   new URL('../../packages/react-plugins/src/styles/_prefix.scss', import.meta.url),
 );
 
+const taroPrefixPath = fileURLToPath(
+  new URL('../../packages/taro-plugins/src/styles/_prefix.scss', import.meta.url),
+);
+
 const transformer: ReturnType<typeof createTransformer> = {
   getCacheKey(source, filename, options) {
     return createHash('sha256')
@@ -19,6 +23,7 @@ const transformer: ReturnType<typeof createTransformer> = {
       .update(options.configString)
       .update(readFileSync(fileURLToPath(import.meta.url)))
       .update(readFileSync(prefixPath))
+      .update(readFileSync(taroPrefixPath))
       .digest('hex');
   },
 
@@ -47,7 +52,15 @@ const transformer: ReturnType<typeof createTransformer> = {
       const { css } = compileString(source, {
         url: pathToFileURL(filename),
         importers: [
-          { findFileUrl: (url) => (url === '@prefix' ? pathToFileURL(prefixPath) : null) },
+          {
+            findFileUrl: (url) => {
+              if (url === '@taro-prefix') {
+                return pathToFileURL(taroPrefixPath);
+              }
+
+              return url === '@prefix' ? pathToFileURL(prefixPath) : null;
+            },
+          },
         ],
       });
 
