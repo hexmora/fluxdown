@@ -1,0 +1,34 @@
+.controls {
+  display: flex;
+  flex: none;
+  margin-left: auto;
+  align-items: center;
+  gap: 4px;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--site-muted);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--site-hover);
+      color: var(--site-ink);
+    }
+
+    @media (hover: none) {
+      width: 40px;
+      height: 40px;
+    }
+  }
+}
+
+.controls button:focus-visible {
+  outline: 2px solid var(--site-accent);
+  outline-offset: 2px;
+}

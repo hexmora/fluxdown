@@ -8,6 +8,7 @@ import type { RendererPreviewProps } from './type';
 
 import { useLocale } from '../../../hooks';
 import { LynxPreview } from './components/lynx-preview';
+import { SolidPreview } from './components/solid-preview';
 import { VuePreview } from './components/vue-preview';
 
 export const RendererPreview = ({
@@ -48,6 +49,10 @@ export const RendererPreview = ({
         }
       />
     );
+  }
+
+  if (renderer === 'solid') {
+    return <SolidPreview key={cycle} {...props} />;
   }
 
   if (renderer === 'vue') {

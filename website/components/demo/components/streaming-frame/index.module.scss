@@ -28,36 +28,6 @@
     line-height: 1.5;
   }
 
-  .controls {
-    display: flex;
-    flex: none;
-    margin-left: auto;
-    align-items: center;
-    gap: 4px;
-
-    button {
-      display: grid;
-      place-items: center;
-      width: 32px;
-      height: 32px;
-      border: 0;
-      border-radius: 5px;
-      background: transparent;
-      color: var(--site-muted);
-      cursor: pointer;
-
-      &:hover {
-        background: var(--site-hover);
-        color: var(--site-ink);
-      }
-
-      @media (hover: none) {
-        width: 40px;
-        height: 40px;
-      }
-    }
-  }
-
   @media (max-width: 480px) {
     .toolbar {
       gap: 8px;

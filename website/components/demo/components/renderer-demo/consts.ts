@@ -1,6 +1,8 @@
 export const COPY = {
   zh: {
-    title: '同一份内容，四种渲染',
+    label: '渲染库对比',
+    renderers: '选择渲染库（可多选）',
+    empty: '选择要对比的渲染库',
     static: '静态',
     streaming: '流式',
     effect: '动画效果',
@@ -8,7 +10,9 @@ export const COPY = {
     scroll: '横向滚动查看所有渲染库',
   },
   en: {
-    title: 'One stream, four renderers',
+    label: 'Renderer comparison',
+    renderers: 'Choose renderers (multiple selections)',
+    empty: 'Choose a renderer to compare',
     static: 'Static',
     streaming: 'Streaming',
     effect: 'Effect',
@@ -18,3 +22,5 @@ export const COPY = {
 };
 
 export const EFFECTS = ['scale', 'shad', 'chunk', 'suffix'] as const;
+
+export const MODES = ['static', 'streaming'] as const;

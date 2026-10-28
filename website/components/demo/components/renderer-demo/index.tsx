@@ -2,7 +2,8 @@
 import { useDark } from '@rspress/core/runtime';
 import { useState } from 'react';
 
-import type { PreviewEffect, RendererPreviewProps } from '../renderer-preview';
+import type { PreviewEffect, Renderer } from '../renderer-preview';
+import type { RendererPanelProps } from './type';
 
 import { useBottomScroll } from '../../../bottom-scroll';
 import { useLocale } from '../../../hooks';
@@ -10,11 +11,12 @@ import { DEMO_BUILD } from '../../consts';
 import { useDemoStream } from '../../hooks';
 import { getStreamSample } from '../../utils';
 import { RendererPreview, RENDERERS } from '../renderer-preview';
+import { StreamingControls } from '../streaming-controls';
 import { StreamingFrame } from '../streaming-frame';
-import { COPY, EFFECTS } from './consts';
+import { COPY, EFFECTS, MODES } from './consts';
 import styles from './index.module.scss';
 
-const RendererPanel = ({ label, ...props }: RendererPreviewProps & { label: string }) => {
+const RendererPanel = ({ label, ...props }: RendererPanelProps) => {
   const scroll = useBottomScroll(props.reducedMotion ?? false);
 
   return (
@@ -42,13 +44,23 @@ const RendererPanel = ({ label, ...props }: RendererPreviewProps & { label: stri
 
 export const RendererDemo = () => {
   const { lang } = useLocale();
+
   const labels = COPY[lang];
+
   const dark = useDark();
+
   const source = getStreamSample(lang);
+
   const stream = useDemoStream(source);
+
   const [mode, setMode] = useState<'static' | 'streaming'>('streaming');
+
   const [effect, setEffect] = useState<PreviewEffect>('scale');
+
+  const [selected, setSelected] = useState<Renderer[]>(() => RENDERERS.map(({ value }) => value));
+
   const text = mode === 'static' ? source : stream.text;
+
   const streaming = mode === 'streaming' &&
     !stream.complete &&
     !stream.reducedMotion && {
@@ -59,27 +71,16 @@ export const RendererDemo = () => {
 
   return (
     <div className={styles.demo} data-demo="renderers" ref={stream.containerRef}>
-      <StreamingFrame
-        caption={labels.title}
-        controls={{
-          ...stream,
-          complete: mode === 'static' || stream.complete,
-          playing: mode === 'streaming' && stream.playing,
-          replay: () => {
-            setMode('streaming');
-            stream.replay();
-          },
-        }}
-        label={labels.title}
-      >
+      <StreamingFrame label={labels.label}>
         <div className={styles.options}>
           <div className={styles.modes}>
-            {(['static', 'streaming'] as const).map((value) => (
+            {MODES.map((value) => (
               <button
                 aria-pressed={mode === value}
                 key={value}
                 onClick={() => {
                   setMode(value);
+
                   if (value === 'streaming') stream.replay();
                 }}
                 type="button"
@@ -88,40 +89,78 @@ export const RendererDemo = () => {
               </button>
             ))}
           </div>
-          <label className={styles.effect}>
-            {labels.effect}
-            <span className={styles.select}>
-              <select
-                value={effect}
-                onChange={(event) => {
-                  setEffect(event.currentTarget.value as PreviewEffect);
-                  if (mode === 'streaming') stream.replay();
+          <fieldset aria-label={labels.renderers} className={styles.renderers}>
+            {RENDERERS.map(({ value, label }) => (
+              <button
+                aria-pressed={selected.includes(value)}
+                key={value}
+                onClick={() => {
+                  setSelected((current) => {
+                    return current.includes(value)
+                      ? current.filter((item) => item !== value)
+                      : [...current, value];
+                  });
                 }}
+                type="button"
               >
-                {EFFECTS.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </span>
-          </label>
-        </div>
-        <section aria-label={labels.scroll} className={styles.row} tabIndex={0}>
-          {RENDERERS.map(({ value, label }) => (
-            <RendererPanel
-              build={DEMO_BUILD}
-              cycle={stream.cycle}
-              dark={dark}
-              key={value}
-              label={label}
-              reducedMotion={!!stream.reducedMotion}
-              renderer={value}
-              streaming={streaming}
-              text={text}
+                {label}
+              </button>
+            ))}
+          </fieldset>
+          <div className={styles.actions}>
+            <label className={styles.effect}>
+              <span className={styles.effectLabel}>{labels.effect}</span>
+              <span className={styles.select}>
+                <select
+                  aria-label={labels.effect}
+                  value={effect}
+                  onChange={(event) => {
+                    setEffect(event.currentTarget.value as PreviewEffect);
+
+                    if (mode === 'streaming') stream.replay();
+                  }}
+                >
+                  {EFFECTS.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
+            <StreamingControls
+              controls={{
+                ...stream,
+                complete: mode === 'static' || stream.complete,
+                playing: mode === 'streaming' && stream.playing,
+                replay: () => {
+                  setMode('streaming');
+
+                  stream.replay();
+                },
+              }}
             />
-          ))}
-        </section>
+          </div>
+        </div>
+        {selected.length > 0 ? (
+          <section aria-label={labels.scroll} className={styles.row} tabIndex={0}>
+            {RENDERERS.filter(({ value }) => selected.includes(value)).map(({ value, label }) => (
+              <RendererPanel
+                build={DEMO_BUILD}
+                cycle={stream.cycle}
+                dark={dark}
+                key={value}
+                label={label}
+                reducedMotion={!!stream.reducedMotion}
+                renderer={value}
+                streaming={streaming}
+                text={text}
+              />
+            ))}
+          </section>
+        ) : (
+          <output className={styles.empty}>{labels.empty}</output>
+        )}
         <div className={styles.footer}>{labels.hint}</div>
       </StreamingFrame>
     </div>

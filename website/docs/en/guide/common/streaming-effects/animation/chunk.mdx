@@ -11,7 +11,7 @@ import { ChunkDemo } from '../../../../../../components';
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -23,7 +23,11 @@ const mappers: MapperPluggable[] = [[Chunk, { enabled: true }]];
 ```tsx
 import { Fluxdown } from 'fluxdown';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown streaming={{ smooth: false, effect: 'chunk' }} text={text} />
   );
@@ -43,9 +47,30 @@ defineProps<{ text: string }>();
 ```
 
 ```tsx
+import { Fluxdown } from '@fluxdown/solid';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message(props: MessageProps) {
+  return (
+    <Fluxdown
+      streaming={{ smooth: false, effect: 'chunk' }}
+      text={props.text}
+    />
+  );
+}
+```
+
+```tsx
 import { Fluxdown } from '@fluxdown/react-native';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown streaming={{ smooth: false, effect: 'chunk' }} text={text} />
   );
@@ -55,7 +80,11 @@ export function Message({ text }: { text: string }) {
 ```tsx
 import { Fluxdown } from '@fluxdown/lynx';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown streaming={{ smooth: false, effect: 'chunk' }} text={text} />
   );
@@ -66,7 +95,7 @@ export function Message({ text }: { text: string }) {
 
 Always pass the complete Markdown received so far. Each group fades from transparent to opaque with an `ease-out` curve. An existing group's animation continues when another group arrives.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -78,7 +107,11 @@ const mappers: MapperPluggable[] = [[Chunk, { enabled: true, duration: 300 }]];
 ```tsx
 import { Fluxdown } from 'fluxdown';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{ smooth: false, effect: ['chunk', { duration: 300 }] }}
@@ -104,9 +137,30 @@ defineProps<{ text: string }>();
 ```
 
 ```tsx
+import { Fluxdown } from '@fluxdown/solid';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message(props: MessageProps) {
+  return (
+    <Fluxdown
+      streaming={{ smooth: false, effect: ['chunk', { duration: 300 }] }}
+      text={props.text}
+    />
+  );
+}
+```
+
+```tsx
 import { Fluxdown } from '@fluxdown/react-native';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{ smooth: false, effect: ['chunk', { duration: 300 }] }}
@@ -119,7 +173,11 @@ export function Message({ text }: { text: string }) {
 ```tsx
 import { Fluxdown } from '@fluxdown/lynx';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{ smooth: false, effect: ['chunk', { duration: 300 }] }}

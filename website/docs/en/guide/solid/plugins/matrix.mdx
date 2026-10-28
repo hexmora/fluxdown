@@ -1,0 +1,63 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# Plugin matrix
+
+## Component variants
+
+All three entries share the same component API. Choose the default capabilities you need:
+
+| Component      | Entry                                       | Purpose                                           |
+| -------------- | ------------------------------------------- | ------------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/solid` or `@fluxdown/solid/full` | Full preset with highlighting, math and diagrams. |
+| `FluxdownLite` | `@fluxdown/solid/lite`                      | Basic Markdown presentation, ready to extend.     |
+| `FluxdownRaw`  | `@fluxdown/solid/raw`                       | Choose render and slot plugins explicitly.        |
+
+## All plugins
+
+Composition includes inherited plugin types. A check means the component includes that plugin by default; an empty cell means it can be added manually.
+
+| Plugin                  | Composition                                           | Package                            |      Lite       |      Full       |
+| ----------------------- | ----------------------------------------------------- | ---------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`             | <PluginTag type="remark" />                           | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> |                 |
+| `CodePelePlugin`        | <PluginTag type="slot" />                             | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+| `CodePrismPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> |                 |                 |
+| `CodeShikiPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PluginTag type="render" />                           | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> |                 |
+| `TexKatexPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> |                 |                 |
+| `TexMathjaxKatexPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+
+### Package
+
+> <PluginTag type="solid-plugins" /> refers to `@fluxdown/solid-plugins`, which
+> provides aggregate plugins, renderers and slots for Solid.
+
+### Import rules
+
+> Import from `@fluxdown/solid-plugins/plugins/<plugin-directory>`. Remove the `Plugin` suffix and convert the name to lowercase kebab case: `CodeShikiPlugin` becomes `code-shiki`, and `TexMathjaxKatexPlugin` becomes `tex-mathjax-katex`.
+
+```ts
+import { CodeShikiPlugin } from '@fluxdown/solid-plugins/plugins/code-shiki';
+import { TexMathjaxKatexPlugin } from '@fluxdown/solid-plugins/plugins/tex-mathjax-katex';
+```
+
+> Import `PRESET_FULL_PLUGINS` from `@fluxdown/solid-plugins/full` and `PRESET_LITE_PLUGINS` from `@fluxdown/solid-plugins/lite`.
+
+Pass plugins through the component's `plugins` prop. See [aggregate plugins](./aggregate.md) for declaration, composition and configuration.

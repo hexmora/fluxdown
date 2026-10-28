@@ -77,7 +77,29 @@ export default defineConfig({
         // Workspace demos share the same React instance as the documentation theme.
         react: fileURLToPath(new URL('./node_modules/react', import.meta.url)),
         'react-dom': fileURLToPath(new URL('./node_modules/react-dom', import.meta.url)),
+        // Directory aliases bypass Solid's browser export conditions.
+        'solid-js$': fileURLToPath(
+          new URL('./node_modules/solid-js/dist/solid.js', import.meta.url),
+        ),
+        'solid-js/web$': fileURLToPath(
+          new URL('./node_modules/solid-js/web/dist/web.js', import.meta.url),
+        ),
+        'solid-js/store$': fileURLToPath(
+          new URL('./node_modules/solid-js/store/dist/store.js', import.meta.url),
+        ),
         vue: fileURLToPath(new URL('./node_modules/vue', import.meta.url)),
+        '@fluxdown/solid$': fileURLToPath(
+          new URL('../packages/solid/dist/esm/full.browser.js', import.meta.url),
+        ),
+        '@fluxdown/solid-plugins/base$': fileURLToPath(
+          new URL('../packages/solid-plugins/dist/esm/base.browser.js', import.meta.url),
+        ),
+        '@fluxdown/solid-plugins/full$': fileURLToPath(
+          new URL('../packages/solid-plugins/dist/esm/presets/full.browser.js', import.meta.url),
+        ),
+        '@fluxdown/solid-plugins/lite$': fileURLToPath(
+          new URL('../packages/solid-plugins/dist/esm/presets/lite.browser.js', import.meta.url),
+        ),
         // Vue JSX is compiled by its package build before Rspress handles the demo.
         '@fluxdown/vue$': fileURLToPath(
           new URL('../packages/vue/dist/esm/full.browser.js', import.meta.url),
