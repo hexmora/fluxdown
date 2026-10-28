@@ -13,7 +13,7 @@ Switch the content type to inspect different endings. Pause or replay the stream
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -80,13 +80,32 @@ export function Message({ text }: { text: string }) {
 }
 ```
 
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['suffix', { type: 'cursor' }] }"
+    :text="text"
+  />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 Use `type: 'dot'` for a circular marker. `effect: 'suffix'` uses the block cursor by default. Both shapes inherit the current text color and scale with the text. Their breathing animation respects `prefers-reduced-motion`.
 
 The marker remains visible while the effect is enabled. Set `streaming` to `false` when the response finishes, or set the suffix's `enabled` option to `false` to keep other streaming behavior active:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -187,11 +206,34 @@ export function Message({
 }
 ```
 
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+  isStreaming: boolean;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{
+      smooth: true,
+      effect: ['suffix', { type: 'dot', enabled: isStreaming }],
+    }"
+    :text="text"
+  />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 Combine the marker with an entrance effect:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -258,6 +300,25 @@ export function Message({ text }: { text: string }) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['scale', ['suffix', { type: 'dot' }]] }"
+    :text="text"
+  />
+</template>
 ```
 
 </FrameworkCodeTabs>
@@ -442,6 +503,54 @@ export function Message({ text }: { text: string }) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import type {
+  UniRenderMatchParams,
+  UniRenderParams,
+} from '@fluxdown/uni-app-plugins/base';
+
+import {
+  isSuffixNode,
+  SUFFIX_DATA_ATTR,
+} from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { BaseUniRenderPlugin } from '@fluxdown/uni-app-plugins/base';
+import { Fluxdown } from '@fluxdown/uni-app';
+
+class SmileRenderPlugin extends BaseUniRenderPlugin {
+  static readonly key = 'render-smile';
+
+  match({ node }: UniRenderMatchParams) {
+    return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
+  }
+
+  render({ node }: UniRenderParams) {
+    if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
+      return null;
+    }
+
+    return '🙂';
+  }
+}
+
+const plugins = { renders: [SmileRenderPlugin] };
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown
+    :plugins="plugins"
+    :streaming="{ effect: ['suffix', { type: 'smile' }] }"
+    :text="text"
+  />
+</template>
 ```
 
 </FrameworkCodeTabs>

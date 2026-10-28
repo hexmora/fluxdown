@@ -11,7 +11,7 @@ import { AnimationDemo } from '../../../../../../components';
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -60,11 +60,27 @@ export function Message({ text }: { text: string }) {
 }
 ```
 
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown :streaming="{ effect: 'scale' }" :text="text" />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 Reduce the amount of change for a gentler entrance:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -135,6 +151,25 @@ export function Message({ text }: { text: string }) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }] }"
+    :text="text"
+  />
+</template>
 ```
 
 </FrameworkCodeTabs>

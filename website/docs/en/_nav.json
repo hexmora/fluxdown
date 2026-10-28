@@ -24,6 +24,12 @@
     "position": "left"
   },
   {
+    "text": "uni-app",
+    "link": "/guide/uni-app/quick-start",
+    "activeMatch": "/guide/uni-app/",
+    "position": "left"
+  },
+  {
     "text": "Core",
     "link": "/guide/core/quick-start",
     "activeMatch": "/guide/core/",

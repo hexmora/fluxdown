@@ -53,6 +53,11 @@
     --tag-dark-color: #92dacf;
   }
 
+  &[data-type="uni-app-plugins"] {
+    --tag-color: #357717;
+    --tag-dark-color: #b4dc9c;
+  }
+
   &[data-type="vue-plugins"] {
     --tag-color: #287b58;
     --tag-dark-color: #a0dfbd;

@@ -6,6 +6,7 @@ export const PLUGIN_TAG_LABELS = {
   repair: 'Repair',
   mapper: 'Mapper',
   'lynx-plugins': 'lynx-plugins',
+  'uni-app-plugins': 'uni-app-plugins',
   'vue-plugins': 'vue-plugins',
   'react-plugins': 'react-plugins',
   'react-native-plugins': 'react-native-plugins',

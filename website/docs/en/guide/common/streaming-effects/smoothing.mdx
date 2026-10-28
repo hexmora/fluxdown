@@ -25,7 +25,7 @@ Choose your framework above each example. Pass the Core example’s `mappers` to
 
 Enabling `streaming` uses spring smoothing by default:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -96,11 +96,28 @@ export function Message({
 }
 ```
 
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+  isStreaming: boolean;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown :streaming="isStreaming" :text="text" />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 You can also select the scheduler explicitly and add an [animation effect](./animation/index.mdx):
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -190,10 +207,32 @@ export function Message({ text }: { text: string }) {
 }
 ```
 
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{
+      smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+      effect: 'shad',
+    }"
+    :text="text"
+  />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 Always pass the complete text received so far to `text`. Setting `streaming` to `false` reveals the remaining buffer immediately. Keep smoothing enabled if you want the remaining content to finish appearing gradually.
 
-Core uses the same `Smooth` mapper to produce trimmed content blocks, so the renderer does not need to schedule character updates. See [Core state and updates](../../core/streaming.md#enable-smooth-output) for integration and your framework’s configuration for all options: [React](../../react/configuration.md#streamingsmooth), [Vue](../../vue/configuration.md#streamingsmooth), [React Native](../../react-native/configuration.md), or [Lynx](../../lynx/configuration.md).
+Core uses the same `Smooth` mapper to produce trimmed content blocks, so the renderer does not need to schedule character updates. See [Core state and updates](../../core/streaming.md#enable-smooth-output) for integration and your framework’s configuration for all options: [React](../../react/configuration.md#streamingsmooth), [Vue](../../vue/configuration.md#streamingsmooth), [React Native](../../react-native/configuration.md), [Lynx](../../lynx/configuration.md), or [uni-app](../../uni-app/configuration.md#streamingsmooth).
 
 The reactive Core example owns its `MutableState`: call `isStreaming.next(false)` when receiving finishes, then dispose `active` and `isStreaming` with `.destroy()` after destroying Core.

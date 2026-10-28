@@ -52,6 +52,7 @@ import "fluxdown/styles.css";
 | [`fluxdown`](../packages/react/docs/README.zh-CN.md) | 开箱即用的 React Markdown 渲染组件。             |
 | [`@fluxdown/react-native`](../packages/react-native) | 开箱即用的 React Native Markdown 渲染组件。      |
 | [`@fluxdown/lynx`](../packages/lynx)                 | 开箱即用的 ReactLynx Markdown 渲染组件。         |
+| [`@fluxdown/uni-app`](../packages/uni-app)           | 在 uni-app x Vapor 中展示 Markdown 与流式内容。  |
 | [`@fluxdown/core`](../packages/core)                 | 为自定义渲染器提供解析、修复和响应式内容块。     |
 | [`stative`](../packages/stative)                     | 可组合的状态与派生计算，也是 Core 的响应式基础。 |
 

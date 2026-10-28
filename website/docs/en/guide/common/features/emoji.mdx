@@ -2,7 +2,7 @@ import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs
 
 # Emoji shortcodes
 
-`EmojiPlugin` converts GitHub-style emoji shortcodes such as `:smile:` and `:+1:` into Unicode emoji. The Full components for React, Vue, React Native, and Lynx include it by default; Lite components can add it as needed.
+`EmojiPlugin` converts GitHub-style emoji shortcodes such as `:smile:` and `:+1:` into Unicode emoji. The Full components for React, Vue, React Native, Lynx, and uni-app include it by default; Lite components can add it as needed.
 
 <FrameworkCodeTabs>
 
@@ -40,6 +40,16 @@ export function Message() {
 }
 ```
 
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+</script>
+
+<template>
+  <Fluxdown text="Hello :smile: Great work :+1:" />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 The output is “Hello 😄 Great work 👍”. Emoji use the system font, so their appearance depends on the device.
@@ -54,7 +64,7 @@ Inline code and fenced code blocks preserve their source. For example, `` `:smil
 
 All Full components include `EmojiPlugin` without manual registration. For Core or a Lite component, install the matching plugin package:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```sh
 pnpm add @fluxdown/core-plugins
@@ -76,11 +86,15 @@ pnpm add @fluxdown/react-base-plugins
 pnpm add @fluxdown/lynx-plugins
 ```
 
+```sh
+pnpm add @fluxdown/uni-app-plugins
+```
+
 </FrameworkCodeTabs>
 
 For Core, add `EmojiRemarkPlugin` to the `remarks` input in the [quick start](../../core/quick-start.md). Components extend their presets through `plugins`:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```ts
 import { EmojiRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/emoji';
@@ -128,13 +142,30 @@ export function Message({ text }: { text: string }) {
 }
 ```
 
+```vue
+<script setup lang="ts">
+import { EmojiPlugin } from '@fluxdown/uni-app-plugins/plugins/emoji';
+import { FluxdownLite } from '@fluxdown/uni-app/lite';
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <FluxdownLite :plugins="EmojiPlugin" :text="text" />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 ## Disable conversion
 
 Include `EmojiPlugin` and `config` in the same plugin pack to disable this behavior. Core uses a remark plugin entry with `disabled` set:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'uni-app']}>
 
 ```ts
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
@@ -213,6 +244,28 @@ export function Message({ text }: { text: string }) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import { EmojiPlugin } from '@fluxdown/uni-app-plugins/plugins/emoji';
+import { Fluxdown } from '@fluxdown/uni-app';
+
+const plugins = {
+  ...EmojiPlugin,
+  config: { 'remark-emoji': { disabled: true } },
+};
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown :plugins="plugins" :text="text" />
+</template>
 ```
 
 </FrameworkCodeTabs>

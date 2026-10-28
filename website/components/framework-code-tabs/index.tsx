@@ -5,22 +5,25 @@ import { Children, useId, useState } from 'react';
 import { useLocale } from '../hooks';
 import styles from './index.module.scss';
 
-export type CodeFramework = 'Core' | 'React' | 'Vue' | 'React Native' | 'Lynx';
+export type CodeFramework = 'Core' | 'React' | 'Vue' | 'React Native' | 'Lynx' | 'uni-app';
 
 interface FrameworkCodeTabsProps {
   children: ReactNode;
   frameworks?: CodeFramework[];
 }
 
-const DEFAULT_FRAMEWORKS: CodeFramework[] = ['React', 'Vue', 'React Native', 'Lynx'];
+const DEFAULT_FRAMEWORKS: CodeFramework[] = ['React', 'Vue', 'React Native', 'Lynx', 'uni-app'];
 
 export const FrameworkCodeTabs = ({
   children,
   frameworks = DEFAULT_FRAMEWORKS,
 }: FrameworkCodeTabsProps) => {
   const id = useId();
+
   const { lang } = useLocale();
+
   const [active, setActive] = useState(0);
+
   const panels = Children.toArray(children).filter(
     (child) => typeof child !== 'string' || child.trim().length > 0,
   );
@@ -40,7 +43,9 @@ export const FrameworkCodeTabs = ({
     if (next === undefined) return;
 
     event.preventDefault();
+
     setActive(next);
+
     document.getElementById(`${id}-tab-${next}`)?.focus();
   };
 

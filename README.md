@@ -52,6 +52,7 @@ See the [React quick start](./website/docs/en/guide/react/quick-start.md) for mo
 | [`fluxdown`](./packages/react)                      | Ready-to-use Markdown rendering in React.                           |
 | [`@fluxdown/react-native`](./packages/react-native) | Ready-to-use Markdown rendering in React Native.                    |
 | [`@fluxdown/lynx`](./packages/lynx)                 | Ready-to-use Markdown rendering in ReactLynx.                       |
+| [`@fluxdown/uni-app`](./packages/uni-app)           | Ready-to-use Markdown rendering in uni-app x Vapor.                 |
 | [`@fluxdown/core`](./packages/core)                 | Parsing, repair, and reactive content blocks for a custom renderer. |
 | [`stative`](./packages/stative)                     | Composable state and derived computations, also used by Core.       |
 
