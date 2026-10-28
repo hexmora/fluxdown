@@ -648,6 +648,14 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
     }
 
     if (nativeArtifacts.length) {
+      const nativePackages = nativeArtifacts.map(({ tarball }) => tarball);
+
+      if (!nativeArtifacts.some(({ manifest }) => manifest.name === '@fluxdown/react-native')) {
+        const { name, version } = await readManifest(path.join(root, 'packages/react-native'));
+
+        nativePackages.push(`${name}@${version}`);
+      }
+
       run(
         'npm',
         [
@@ -656,7 +664,7 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
           '--no-audit',
           '--no-fund',
           '--no-package-lock',
-          ...nativeArtifacts.map(({ tarball }) => tarball),
+          ...nativePackages,
           'react-native-web@^0.21.4',
           'react-native-svg@^15.16.0',
         ],
