@@ -70,6 +70,7 @@ const createChunkText = (
   node: Text,
   characters: ChunkCharacter[],
   now: number,
+  offset: number,
 ): ElementContent[] => {
   // Preserve structural whitespace without creating an animated text box around it.
   if (
@@ -81,7 +82,7 @@ const createChunkText = (
 
   const children: ElementContent[] = [];
 
-  for (const { text, start, duration } of characters) {
+  for (const [index, { text, start, duration }] of characters.entries()) {
     const previous = children[children.length - 1];
 
     if (start < 0 || start + duration <= now) {
@@ -112,6 +113,7 @@ const createChunkText = (
         dataChunkStart: start,
         dataChunkDuration: duration,
       },
+      data: { renderKey: `chunk:${offset + index}:${start}` },
       children: [{ ...node, value: text }],
     });
   }
@@ -140,9 +142,11 @@ export const createChunkRoot = (
 
       const selected = characters.slice(offset, offset + length);
 
+      const children = createChunkText(node, selected, config.start, offset);
+
       offset += length;
 
-      return createChunkText(node, selected, config.start);
+      return children;
     }
 
     if (node.type !== 'element' || isForbidden(node)) {

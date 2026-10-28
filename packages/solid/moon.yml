@@ -1,0 +1,22 @@
+language: typescript
+layer: library
+
+tasks:
+  build:
+    inputs:
+      - vite.config.ts
+  test:
+    inputs:
+      - vitest.config.ts
+      - vitest.setup.ts
+  dev:
+    command: pnpm run dev
+    preset: server
+  build-storybook:
+    command: pnpm run build:storybook
+    deps: ["^:build"]
+    inputs:
+      - "**/*"
+      - /packages/*/src/**/*
+      - /pnpm-lock.yaml
+    outputs: [storybook-static]

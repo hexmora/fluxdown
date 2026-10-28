@@ -132,6 +132,8 @@ describe('native effects', () => {
   test('continues scale after measurement and repeated renders with the original start', () => {
     let resize: ResizeObserverCallback;
 
+    const consoleError = jest.spyOn(console, 'error');
+
     // RN Web replaces timing with an immediate mock in tests. Exercise its real
     // animation graph so detaching the last derived node cannot stop unnoticed.
     const runtime = jest.requireActual<{ default: typeof Animated }>(
@@ -203,6 +205,8 @@ describe('native effects', () => {
 
     expect(deviation()).toBeGreaterThan(0);
 
+    expect(view.container.querySelector('feGaussianBlur')).not.toHaveAttribute('collapsable');
+
     expect(screen.getAllByText('A')[0]).toHaveStyle({ letterSpacing: '0px' });
 
     for (let index = 0; index < 5; index += 1) {
@@ -214,6 +218,8 @@ describe('native effects', () => {
 
       expect(deviation()).toBeLessThan(before);
     }
+
+    expect(consoleError).not.toHaveBeenCalled();
 
     act(() => jest.advanceTimersByTime(400));
 

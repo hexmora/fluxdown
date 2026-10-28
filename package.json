@@ -74,9 +74,11 @@
     "oxlint": "catalog:",
     "sass": "catalog:",
     "semver": "catalog:",
+    "solid-js": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
+    "vite-plugin-solid": "catalog:",
     "vitest": "catalog:",
     "yaml": "catalog:"
   },

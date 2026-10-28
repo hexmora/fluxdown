@@ -9,9 +9,9 @@ import Svg, { Defs, FeGaussianBlur, Filter, ForeignObject, G } from 'react-nativ
 import { BLUR, EASE_OUT, STEPS } from '../../consts';
 
 // Keep the public SVG prop conversions on every animation frame.
-class Blur extends Component<FeGaussianBlurProps> {
+class Blur extends Component<Pick<FeGaussianBlurProps, 'stdDeviation'>> {
   render() {
-    return <FeGaussianBlur {...this.props} />;
+    return <FeGaussianBlur stdDeviation={this.props.stdDeviation} />;
   }
 }
 

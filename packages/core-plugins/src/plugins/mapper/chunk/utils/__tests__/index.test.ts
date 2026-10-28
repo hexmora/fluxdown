@@ -28,6 +28,68 @@ const readText = (node: HastRoot | RootContent): string =>
       ? node.children.map(readText).join('')
       : '';
 
+test('keeps batch render keys stable when an earlier batch settles', () => {
+  const first = createChunkRoot(paragraph('a'), [], config);
+
+  const second = createChunkRoot(paragraph('a b'), first.characters, { ...config, start: 1100 });
+
+  const third = createChunkRoot(paragraph('a b c'), second.characters, { ...config, start: 1200 });
+
+  const before = readChunks(third.root);
+
+  const settled = createChunkRoot(paragraph('a b c d'), third.characters, {
+    ...config,
+    start: 1400,
+  });
+
+  const after = readChunks(settled.root);
+
+  expect(before.map(readText)).toEqual(['a', ' b', ' c']);
+
+  expect(after.map(readText)).toEqual([' b', ' c', ' d']);
+
+  expect(after.slice(0, 2).map((node) => node.data?.renderKey)).toEqual(
+    before.slice(1).map((node) => node.data?.renderKey),
+  );
+
+  expect(after.every((node) => typeof node.data?.renderKey === 'string')).toBe(true);
+
+  expect(after.every((node) => !('renderKey' in node.properties))).toBe(true);
+});
+
+test('distinguishes parts of the same batch across inline elements', () => {
+  const root: HastRoot = {
+    type: 'root',
+    children: [
+      {
+        type: 'element',
+        tagName: 'p',
+        properties: {},
+        children: [
+          { type: 'text', value: 'first ' },
+          {
+            type: 'element',
+            tagName: 'strong',
+            properties: {},
+            children: [{ type: 'text', value: 'middle' }],
+          },
+          { type: 'text', value: ' last' },
+        ],
+      },
+    ],
+  };
+
+  const active = createChunkRoot(root, [], config);
+
+  const keys = readChunks(active.root).map((node) => node.data?.renderKey);
+
+  expect(keys).toHaveLength(3);
+
+  expect(keys.every((key, index) => typeof key === 'string' && keys.indexOf(key) === index)).toBe(
+    true,
+  );
+});
+
 test('groups each incoming batch into one inline span, including whitespace and graphemes', () => {
   const root = paragraph('Hello');
   const initial = createChunkRoot(root, [], { ...config, initial: true });
