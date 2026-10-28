@@ -1,0 +1,141 @@
+{
+  "name": "@fluxdown/taro",
+  "version": "0.1.0",
+  "description": "Taro components for streaming Markdown.",
+  "keywords": [
+    "hast",
+    "llm",
+    "markdown",
+    "renderer",
+    "streaming",
+    "taro"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/taro"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss",
+    "./dist/esm/*.browser.js",
+    "./dist/cjs/*.browser.cjs"
+  ],
+  "main": "./src/packs/full/index.tsx",
+  "module": "./src/packs/full/index.tsx",
+  "types": "./src/packs/full/index.tsx",
+  "exports": {
+    ".": "./src/packs/full/index.tsx",
+    "./*": "./src/packs/*/index.tsx",
+    "./styles.css": "./dist/esm/styles.css"
+  },
+  "publishConfig": {
+    "main": "./dist/cjs/full.cjs",
+    "module": "./dist/esm/full.browser.js",
+    "types": "./dist/esm/packs/full/index.d.ts",
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/esm/packs/full/index.d.ts",
+          "browser": "./dist/esm/full.browser.js",
+          "node": "./dist/esm/full.js",
+          "default": "./dist/esm/full.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/full/index.d.cts",
+          "browser": "./dist/cjs/full.browser.cjs",
+          "node": "./dist/cjs/full.cjs",
+          "default": "./dist/cjs/full.browser.cjs"
+        }
+      },
+      "./styles.css": "./dist/esm/styles.css",
+      "./*": {
+        "import": {
+          "types": "./dist/esm/packs/*/index.d.ts",
+          "browser": "./dist/esm/*.browser.js",
+          "node": "./dist/esm/*.js",
+          "default": "./dist/esm/*.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/*/index.d.cts",
+          "browser": "./dist/cjs/*.browser.cjs",
+          "node": "./dist/cjs/*.cjs",
+          "default": "./dist/cjs/*.browser.cjs"
+        }
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "storybook dev -p 6014 --no-open",
+    "storybook": "storybook dev -p 6014",
+    "build": "rslib build",
+    "build:storybook": "storybook build",
+    "lint": "oxlint .",
+    "test": "jest --config ../../jest.config.ts --selectProjects taro --runInBand",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/react-base": "workspace:^",
+    "@fluxdown/react-base-plugins": "workspace:^",
+    "@fluxdown/taro-plugins": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "classnames": "catalog:",
+    "lodash-es": "catalog:"
+  },
+  "devDependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@rslib/core": "catalog:",
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/react-vite": "catalog:",
+    "@tarojs/cli": "catalog:",
+    "@tarojs/components": "catalog:",
+    "@tarojs/components-react": "catalog:",
+    "@tarojs/plugin-framework-react": "catalog:",
+    "@tarojs/plugin-platform-h5": "catalog:",
+    "@tarojs/plugin-platform-weapp": "catalog:",
+    "@tarojs/runtime": "catalog:",
+    "@tarojs/shared": "catalog:",
+    "@tarojs/taro": "catalog:",
+    "@tarojs/taro-h5": "catalog:",
+    "@tarojs/webpack5-runner": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "babel-preset-taro": "catalog:",
+    "oxlint": "catalog:",
+    "react": "catalog:taro-react",
+    "react-dom": "catalog:taro-react",
+    "sass": "catalog:",
+    "stative": "workspace:^",
+    "storybook": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "webpack": "catalog:"
+  },
+  "peerDependencies": {
+    "@tarojs/components": "catalog:taro-peer",
+    "@tarojs/taro": "catalog:taro-peer",
+    "react": "catalog:react-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

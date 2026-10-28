@@ -1,0 +1,42 @@
+@use "@taro-prefix" as *;
+
+.root {
+  &[data-tag="del"],
+  &[data-tag="s"] {
+    color: var(--#{$prefix}-colors-fg-muted);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
+  &[data-tag="code"] {
+    padding: var(--#{$prefix}-inline-code-padding-block)
+      var(--#{$prefix}-inline-code-padding-inline);
+    border: var(--#{$prefix}-inline-code-border);
+    border-radius: var(--#{$prefix}-inline-code-border-radius);
+    background: var(--#{$prefix}-inline-code-background);
+    color: inherit;
+    font-family: var(--#{$prefix}-inline-code-font-family);
+    font-size: var(--#{$prefix}-inline-code-font-size);
+    white-space: var(--#{$prefix}-inline-code-white-space);
+  }
+
+  &[data-tag="sup"] {
+    font-size: 0.75em;
+    line-height: 0;
+    vertical-align: super;
+  }
+
+  &[data-tag="hr"] {
+    height: var(--#{$prefix}-divider-height);
+    margin-block: var(--#{$prefix}-divider-margin-block);
+    margin-inline: var(--#{$prefix}-divider-margin-inline);
+    border: var(--#{$prefix}-divider-border);
+    border-block-end: var(--#{$prefix}-divider-border-block-end);
+    background: var(--#{$prefix}-divider-background);
+  }
+}
+
+.checkbox {
+  display: inline-block;
+  box-sizing: border-box;
+}

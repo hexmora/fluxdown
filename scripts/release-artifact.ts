@@ -30,6 +30,8 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/react-plugins',
   '@fluxdown/react-native-plugins',
   '@fluxdown/react-native',
+  '@fluxdown/taro-plugins',
+  '@fluxdown/taro',
   'fluxdown',
 ] as const;
 
@@ -268,10 +270,39 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
 
   if (verification.lynx !== undefined) validateLynxVerification(verification.lynx, lynxPackages);
 
+  const taroPackages = [...names].filter(
+    (name) => name === '@fluxdown/taro' || name === '@fluxdown/taro-plugins',
+  );
+
+  const browserChecks = verification.browser;
+
+  const taroVerified =
+    taroPackages.length > 0 &&
+    taroPackages.every((name) =>
+      ['import', 'require'].every((format) =>
+        browserChecks.some((item) => {
+          const check = record(item, 'Taro browser verification');
+
+          return (
+            check.format === format &&
+            typeof check.specifier === 'string' &&
+            (check.specifier === name || check.specifier.startsWith(`${name}/`)) &&
+            Number(check.selectors) > 0 &&
+            Number(check.cssBytes) > 0 &&
+            Array.isArray(check.cssAssets) &&
+            check.cssAssets.length > 0
+          );
+        }),
+      ),
+    );
+
+  assert(!taroPackages.length || taroVerified, 'Missing Taro browser verification');
+
   // Existing artifacts predate Lynx evidence and remain valid for recovery.
   assert(
     Number(verification.nodeEntries) > 0 ||
-      (lynxPackages.length === names.size && verification.lynx !== undefined),
+      (lynxPackages.length === names.size && verification.lynx !== undefined) ||
+      (taroPackages.length === names.size && taroVerified),
     'Missing consumer verification',
   );
 

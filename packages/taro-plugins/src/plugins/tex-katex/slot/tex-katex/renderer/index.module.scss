@@ -1,0 +1,22 @@
+@use "@taro-prefix" as *;
+
+.root {
+  display: inline;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  overflow-wrap: normal;
+
+  &[data-mode="display"] {
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-block: var(--#{$prefix}-spacing-lg);
+    padding-block: var(--#{$prefix}-spacing-sm);
+    text-align: center;
+  }
+
+  :global(.katex-display) {
+    margin: 0;
+  }
+}

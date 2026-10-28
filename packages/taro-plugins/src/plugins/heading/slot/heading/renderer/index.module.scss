@@ -1,0 +1,35 @@
+@use "@taro-prefix" as *;
+
+.root {
+  color: var(--#{$prefix}-colors-fg);
+  font-family: var(--#{$prefix}-typography-font-sans);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+
+  scroll-margin-top: var(--#{$prefix}-spacing-xl);
+
+  @for $level from 1 through 6 {
+    &[data-level="#{$level}"] {
+      margin-top: var(--#{$prefix}-heading-h#{$level}-margin-top);
+      margin-bottom: var(--#{$prefix}-heading-h#{$level}-margin-bottom);
+
+      font-size: var(--#{$prefix}-heading-h#{$level}-font-size);
+      font-weight: var(--#{$prefix}-heading-h#{$level}-font-weight);
+      line-height: var(--#{$prefix}-heading-h#{$level}-line-height);
+    }
+  }
+
+  &[data-level="1"],
+  &[data-level="2"] {
+    letter-spacing: -0.025em;
+  }
+
+  &[data-level="5"],
+  &[data-level="6"] {
+    color: var(--#{$prefix}-colors-fg-muted);
+  }
+
+  &:first-child {
+    margin-top: 0;
+  }
+}

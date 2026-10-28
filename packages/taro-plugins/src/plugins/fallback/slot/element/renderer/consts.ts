@@ -1,0 +1,18 @@
+export const INLINE_TAG_NAMES = [
+  'abbr',
+  'b',
+  'cite',
+  'code',
+  'del',
+  'em',
+  'i',
+  'kbd',
+  'mark',
+  's',
+  'small',
+  'span',
+  'strong',
+  'sub',
+  'sup',
+  'u',
+];
