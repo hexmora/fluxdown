@@ -1,9 +1,18 @@
-html {
+html,
+body {
+  height: 100%;
+  margin: 0;
   background: transparent;
 }
 
-body {
-  margin: 0;
+.viewport {
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.content {
   padding: 20px;
 }
 

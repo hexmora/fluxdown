@@ -24,10 +24,5 @@
     "name": "plugins",
     "label": "使用与编写插件",
     "collapsed": false
-  },
-  {
-    "type": "file",
-    "name": "comparison",
-    "label": "对比 React"
   }
 ]

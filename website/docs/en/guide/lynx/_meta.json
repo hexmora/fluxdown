@@ -24,10 +24,5 @@
     "name": "plugins",
     "label": "Using and writing plugins",
     "collapsed": false
-  },
-  {
-    "type": "file",
-    "name": "comparison",
-    "label": "Compare with React"
   }
 ]

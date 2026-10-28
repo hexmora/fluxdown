@@ -1,8 +1,9 @@
-import type { EffectItem } from 'fluxdown';
-
+import type { PreviewStreaming } from '../../../demo/components/renderer-preview';
 import type { EditorEffect } from './type';
 
-export const getEditorEffect = (effect: EditorEffect): false | EffectItem => {
+export const getEditorEffect = (
+  effect: EditorEffect,
+): Exclude<PreviewStreaming, boolean>['effect'] => {
   if (effect === 'none') {
     return false;
   }

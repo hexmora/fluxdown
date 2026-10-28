@@ -1,3 +1,4 @@
+import { FrameworkCodeTabs } from '../../../../../../components/framework-code-tabs';
 import { AnimationDemo } from '../../../../../../components';
 
 # Character entrance
@@ -8,20 +9,135 @@ import { AnimationDemo } from '../../../../../../components';
 
 ## Usage
 
-The following examples use the React component:
+Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-```tsx
-<Fluxdown streaming={{ effect: 'scale' }} text={text} />
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Scale } from '@fluxdown/core-plugins/plugins/mapper/scale';
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: true }],
+  [Scale, { enabled: true }],
+];
 ```
 
-The following React component example reduces the amount of change for a gentler entrance:
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return <Fluxdown streaming={{ effect: 'scale' }} text={text} />;
+}
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown :streaming="{ effect: 'scale' }" :text="text" />
+</template>
+```
 
 ```tsx
-<Fluxdown
-  streaming={{ effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }] }}
-  text={text}
-/>
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return <Fluxdown streaming={{ effect: 'scale' }} text={text} />;
+}
 ```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return <Fluxdown streaming={{ effect: 'scale' }} text={text} />;
+}
+```
+
+</FrameworkCodeTabs>
+
+Reduce the amount of change for a gentler entrance:
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Scale } from '@fluxdown/core-plugins/plugins/mapper/scale';
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: true }],
+  [Scale, { enabled: true, duration: 250, from: 0.5, blur: 0.04 }],
+];
+```
+
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }] }"
+    :text="text"
+  />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>
 
 Only newly visible text is animated. Code, formulas, and replacement content keep their existing rendering. The animation respects the system's reduced-motion preference.
 
