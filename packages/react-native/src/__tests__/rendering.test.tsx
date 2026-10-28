@@ -275,6 +275,7 @@ describe('React Native packs', () => {
     expect(screen.getByText('x + y')).toBeOnTheScreen();
   });
 
+  // Cold-loading the highlighter, formula, and diagram engines can exceed Jest's default timeout on CI.
   test('full renders highlighting, formulas, and diagrams in native hosts', async () => {
     const appVersion = Object.getOwnPropertyDescriptor(navigator, 'appVersion');
 
@@ -304,7 +305,7 @@ describe('React Native packs', () => {
     expect(Object.getOwnPropertyDescriptor(navigator, 'appVersion')).toEqual(appVersion);
 
     expect(Object.getOwnPropertyDescriptor(navigator, 'userAgent')).toEqual(userAgent);
-  });
+  }, 20_000);
 
   test('updates themes, style arrays, and slot overrides without replacing the core', async () => {
     const ref = createRef<FluxdownRef>();
