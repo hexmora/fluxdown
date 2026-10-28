@@ -24,6 +24,12 @@
     "position": "left"
   },
   {
+    "text": "Solid",
+    "link": "/guide/solid/quick-start",
+    "activeMatch": "/guide/solid/",
+    "position": "left"
+  },
+  {
     "text": "Core",
     "link": "/guide/core/quick-start",
     "activeMatch": "/guide/core/",

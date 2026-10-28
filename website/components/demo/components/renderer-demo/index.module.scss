@@ -11,8 +11,8 @@
 }
 
 .options {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   padding: 14px 24px;
@@ -44,11 +44,49 @@
   }
 }
 
+.renderers {
+  display: flex;
+  margin: 0;
+  border: 0;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 4px;
+
+  button {
+    flex: none;
+    padding: 7px 12px;
+    border: 1px solid var(--site-line);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--site-muted);
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &[aria-pressed="true"] {
+      border-color: var(--site-accent-line);
+      background: color-mix(in srgb, var(--site-accent) 9%, var(--site-surface));
+      color: var(--site-accent);
+    }
+
+    &:hover {
+      border-color: var(--site-accent);
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .effect {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-inline-start: auto;
   color: var(--site-muted);
 }
 
@@ -85,7 +123,8 @@
 
 .row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(230px, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(min(100%, max(300px, calc(100% / 3.5))), 1fr);
   overflow-x: auto;
   overscroll-behavior-x: contain;
 }
@@ -115,12 +154,23 @@
 
 .viewport {
   overflow: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
 }
 
 .content {
   padding: 20px;
+}
+
+.empty {
+  display: grid;
+  place-items: center;
+  height: var(--preview-height);
+  min-height: 360px;
+  margin: 0 !important;
+  padding: 24px;
+  color: var(--site-muted);
+  font-size: 13px;
 }
 
 .footer {
@@ -131,17 +181,74 @@
   line-height: 1.6;
 }
 
+@media (max-width: 1000px) {
+  .options {
+    grid-template-columns: 1fr auto;
+  }
+
+  .renderers {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
 @media (max-width: 600px) {
   .options {
-    padding-inline: 16px;
+    gap: 8px;
+    padding: 10px 12px;
   }
+
+  .modes button {
+    padding-inline: 10px;
+  }
+
+  .actions {
+    gap: 4px;
+  }
+
+  .effectLabel {
+    display: none;
+  }
+
+  .select select {
+    min-width: 88px;
+  }
+
   .footer {
     padding-inline: 16px;
   }
 }
 
 .modes button:focus-visible,
+.renderers button:focus-visible,
 .select select:focus-visible {
   outline: 2px solid var(--site-accent) !important;
   outline-offset: 2px;
+}
+
+@media (hover: none) {
+  .modes button,
+  .renderers button,
+  .select select {
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .options {
+    grid-template-columns: 1fr;
+  }
+
+  .modes {
+    justify-self: start;
+  }
+
+  .actions {
+    grid-row: 3;
+    justify-content: space-between;
+  }
+
+  .effectLabel {
+    display: inline;
+  }
 }

@@ -6,11 +6,9 @@
     "types": ["node"],
     "paths": {
       "@fluxdown/vue": ["../packages/vue/dist/esm/packs/full/index.d.ts"],
-      "@fluxdown/vue/*": ["../packages/vue/dist/esm/packs/*/index.d.ts"],
-      "@fluxdown/vue-plugins/base": ["../packages/vue-plugins/dist/esm/base/index.d.ts"],
       "@fluxdown/vue-plugins/typings": ["../packages/vue-plugins/dist/esm/typings/index.d.ts"],
-      "@fluxdown/vue-plugins/plugins/*": ["../packages/vue-plugins/dist/esm/plugins/*/index.d.ts"],
-      "@fluxdown/vue-plugins/*": ["../packages/vue-plugins/dist/esm/presets/*/index.d.ts"]
+      "@fluxdown/solid": ["../packages/solid/dist/esm/packs/full/index.d.ts"],
+      "@fluxdown/solid-plugins/typings": ["../packages/solid-plugins/dist/esm/typings/index.d.ts"]
     }
   },
   "include": ["docs", "components", "theme", "rspress.config.ts", "env.d.ts"]

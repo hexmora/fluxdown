@@ -5,14 +5,14 @@ import { Children, useId, useState } from 'react';
 import { useLocale } from '../hooks';
 import styles from './index.module.scss';
 
-export type CodeFramework = 'Core' | 'React' | 'Vue' | 'React Native' | 'Lynx';
+export type CodeFramework = 'Core' | 'React' | 'Vue' | 'Solid' | 'React Native' | 'Lynx';
 
 interface FrameworkCodeTabsProps {
   children: ReactNode;
   frameworks?: CodeFramework[];
 }
 
-const DEFAULT_FRAMEWORKS: CodeFramework[] = ['React', 'Vue', 'React Native', 'Lynx'];
+const DEFAULT_FRAMEWORKS: CodeFramework[] = ['React', 'Vue', 'Solid', 'React Native', 'Lynx'];
 
 export const FrameworkCodeTabs = ({
   children,
