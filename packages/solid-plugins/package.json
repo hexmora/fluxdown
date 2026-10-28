@@ -1,0 +1,155 @@
+{
+  "name": "@fluxdown/solid-plugins",
+  "version": "0.1.0",
+  "description": "Solid render slots and plugin presets for Fluxdown.",
+  "keywords": [
+    "hast",
+    "markdown",
+    "plugins",
+    "renderer",
+    "solid",
+    "streaming"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/solid-plugins"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss",
+    "**/*.less",
+    "./dist/esm/**/*.browser.js",
+    "./dist/cjs/**/*.browser.cjs"
+  ],
+  "exports": {
+    "./typings": "./src/typings/index.ts",
+    "./base": "./src/base/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts",
+    "./*": "./src/presets/*/index.ts",
+    "./styles.css": "./dist/esm/styles.css"
+  },
+  "publishConfig": {
+    "exports": {
+      "./typings": {
+        "import": {
+          "types": "./dist/esm/typings/index.d.ts"
+        },
+        "require": {
+          "types": "./dist/cjs/typings/index.d.cts"
+        }
+      },
+      "./base": {
+        "import": {
+          "types": "./dist/esm/base/index.d.ts",
+          "worker": "./dist/esm/server/base.js",
+          "deno": "./dist/esm/server/base.js",
+          "browser": "./dist/esm/base.browser.js",
+          "node": "./dist/esm/server/base.js",
+          "default": "./dist/esm/base.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/base/index.d.cts",
+          "worker": "./dist/cjs/server/base.cjs",
+          "deno": "./dist/cjs/server/base.cjs",
+          "browser": "./dist/cjs/base.browser.cjs",
+          "node": "./dist/cjs/server/base.cjs",
+          "default": "./dist/cjs/base.browser.cjs"
+        }
+      },
+      "./plugins/*": {
+        "import": {
+          "types": "./dist/esm/plugins/*/index.d.ts",
+          "worker": "./dist/esm/server/plugins/*.js",
+          "deno": "./dist/esm/server/plugins/*.js",
+          "browser": "./dist/esm/plugins/*.browser.js",
+          "node": "./dist/esm/server/plugins/*.js",
+          "default": "./dist/esm/plugins/*.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/plugins/*/index.d.cts",
+          "worker": "./dist/cjs/server/plugins/*.cjs",
+          "deno": "./dist/cjs/server/plugins/*.cjs",
+          "browser": "./dist/cjs/plugins/*.browser.cjs",
+          "node": "./dist/cjs/server/plugins/*.cjs",
+          "default": "./dist/cjs/plugins/*.browser.cjs"
+        }
+      },
+      "./*": {
+        "import": {
+          "types": "./dist/esm/presets/*/index.d.ts",
+          "worker": "./dist/esm/server/presets/*.js",
+          "deno": "./dist/esm/server/presets/*.js",
+          "browser": "./dist/esm/presets/*.browser.js",
+          "node": "./dist/esm/server/presets/*.js",
+          "default": "./dist/esm/presets/*.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/presets/*/index.d.cts",
+          "worker": "./dist/cjs/server/presets/*.cjs",
+          "deno": "./dist/cjs/server/presets/*.cjs",
+          "browser": "./dist/cjs/presets/*.browser.cjs",
+          "node": "./dist/cjs/server/presets/*.cjs",
+          "default": "./dist/cjs/presets/*.browser.cjs"
+        }
+      },
+      "./styles.css": "./dist/esm/styles.css"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build && vite build --ssr",
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@mathjax/mathjax-tex-font": "catalog:",
+    "@mathjax/src": "catalog:",
+    "@types/hast": "catalog:",
+    "classnames": "catalog:",
+    "katex": "catalog:",
+    "lodash-es": "catalog:",
+    "pele": "catalog:",
+    "prismjs": "catalog:",
+    "shiki": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@solidjs/testing-library": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/prismjs": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "sass": "catalog:",
+    "solid-js": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-solid": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "solid-js": "catalog:solid-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

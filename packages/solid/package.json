@@ -1,0 +1,133 @@
+{
+  "name": "@fluxdown/solid",
+  "version": "0.1.0",
+  "description": "Solid components for streaming Markdown.",
+  "keywords": [
+    "hast",
+    "llm",
+    "markdown",
+    "renderer",
+    "solid",
+    "streaming"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/solid"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss",
+    "**/*.less",
+    "./dist/esm/**/*.browser.js",
+    "./dist/cjs/**/*.browser.cjs"
+  ],
+  "main": "./src/packs/full/index.tsx",
+  "module": "./src/packs/full/index.tsx",
+  "types": "./src/packs/full/index.tsx",
+  "exports": {
+    ".": "./src/packs/full/index.tsx",
+    "./*": "./src/packs/*/index.tsx",
+    "./styles.css": "./dist/esm/styles.css"
+  },
+  "publishConfig": {
+    "main": "./dist/cjs/server/full.cjs",
+    "module": "./dist/esm/full.browser.js",
+    "types": "./dist/esm/packs/full/index.d.ts",
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/esm/packs/full/index.d.ts",
+          "worker": "./dist/esm/server/full.js",
+          "deno": "./dist/esm/server/full.js",
+          "browser": "./dist/esm/full.browser.js",
+          "node": "./dist/esm/server/full.js",
+          "default": "./dist/esm/full.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/full/index.d.cts",
+          "worker": "./dist/cjs/server/full.cjs",
+          "deno": "./dist/cjs/server/full.cjs",
+          "browser": "./dist/cjs/full.browser.cjs",
+          "node": "./dist/cjs/server/full.cjs",
+          "default": "./dist/cjs/full.browser.cjs"
+        }
+      },
+      "./*": {
+        "import": {
+          "types": "./dist/esm/packs/*/index.d.ts",
+          "worker": "./dist/esm/server/*.js",
+          "deno": "./dist/esm/server/*.js",
+          "browser": "./dist/esm/*.browser.js",
+          "node": "./dist/esm/server/*.js",
+          "default": "./dist/esm/*.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/*/index.d.cts",
+          "worker": "./dist/cjs/server/*.cjs",
+          "deno": "./dist/cjs/server/*.cjs",
+          "browser": "./dist/cjs/*.browser.cjs",
+          "node": "./dist/cjs/server/*.cjs",
+          "default": "./dist/cjs/*.browser.cjs"
+        }
+      },
+      "./styles.css": "./dist/esm/styles.css"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build && vite build --ssr",
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source",
+    "dev": "storybook dev -p 6011 --no-open",
+    "storybook": "storybook dev -p 6011",
+    "build:storybook": "storybook build"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/solid-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "lodash-es": "catalog:",
+    "shallow-equal": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@solidjs/testing-library": "catalog:",
+    "@storybook/addon-docs": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@types/hast": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "sass": "catalog:",
+    "solid-js": "catalog:",
+    "storybook": "catalog:",
+    "storybook-solidjs-vite": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-solid": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "solid-js": "catalog:solid-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
