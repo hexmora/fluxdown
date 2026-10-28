@@ -1,3 +1,4 @@
+import { FrameworkCodeTabs } from '../../../../../../components/framework-code-tabs';
 import { AnimationDemo } from '../../../../../../components';
 
 # 逐字入场
@@ -8,20 +9,135 @@ import { AnimationDemo } from '../../../../../../components';
 
 ## 使用方式
 
-以下以 React 版组件为例：
+选择对应框架查看代码。Core 示例中的 `mappers` 传入 [Core 输入](../../../core/quick-start.md)，并显式启用 mapper；组件通过 `streaming.effect` 启用相同效果，并内置视觉渲染器。
 
-```tsx
-<Fluxdown streaming={{ effect: 'scale' }} text={text} />
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Scale } from '@fluxdown/core-plugins/plugins/mapper/scale';
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: true }],
+  [Scale, { enabled: true }],
+];
 ```
 
-以下以 React 版组件为例，缩小变化幅度，让入场更柔和：
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return <Fluxdown streaming={{ effect: 'scale' }} text={text} />;
+}
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown :streaming="{ effect: 'scale' }" :text="text" />
+</template>
+```
 
 ```tsx
-<Fluxdown
-  streaming={{ effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }] }}
-  text={text}
-/>
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return <Fluxdown streaming={{ effect: 'scale' }} text={text} />;
+}
 ```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return <Fluxdown streaming={{ effect: 'scale' }} text={text} />;
+}
+```
+
+</FrameworkCodeTabs>
+
+缩小变化幅度，让入场更柔和：
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Scale } from '@fluxdown/core-plugins/plugins/mapper/scale';
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: true }],
+  [Scale, { enabled: true, duration: 250, from: 0.5, blur: 0.04 }],
+];
+```
+
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }] }"
+    :text="text"
+  />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>
 
 只有新出现的文字参与动画。代码、公式和替换内容保持原有渲染方式。动画遵循系统的减少动态效果设置。
 

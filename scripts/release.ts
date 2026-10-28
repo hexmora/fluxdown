@@ -20,6 +20,7 @@ import type {
 import type { PackageArtifact, WorkspacePackage } from './types.ts';
 
 import { checkBrowserConsumer } from './check-browser.ts';
+import { checkLynxConsumer } from './check-lynx-consumer.ts';
 import { checkPackage, isLynxPackage, publicEntries, readManifest } from './check-package.ts';
 import { checkReactNativePacks, REACT_NATIVE_PACKAGES } from './check-react-native-packs.ts';
 import { checkReactPacks } from './check-react-packs.ts';
@@ -315,6 +316,7 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
         '--no-audit',
         '--no-fund',
         '--no-package-lock',
+        'vue@^3.5.0',
         'react@18.3.1',
         'react-dom@18.3.1',
         '@types/node@22',
@@ -609,6 +611,7 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
     );
 
     const browser = await checkBrowserConsumer(consumer, artifacts);
+    const lynx = await checkLynxConsumer(consumer, artifacts);
 
     if (specifiers.includes('fluxdown') || nativeArtifacts.length) {
       run(
@@ -673,7 +676,7 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
     if (specifiers.includes('fluxdown/lite'))
       await checkReactPacks(consumer, nativeArtifacts.length > 0);
 
-    return { nodeEntries: specifiers.length, browser };
+    return { nodeEntries: specifiers.length, browser, ...(lynx ? { lynx } : {}) };
   } finally {
     if (process.env.FLUXDOWN_KEEP_CONSUMER === '1') {
       console.log(`Preserved isolated consumer for inspection: ${consumer}`);

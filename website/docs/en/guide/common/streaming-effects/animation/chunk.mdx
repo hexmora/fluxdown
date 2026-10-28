@@ -1,3 +1,4 @@
+import { FrameworkCodeTabs } from '../../../../../../components/framework-code-tabs';
 import { ChunkDemo } from '../../../../../../components';
 
 # Chunk entrance
@@ -8,25 +9,127 @@ import { ChunkDemo } from '../../../../../../components';
 
 ## Usage
 
-The following examples use the React component:
+Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Chunk } from '@fluxdown/core-plugins/plugins/mapper/chunk';
+
+const mappers: MapperPluggable[] = [[Chunk, { enabled: true }]];
+```
 
 ```tsx
-<Fluxdown streaming={{ smooth: false, effect: 'chunk' }} text={text} />
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown streaming={{ smooth: false, effect: 'chunk' }} text={text} />
+  );
+}
 ```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown :streaming="{ smooth: false, effect: 'chunk' }" :text="text" />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown streaming={{ smooth: false, effect: 'chunk' }} text={text} />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown streaming={{ smooth: false, effect: 'chunk' }} text={text} />
+  );
+}
+```
+
+</FrameworkCodeTabs>
 
 Always pass the complete Markdown received so far. Each group fades from transparent to opaque with an `ease-out` curve. An existing group's animation continues when another group arrives.
 
-The following example uses the React component:
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Chunk } from '@fluxdown/core-plugins/plugins/mapper/chunk';
+
+const mappers: MapperPluggable[] = [[Chunk, { enabled: true, duration: 300 }]];
+```
 
 ```tsx
-<Fluxdown
-  streaming={{
-    smooth: false,
-    effect: ['chunk', { duration: 300 }],
-  }}
-  text={text}
-/>
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ smooth: false, effect: ['chunk', { duration: 300 }] }}
+      text={text}
+    />
+  );
+}
 ```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ smooth: false, effect: ['chunk', { duration: 300 }] }"
+    :text="text"
+  />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ smooth: false, effect: ['chunk', { duration: 300 }] }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ smooth: false, effect: ['chunk', { duration: 300 }] }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>
 
 ## Grouping and smoothing
 

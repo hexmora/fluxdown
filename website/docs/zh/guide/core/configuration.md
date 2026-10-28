@@ -229,9 +229,11 @@ const mappers: MapperOptions = [[], { smooth: { enabled: toClosure(true) } }];
 
 嵌套的 mapper 选项直接传给 mapper。内置的响应式选项接收可读闭包，`toClosure` 可以把静态值或外部状态转为这种输入。
 
-## 插件输入形式
+## plugins {#plugins}
 
-`PluginSet<T, C>` — `T[] | C | [T[], C]`
+**类型：** `PluginSet<T, C>` — `T[] | Partial<C> | [T[], Partial<C>]`
+
+这里的 `plugins` 统指 `renders`、`remarks`、`rehypes`、`repairs` 和 `mappers` 的插件配置。使用 Core 时，分别通过这五个字段传入。
 
 五个插件输入都支持列表、按名称配置的对象，或者两者的组合。列表中的类插件可以写为 `PluginClass` 或 `[PluginClass, options]`；mapper 可以写为函数或 `[Mapper, options]`。
 
@@ -251,7 +253,7 @@ repairs.next({
 
 在 `S` 中使用静态配置对象时，也可以通过 `toClosure(config)` 转为可读输入，见[允许额外 HTML 标签](./plugins/rehype.mdx#允许额外-html-标签)。按名称配置只调整已有插件；注册新的插件需使用列表。
 
-## 插件选项.disabled <span className="field-tag">可选</span> {#插件选项disabled}
+### disabled <span className="field-tag">可选</span> {#disabled}
 
 **类型：** `boolean | undefined`
 
@@ -259,7 +261,7 @@ repairs.next({
 
 不创建这个插件，并将其从当前插件组中排除。省略或传 `false` 时保留插件，例如 `{ disabled: true }` 可以禁用一个预设。
 
-## 插件选项.priority <span className="field-tag">可选</span> {#插件选项priority}
+### priority <span className="field-tag">可选</span> {#priority}
 
 **类型：** `PluginPriority | number | undefined`
 

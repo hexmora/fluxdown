@@ -1,5 +1,4 @@
-import type { EffectItem } from 'fluxdown';
-
+import type { PreviewEffectItem } from '../../../../demo/components/renderer-preview';
 import type { AnimationSpeed, EditorEffect, EditorTuning } from '../type';
 
 import { CHUNK_DURATION, SHAD_DURATION } from '../consts';
@@ -11,7 +10,7 @@ export const getEffectConfig = (
   effect: EditorEffect,
   speed: AnimationSpeed,
   tuning: EditorTuning,
-): false | EffectItem => {
+): false | PreviewEffectItem => {
   switch (effect) {
     case 'none':
       return false;

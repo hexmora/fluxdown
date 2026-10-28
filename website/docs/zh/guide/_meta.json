@@ -26,6 +26,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "vue",
+    "label": "Vue 3"
+  },
+  {
+    "type": "dir-section-header",
     "name": "core",
     "label": "Core"
   }

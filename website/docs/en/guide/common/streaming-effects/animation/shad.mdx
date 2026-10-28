@@ -1,3 +1,4 @@
+import { FrameworkCodeTabs } from '../../../../../../components/framework-code-tabs';
 import { AnimationDemo } from '../../../../../../components';
 
 # Trailing fade
@@ -8,20 +9,129 @@ import { AnimationDemo } from '../../../../../../components';
 
 ## Usage
 
-The following examples use the React component:
+Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-```tsx
-<Fluxdown streaming={{ effect: 'shad' }} text={text} />
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: true }],
+  [Shad, { enabled: true }],
+];
 ```
 
-Smoothing is enabled by default. The following React component example keeps a shorter tail and allows longer fades:
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return <Fluxdown streaming={{ effect: 'shad' }} text={text} />;
+}
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown :streaming="{ effect: 'shad' }" :text="text" />
+</template>
+```
 
 ```tsx
-<Fluxdown
-  streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
-  text={text}
-/>
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return <Fluxdown streaming={{ effect: 'shad' }} text={text} />;
+}
 ```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return <Fluxdown streaming={{ effect: 'shad' }} text={text} />;
+}
+```
+
+</FrameworkCodeTabs>
+
+Smoothing is enabled by default. The following example keeps a shorter tail and allows longer fades:
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: true }],
+  [Shad, { enabled: true, length: 6, duration: 600 }],
+];
+```
+
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
+      text={text}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['shad', { length: 6, duration: 600 }] }"
+    :text="text"
+  />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>
 
 ## How the fade adapts
 

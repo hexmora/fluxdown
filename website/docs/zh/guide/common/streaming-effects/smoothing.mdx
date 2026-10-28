@@ -1,3 +1,4 @@
+import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs';
 import { SpringDemo } from '../../../../../components';
 
 # 平滑化
@@ -20,26 +21,179 @@ import { SpringDemo } from '../../../../../components';
 
 ## 在应用中使用
 
-以下以 React 版组件为例，开启 `streaming` 就会使用默认的弹簧平滑化：
+选择对应框架查看代码。Core 示例中的 `mappers` 传入 [Core 输入](../../core/quick-start.md)，只生成内容与效果标记，视觉呈现由渲染器完成；组件已内置对应渲染器。
+
+开启 `streaming` 就会使用默认的弹簧平滑化：
+
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Scale } from '@fluxdown/core-plugins/plugins/mapper/scale';
+import { MutableState, toClosure } from 'stative';
+
+const isStreaming = MutableState.of(true);
+const active = toClosure(isStreaming);
+
+const mappers: MapperPluggable[] = [
+  [Smooth, { enabled: active }],
+  [Scale, { enabled: active }],
+];
+```
 
 ```tsx
-<Fluxdown streaming={isStreaming} text={text} />
+import { Fluxdown } from 'fluxdown';
+
+export function Message({
+  text,
+  isStreaming,
+}: {
+  text: string;
+  isStreaming: boolean;
+}) {
+  return <Fluxdown streaming={isStreaming} text={text} />;
+}
 ```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string; isStreaming: boolean }>();
+</script>
+
+<template>
+  <Fluxdown :streaming="isStreaming" :text="text" />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({
+  text,
+  isStreaming,
+}: {
+  text: string;
+  isStreaming: boolean;
+}) {
+  return <Fluxdown streaming={isStreaming} text={text} />;
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({
+  text,
+  isStreaming,
+}: {
+  text: string;
+  isStreaming: boolean;
+}) {
+  return <Fluxdown streaming={isStreaming} text={text} />;
+}
+```
+
+</FrameworkCodeTabs>
 
 也可以显式指定插值方式，并配合[动画效果](./animation/index.mdx)使用：
 
-以下以 React 版组件为例：
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+
+```ts
+import type { MapperPluggable } from '@fluxdown/core';
+import {
+  RafSmoothDriver,
+  Smooth,
+  SpringSmoothInterpolator,
+} from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
+
+const mappers: MapperPluggable[] = [
+  [
+    Smooth,
+    {
+      enabled: true,
+      driver: RafSmoothDriver,
+      interpolation: SpringSmoothInterpolator,
+    },
+  ],
+  [Shad, { enabled: true }],
+];
+```
 
 ```tsx
-<Fluxdown
-  streaming={{
-    smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
-    effect: 'shad',
-  }}
-  text={text}
-/>
+import { Fluxdown } from 'fluxdown';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
+        effect: 'shad',
+      }}
+      text={text}
+    />
+  );
+}
 ```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{
+      smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
+      effect: 'shad',
+    }"
+    :text="text"
+  />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
+        effect: 'shad',
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/lynx';
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
+        effect: 'shad',
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+</FrameworkCodeTabs>
 
 `text` 始终传入已经收到的完整内容。将 `streaming` 设为 `false` 后，剩余缓冲会立即显示；如果希望保留收尾过程，可以让平滑化继续开启。
 
-Core 使用同一个 `Smooth` mapper，输出经过截取的内容块，渲染层无需自己安排逐字更新。接入方式见 [Core 状态与更新](../../core/streaming.md#启用平滑输出)，完整选项见 [React 配置](../../react/configuration.md#streamingsmooth)。
+Core 使用同一个 `Smooth` mapper，输出经过截取的内容块，渲染层无需自己安排逐字更新。接入方式见 [Core 状态与更新](../../core/streaming.md#启用平滑输出)，完整选项见各框架的配置文档：[React](../../react/configuration.md#streamingsmooth)、[Vue](../../vue/configuration.md#streamingsmooth)、[React Native](../../react-native/configuration.md)、[Lynx](../../lynx/configuration.md)。
+
+Core 示例用 `MutableState` 保存接收状态；完成时调用 `isStreaming.next(false)`，销毁 Core 后再调用 `active.destroy()` 和 `isStreaming.destroy()` 清理外部状态。

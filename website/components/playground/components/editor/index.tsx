@@ -1,11 +1,11 @@
 import { compute } from '@fluxdown/utils';
 import { useDark } from '@rspress/core/runtime';
-import { Fluxdown } from 'fluxdown';
 import { useId, useState } from 'react';
 
 import type { AnimationSpeed, ChunkPace, EditorEffect, EditorProps } from './type';
 
-import { DEMO_BUILD, DEMO_PLUGINS, getDemoTheme } from '../../../demo';
+import { useBottomScroll } from '../../../bottom-scroll';
+import { DEMO_BUILD, RendererPreview, RENDERERS } from '../../../demo';
 import { PauseIcon, PlayIcon, ReplayIcon, ResetIcon } from '../../../icons';
 import { ANIMATION_SPEEDS, CHUNK_PACES, COPY, DEFAULT_TUNING } from './consts';
 import { useEditor } from './hooks';
@@ -18,6 +18,8 @@ export const Editor = ({ lang }: EditorProps) => {
   const dark = useDark();
 
   const {
+    renderer,
+    setRenderer,
     text,
     smooth,
     setSmooth,
@@ -39,6 +41,8 @@ export const Editor = ({ lang }: EditorProps) => {
     resetContent,
   } = useEditor(lang);
 
+  const preview = useBottomScroll(false);
+
   const playLabel = stream.playing ? copy.pause : copy.play;
 
   const [tuningOpen, setTuningOpen] = useState(false);
@@ -59,6 +63,18 @@ export const Editor = ({ lang }: EditorProps) => {
       </div>
 
       <div className={styles.workspace}>
+        <fieldset aria-label={copy.renderer} className={styles.renderers}>
+          {RENDERERS.map(({ value, label }) => (
+            <button
+              aria-pressed={renderer === value}
+              key={value}
+              onClick={() => setRenderer(value)}
+              type="button"
+            >
+              {label}
+            </button>
+          ))}
+        </fieldset>
         <div className={styles.toolbar}>
           <div className={styles.options}>
             <label>
@@ -255,27 +271,37 @@ export const Editor = ({ lang }: EditorProps) => {
             />
           </div>
 
-          <section aria-label={copy.preview} className={styles.preview}>
-            <div className={styles.output}>
-              {text.length === 0 ? <p className={styles.empty}>{copy.empty}</p> : null}
-              <Fluxdown
-                build={DEMO_BUILD}
-                plugins={DEMO_PLUGINS}
-                streaming={compute(() => {
-                  if (!stream.playing) {
-                    return false;
-                  }
+          <section aria-label={copy.preview} className={styles.preview} data-renderer={renderer}>
+            {text.length === 0 ? <p className={styles.empty}>{copy.empty}</p> : null}
+            {/* oxlint-disable jsx-a11y/no-noninteractive-tabindex -- Make the scrollable preview keyboard accessible. */}
+            <section
+              aria-label={copy.preview}
+              className={styles.output}
+              data-lynx={renderer === 'lynx'}
+              ref={preview.viewportRef}
+              tabIndex={0}
+            >
+              <div className={styles.previewContent} ref={preview.contentRef}>
+                <RendererPreview
+                  build={DEMO_BUILD}
+                  dark={dark}
+                  renderer={renderer}
+                  streaming={compute(() => {
+                    if (!playback || stream.complete) {
+                      return false;
+                    }
 
-                  return {
-                    smooth: smooth && { enabled: true, driver, interpolation },
-                    effect: getEffectConfig(effect, speed, tuning),
-                    repairEnding: repair,
-                  };
-                })}
-                text={previewText}
-                theme={getDemoTheme(dark)}
-              />
-            </div>
+                    return {
+                      smooth: smooth && { enabled: true, driver, interpolation },
+                      effect: getEffectConfig(effect, speed, tuning),
+                      repairEnding: repair,
+                    };
+                  })}
+                  text={previewText}
+                />
+              </div>
+            </section>
+            {/* oxlint-enable jsx-a11y/no-noninteractive-tabindex */}
           </section>
         </div>
 

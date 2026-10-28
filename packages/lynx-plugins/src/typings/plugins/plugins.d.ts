@@ -21,6 +21,7 @@ import '../../plugins/patch';
 import '../../plugins/strong';
 import '../../plugins/table';
 import '../../plugins/tex';
+import '../../plugins/tex-svg';
 
 export type PluginConfigs = PluggableConfigs<MapperConfigs> &
   Partial<RemarkConfigs & RehypeConfigs & RepairConfigs & LynxRenderConfigs & LynxSlotConfigs>;

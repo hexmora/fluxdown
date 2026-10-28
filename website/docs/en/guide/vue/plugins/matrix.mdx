@@ -1,0 +1,63 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# Plugin matrix
+
+## Component variants
+
+All three entries share the same component API. Choose the default capabilities you need:
+
+| Component      | Entry                                   | Purpose                                                         |
+| -------------- | --------------------------------------- | --------------------------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/vue` or `@fluxdown/vue/full` | Full preset with highlighting, math and diagrams.               |
+| `FluxdownLite` | `@fluxdown/vue/lite`                    | Basic Markdown presentation, ready to extend.                   |
+| `FluxdownRaw`  | `@fluxdown/vue/raw`                     | Supply the complete `plugins` list and choose every capability. |
+
+## All plugins
+
+Composition includes inherited plugin types. A check means the component includes that plugin by default; an empty cell means it can be added manually.
+
+| Plugin                  | Composition                                           | Package                          |      Lite       |      Full       |
+| ----------------------- | ----------------------------------------------------- | -------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`             | <PluginTag type="remark" />                           | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> |                 |
+| `CodePelePlugin`        | <PluginTag type="slot" />                             | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
+| `CodePrismPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> |                 |                 |
+| `CodeShikiPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PluginTag type="render" />                           | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> |                 |
+| `TexKatexPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> |                 |                 |
+| `TexMathjaxKatexPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
+
+### Package
+
+<PluginTag type="vue-plugins" /> refers to `@fluxdown/vue-plugins`, which
+provides aggregate plugins, renderers and slots for Vue.
+
+### Import rules
+
+> Import from `@fluxdown/vue-plugins/plugins/<plugin-directory>`. Remove the `Plugin` suffix and convert the name to lowercase kebab case: `CodeShikiPlugin` becomes `code-shiki`, and `TexMathjaxKatexPlugin` becomes `tex-mathjax-katex`.
+
+```ts
+import { CodeShikiPlugin } from '@fluxdown/vue-plugins/plugins/code-shiki';
+import { TexMathjaxKatexPlugin } from '@fluxdown/vue-plugins/plugins/tex-mathjax-katex';
+```
+
+> Import `PRESET_FULL_PLUGINS` from `@fluxdown/vue-plugins/full` and `PRESET_LITE_PLUGINS` from `@fluxdown/vue-plugins/lite`.
+
+Pass plugins through the component's `plugins` prop. See [aggregate plugins](./aggregate.md) for declaration, composition and configuration.

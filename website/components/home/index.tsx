@@ -11,7 +11,9 @@ import { getQuickStart } from './utils';
 
 export const Home = () => {
   const { lang, href } = useLocale();
+
   const copy = COPY[lang];
+
   const quickStart = getQuickStart(copy.codeComment);
 
   return (
@@ -106,6 +108,10 @@ export const Home = () => {
             </a>
             <a className={styles.frameworkCard} href={href('/guide/lynx/quick-start')}>
               <strong>Lynx</strong>
+              <span>{copy.react}</span>
+            </a>
+            <a className={styles.frameworkCard} href={href('/guide/vue/quick-start')}>
+              <strong>Vue 3</strong>
               <span>{copy.react}</span>
             </a>
             {UPCOMING_FRAMEWORKS.map((framework) => (

@@ -4,7 +4,7 @@ Animation controls how new content appears. Effects are active only when `stream
 
 ## Effect input
 
-The following forms describe the React component's `streaming.effect` option. Custom effects use the same configuration as [mapper plugins](../../../core/plugins/mapper.mdx).
+The following forms describe the `streaming.effect` option in React, Vue, React Native, and Lynx. Custom effects use the same configuration as [mapper plugins](../../../core/plugins/mapper.mdx).
 
 | Input                                                      | Meaning                                               |
 | ---------------------------------------------------------- | ----------------------------------------------------- |
@@ -27,4 +27,4 @@ Open an effect below for its live demo and configuration. [Effect input](#effect
 | [`chunk`](./chunk.mdx)   | Fades in the new text from each visible update as one group.             |
 | [`suffix`](./suffix.mdx) | Follows the visible content with a cursor, dot, or custom marker.        |
 
-Each effect page includes a live demo, a React component example, and its configuration fields. Fields accept plain values or readable closures. Effects run after smoothing; `priority` controls mapper ordering and `disabled` excludes an effect.
+Each effect page includes a live demo, framework-specific code examples, and its configuration fields. Fields accept plain values or readable closures. Effects run after smoothing; `priority` controls mapper ordering and `disabled` excludes an effect.

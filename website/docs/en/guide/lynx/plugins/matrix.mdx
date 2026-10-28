@@ -12,7 +12,7 @@ import { PluginTag, PresetCheck } from '../../../../../components';
 
 Full highlights Bash, CSS, HTML, JavaScript, JSON, Python and TypeScript. Unrecognized languages remain plain text. Lite displays code as source text.
 
-Both presets provide a `Tex` slot. `build.tex` defaults to `false`; enabling it displays formula source. Supply your own slot for typeset math.
+Both presets provide a `Tex` slot. `build.tex` defaults to `false`; enabling it displays formula source. Add `TexSvgPlugin` and integrate SVG XElement in the host to typeset math.
 
 ## All plugins
 
@@ -41,6 +41,7 @@ Composition includes inherited plugin types. A check means the preset directly i
 | `StrongPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `TablePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexSvgPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="lynx-plugins" /> |                 |                 |
 
 ## Package and imports
 

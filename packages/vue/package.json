@@ -1,0 +1,125 @@
+{
+  "name": "@fluxdown/vue",
+  "version": "0.1.0",
+  "description": "Vue 3 components for streaming Markdown.",
+  "keywords": [
+    "hast",
+    "llm",
+    "markdown",
+    "renderer",
+    "streaming",
+    "vue"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/vue"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss",
+    "**/*.less",
+    "./dist/esm/**/*.browser.js",
+    "./dist/cjs/**/*.browser.cjs"
+  ],
+  "main": "./src/packs/full/index.tsx",
+  "module": "./src/packs/full/index.tsx",
+  "types": "./src/packs/full/index.tsx",
+  "exports": {
+    ".": "./src/packs/full/index.tsx",
+    "./*": "./src/packs/*/index.tsx",
+    "./styles.css": "./dist/esm/styles.css"
+  },
+  "publishConfig": {
+    "main": "./dist/cjs/full.cjs",
+    "module": "./dist/esm/full.browser.js",
+    "types": "./dist/esm/packs/full/index.d.ts",
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/esm/packs/full/index.d.ts",
+          "browser": "./dist/esm/full.browser.js",
+          "node": "./dist/esm/full.js",
+          "default": "./dist/esm/full.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/full/index.d.cts",
+          "browser": "./dist/cjs/full.browser.cjs",
+          "node": "./dist/cjs/full.cjs",
+          "default": "./dist/cjs/full.browser.cjs"
+        }
+      },
+      "./*": {
+        "import": {
+          "types": "./dist/esm/packs/*/index.d.ts",
+          "browser": "./dist/esm/*.browser.js",
+          "node": "./dist/esm/*.js",
+          "default": "./dist/esm/*.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/*/index.d.cts",
+          "browser": "./dist/cjs/*.browser.cjs",
+          "node": "./dist/cjs/*.cjs",
+          "default": "./dist/cjs/*.browser.cjs"
+        }
+      },
+      "./styles.css": "./dist/esm/styles.css"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build",
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source",
+    "dev": "storybook dev -p 6010 --no-open",
+    "storybook": "storybook dev -p 6010",
+    "build:storybook": "storybook build"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@fluxdown/vue-plugins": "workspace:^",
+    "lodash-es": "catalog:",
+    "shallow-equal": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/vue3-vite": "catalog:",
+    "@types/hast": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue-jsx": "catalog:",
+    "@vue/server-renderer": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "sass": "catalog:",
+    "storybook": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "vue": "catalog:vue-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

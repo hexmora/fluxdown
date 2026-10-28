@@ -6,6 +6,11 @@
   background: var(--site-surface);
   color: var(--site-ink);
 
+  table {
+    // The renderer's wrapper already provides the table spacing.
+    margin-block: 0;
+  }
+
   .toolbar {
     display: flex;
     align-items: center;

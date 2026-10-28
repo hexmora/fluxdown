@@ -6,6 +6,7 @@ export const COPY = {
     description: 'Edit on the left. See Fluxdown respond on the right.',
     source: 'Markdown',
     preview: 'Preview',
+    renderer: 'Renderer',
     reset: 'Reset content',
     play: 'Play',
     pause: 'Pause',
@@ -36,13 +37,14 @@ export const COPY = {
     placeholder: 'Write some Markdown…',
     empty: 'Your preview starts here.',
     characters: 'characters',
-    note: 'Your changes stay in this browser tab.',
+    note: 'Content stays in this tab. Your renderer choice is remembered.',
   },
   zh: {
     title: '试试你自己的 Markdown。',
     description: '在左侧编辑，在右侧即刻看到结果。',
     source: 'Markdown',
     preview: '实时预览',
+    renderer: '渲染库',
     reset: '重置内容',
     play: '播放',
     pause: '暂停',
@@ -73,7 +75,7 @@ export const COPY = {
     placeholder: '写点 Markdown…',
     empty: '你的预览，从这里开始。',
     characters: '个字符',
-    note: '修改仅保留在当前浏览器标签页。',
+    note: '内容保留在当前标签页，渲染库选择会自动记住。',
   },
 };
 

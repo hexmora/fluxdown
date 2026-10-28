@@ -8,6 +8,12 @@ catalogMode: strict
 verifyDepsBeforeRun: error
 
 catalog:
+  vue: ^3.5.44
+  "@vue/server-renderer": ^3.5.44
+  "@vue/test-utils": ^2.5.1
+  "@vitejs/plugin-vue-jsx": ^5.1.6
+  "@storybook/vue3-vite": 10.6.3
+  vitest: ^5.0.5
   "@lynx-js/react": 0.129.0
   "@lynx-js/react-rsbuild-plugin": 0.22.0
   "@lynx-js/types": 4.3.0
@@ -130,6 +136,8 @@ catalog:
   background-only: 0.0.1
 
 catalogs:
+  vue-peer:
+    vue: ^3.5.0
   react-native-peer:
     react: ^19.0.0
     react-native: ">=0.83.0 <1"
