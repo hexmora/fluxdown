@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- 04d6300: Add Solid components and plugin presets for static and streaming Markdown, with full, lite, and raw entry points.
+- 44a3c8d: Add Solid components and plugin presets for static and streaming Markdown, with full, lite, and raw entry points.
 
   Keep chunk animation batches stable when earlier batches settle into text.
 
@@ -12,6 +12,6 @@
 
 ### Patch Changes
 
-- Updated dependencies [04d6300]
+- Updated dependencies [44a3c8d]
   - @fluxdown/solid-plugins@0.2.0
   - @fluxdown/core-plugins@0.12.3

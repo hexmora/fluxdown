@@ -48,6 +48,8 @@ afterEach(async () => {
   jest.restoreAllMocks();
 
   restoreGlobals();
+
+  jest.useRealTimers();
 });
 
 describe('React Native streaming', () => {

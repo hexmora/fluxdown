@@ -4,11 +4,13 @@
 
 ### Patch Changes
 
-- fd1f81c: Add English and Chinese Solid guides, a complete component configuration reference, and Solid previews in the shared demos and Playground.
+- 44a3c8d: Add English and Chinese Solid guides, a complete component configuration reference, and Solid previews in the shared demos and Playground.
 
   Choose renderers in the comparison demo and keep readable previews in one horizontally scrollable row.
 
-- Updated dependencies [04d6300]
+- Updated dependencies [44a3c8d]
+- Updated dependencies [44a3c8d]
+  - @fluxdown/react-native@0.2.1
   - @fluxdown/solid@0.2.0
   - @fluxdown/core-plugins@0.12.3
   - @fluxdown/react-native-plugins@0.2.1

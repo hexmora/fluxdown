@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- 04d6300: Add Solid components and plugin presets for static and streaming Markdown, with full, lite, and raw entry points.
+- 44a3c8d: Add Solid components and plugin presets for static and streaming Markdown, with full, lite, and raw entry points.
 
   Keep chunk animation batches stable when earlier batches settle into text.
 
