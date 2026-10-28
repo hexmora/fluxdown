@@ -1,5 +1,13 @@
 # @fluxdown/react-native
 
+## 0.2.1
+
+### Patch Changes
+
+- 44a3c8d: Make the shade continuity regression test independent of CI timing while preserving its rendering and host identity assertions.
+- Updated dependencies [44a3c8d]
+  - @fluxdown/react-native-plugins@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
