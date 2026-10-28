@@ -7,7 +7,7 @@ export type StreamingFrameProps = {
 
   caption?: ReactNode;
 
-  controls: DemoControls;
+  controls?: DemoControls;
 
   children: ReactNode;
 };

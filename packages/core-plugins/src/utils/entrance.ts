@@ -34,9 +34,11 @@ export interface EntranceOptions {
   duration: number | ((added: number) => number);
 
   /**
-   * Wrap a run of characters that share one entrance.
+   * Wrap a run of characters that share one entrance. `index` is the position of the run's first
+   * character in the whole root, so wrappers can derive render keys that survive earlier runs
+   * settling.
    */
-  wrap: (text: Text, start: number, duration: number) => Element;
+  wrap: (text: Text, start: number, duration: number, index: number) => Element;
 
   /**
    * Whether `element` is a wrapper created by `wrap` for this exact entrance.
@@ -119,6 +121,7 @@ const toCharacters = (
 const createText = (
   node: Text,
   characters: EntranceCharacter[],
+  offset: number,
   { start: now, wrap, isWrapper }: EntranceOptions,
 ): ElementContent[] => {
   // Preserve structural whitespace without creating an animated text box around it.
@@ -128,7 +131,7 @@ const createText = (
 
   const children: ElementContent[] = [];
 
-  for (const character of characters) {
+  for (const [index, character] of characters.entries()) {
     const { text, start, duration } = character;
 
     const previous = children[children.length - 1];
@@ -149,7 +152,7 @@ const createText = (
       continue;
     }
 
-    children.push(wrap({ ...node, value: text }, start, duration));
+    children.push(wrap({ ...node, value: text }, start, duration, offset + index));
   }
 
   return children;
@@ -174,9 +177,11 @@ export const createEntranceRoot = (
 
       const selected = characters.slice(offset, offset + length);
 
+      const children = createText(node, selected, offset, options);
+
       offset += length;
 
-      return createText(node, selected, options);
+      return children;
     }
 
     if (node.type !== 'element' || isEntranceForbidden(node)) {

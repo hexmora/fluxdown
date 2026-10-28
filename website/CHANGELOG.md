@@ -1,5 +1,27 @@
 # @fluxdown/website
 
+## 0.0.11
+
+### Patch Changes
+
+- fd1f81c: Add English and Chinese Solid guides, a complete component configuration reference, and Solid previews in the shared demos and Playground.
+
+  Choose renderers in the comparison demo and keep readable previews in one horizontally scrollable row.
+
+- Updated dependencies [04d6300]
+  - @fluxdown/solid@0.2.0
+  - @fluxdown/core-plugins@0.12.3
+  - @fluxdown/react-native-plugins@0.2.1
+
+## 0.0.10
+
+### Patch Changes
+
+- 441e387: Add a shared side-by-side renderer demo, persistent playground renderer selection, and framework tabs for common feature examples.
+- b2a77a7: Add English and Chinese Vue guides, complete component configuration reference, and navigation.
+- Updated dependencies [ee390c4]
+  - @fluxdown/vue@0.2.0
+
 ## 0.0.9
 
 ### Patch Changes

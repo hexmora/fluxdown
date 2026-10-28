@@ -45,4 +45,4 @@ Always pass the complete text received so far as `text`. Set `streaming` to `fal
 - [Streaming content](./streaming.md): control smoothing and trailing effects.
 - [Styling](./customization.md): adjust colors, fonts and spacing.
 - [Plugin matrix](./plugins/matrix.mdx): choose Full, Lite or your own set.
-- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, React Native, and Lynx together.
+- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Solid, React Native, and Lynx together.

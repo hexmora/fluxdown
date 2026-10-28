@@ -6,7 +6,7 @@ import type {
 
 export type PreviewBuild = Partial<Omit<BlockCompilerConfig, 'repairEnding'>>;
 
-export type Renderer = 'react' | 'vue' | 'react-native' | 'lynx';
+export type Renderer = 'react' | 'solid' | 'vue' | 'react-native' | 'lynx';
 
 export type PreviewEffect = 'scale' | 'shad' | 'chunk' | 'suffix';
 

@@ -1,0 +1,63 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# 插件矩阵
+
+## 组件分化
+
+三个入口使用相同的组件 API，按需要选择默认能力：
+
+| 组件           | 导入入口                                    | 定位                                     |
+| -------------- | ------------------------------------------- | ---------------------------------------- |
+| `Fluxdown`     | `@fluxdown/solid` 或 `@fluxdown/solid/full` | 完整预设，提供高亮、公式和图表等能力。   |
+| `FluxdownLite` | `@fluxdown/solid/lite`                      | 基础 Markdown 展示，按需添加能力。       |
+| `FluxdownRaw`  | `@fluxdown/solid/raw`                       | 自行传入完整的 `plugins`，组合全部能力。 |
+
+## 全部插件
+
+「组成」包含继承的子插件类型；勾选表示对应组件默认包含此插件，空白表示需要手动添加。
+
+| 插件                    | 组成                                                  | 所在包                             |      Lite       |      Full       |
+| ----------------------- | ----------------------------------------------------- | ---------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`             | <PluginTag type="remark" />                           | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> |                 |
+| `CodePelePlugin`        | <PluginTag type="slot" />                             | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+| `CodePrismPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> |                 |                 |
+| `CodeShikiPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PluginTag type="render" />                           | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> | <PresetCheck /> |                 |
+| `TexKatexPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> |                 |                 |
+| `TexMathjaxKatexPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="solid-plugins" /> |                 | <PresetCheck /> |
+
+### 所在包
+
+<PluginTag type="solid-plugins" /> 对应 `@fluxdown/solid-plugins`，提供 Solid
+的综合插件、渲染器和插槽。
+
+### 导入规则
+
+> 使用 `@fluxdown/solid-plugins/plugins/<插件目录>` 导入。插件目录由名称去掉 `Plugin` 后缀，再转为小写中划线，例如 `CodeShikiPlugin` 对应 `code-shiki`，`TexMathjaxKatexPlugin` 对应 `tex-mathjax-katex`。
+
+```ts
+import { CodeShikiPlugin } from '@fluxdown/solid-plugins/plugins/code-shiki';
+import { TexMathjaxKatexPlugin } from '@fluxdown/solid-plugins/plugins/tex-mathjax-katex';
+```
+
+> `PRESET_FULL_PLUGINS` 与 `PRESET_LITE_PLUGINS` 分别从 `@fluxdown/solid-plugins/full`、`@fluxdown/solid-plugins/lite` 导入。
+
+通过组件的 `plugins` 添加所需插件；声明、组合与配置方式见[综合插件](./aggregate.md)。

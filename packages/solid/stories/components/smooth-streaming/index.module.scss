@@ -1,0 +1,20 @@
+.shell {
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.header {
+  padding-block: 1rem 2rem;
+  font-family: sans-serif;
+
+  button {
+    margin-right: 0.5rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  output {
+    display: inline-block;
+    margin-inline-start: 0.5rem;
+    font-size: 0.875rem;
+  }
+}

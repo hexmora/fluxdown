@@ -53,6 +53,11 @@
     --tag-dark-color: #92dacf;
   }
 
+  &[data-type="solid-plugins"] {
+    --tag-color: #446b9e;
+    --tag-dark-color: #a9c9f2;
+  }
+
   &[data-type="vue-plugins"] {
     --tag-color: #287b58;
     --tag-dark-color: #a0dfbd;

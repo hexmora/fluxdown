@@ -100,9 +100,14 @@ export async function checkBrowserConsumer(
     const style = resolveExport(manifest.exports?.['./styles.css'], ['browser', 'import']);
 
     if (
-      ['fluxdown', '@fluxdown/react-plugins', '@fluxdown/vue', '@fluxdown/vue-plugins'].includes(
-        manifest.name,
-      )
+      [
+        'fluxdown',
+        '@fluxdown/react-plugins',
+        '@fluxdown/solid',
+        '@fluxdown/solid-plugins',
+        '@fluxdown/vue',
+        '@fluxdown/vue-plugins',
+      ].includes(manifest.name)
     ) {
       assert(style, `${manifest.name}: missing public stylesheet export`);
     }

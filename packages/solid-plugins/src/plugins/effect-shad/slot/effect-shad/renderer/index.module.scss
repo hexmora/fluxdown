@@ -1,0 +1,25 @@
+@use "@prefix" as *;
+
+.root {
+  // Fading runs wrap naturally across lines, including their whitespace.
+  display: inline;
+
+  &.active {
+    // Linear opacity over time reads as an even gradient across the tail at a steady pace.
+    animation: appear var(--#{$prefix}-shad-duration) linear both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

@@ -18,7 +18,7 @@ export const createChunkRoot = (
     initial,
     start,
     duration: Number.isFinite(duration) ? Math.max(0, duration) : 400,
-    wrap: (text, entrance, length) => ({
+    wrap: (text, entrance, length, index) => ({
       type: 'element',
       tagName: CHUNK_TAG_NAME,
       properties: {
@@ -26,6 +26,7 @@ export const createChunkRoot = (
         dataChunkStart: entrance,
         dataChunkDuration: length,
       },
+      data: { renderKey: `chunk:${index}:${entrance}` },
       children: [text],
     }),
     isWrapper: (element, entrance, length) =>

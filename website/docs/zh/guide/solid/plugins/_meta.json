@@ -1,0 +1,22 @@
+[
+  {
+    "type": "file",
+    "name": "slot",
+    "label": "Slot 插件"
+  },
+  {
+    "type": "file",
+    "name": "render",
+    "label": "Render 插件"
+  },
+  {
+    "type": "file",
+    "name": "aggregate",
+    "label": "综合插件"
+  },
+  {
+    "type": "file",
+    "name": "matrix",
+    "label": "插件矩阵"
+  }
+]

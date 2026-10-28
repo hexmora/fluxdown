@@ -1,17 +1,17 @@
 {
   "name": "@fluxdown/website",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "private": true,
   "homepage": "https://hexmora.github.io/fluxdown/",
   "type": "module",
   "scripts": {
-    "dev": "pnpm run build:vue && rspress dev --host 127.0.0.1",
-    "build": "pnpm run build:vue && rspress build",
+    "dev": "pnpm run build:renderers && rspress dev --host 127.0.0.1",
+    "build": "pnpm run build:renderers && rspress build",
     "preview": "rspress preview --host 127.0.0.1",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run build",
     "lint": "oxlint .",
-    "typecheck": "pnpm run build:vue && tsc --noEmit && tsc --noEmit -p lynx/tsconfig.json",
-    "build:vue": "pnpm --filter @fluxdown/vue-plugins --filter @fluxdown/vue build"
+    "typecheck": "pnpm run build:renderers && tsc --noEmit && tsc --noEmit -p lynx/tsconfig.json",
+    "build:renderers": "pnpm --filter @fluxdown/vue-plugins --filter @fluxdown/vue --filter @fluxdown/solid-plugins --filter @fluxdown/solid build"
   },
   "dependencies": {
     "@fluxdown/core": "workspace:^",
@@ -19,6 +19,7 @@
     "@fluxdown/react-native": "workspace:^",
     "@fluxdown/react-native-plugins": "workspace:^",
     "@fluxdown/react-plugins": "workspace:^",
+    "@fluxdown/solid": "workspace:^",
     "@fluxdown/utils": "workspace:^",
     "@fluxdown/vue": "workspace:^",
     "fluxdown": "workspace:^",
@@ -26,6 +27,7 @@
     "react-dom": "catalog:",
     "react-native-svg": "catalog:",
     "react-native-web": "catalog:",
+    "solid-js": "catalog:",
     "stative": "workspace:^",
     "vue": "catalog:"
   },

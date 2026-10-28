@@ -1,0 +1,94 @@
+@use "@prefix" as *;
+
+.root {
+  display: inline-block;
+
+  .glyph {
+    display: inline-block;
+    transform-origin: center bottom;
+  }
+
+  &.active {
+    animation: appear var(--#{$prefix}-scale-duration) linear both;
+
+    .glyph {
+      animation: grow var(--#{$prefix}-scale-duration) cubic-bezier(0.333333, 1, 0.666667, 1) both;
+      animation-delay: inherit;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+
+      .glyph {
+        animation: none;
+      }
+    }
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scale(var(--#{$prefix}-scale-from));
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+    filter: blur(var(--#{$prefix}-scale-blur));
+  }
+
+  10% {
+    opacity: 0.073441;
+    filter: blur(calc(var(--#{$prefix}-scale-blur) * 0.987688));
+  }
+
+  20% {
+    opacity: 0.238144;
+    filter: blur(calc(var(--#{$prefix}-scale-blur) * 0.951057));
+  }
+
+  30% {
+    opacity: 0.431649;
+    filter: blur(calc(var(--#{$prefix}-scale-blur) * 0.891007));
+  }
+
+  40% {
+    opacity: 0.614656;
+    filter: blur(calc(var(--#{$prefix}-scale-blur) * 0.809017));
+  }
+
+  50% {
+    opacity: 0.765625;
+    filter: blur(calc(var(--#{$prefix}-scale-blur) * 0.707107));
+  }
+
+  60% {
+    opacity: 0.876096;
+    filter: blur(calc(var(--#{$prefix}-scale-blur) * 0.587785));
+  }
+
+  70% {
+    opacity: 0.946729;
+    filter: blur(calc(var(--#{$prefix}-scale-blur) * 0.45399));
+  }
+
+  80% {
+    opacity: 0.984064;
+    filter: blur(calc(var(--#{$prefix}-scale-blur) * 0.309017));
+  }
+
+  90% {
+    opacity: 0.998001;
+    filter: blur(calc(var(--#{$prefix}-scale-blur) * 0.156434));
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}

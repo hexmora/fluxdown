@@ -2,7 +2,7 @@ import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs
 
 # CJK support
 
-`CjkPlugin` improves Markdown parsing for Chinese, Japanese, and Korean text. It recognizes emphasis, strong emphasis, and strikethrough next to CJK punctuation, and keeps that punctuation out of bare URLs. The Full components for React, Vue, React Native, and Lynx include it by default; Lite components can add it as needed.
+`CjkPlugin` improves Markdown parsing for Chinese, Japanese, and Korean text. It recognizes emphasis, strong emphasis, and strikethrough next to CJK punctuation, and keeps that punctuation out of bare URLs. The Full components for React, Vue, Solid, React Native, and Lynx include it by default; Lite components can add it as needed.
 
 <FrameworkCodeTabs>
 
@@ -22,6 +22,14 @@ import { Fluxdown } from '@fluxdown/vue';
 <template>
   <Fluxdown text="这是**加粗。**文字。" />
 </template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/solid';
+
+export function Message() {
+  return <Fluxdown text="这是**加粗。**文字。" />;
+}
 ```
 
 ```tsx
@@ -62,7 +70,7 @@ Explicit Markdown links and code preserve their content. The URL in `[link](http
 
 All Full components include `CjkPlugin` without manual registration. For Core or a Lite component, install the matching plugin package:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
 
 ```sh
 pnpm add @fluxdown/core-plugins
@@ -77,6 +85,10 @@ pnpm add @fluxdown/vue-plugins
 ```
 
 ```sh
+pnpm add @fluxdown/solid-plugins
+```
+
+```sh
 pnpm add @fluxdown/react-base-plugins
 ```
 
@@ -88,7 +100,7 @@ pnpm add @fluxdown/lynx-plugins
 
 For Core, add `CjkRemarkPlugin` to the `remarks` input in the [quick start](../../core/quick-start.md). Components extend their presets through `plugins`:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
 
 ```ts
 import { CjkRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/cjk';
@@ -100,7 +112,11 @@ const remarks = [CjkRemarkPlugin];
 import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { FluxdownLite } from 'fluxdown/lite';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={CjkPlugin} text={text} />;
 }
 ```
@@ -119,10 +135,27 @@ defineProps<{ text: string }>();
 ```
 
 ```tsx
+import { CjkPlugin } from '@fluxdown/solid-plugins/plugins/cjk';
+import { FluxdownLite } from '@fluxdown/solid/lite';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message(props: MessageProps) {
+  return <FluxdownLite plugins={CjkPlugin} text={props.text} />;
+}
+```
+
+```tsx
 import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { FluxdownLite } from '@fluxdown/react-native/lite';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={CjkPlugin} text={text} />;
 }
 ```
@@ -131,7 +164,11 @@ export function Message({ text }: { text: string }) {
 import { CjkPlugin } from '@fluxdown/lynx-plugins/plugins/cjk';
 import { FluxdownLite } from '@fluxdown/lynx/lite';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={CjkPlugin} text={text} />;
 }
 ```
@@ -142,7 +179,7 @@ export function Message({ text }: { text: string }) {
 
 Include `CjkPlugin` and `config` in the same plugin pack to disable this behavior. Core uses a remark plugin entry with `disabled` set:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
 
 ```ts
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
@@ -158,7 +195,11 @@ const remarks: IPluggable<IRemarkPlugin, unknown>[] = [
 import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { Fluxdown } from 'fluxdown';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       plugins={{ ...CjkPlugin, config: { 'remark-cjk': { disabled: true } } }}
@@ -184,10 +225,32 @@ defineProps<{ text: string }>();
 ```
 
 ```tsx
+import { CjkPlugin } from '@fluxdown/solid-plugins/plugins/cjk';
+import { Fluxdown } from '@fluxdown/solid';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message(props: MessageProps) {
+  return (
+    <Fluxdown
+      plugins={{ ...CjkPlugin, config: { 'remark-cjk': { disabled: true } } }}
+      text={props.text}
+    />
+  );
+}
+```
+
+```tsx
 import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
 import { Fluxdown } from '@fluxdown/react-native';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       plugins={{ ...CjkPlugin, config: { 'remark-cjk': { disabled: true } } }}
@@ -201,7 +264,11 @@ export function Message({ text }: { text: string }) {
 import { CjkPlugin } from '@fluxdown/lynx-plugins/plugins/cjk';
 import { Fluxdown } from '@fluxdown/lynx';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       plugins={{ ...CjkPlugin, config: { 'remark-cjk': { disabled: true } } }}

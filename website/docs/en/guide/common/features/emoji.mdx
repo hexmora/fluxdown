@@ -2,7 +2,7 @@ import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs
 
 # Emoji shortcodes
 
-`EmojiPlugin` converts GitHub-style emoji shortcodes such as `:smile:` and `:+1:` into Unicode emoji. The Full components for React, Vue, React Native, and Lynx include it by default; Lite components can add it as needed.
+`EmojiPlugin` converts GitHub-style emoji shortcodes such as `:smile:` and `:+1:` into Unicode emoji. The Full components for React, Vue, Solid, React Native, and Lynx include it by default; Lite components can add it as needed.
 
 <FrameworkCodeTabs>
 
@@ -22,6 +22,14 @@ import { Fluxdown } from '@fluxdown/vue';
 <template>
   <Fluxdown text="Hello :smile: Great work :+1:" />
 </template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/solid';
+
+export function Message() {
+  return <Fluxdown text="Hello :smile: Great work :+1:" />;
+}
 ```
 
 ```tsx
@@ -54,7 +62,7 @@ Inline code and fenced code blocks preserve their source. For example, `` `:smil
 
 All Full components include `EmojiPlugin` without manual registration. For Core or a Lite component, install the matching plugin package:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
 
 ```sh
 pnpm add @fluxdown/core-plugins
@@ -69,6 +77,10 @@ pnpm add @fluxdown/vue-plugins
 ```
 
 ```sh
+pnpm add @fluxdown/solid-plugins
+```
+
+```sh
 pnpm add @fluxdown/react-base-plugins
 ```
 
@@ -80,7 +92,7 @@ pnpm add @fluxdown/lynx-plugins
 
 For Core, add `EmojiRemarkPlugin` to the `remarks` input in the [quick start](../../core/quick-start.md). Components extend their presets through `plugins`:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
 
 ```ts
 import { EmojiRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/emoji';
@@ -92,7 +104,11 @@ const remarks = [EmojiRemarkPlugin];
 import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { FluxdownLite } from 'fluxdown/lite';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={EmojiPlugin} text={text} />;
 }
 ```
@@ -111,10 +127,27 @@ defineProps<{ text: string }>();
 ```
 
 ```tsx
+import { EmojiPlugin } from '@fluxdown/solid-plugins/plugins/emoji';
+import { FluxdownLite } from '@fluxdown/solid/lite';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message(props: MessageProps) {
+  return <FluxdownLite plugins={EmojiPlugin} text={props.text} />;
+}
+```
+
+```tsx
 import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { FluxdownLite } from '@fluxdown/react-native/lite';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={EmojiPlugin} text={text} />;
 }
 ```
@@ -123,7 +156,11 @@ export function Message({ text }: { text: string }) {
 import { EmojiPlugin } from '@fluxdown/lynx-plugins/plugins/emoji';
 import { FluxdownLite } from '@fluxdown/lynx/lite';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return <FluxdownLite plugins={EmojiPlugin} text={text} />;
 }
 ```
@@ -134,7 +171,7 @@ export function Message({ text }: { text: string }) {
 
 Include `EmojiPlugin` and `config` in the same plugin pack to disable this behavior. Core uses a remark plugin entry with `disabled` set:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
 
 ```ts
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
@@ -150,7 +187,11 @@ const remarks: IPluggable<IRemarkPlugin, unknown>[] = [
 import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { Fluxdown } from 'fluxdown';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       plugins={{
@@ -182,10 +223,35 @@ defineProps<{ text: string }>();
 ```
 
 ```tsx
+import { EmojiPlugin } from '@fluxdown/solid-plugins/plugins/emoji';
+import { Fluxdown } from '@fluxdown/solid';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message(props: MessageProps) {
+  return (
+    <Fluxdown
+      plugins={{
+        ...EmojiPlugin,
+        config: { 'remark-emoji': { disabled: true } },
+      }}
+      text={props.text}
+    />
+  );
+}
+```
+
+```tsx
 import { EmojiPlugin } from '@fluxdown/react-base-plugins/plugins/emoji';
 import { Fluxdown } from '@fluxdown/react-native';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       plugins={{
@@ -202,7 +268,11 @@ export function Message({ text }: { text: string }) {
 import { EmojiPlugin } from '@fluxdown/lynx-plugins/plugins/emoji';
 import { Fluxdown } from '@fluxdown/lynx';
 
-export function Message({ text }: { text: string }) {
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       plugins={{

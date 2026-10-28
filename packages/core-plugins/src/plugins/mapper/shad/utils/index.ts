@@ -38,7 +38,7 @@ export const createShadRoot = (
     initial: initial || length === 0,
     start,
     duration: (added) => concurrency.allocate(start, added, length, duration),
-    wrap: (text, entrance, fade) => ({
+    wrap: (text, entrance, fade, index) => ({
       type: 'element',
       tagName: SHAD_TAG_NAME,
       properties: {
@@ -46,6 +46,7 @@ export const createShadRoot = (
         dataShadStart: entrance,
         dataShadDuration: fade,
       },
+      data: { renderKey: `shad:${index}:${entrance}` },
       children: [text],
     }),
     isWrapper: (element, entrance, fade) =>
