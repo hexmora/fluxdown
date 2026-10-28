@@ -12,7 +12,7 @@ Fluxdown 让 Markdown 在生成过程中保持可读，适用于 AI 对话、实
 - **减少重复计算。** 以内容块为单位缓存结果，复用消息中已稳定的部分。
 - **熟悉的 Markdown。** 支持 GFM 表格、任务列表、删除线、自动链接和代码高亮，也可按需启用公式。
 - **灵活的呈现方式。** 定制主题、替换组件，或通过插件扩展解析与渲染。
-- **框架无关的核心。** 直接使用 React、Vue 3、React Native、Lynx 或 Solid 组件，或为自己的界面构建渲染器。
+- **框架无关的核心。** 直接使用 React、Vue 3、React Native、Lynx、Solid 或 Taro 组件，或为自己的界面构建渲染器。
 
 ## 快速上手
 
@@ -43,7 +43,7 @@ export function Message({ text, isStreaming }: MessageProps) {
 import "fluxdown/styles.css";
 ```
 
-更多示例见 [React](../website/docs/zh/guide/react/quick-start.md)、[Vue 3](../website/docs/zh/guide/vue/quick-start.md)、[React Native](../website/docs/zh/guide/react-native/quick-start.md)、[Lynx](../website/docs/zh/guide/lynx/quick-start.md) 或 [Solid](../website/docs/zh/guide/solid/quick-start.md) 的快速上手文档。
+更多示例见 [React](../website/docs/zh/guide/react/quick-start.md)、[Vue 3](../website/docs/zh/guide/vue/quick-start.md)、[React Native](../website/docs/zh/guide/react-native/quick-start.md)、[Lynx](../website/docs/zh/guide/lynx/quick-start.md)、[Solid](../website/docs/zh/guide/solid/quick-start.md) 或 [Taro](../website/docs/zh/guide/taro/quick-start.md) 的快速上手文档。
 
 ## 包
 
@@ -54,6 +54,7 @@ import "fluxdown/styles.css";
 | [`@fluxdown/react-native`](../packages/react-native) | 开箱即用的 React Native Markdown 渲染组件。      |
 | [`@fluxdown/lynx`](../packages/lynx)                 | 开箱即用的 ReactLynx Markdown 渲染组件。         |
 | [`@fluxdown/solid`](../packages/solid)               | 开箱即用的 Solid Markdown 组件。                 |
+| [`@fluxdown/taro`](../packages/taro)                 | 开箱即用的 Taro Markdown 渲染组件。              |
 | [`@fluxdown/core`](../packages/core)                 | 为自定义渲染器提供解析、修复和响应式内容块。     |
 | [`stative`](../packages/stative)                     | 可组合的状态与派生计算，也是 Core 的响应式基础。 |
 

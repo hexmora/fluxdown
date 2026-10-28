@@ -5,6 +5,7 @@ import { defineConfig, normalizeHref } from '@rspress/core';
 import { fileURLToPath } from 'node:url';
 
 import { reactNativeWebPlugin } from '../scripts/build/react-native-web';
+import { taroWebAliases, taroWebDefines } from '../scripts/build/taro-web';
 import { lynxDemo } from './lynx/plugin';
 import { sessionAppearance } from './theme/appearance/plugin';
 import { sessionLocale } from './theme/locale/plugin';
@@ -63,6 +64,7 @@ export default defineConfig({
     socialLinks: [{ icon: 'github', mode: 'link', content: 'https://github.com/hexmora/fluxdown' }],
   },
   builderConfig: {
+    source: { define: taroWebDefines },
     plugins: [
       pluginLess(),
       pluginSass(),
@@ -74,6 +76,7 @@ export default defineConfig({
     resolve: {
       aliasStrategy: 'prefer-alias',
       alias: {
+        ...taroWebAliases(),
         // Workspace demos share the same React instance as the documentation theme.
         react: fileURLToPath(new URL('./node_modules/react', import.meta.url)),
         'react-dom': fileURLToPath(new URL('./node_modules/react-dom', import.meta.url)),
@@ -128,6 +131,24 @@ export default defineConfig({
       },
     },
     tools: {
+      rspack: {
+        module: {
+          rules: [
+            {
+              // Taro's Stencil fallback carries a redundant webpackExports hint.
+              // Keep its pure annotations while Rspack infers the dynamic import.
+              test: /@tarojs[/\\]components[/\\]dist[/\\]components[/\\]taro-video-core\.js$/,
+              loader: 'builtin:swc-loader',
+              options: {
+                jsc: {
+                  target: 'esnext',
+                  minify: { format: { comments: 'some', preserveAnnotations: true } },
+                },
+              },
+            },
+          ],
+        },
+      },
       swc: {
         jsc: {
           transform: {
