@@ -1,0 +1,66 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# Plugin matrix
+
+## Component variants
+
+All three entries share the same component API. Choose the default capabilities you need:
+
+| Component      | Entry                                     | Purpose                                                         |
+| -------------- | ----------------------------------------- | --------------------------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/taro` or `@fluxdown/taro/full` | Full preset with highlighting, math, CJK and emoji.             |
+| `FluxdownLite` | `@fluxdown/taro/lite`                     | Basic Markdown presentation, ready to extend.                   |
+| `FluxdownRaw`  | `@fluxdown/taro/raw`                      | Supply the complete `plugins` list and choose every capability. |
+
+## All plugins
+
+Composition includes inherited plugin types. A check means the component includes that plugin by default; an empty cell means it can be added manually.
+
+| Plugin                  | Composition                                           | Package                                 |      Lite       |      Full       |
+| ----------------------- | ----------------------------------------------------- | --------------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`             | <PluginTag type="remark" />                           | <PluginTag type="react-base-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> |                 |
+| `CodePrismPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="react-base-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PluginTag type="render" />                           | <PluginTag type="react-base-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       | <PresetCheck /> |                 |
+| `TexKatexPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       |                 |                 |
+| `TexMathjaxKatexPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="taro-plugins" />       |                 | <PresetCheck /> |
+
+### Package
+
+<PluginTag type="taro-plugins" /> refers to `@fluxdown/taro-plugins`, which
+provides Taro slots on top of the shared render plugins.
+
+<PluginTag type="react-base-plugins" /> refers to
+`@fluxdown/react-base-plugins`, which provides shared rendering and syntax
+plugins.
+
+### Import rules
+
+> Import from `<package>/plugins/<plugin-directory>`. Remove the `Plugin` suffix and convert the name to lowercase kebab case: `CodePrismPlugin` becomes `code-prism`, and `TexMathjaxKatexPlugin` becomes `tex-mathjax-katex`. Use the package shown in the table.
+
+```ts
+import { CjkPlugin } from '@fluxdown/react-base-plugins/plugins/cjk';
+import { CodePrismPlugin } from '@fluxdown/taro-plugins/plugins/code-prism';
+import { TexMathjaxKatexPlugin } from '@fluxdown/taro-plugins/plugins/tex-mathjax-katex';
+```
+
+> Import `PRESET_FULL_PLUGINS` from `@fluxdown/taro-plugins/full` and `PRESET_LITE_PLUGINS` from `@fluxdown/taro-plugins/lite`.
+
+Pass plugins through the component's `plugins` prop. See [aggregate plugins](./aggregate.md) for declaration, composition and configuration.

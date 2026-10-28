@@ -12,7 +12,7 @@ Fluxdown keeps streaming Markdown readable, from unfinished syntax to the final 
 - **Less repeated work.** Block-level caching reuses stable content as the message grows.
 - **Familiar Markdown.** Render GFM tables, task lists, strikethrough, and autolinks, with code highlighting and optional math.
 - **Adaptable presentation.** Customize themes, replace components, or extend parsing and rendering with plugins.
-- **A framework-independent core.** Use built-in components for React, Vue 3, React Native, Lynx, and Solid, or build your own renderer.
+- **A framework-independent core.** Use built-in components for React, Vue 3, React Native, Lynx, Solid, and Taro, or build your own renderer.
 
 ## Get started
 
@@ -43,7 +43,7 @@ If your bundler does not load the styles automatically, add this to your app's g
 import "fluxdown/styles.css";
 ```
 
-See the quick starts for [React](./website/docs/en/guide/react/quick-start.md), [Vue 3](./website/docs/en/guide/vue/quick-start.md), [React Native](./website/docs/en/guide/react-native/quick-start.md), [Lynx](./website/docs/en/guide/lynx/quick-start.md), and [Solid](./website/docs/en/guide/solid/quick-start.md) for more examples.
+See the quick starts for [React](./website/docs/en/guide/react/quick-start.md), [Vue 3](./website/docs/en/guide/vue/quick-start.md), [React Native](./website/docs/en/guide/react-native/quick-start.md), [Lynx](./website/docs/en/guide/lynx/quick-start.md), [Solid](./website/docs/en/guide/solid/quick-start.md), and [Taro](./website/docs/en/guide/taro/quick-start.md) for more examples.
 
 ## Packages
 
@@ -54,6 +54,7 @@ See the quick starts for [React](./website/docs/en/guide/react/quick-start.md), 
 | [`@fluxdown/react-native`](./packages/react-native) | Ready-to-use Markdown rendering in React Native.                    |
 | [`@fluxdown/lynx`](./packages/lynx)                 | Ready-to-use Markdown rendering in ReactLynx.                       |
 | [`@fluxdown/solid`](./packages/solid)               | Ready-to-use Markdown rendering in Solid.                           |
+| [`@fluxdown/taro`](./packages/taro)                 | Ready-to-use Markdown rendering in Taro.                            |
 | [`@fluxdown/core`](./packages/core)                 | Parsing, repair, and reactive content blocks for a custom renderer. |
 | [`stative`](./packages/stative)                     | Composable state and derived computations, also used by Core.       |
 

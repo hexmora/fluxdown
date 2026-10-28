@@ -58,6 +58,11 @@
     --tag-dark-color: #a9c9f2;
   }
 
+  &[data-type="taro-plugins"] {
+    --tag-color: #3c64a6;
+    --tag-dark-color: #aecbff;
+  }
+
   &[data-type="vue-plugins"] {
     --tag-color: #287b58;
     --tag-dark-color: #a0dfbd;

@@ -6,7 +6,7 @@ A framework-independent Markdown engine for streaming content.
 
 `@fluxdown/core` turns changing Markdown into reactive content blocks backed by HAST, an HTML syntax tree. It handles parsing, syntax repair, and updates; your renderer decides what each block becomes.
 
-Core runs without a browser. Use it to build a custom renderer or a framework integration. For ready-to-use components, see [React](../react), [Vue 3](../vue), [React Native](../react-native), [Lynx](../lynx), and [Solid](../solid).
+Core runs without a browser. Use it to build a custom renderer or a framework integration. For ready-to-use components, see [React](../react), [Vue 3](../vue), [React Native](../react-native), [Lynx](../lynx), [Solid](../solid), and [Taro](../taro).
 
 ## Install
 

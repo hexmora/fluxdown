@@ -36,6 +36,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "taro",
+    "label": "Taro"
+  },
+  {
+    "type": "dir-section-header",
     "name": "core",
     "label": "Core"
   }

@@ -118,6 +118,10 @@ export const Home = () => {
               <strong>Solid</strong>
               <span>{copy.react}</span>
             </a>
+            <a className={styles.frameworkCard} href={href('/guide/taro/quick-start')}>
+              <strong>Taro</strong>
+              <span>{copy.react}</span>
+            </a>
             {UPCOMING_FRAMEWORKS.map((framework) => (
               <div className={styles.frameworkCard} data-upcoming key={framework}>
                 <strong>{framework}</strong>

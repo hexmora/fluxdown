@@ -30,6 +30,12 @@
     "position": "left"
   },
   {
+    "text": "Taro",
+    "link": "/guide/taro/quick-start",
+    "activeMatch": "/guide/taro/",
+    "position": "left"
+  },
+  {
     "text": "Core",
     "link": "/guide/core/quick-start",
     "activeMatch": "/guide/core/",

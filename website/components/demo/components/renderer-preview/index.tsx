@@ -9,6 +9,7 @@ import type { RendererPreviewProps } from './type';
 import { useLocale } from '../../../hooks';
 import { LynxPreview } from './components/lynx-preview';
 import { SolidPreview } from './components/solid-preview';
+import { TaroPreview } from './components/taro-preview';
 import { VuePreview } from './components/vue-preview';
 
 export const RendererPreview = ({
@@ -21,10 +22,12 @@ export const RendererPreview = ({
   reducedMotion = false,
 }: RendererPreviewProps) => {
   const { lang } = useLocale();
+
   const theme = useMemo(
     () => [dark ? 'dark' : 'light', { tokens: { colors: { bg: 'transparent' } } }] satisfies Theme,
     [dark],
   );
+
   const data = useMemo(
     () => ({
       text,
@@ -36,6 +39,7 @@ export const RendererPreview = ({
     }),
     [text, streaming, build, dark, cycle, reducedMotion],
   );
+
   const props = { text, streaming, build, theme };
 
   if (renderer === 'lynx') {
@@ -57,6 +61,10 @@ export const RendererPreview = ({
 
   if (renderer === 'vue') {
     return <VuePreview key={cycle} {...props} />;
+  }
+
+  if (renderer === 'taro') {
+    return <TaroPreview key={cycle} {...props} />;
   }
 
   if (renderer === 'react-native') {
