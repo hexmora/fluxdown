@@ -1,5 +1,14 @@
 # @fluxdown/website
 
+## 0.0.10
+
+### Patch Changes
+
+- 441e387: Add a shared side-by-side renderer demo, persistent playground renderer selection, and framework tabs for common feature examples.
+- b2a77a7: Add English and Chinese Vue guides, complete component configuration reference, and navigation.
+- Updated dependencies [ee390c4]
+  - @fluxdown/vue@0.2.0
+
 ## 0.0.9
 
 ### Patch Changes

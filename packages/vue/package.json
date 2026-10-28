@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/vue",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Vue 3 components for streaming Markdown.",
   "keywords": [
     "hast",
