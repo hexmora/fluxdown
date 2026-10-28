@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/react-native-plugins",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "description": "React Native render slots and plugin presets for Fluxdown.",
   "keywords": [
     "hast",

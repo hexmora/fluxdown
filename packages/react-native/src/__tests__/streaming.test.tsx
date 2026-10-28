@@ -53,10 +53,15 @@ afterEach(async () => {
   jest.restoreAllMocks();
 
   restoreGlobals();
+
+  jest.useRealTimers();
 });
 
 describe('React Native streaming', () => {
   test('keeps the shade host and measured drawing when inline formatting appears', async () => {
+    // Shad inactivity must not expire while the test advances its own RAF clock.
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+
     const clock = createRafClock();
 
     let mounts = 0;
@@ -140,6 +145,8 @@ describe('React Native streaming', () => {
   ])(
     'retains $token when the real shaded tail moves forward',
     async ({ before, after, token, next, ready, nextReady, width, prefix }) => {
+      jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
+
       const clock = createRafClock();
 
       const streaming = { effect: 'shad', smooth: true } as const;
