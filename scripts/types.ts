@@ -50,3 +50,13 @@ export interface LynxCheckResult {
   nativeAssets: string[];
   webAssets: string[];
 }
+
+export interface UniAppCheckResult {
+  specifiers: string[];
+
+  typeEntries: number;
+
+  webAssets: string[];
+
+  compilerVersion: string;
+}

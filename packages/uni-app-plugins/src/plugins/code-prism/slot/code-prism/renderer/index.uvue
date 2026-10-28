@@ -1,0 +1,69 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { RendererProps } from './type';
+
+import InheritedText from '../../../../../base/components/inherited-text/index.uvue';
+import { provideInlineFlow } from '../../../../../base/components/inline-flow/context';
+import RenderNodes from '../../../../../base/slot/components/render-nodes/index.uvue';
+import { useTheme } from '../../../../../base/theme';
+import { highlight, toCodeLines } from './utils';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+
+provideInlineFlow(false);
+
+const lines = computed(() => toCodeLines(highlight(props.code, props.language)));
+
+const color = (type?: string) => {
+  const syntax = theme.value.tokens.syntax;
+
+  return type && type in syntax
+    ? syntax[type as keyof typeof syntax]
+    : theme.value.tokens.colors.fg;
+};
+</script>
+
+<template>
+  <scroll-view
+    class="fluxdown-code-prism"
+    direction="horizontal"
+    style="height: auto"
+    :style="{ padding: `${theme.tokens.spacing.lg}px` }"
+  >
+    <InheritedText
+      :style="{
+        fontFamily: theme.tokens.typography.fontMono,
+        fontSize: `${theme.tokens.code.fontSize}px`,
+        lineHeight: `${theme.tokens.code.fontSize * theme.tokens.code.lineHeight}px`,
+        whiteSpace: 'pre',
+      }"
+    >
+      <view style="display: flex; flex-direction: column; align-items: flex-start">
+        <view
+          v-for="(line, lineIndex) in lines"
+          :key="lineIndex"
+          :style="{
+            display: 'flex',
+            flexDirection: 'row',
+            flexShrink: 0,
+            minHeight: `${theme.tokens.code.fontSize * theme.tokens.code.lineHeight}px`,
+          }"
+        >
+          <InheritedText
+            v-for="(token, index) in line"
+            :key="index"
+            :style="{ color: color(token.type) }"
+            :text="token.text"
+          />
+          <RenderNodes
+            v-if="lineIndex === lines.length - 1 && props.suffix"
+            :nodes="[props.suffix]"
+          />
+        </view>
+      </view>
+    </InheritedText>
+  </scroll-view>
+</template>

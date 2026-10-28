@@ -1,0 +1,51 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import InheritedText from '../../../../../base/components/inherited-text/index.uvue';
+import InlineFlow from '../../../../../base/components/inline-flow/index.uvue';
+import { useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+</script>
+
+<template>
+  <view
+    class="fluxdown-table-cell"
+    :style="{
+      flex: 1,
+      minWidth: '120px',
+      padding: `${theme.tokens.spacing.sm}px ${theme.tokens.spacing.md}px`,
+      borderRightWidth: '1px',
+      borderRightStyle: 'solid',
+      borderRightColor: theme.tokens.colors.border,
+      backgroundColor: props.tagName === 'th' ? theme.tokens.colors.surfaceMuted : 'transparent',
+    }"
+  >
+    <InheritedText
+      :style="{
+        textAlign: props.align ?? 'left',
+        fontSize: `${theme.tokens.typography.fontSize.sm}px`,
+        lineHeight: `${theme.tokens.typography.fontSize.sm * theme.tokens.typography.lineHeight.md}px`,
+        fontWeight:
+          props.tagName === 'th'
+            ? theme.tokens.typography.fontWeight.medium
+            : theme.tokens.typography.fontWeight.normal,
+      }"
+    >
+      <InlineFlow
+        :style="{
+          justifyContent:
+            props.align === 'center'
+              ? 'center'
+              : props.align === 'right'
+                ? 'flex-end'
+                : 'flex-start',
+        }"
+      >
+        <slot />
+      </InlineFlow>
+    </InheritedText>
+  </view>
+</template>

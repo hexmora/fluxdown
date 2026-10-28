@@ -1,0 +1,9 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+const props = defineProps<RendererProps>();
+</script>
+
+<template>
+  <image class="fluxdown-image" :src="props.src" mode="widthFix" style="width: 100%" />
+</template>

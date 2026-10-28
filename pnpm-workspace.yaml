@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - packages/uni-app/playground
   - website
 
 catalogMode: strict
@@ -8,6 +9,9 @@ catalogMode: strict
 verifyDepsBeforeRun: error
 
 catalog:
+  "@dcloudio/uni-app-x": 0.7.134
+  "@vitejs/plugin-vue": ^6.0.10
+  vue-tsc: ^3.3.13
   vue: ^3.5.44
   "@vue/server-renderer": ^3.5.44
   "@vue/test-utils": ^2.5.1
@@ -135,6 +139,22 @@ catalog:
   background-only: 0.0.1
 
 catalogs:
+  uni-app-peer:
+    vue: ^3.4.21
+  uni-app-cli:
+    "@rollup/plugin-commonjs": ^29.0.2
+    "@babel/core": ^8.0.9
+    "@babel/plugin-transform-unicode-property-regex": ^8.0.1
+    "@dcloudio/uni-app": 3.0.0-5030320261023001
+    "@dcloudio/uni-components": 3.0.0-5030320261023001
+    "@dcloudio/uni-h5": 3.0.0-5030320261023001
+    "@dcloudio/uni-cli-shared": 3.0.0-5030320261023001
+    "@dcloudio/vite-plugin-uni": 3.0.0-5030320261023001
+    "@dcloudio/uni-uts-v1": 3.0.0-5030320261023001
+    vite: 5.2.8
+    vue: 3.4.21
+  vue-language-tools:
+    typescript: npm:@typescript/typescript6@6.0.2
   vue-peer:
     vue: ^3.5.0
   react-native-peer:
@@ -166,5 +186,6 @@ allowBuilds:
   "@swc/core": true
   "@parcel/watcher": true
   core-js: false
+  core-js-pure: false
   esbuild: true
   unrs-resolver: true

@@ -1,0 +1,19 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { RendererProps } from './type';
+
+import { EASE_OUT } from '../../../../../base/animation/easing';
+import { useAppear } from '../../../../../base/animation/hooks';
+import InheritedText from '../../../../../base/components/inherited-text/index.uvue';
+
+const props = defineProps<RendererProps>();
+
+const progress = useAppear(() => ({ start: props.start, duration: props.duration }));
+
+const opacity = computed(() => EASE_OUT(progress.value));
+</script>
+
+<template>
+  <InheritedText :style="{ opacity }"><slot /></InheritedText>
+</template>

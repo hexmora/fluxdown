@@ -1,0 +1,22 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { PatchReconcilerProps } from './type';
+
+import { useStateValue } from '../../../../../../base/composables';
+import RenderNodes from '../../../../../../base/slot/components/render-nodes/index.uvue';
+
+const props = defineProps<PatchReconcilerProps>();
+
+const patches = useStateValue(() => props.patches);
+
+const nodes = computed(() => {
+  const patch = patches.value.find(({ key }) => key === props.patchKey)?.render;
+
+  return [patch ? patch(props.text) : null];
+});
+</script>
+
+<template>
+  <RenderNodes :nodes="nodes" />
+</template>

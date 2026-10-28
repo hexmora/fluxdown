@@ -1,0 +1,22 @@
+<script setup lang="ts">
+import type { MentionProps } from './type';
+
+const props = defineProps<MentionProps>();
+</script>
+
+<template>
+  <button class="mention" size="mini" @click="props.onPress">
+    {{ props.label }}
+  </button>
+</template>
+
+<style>
+.mention {
+  padding: 0 8px;
+  border-radius: 6px;
+  background-color: #d5efeb;
+  color: #0f766e;
+  font-size: 16px;
+  line-height: 26px;
+}
+</style>

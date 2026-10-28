@@ -1,0 +1,20 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { RendererProps } from './type';
+
+import RenderNodes from '../../../../../base/slot/components/render-nodes/index.uvue';
+import { shadeNodes } from './utils';
+
+const props = defineProps<RendererProps>();
+
+const nodes = computed(() => {
+  const children = [props.leading, props.active];
+
+  return props.isActive ? shadeNodes(props.leading, props.active, props.offset) : children;
+});
+</script>
+
+<template>
+  <RenderNodes :nodes="nodes" />
+</template>

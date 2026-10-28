@@ -1,0 +1,33 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import InheritedText from '../../../../../base/components/inherited-text/index.uvue';
+import { provideInlineFlow } from '../../../../../base/components/inline-flow/context';
+import RenderNodes from '../../../../../base/slot/components/render-nodes/index.uvue';
+import { useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+
+provideInlineFlow(false);
+</script>
+
+<template>
+  <scroll-view
+    class="fluxdown-code-highlighter"
+    direction="horizontal"
+    style="height: auto"
+    :style="{ padding: `${theme.tokens.spacing.lg}px` }"
+  >
+    <InheritedText
+      :style="{
+        fontFamily: theme.tokens.typography.fontMono,
+        fontSize: `${theme.tokens.code.fontSize}px`,
+        lineHeight: `${theme.tokens.code.fontSize * theme.tokens.code.lineHeight}px`,
+        whiteSpace: 'pre',
+      }"
+      ><InheritedText :text="props.code" /><RenderNodes v-if="props.suffix" :nodes="[props.suffix]"
+    /></InheritedText>
+  </scroll-view>
+</template>

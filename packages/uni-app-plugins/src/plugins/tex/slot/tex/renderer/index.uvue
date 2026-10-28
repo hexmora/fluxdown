@@ -1,0 +1,21 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import InheritedText from '../../../../../base/components/inherited-text/index.uvue';
+import { useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+</script>
+
+<template>
+  <InheritedText
+    class="fluxdown-tex"
+    :style="{
+      fontFamily: theme.tokens.typography.fontMono,
+      fontSize: `${theme.tokens.code.fontSize}px`,
+    }"
+    :text="props.tex"
+  />
+</template>

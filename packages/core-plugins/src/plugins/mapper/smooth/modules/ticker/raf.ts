@@ -25,12 +25,13 @@ export class RafSmoothTicker extends BaseSmoothTicker {
 
     const generation = ++this.generation;
 
-    const next = (time: number) => {
+    const next = () => {
       if (!this.running || generation !== this.generation) {
         return;
       }
 
-      this.subject.next(time);
+      // Native RAF callbacks may use a different clock origin from start().
+      this.subject.next(getNow());
 
       if (this.running && generation === this.generation) {
         this.frame = requestAnimationFrame(next);

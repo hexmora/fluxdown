@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { RenderNodesProps } from './type';
+
+import InheritedText from '../../../components/inherited-text/index.uvue';
+import { useSlotPlugins } from '../../context';
+import { flattenNodes, getNodeKey, isComponentNode, isTextNode } from './utils';
+
+defineOptions({ name: 'FluxdownRenderNodes' });
+
+const props = defineProps<RenderNodesProps>();
+
+const slots = useSlotPlugins();
+
+const entries = computed(() => flattenNodes(props.nodes));
+</script>
+
+<template>
+  <template v-for="(node, index) in entries" :key="getNodeKey(node, index)">
+    <InheritedText v-if="isTextNode(node)" :text="node" />
+    <component v-else-if="isComponentNode(node)" :is="node.component" v-bind="node.props" />
+    <component
+      v-else
+      :is="slots[node.type]?.at(-1)?.Component"
+      v-bind="{ ...slots[node.type]?.at(-1)?.props, ...node.props, children: node.children }"
+    >
+      <FluxdownRenderNodes v-if="node.children" :nodes="node.children" />
+    </component>
+  </template>
+</template>

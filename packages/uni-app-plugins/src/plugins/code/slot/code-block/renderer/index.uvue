@@ -1,0 +1,37 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { RendererProps } from './type';
+
+import RenderNodes from '../../../../../base/slot/components/render-nodes/index.uvue';
+import { getBlockStyle, useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+
+const nodes = computed(() => [
+  { type: 'CodeHeader' as const, props: { code: props.code, language: props.language } },
+  {
+    type: 'CodeHighlighter' as const,
+    props: { code: props.code, language: props.language, suffix: props.suffix },
+  },
+]);
+</script>
+
+<template>
+  <view
+    class="fluxdown-code-block"
+    :style="{
+      ...getBlockStyle('pre', theme.tokens),
+      borderRadius: `${theme.tokens.radius.lg}px`,
+      overflow: 'hidden',
+      backgroundColor: theme.tokens.colors.surfaceSubtle,
+      borderWidth: '1px',
+      borderStyle: 'solid',
+      borderColor: theme.tokens.colors.border,
+    }"
+  >
+    <RenderNodes :nodes="nodes" />
+  </view>
+</template>

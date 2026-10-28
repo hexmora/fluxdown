@@ -1,0 +1,56 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { RendererProps } from './type';
+
+import InheritedText from '../../../../../base/components/inherited-text/index.uvue';
+import { isHastElement } from '../../../../../base/render/utils/node';
+import RenderNodes from '../../../../../base/slot/components/render-nodes/index.uvue';
+import { getBlockStyle, useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+
+const entries = computed(() =>
+  props.current.children.filter((node) => node.type === 'element' && node.tagName === 'li'),
+);
+
+const nested = computed(
+  () => props.parents?.some((parent) => isHastElement(parent, 'li')) ?? false,
+);
+</script>
+
+<template>
+  <view class="fluxdown-list" :style="getBlockStyle(props.current.tagName, theme.tokens, nested)">
+    <view
+      v-for="(item, index) in entries"
+      :key="index"
+      :style="{
+        display: 'flex',
+        flexDirection: 'row',
+        marginTop: `${index > 0 ? theme.tokens.spacing.xs : 0}px`,
+      }"
+    >
+      <InheritedText
+        v-if="props.type !== 'task'"
+        :style="{
+          width: `${theme.tokens.spacing.xl - theme.tokens.spacing.sm}px`,
+          marginRight: `${theme.tokens.spacing.sm}px`,
+          flexShrink: 0,
+          textAlign: 'right',
+          color: theme.tokens.colors.fgMuted,
+          fontWeight: theme.tokens.typography.fontWeight.medium,
+        }"
+        :text="
+          props.type === 'ordered'
+            ? `${Number(props.current.properties?.start ?? 1) + index}.`
+            : '•'
+        "
+      />
+      <view :style="{ flex: 1, paddingLeft: `${theme.tokens.spacing.xs}px` }"
+        ><RenderNodes :nodes="[props.render(item)]"
+      /></view>
+    </view>
+  </view>
+</template>

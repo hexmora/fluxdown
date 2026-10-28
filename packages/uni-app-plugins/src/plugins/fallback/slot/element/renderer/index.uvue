@@ -1,0 +1,57 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import InheritedText from '../../../../../base/components/inherited-text/index.uvue';
+import InlineFlow from '../../../../../base/components/inline-flow/index.uvue';
+import { useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+</script>
+
+<template>
+  <InheritedText
+    v-bind="$attrs"
+    class="fluxdown-element"
+    v-if="props.tagName === 'code'"
+    :style="{
+      fontFamily: theme.tokens.typography.fontMono,
+      fontSize: `${theme.tokens.code.fontSize}px`,
+      backgroundColor: theme.tokens.colors.surfaceMuted,
+    }"
+    ><slot
+  /></InheritedText>
+  <InheritedText
+    v-bind="$attrs"
+    v-else-if="props.tagName === 'del'"
+    :style="{ textDecorationLine: 'line-through' }"
+    ><slot
+  /></InheritedText>
+  <InheritedText
+    v-bind="$attrs"
+    v-else-if="props.tagName === 'input'"
+    :text="props.checked ? '☑ ' : '☐ '"
+  />
+  <view
+    v-bind="$attrs"
+    v-else-if="props.tagName === 'hr'"
+    :style="{
+      height: '1px',
+      backgroundColor: theme.tokens.colors.border,
+      marginTop: '24px',
+      marginBottom: '24px',
+    }"
+  />
+  <view
+    v-bind="$attrs"
+    v-else-if="props.tagName === 'tr'"
+    style="display: flex; flex-direction: row"
+    ><slot
+  /></view>
+  <InlineFlow v-else-if="props.tagName === 'li'"><slot /></InlineFlow>
+  <view v-bind="$attrs" v-else-if="['div', 'thead', 'tbody', 'tfoot'].includes(props.tagName)"
+    ><slot
+  /></view>
+  <InheritedText v-bind="$attrs" v-else><slot /></InheritedText>
+</template>

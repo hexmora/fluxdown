@@ -1,0 +1,45 @@
+<script setup lang="ts">
+import { computed, useAttrs } from 'vue';
+
+import type { InheritedTextProps } from './type';
+
+import { useInlineFlow } from '../inline-flow/context';
+import { useTextStyle } from './hooks';
+import { splitInlineText } from './utils';
+
+defineOptions({ inheritAttrs: false });
+
+const props = defineProps<InheritedTextProps>();
+
+const attributes = useAttrs();
+
+const context = useTextStyle(
+  () => props.style,
+  () => attributes,
+);
+
+const inline = useInlineFlow();
+
+const parts = computed(() => {
+  if (props.text === undefined) {
+    return [];
+  }
+
+  return inline ? splitInlineText(props.text) : [String(props.text)];
+});
+</script>
+
+<template>
+  <text
+    v-for="(part, index) in parts"
+    :key="index"
+    v-bind="context.attributes"
+    :style="{ ...context.style, flexShrink: 0, maxWidth: '100%' }"
+    >{{ part }}</text
+  >
+  <slot
+    v-if="props.text === undefined"
+    :text-style="context.style"
+    :attributes="context.attributes"
+  />
+</template>

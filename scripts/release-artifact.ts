@@ -6,7 +6,7 @@ import path from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import semver from 'semver';
 
-import type { BrowserCheckResult, LynxCheckResult } from './types.ts';
+import type { BrowserCheckResult, LynxCheckResult, UniAppCheckResult } from './types.ts';
 
 export const RELEASE_REPOSITORY = 'hexmora/fluxdown';
 export const RELEASE_REGISTRY = 'https://registry.npmjs.org/';
@@ -18,6 +18,8 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/types',
   '@fluxdown/core-plugins',
   '@fluxdown/core',
+  '@fluxdown/uni-app-plugins',
+  '@fluxdown/uni-app',
   '@fluxdown/vue-plugins',
   '@fluxdown/vue',
   '@fluxdown/lynx-plugins',
@@ -65,7 +67,12 @@ export interface ReleaseArtifactManifest {
   publishable: boolean;
   tools: { node: string; npm: string; pnpm: string; changesets: string };
   candidate?: StableCandidate;
-  verification: { nodeEntries: number; browser: BrowserCheckResult[]; lynx?: LynxCheckResult };
+  verification: {
+    nodeEntries: number;
+    browser: BrowserCheckResult[];
+    lynx?: LynxCheckResult;
+    uniApp?: UniAppCheckResult;
+  };
   packages: ArtifactPackage[];
 }
 
@@ -184,6 +191,56 @@ function validateLynxVerification(value: unknown, packages: string[]): void {
   }
 }
 
+function validateUniAppVerification(value: unknown, packages: string[]): void {
+  const verification = record(value, 'uni-app verification');
+
+  const { specifiers, typeEntries, webAssets } = verification;
+
+  nonempty(verification.compilerVersion, 'uni-app compiler version');
+
+  assert(Array.isArray(specifiers) && specifiers.length > 0, 'Missing uni-app entry verification');
+
+  assert(
+    specifiers.every((specifier, index) => specifiers.indexOf(specifier) === index),
+    'Duplicate uni-app entry verification',
+  );
+
+  for (const specifier of specifiers) {
+    nonempty(specifier, 'uni-app entry specifier');
+
+    const name = packages.find((pkg) => specifier === pkg || specifier.startsWith(`${pkg}/`));
+
+    assert(name, `uni-app entry does not belong to an artifact package: ${specifier}`);
+
+    if (specifier !== name) {
+      safeRelativePath(specifier.slice(name.length + 1));
+    }
+  }
+
+  for (const name of packages) {
+    assert(
+      specifiers.some((specifier) => specifier === name || specifier.startsWith(`${name}/`)),
+      `Missing uni-app package verification: ${name}`,
+    );
+  }
+
+  assert.equal(typeEntries, specifiers.length, 'Incomplete uni-app declaration verification');
+
+  assert(Array.isArray(webAssets) && webAssets.length > 0, 'Missing uni-app web assets');
+
+  assert(
+    webAssets.every((asset, index) => webAssets.indexOf(asset) === index),
+    'Duplicate uni-app web assets',
+  );
+
+  webAssets.forEach(safeRelativePath);
+
+  assert(
+    webAssets.includes('index.html') && webAssets.some((asset) => asset.endsWith('.js')),
+    'Incomplete uni-app H5 output',
+  );
+}
+
 export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest {
   const manifest = record(value, 'release artifact manifest');
 
@@ -266,10 +323,20 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
 
   if (verification.lynx !== undefined) validateLynxVerification(verification.lynx, lynxPackages);
 
+  const uniAppPackages = [...names].filter(
+    (name) => name === '@fluxdown/uni-app' || name === '@fluxdown/uni-app-plugins',
+  );
+
+  if (uniAppPackages.length || verification.uniApp !== undefined) {
+    validateUniAppVerification(verification.uniApp, uniAppPackages);
+  }
+
   // Existing artifacts predate Lynx evidence and remain valid for recovery.
   assert(
     Number(verification.nodeEntries) > 0 ||
-      (lynxPackages.length === names.size && verification.lynx !== undefined),
+      (verification.lynx !== undefined ? lynxPackages.length : 0) +
+        (verification.uniApp !== undefined ? uniAppPackages.length : 0) ===
+        names.size,
     'Missing consumer verification',
   );
 

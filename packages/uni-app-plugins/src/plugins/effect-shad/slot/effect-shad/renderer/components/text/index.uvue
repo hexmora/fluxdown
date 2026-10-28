@@ -1,0 +1,35 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { ShadTextProps } from './type';
+
+import InheritedText from '../../../../../../../base/components/inherited-text/index.uvue';
+import InlineCanvas from '../../../../../../../base/components/inline-canvas/index.uvue';
+import { toShadWords } from './utils';
+
+const props = defineProps<ShadTextProps>();
+
+const words = computed(() =>
+  toShadWords(props.text, props.trailingText, props.prefix, props.offset),
+);
+</script>
+
+<template>
+  <InheritedText v-slot="{ textStyle, attributes }">
+    <template v-for="word in words" :key="word.key">
+      <InheritedText v-if="word.trailing === undefined" :text="word.text" />
+      <InlineCanvas
+        v-else
+        v-bind="attributes"
+        :text="word.text"
+        :text-style="textStyle"
+        :start="-1"
+        :duration="0"
+        :from="1"
+        :blur="0"
+        :mask-text="props.maskText"
+        :trailing-text="word.trailing"
+      />
+    </template>
+  </InheritedText>
+</template>

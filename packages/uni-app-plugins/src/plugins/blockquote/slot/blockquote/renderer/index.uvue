@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import type { SlotBaseProps } from '../../../../../base/slot/type';
+
+import InheritedText from '../../../../../base/components/inherited-text/index.uvue';
+import { getBlockStyle, useTheme } from '../../../../../base/theme';
+
+const theme = useTheme();
+
+defineProps<SlotBaseProps>();
+</script>
+
+<template>
+  <view
+    class="fluxdown-blockquote"
+    :style="{
+      borderLeftWidth: '3px',
+      borderLeftStyle: 'solid',
+      borderLeftColor: theme.tokens.colors.borderEmphasis,
+      borderTopRightRadius: `${theme.tokens.radius.md}px`,
+      borderBottomRightRadius: `${theme.tokens.radius.md}px`,
+      paddingLeft: `${theme.tokens.spacing.lg}px`,
+      paddingRight: `${theme.tokens.spacing.lg}px`,
+      paddingTop: `${theme.tokens.spacing.sm}px`,
+      paddingBottom: `${theme.tokens.spacing.sm}px`,
+      ...getBlockStyle('blockquote', theme.tokens),
+      backgroundColor: theme.tokens.colors.surfaceSubtle,
+    }"
+  >
+    <InheritedText :style="{ color: theme.tokens.colors.fgMuted }"><slot /></InheritedText>
+  </view>
+</template>

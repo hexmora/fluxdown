@@ -1,0 +1,98 @@
+{
+  "name": "@fluxdown/uni-app-plugins",
+  "version": "0.1.0",
+  "description": "uni-app x Vapor render slots and plugin presets for Fluxdown.",
+  "keywords": [
+    "hast",
+    "markdown",
+    "plugins",
+    "renderer",
+    "streaming",
+    "uni-app",
+    "vapor"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/uni-app-plugins"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.uvue"
+  ],
+  "exports": {
+    "./typings": "./src/typings/index.ts",
+    "./base": "./src/base/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts",
+    "./*": "./src/presets/*/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      "./typings": {
+        "types": "./dist/typings/index.d.ts"
+      },
+      "./base": {
+        "types": "./dist/base/index.d.ts",
+        "default": "./dist/base/index.js"
+      },
+      "./plugins/*": {
+        "types": "./dist/plugins/*/index.d.ts",
+        "default": "./dist/plugins/*/index.js"
+      },
+      "./*": {
+        "types": "./dist/presets/*/index.d.ts",
+        "default": "./dist/presets/*/index.js"
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build",
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "typecheck": "vue-tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/hast": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@types/hast": "catalog:",
+    "lodash-es": "catalog:",
+    "mathjax-full": "catalog:",
+    "prismjs": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-app-x": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/prismjs": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "typescript": "catalog:vue-language-tools",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:uni-app-cli",
+    "vue-tsc": "catalog:"
+  },
+  "peerDependencies": {
+    "vue": "catalog:uni-app-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

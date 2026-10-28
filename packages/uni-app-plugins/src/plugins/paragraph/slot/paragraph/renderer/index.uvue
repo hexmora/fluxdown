@@ -1,0 +1,21 @@
+<script setup lang="ts">
+import type { SlotBaseProps } from '../../../../../base/slot/type';
+
+import InlineFlow from '../../../../../base/components/inline-flow/index.uvue';
+import { getBlockStyle, useTheme } from '../../../../../base/theme';
+
+const theme = useTheme();
+
+defineProps<SlotBaseProps>();
+</script>
+
+<template>
+  <view
+    class="fluxdown-paragraph"
+    :style="{
+      ...getBlockStyle('p', theme.tokens),
+    }"
+  >
+    <InlineFlow><slot /></InlineFlow>
+  </view>
+</template>

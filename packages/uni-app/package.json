@@ -1,0 +1,102 @@
+{
+  "name": "@fluxdown/uni-app",
+  "version": "0.1.0",
+  "description": "uni-app x Vapor components for streaming Markdown.",
+  "keywords": [
+    "hast",
+    "llm",
+    "markdown",
+    "renderer",
+    "streaming",
+    "uni-app",
+    "vapor"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/uni-app"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.uvue",
+    "**/*.css"
+  ],
+  "main": "./src/packs/full/index.ts",
+  "module": "./src/packs/full/index.ts",
+  "types": "./src/packs/full/index.ts",
+  "exports": {
+    ".": "./src/packs/full/index.ts",
+    "./*": "./src/packs/*/index.ts"
+  },
+  "publishConfig": {
+    "main": "./dist/packs/full/index.js",
+    "module": "./dist/packs/full/index.js",
+    "types": "./dist/packs/full/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/packs/full/index.d.ts",
+        "default": "./dist/packs/full/index.js"
+      },
+      "./*": {
+        "types": "./dist/packs/*/index.d.ts",
+        "default": "./dist/packs/*/index.js"
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build",
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "typecheck": "vue-tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source",
+    "dev": "pnpm build:preview && storybook dev -p 6011 --no-open",
+    "storybook": "pnpm build:preview && storybook dev -p 6011",
+    "build:storybook": "pnpm build:preview && storybook build",
+    "build:preview": "pnpm --filter @fluxdown/uni-app-playground build"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/uni-app-plugins": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "lodash-es": "catalog:",
+    "shallow-equal": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-app-x": "catalog:",
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/vue3-vite": "catalog:",
+    "@types/hast": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "storybook": "catalog:",
+    "typescript": "catalog:vue-language-tools",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:uni-app-cli",
+    "vue-tsc": "catalog:"
+  },
+  "peerDependencies": {
+    "vue": "catalog:uni-app-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

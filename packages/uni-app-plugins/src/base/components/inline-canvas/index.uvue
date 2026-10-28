@@ -1,0 +1,33 @@
+<script setup lang="ts">
+import type { InlineCanvasProps } from './type';
+
+import { useDrawing } from './hooks';
+
+const props = defineProps<InlineCanvasProps>();
+
+const { id, textId, active, opacity, canvasStyle } = useDrawing(props);
+</script>
+
+<template>
+  <view
+    class="fluxdown-inline-canvas"
+    :style="
+      props.textStyle.backgroundColor ? { backgroundColor: props.textStyle.backgroundColor } : {}
+    "
+  >
+    <text :id="textId" :flatten="false" :style="[props.textStyle, { opacity }]">{{
+      props.text.replaceAll(' ', '\u00a0')
+    }}</text>
+    <canvas v-if="active" :id="id" type="2d" aria-hidden="true" :style="canvasStyle" />
+  </view>
+</template>
+
+<style>
+.fluxdown-inline-canvas {
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+}
+</style>

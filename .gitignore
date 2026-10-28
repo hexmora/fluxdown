@@ -16,3 +16,5 @@ CLAUDE.md
 .moon/workspace-graph.json
 .release
 *.tgz
+
+unpackage

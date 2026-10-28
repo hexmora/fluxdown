@@ -1,0 +1,38 @@
+<script setup lang="ts">
+import { computed, shallowRef, watch } from 'vue';
+
+import type { RendererProps } from './type';
+
+import { useTheme } from '../../../../../base/theme';
+import TexRenderer from '../../../../tex/slot/tex/renderer/index.uvue';
+import { renderFormula } from './utils';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+
+const failed = shallowRef(false);
+
+const formula = computed(() => {
+  const { colors, typography } = theme.value.tokens;
+
+  return renderFormula(props.tex, props.mode ?? 'inline', typography.fontSize.md, colors.fg);
+});
+
+watch(formula, () => {
+  failed.value = false;
+});
+</script>
+
+<template>
+  <image
+    v-if="formula && !failed"
+    class="fluxdown-tex-mathjax"
+    :src="formula.src"
+    :style="{ width: `${formula.width}px`, height: `${formula.height}px` }"
+    mode="aspectFit"
+    :fade-show="false"
+    @error="failed = true"
+  />
+  <TexRenderer v-else :tex="props.tex" :mode="props.mode" />
+</template>
