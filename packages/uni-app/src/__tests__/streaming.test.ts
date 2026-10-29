@@ -3,6 +3,7 @@ import { nextTick } from 'vue';
 
 import { FluxdownLite } from '../packs/lite';
 import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { getText } from './utils/text';
 
 describe('streaming lifecycle', () => {
   test('preserves chunk batches without smoothing', async () => {
@@ -26,7 +27,7 @@ describe('streaming lifecycle', () => {
 
     expect(wrapper.findAll('text').find((node) => node.text() === 'world')!.element).toBe(chunk);
 
-    expect(wrapper.text().replaceAll('\u00a0', ' ')).toBe('Hello world! Another chunk.');
+    expect(getText(wrapper.element)).toBe('Hello world! Another chunk.');
   });
 
   test.each(['scale', 'shad', 'suffix', 'chunk'] as const)(
@@ -40,11 +41,11 @@ describe('streaming lifecycle', () => {
 
       await wrapper.setProps({ text });
 
-      expect(wrapper.text().replaceAll('\u00a0', ' ')).toContain(text);
+      expect(getText(wrapper.element)).toContain(text);
 
       await wrapper.setProps({ streaming: false });
 
-      expect(wrapper.text().replaceAll('\u00a0', ' ')).toBe(text);
+      expect(getText(wrapper.element)).toBe(text);
     },
   );
 
@@ -65,19 +66,19 @@ describe('streaming lifecycle', () => {
 
       await nextTick();
 
-      expect(wrapper.text().replaceAll('\u00a0', ' ')).toContain('firstse');
+      expect(getText(wrapper.element)).toContain('firstse');
 
       ticker.current().tick(32);
 
       await nextTick();
 
-      expect(wrapper.text().replaceAll('\u00a0', ' ')).toContain('firstseco');
+      expect(getText(wrapper.element)).toContain('firstseco');
 
       ticker.current().tick(48);
 
       await nextTick();
 
-      expect(wrapper.text().replaceAll('\u00a0', ' ')).toContain('firstsecond');
+      expect(getText(wrapper.element)).toContain('firstsecond');
 
       const instance = ticker.current();
 

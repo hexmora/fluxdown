@@ -3,7 +3,7 @@ import { defineComponent, h } from 'vue';
 
 import type { RendererProps } from '../type';
 
-import InlineCanvas from '../../../../../../base/components/inline-canvas/index.uvue';
+import MaskedText from '../../../../../../base/components/masked-text/index.uvue';
 import { provideSlots } from '../../../../../../base/slot/context';
 import ShadText from '../components/text/index.uvue';
 import ShadRenderer from '../index.uvue';
@@ -17,20 +17,20 @@ const Host = /*#__PURE__*/ defineComponent(
   { props: ['leading', 'active', 'isActive', 'maskWidth', 'offset'] },
 );
 
-test('retains word canvas instances when the preceding word leaves the shad tail', async () => {
+test('retains native text instances while words enter and leave the active tail', async () => {
   const wrapper = mount(Host, {
     props: { leading: 'Streaming ', active: 'te', isActive: true, maskWidth: 15, offset: 0 },
   });
 
   const text = wrapper.getComponent(ShadText).vm.$;
 
-  const first = wrapper.getComponent(InlineCanvas).vm.$;
+  const first = wrapper.findAllComponents(MaskedText)[1].vm.$;
 
   await wrapper.setProps({ leading: '', active: 'text sta', offset: 10 });
 
   expect(wrapper.getComponent(ShadText).vm.$).toBe(text);
 
-  const words = wrapper.findAllComponents(InlineCanvas);
+  const words = wrapper.findAllComponents(MaskedText);
 
   expect(words[0].props('text')).toBe('text\u00a0');
 
@@ -42,11 +42,25 @@ test('retains word canvas instances when the preceding word leaves the shad tail
 
   await wrapper.setProps({ leading: 'text ', active: 'stays on', offset: 10 });
 
-  expect(wrapper.findAllComponents(InlineCanvas)[0].vm.$).toBe(next);
+  expect(wrapper.findAllComponents(MaskedText)[0].vm.$).toBe(first);
+
+  expect(wrapper.findAllComponents(MaskedText)[0].props('maskText')).toBe('');
+
+  expect(wrapper.findAllComponents(MaskedText)[1].vm.$).toBe(next);
 
   await wrapper.setProps({ leading: '', active: 'stays on', offset: 15 });
 
   expect(wrapper.getComponent(ShadText).vm.$).toBe(text);
 
-  expect(wrapper.findAllComponents(InlineCanvas)[0].vm.$).toBe(next);
+  expect(wrapper.findAllComponents(MaskedText)[0].vm.$).toBe(next);
+
+  const placeholder = wrapper.getComponent(MaskedText).find('text').element;
+
+  await wrapper.setProps({ isActive: false });
+
+  expect(wrapper.getComponent(MaskedText).vm.$).toBe(next);
+
+  expect(wrapper.getComponent(MaskedText).props('maskText')).toBe('');
+
+  expect(wrapper.getComponent(MaskedText).find('text').element).toBe(placeholder);
 });

@@ -34,7 +34,14 @@ const parts = computed(() => {
     v-for="(part, index) in parts"
     :key="index"
     v-bind="context.attributes"
-    :style="{ ...context.style, flexShrink: 0, maxWidth: '100%' }"
+    :style="{
+      position: 'relative',
+      left: '0px',
+      top: '0px',
+      ...context.style,
+      flexShrink: 0,
+      maxWidth: '100%',
+    }"
     >{{ part }}</text
   >
   <slot

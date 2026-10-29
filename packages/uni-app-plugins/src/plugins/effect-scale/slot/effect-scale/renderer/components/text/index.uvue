@@ -1,0 +1,129 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { ScaleTextProps } from './type';
+
+import { useAppear } from '../../../../../../../base/animation/hooks';
+import { MEASUREMENT_FONT_SIZE } from './consts';
+import { useWidth } from './hooks';
+import { getScaleFrame } from './utils';
+
+const props = defineProps<ScaleTextProps>();
+
+const measurement = useWidth(props);
+
+const style = computed(() => ({
+  ...(props.textStyle.backgroundColor ? { backgroundColor: props.textStyle.backgroundColor } : {}),
+  ...(measurement.width.value === undefined ? {} : { width: `${measurement.width.value}px` }),
+}));
+
+const progress = useAppear(() => ({ start: props.start, duration: props.duration }));
+
+const frame = computed(() => getScaleFrame(props, progress.value));
+
+const layout = computed(() => {
+  const fontSize = parseFloat(String(props.textStyle.fontSize ?? 16));
+
+  const padding =
+    Math.ceil(
+      props.blur * fontSize * 8 + (props.textStyle.fontStyle === 'italic' ? fontSize / 4 : 0),
+    ) + 1;
+
+  const offset = Math.ceil(fontSize * (props.text.length + 1) + padding * 2);
+
+  return { padding, offset };
+});
+
+const clipStyle = computed(() => {
+  const inset = `${-layout.value.padding}px`;
+
+  return { left: inset, right: inset, top: inset, bottom: inset };
+});
+
+const shadowStyle = computed(() => {
+  const { padding, offset } = layout.value;
+
+  return {
+    position: 'absolute' as const,
+    left: `${padding - offset}px`,
+    right: `${padding}px`,
+    top: `${padding}px`,
+    bottom: `${padding}px`,
+    opacity: 1,
+    backgroundColor: 'transparent',
+    overflow: 'visible' as const,
+    textShadow:
+      frame.value.blur === null
+        ? 'none'
+        : `${offset}px 0px ${frame.value.blur}px ${props.textStyle.color ?? '#202123'}`,
+  };
+});
+
+// Native Text approximates isolated characters; a zero-width suffix requests font measurement.
+const text = computed(() => `${props.text.replaceAll(' ', '\u00a0')}\u200b`);
+</script>
+
+<template>
+  <view class="fluxdown-scale-text" :style="style">
+    <text
+      :flatten="false"
+      :style="[
+        props.textStyle,
+        { flexShrink: 0, opacity: progress < 1 ? 0 : (props.textStyle.opacity ?? 1) },
+      ]"
+      >{{ text }}</text
+    >
+    <view
+      v-if="progress < 1"
+      class="fluxdown-scale-text__animation"
+      aria-hidden="true"
+      :style="{ transform: `scale(${frame.scale})`, opacity: frame.opacity }"
+    >
+      <view class="fluxdown-scale-text__clip" :style="clipStyle">
+        <text :flatten="false" :style="[props.textStyle, shadowStyle]">{{ text }}</text>
+      </view>
+    </view>
+    <view
+      class="fluxdown-scale-text__measurement"
+      :style="{ width: `${Math.max(1, props.text.length) * MEASUREMENT_FONT_SIZE * 2}px` }"
+      aria-hidden="true"
+    >
+      <text :id="measurement.id" :flatten="false" :style="measurement.style.value">{{ text }}</text>
+    </view>
+  </view>
+</template>
+
+<style>
+.fluxdown-scale-text {
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+}
+
+.fluxdown-scale-text__animation {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 100%;
+}
+
+.fluxdown-scale-text__clip {
+  position: absolute;
+  overflow: hidden;
+}
+
+.fluxdown-scale-text__measurement {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: flex-start;
+  opacity: 0;
+  pointer-events: none;
+}
+</style>

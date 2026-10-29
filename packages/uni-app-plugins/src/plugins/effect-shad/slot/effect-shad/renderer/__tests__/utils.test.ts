@@ -32,7 +32,7 @@ describe('shad inline preservation', () => {
     });
   });
 
-  test('limits canvas drawing to the tail and retains word order', () => {
+  test('limits masking to the tail and retains word order', () => {
     const words = toShadWords('a long leading sentence ends here', '', 24, 0);
 
     expect(

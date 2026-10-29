@@ -17,8 +17,13 @@ const getText = (node: UniRenderNode): string => {
   return node && 'type' in node && node.children ? getText(node.children) : '';
 };
 
-export const shadeNodes = (leading: UniRenderNode, active: UniRenderNode, offset = 0) => {
-  const maskText = getText(active);
+export const shadeNodes = (
+  leading: UniRenderNode,
+  active: UniRenderNode,
+  offset = 0,
+  enabled = true,
+) => {
+  const maskText = enabled ? getText(active) : '';
 
   const prefix = getText(leading).length;
 

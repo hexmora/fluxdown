@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'vue';
 
-export interface InlineCanvasProps {
+export interface ScaleTextProps {
   text: string;
 
   textStyle: CSSProperties;
@@ -12,14 +12,4 @@ export interface InlineCanvasProps {
   from: number;
 
   blur: number;
-
-  maskText?: string;
-
-  trailingText?: string;
-}
-
-export interface Size {
-  width: number;
-
-  height: number;
 }

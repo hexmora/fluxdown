@@ -8,11 +8,7 @@ import { shadeNodes } from './utils';
 
 const props = defineProps<RendererProps>();
 
-const nodes = computed(() => {
-  const children = [props.leading, props.active];
-
-  return props.isActive ? shadeNodes(props.leading, props.active, props.offset) : children;
-});
+const nodes = computed(() => shadeNodes(props.leading, props.active, props.offset, props.isActive));
 </script>
 
 <template>

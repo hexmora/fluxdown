@@ -1,0 +1,122 @@
+<script setup lang="ts">
+import type { MaskedTextProps } from './type';
+
+import { useMask } from './hooks';
+
+const props = defineProps<MaskedTextProps>();
+
+const {
+  textId,
+  maskId,
+  trailingId,
+  bands,
+  size,
+  masked,
+  text,
+  maskText,
+  trailingText,
+  measurementWidth,
+} = useMask(props);
+</script>
+
+<template>
+  <view
+    class="fluxdown-masked-text"
+    :style="
+      props.textStyle.backgroundColor ? { backgroundColor: props.textStyle.backgroundColor } : {}
+    "
+  >
+    <text
+      :id="textId"
+      :flatten="false"
+      :style="[props.textStyle, { opacity: masked ? 0 : (props.textStyle.opacity ?? 1) }]"
+      >{{ text }}</text
+    >
+    <view v-if="masked" class="fluxdown-masked-text__mask" aria-hidden="true">
+      <view
+        v-for="band in bands"
+        :key="band.key"
+        class="fluxdown-masked-text__band"
+        :style="{
+          left: `${band.left}px`,
+          width: `${band.width}px`,
+          height: `${size.height}px`,
+          opacity: band.opacity * Number(props.textStyle.opacity ?? 1),
+        }"
+      >
+        <text
+          :flatten="false"
+          :style="[
+            props.textStyle,
+            {
+              position: 'absolute',
+              left: `${-band.left}px`,
+              top: '0px',
+              width: `${size.width}px`,
+              height: `${size.height}px`,
+              opacity: 1,
+              backgroundColor: 'transparent',
+            },
+          ]"
+          >{{ text }}</text
+        >
+      </view>
+    </view>
+    <view
+      v-if="masked"
+      class="fluxdown-masked-text__measurement"
+      :style="{ width: `${measurementWidth}px` }"
+      aria-hidden="true"
+    >
+      <text
+        :id="maskId"
+        :flatten="false"
+        :style="[props.textStyle, { alignSelf: 'flex-start', whiteSpace: 'nowrap' }]"
+        >{{ maskText }}</text
+      >
+      <text
+        :id="trailingId"
+        :flatten="false"
+        :style="[props.textStyle, { alignSelf: 'flex-start', whiteSpace: 'nowrap' }]"
+        >{{ trailingText }}</text
+      >
+    </view>
+  </view>
+</template>
+
+<style>
+.fluxdown-masked-text {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.fluxdown-masked-text__mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.fluxdown-masked-text__band {
+  position: absolute;
+  top: 0;
+  overflow: hidden;
+}
+
+.fluxdown-masked-text__measurement {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  opacity: 0;
+  pointer-events: none;
+}
+</style>

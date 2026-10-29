@@ -4,8 +4,8 @@ import { computed } from 'vue';
 import type { RendererProps } from './type';
 
 import InheritedText from '../../../../../base/components/inherited-text/index.uvue';
-import InlineCanvas from '../../../../../base/components/inline-canvas/index.uvue';
 import { isTextNode } from '../../../../../base/slot/components/render-nodes/utils';
+import ScaleText from './components/text/index.uvue';
 
 const props = defineProps<RendererProps>();
 
@@ -14,7 +14,7 @@ const text = computed(() => (props.children?.every(isTextNode) ? props.children.
 
 <template>
   <InheritedText v-slot="{ textStyle, attributes }">
-    <InlineCanvas
+    <ScaleText
       v-if="text !== null"
       v-bind="attributes"
       :text="text"
