@@ -6,6 +6,12 @@
     "position": "left"
   },
   {
+    "text": "Vue",
+    "link": "/guide/vue/quick-start",
+    "activeMatch": "/guide/vue/",
+    "position": "left"
+  },
+  {
     "text": "Native",
     "link": "/guide/react-native/quick-start",
     "activeMatch": "/guide/react-native/",
@@ -15,12 +21,6 @@
     "text": "Lynx",
     "link": "/guide/lynx/quick-start",
     "activeMatch": "/guide/lynx/",
-    "position": "left"
-  },
-  {
-    "text": "Vue",
-    "link": "/guide/vue/quick-start",
-    "activeMatch": "/guide/vue/",
     "position": "left"
   },
   {

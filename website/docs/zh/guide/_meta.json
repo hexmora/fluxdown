@@ -16,6 +16,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "vue",
+    "label": "Vue 3"
+  },
+  {
+    "type": "dir-section-header",
     "name": "react-native",
     "label": "React Native"
   },
@@ -23,11 +28,6 @@
     "type": "dir-section-header",
     "name": "lynx",
     "label": "Lynx"
-  },
-  {
-    "type": "dir-section-header",
-    "name": "vue",
-    "label": "Vue 3"
   },
   {
     "type": "dir-section-header",

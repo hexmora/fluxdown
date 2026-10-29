@@ -102,16 +102,16 @@ export const Home = () => {
               <strong>React</strong>
               <span>{copy.react}</span>
             </a>
+            <a className={styles.frameworkCard} href={href('/guide/vue/quick-start')}>
+              <strong>Vue 3</strong>
+              <span>{copy.react}</span>
+            </a>
             <a className={styles.frameworkCard} href={href('/guide/react-native/quick-start')}>
               <strong>React Native</strong>
               <span>{copy.react}</span>
             </a>
             <a className={styles.frameworkCard} href={href('/guide/lynx/quick-start')}>
               <strong>Lynx</strong>
-              <span>{copy.react}</span>
-            </a>
-            <a className={styles.frameworkCard} href={href('/guide/vue/quick-start')}>
-              <strong>Vue 3</strong>
               <span>{copy.react}</span>
             </a>
             <a className={styles.frameworkCard} href={href('/guide/solid/quick-start')}>
