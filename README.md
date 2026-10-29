@@ -12,7 +12,7 @@ Fluxdown keeps streaming Markdown readable, from unfinished syntax to the final 
 - **Less repeated work.** Block-level caching reuses stable content as the message grows.
 - **Familiar Markdown.** Render GFM tables, task lists, strikethrough, and autolinks, with code highlighting and optional math.
 - **Adaptable presentation.** Customize themes, replace components, or extend parsing and rendering with plugins.
-- **A framework-independent core.** Start with the React component or build a renderer for your own interface.
+- **A framework-independent core.** Use built-in components for React, Vue 3, React Native, Lynx, and Solid, or build your own renderer.
 
 ## Get started
 
@@ -43,13 +43,14 @@ If your bundler does not load the styles automatically, add this to your app's g
 import "fluxdown/styles.css";
 ```
 
-See the [React quick start](./website/docs/en/guide/react/quick-start.md) for more examples.
+See the quick starts for [React](./website/docs/en/guide/react/quick-start.md), [Vue 3](./website/docs/en/guide/vue/quick-start.md), [React Native](./website/docs/en/guide/react-native/quick-start.md), [Lynx](./website/docs/en/guide/lynx/quick-start.md), and [Solid](./website/docs/en/guide/solid/quick-start.md) for more examples.
 
 ## Packages
 
 | Package                                             | Use it for                                                          |
 | --------------------------------------------------- | ------------------------------------------------------------------- |
 | [`fluxdown`](./packages/react)                      | Ready-to-use Markdown rendering in React.                           |
+| [`@fluxdown/vue`](./packages/vue)                   | Ready-to-use Markdown rendering in Vue 3.                           |
 | [`@fluxdown/react-native`](./packages/react-native) | Ready-to-use Markdown rendering in React Native.                    |
 | [`@fluxdown/lynx`](./packages/lynx)                 | Ready-to-use Markdown rendering in ReactLynx.                       |
 | [`@fluxdown/solid`](./packages/solid)               | Ready-to-use Markdown rendering in Solid.                           |
