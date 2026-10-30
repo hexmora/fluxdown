@@ -5,43 +5,51 @@
     "label": "认识 Fluxdown"
   },
   {
-    "type": "dir-section-header",
+    "type": "dir",
     "name": "common",
-    "label": "通用"
+    "label": "通用",
+    "collapsed": true
   },
   {
-    "type": "dir-section-header",
+    "type": "dir",
     "name": "react",
-    "label": "React"
+    "label": "React",
+    "collapsed": true
   },
   {
-    "type": "dir-section-header",
+    "type": "dir",
     "name": "vue",
-    "label": "Vue 3"
+    "label": "Vue 3",
+    "collapsed": true
   },
   {
-    "type": "dir-section-header",
+    "type": "dir",
     "name": "react-native",
-    "label": "React Native"
+    "label": "React Native",
+    "collapsed": true
   },
   {
-    "type": "dir-section-header",
+    "type": "dir",
     "name": "lynx",
-    "label": "Lynx"
+    "label": "Lynx",
+    "collapsed": true
   },
   {
-    "type": "dir-section-header",
+    "type": "dir",
     "name": "solid",
-    "label": "Solid"
+    "label": "Solid",
+    "collapsed": true
   },
   {
-    "type": "dir-section-header",
+    "type": "dir",
     "name": "taro",
-    "label": "Taro"
+    "label": "Taro",
+    "collapsed": true
   },
   {
-    "type": "dir-section-header",
+    "type": "dir",
     "name": "core",
-    "label": "Core"
+    "label": "Core",
+    "collapsed": true
   }
 ]
