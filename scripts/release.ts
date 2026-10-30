@@ -21,7 +21,13 @@ import type { PackageArtifact, WorkspacePackage } from './types.ts';
 
 import { checkBrowserConsumer } from './check-browser.ts';
 import { checkLynxConsumer } from './check-lynx-consumer.ts';
-import { checkPackage, isLynxPackage, publicEntries, readManifest } from './check-package.ts';
+import {
+  checkPackage,
+  isLynxPackage,
+  isTaroPackage,
+  publicEntries,
+  readManifest,
+} from './check-package.ts';
 import { checkReactNativePacks, REACT_NATIVE_PACKAGES } from './check-react-native-packs.ts';
 import { checkReactPacks } from './check-react-packs.ts';
 import {
@@ -322,6 +328,9 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
         '@types/node@22',
         '@types/react@18',
         '@types/react-dom@18',
+        ...(artifacts.some(({ manifest }) => isTaroPackage(manifest.name))
+          ? ['@tarojs/taro-h5@4.3.1', '@tarojs/components-react@4.3.1']
+          : []),
       ],
       { cwd: consumer },
     );
@@ -351,7 +360,7 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
     checkInstalled(installed.dependencies);
 
     const specifiers = nodeArtifacts
-      .filter(({ manifest }) => !isLynxPackage(manifest.name))
+      .filter(({ manifest }) => !isLynxPackage(manifest.name) && !isTaroPackage(manifest.name))
       .flatMap(({ manifest, files }) =>
         publicEntries(manifest, files).map(
           ([entry]) => manifest.name + (entry === '.' ? '' : entry.slice(1)),
@@ -538,6 +547,83 @@ ${renderSmoke}`;
 
     run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')]);
 
+    const taroSpecifiers = nodeArtifacts
+      .filter(({ manifest }) => isTaroPackage(manifest.name))
+      .flatMap(({ manifest, files }) =>
+        publicEntries(manifest, files).map(
+          ([entry]) => manifest.name + (entry === '.' ? '' : entry.slice(1)),
+        ),
+      );
+
+    if (taroSpecifiers.length) {
+      const taroImports = taroSpecifiers
+        .map(
+          (specifier, index) => `import * as Entry${index} from ${JSON.stringify(specifier)};
+
+void Entry${index};`,
+        )
+        .join('\n');
+
+      const taroTypes = taroSpecifiers.includes('@fluxdown/taro')
+        ? `
+import { Fluxdown, type FluxdownProps, type FluxdownRef } from '@fluxdown/taro';
+import { FluxdownLite } from '@fluxdown/taro/lite';
+import { FluxdownRaw } from '@fluxdown/taro/raw';
+import { PRESET_LITE_PLUGINS } from '@fluxdown/taro-plugins/lite';
+import { ParagraphPlugin } from '@fluxdown/taro-plugins/plugins/paragraph';
+import type { IPluginItem } from '@fluxdown/react-base-plugins/typings';
+import { createElement, createRef } from 'react';
+
+const props: FluxdownProps = { text: 'Taro consumer', style: 'padding: 16px', theme: 'dark' };
+
+const plugins: IPluginItem[] = [...PRESET_LITE_PLUGINS, ParagraphPlugin];
+
+const ref = createRef<FluxdownRef>();
+
+createElement(Fluxdown, { ...props, ref, streaming: { effect: 'scale' } });
+
+createElement(FluxdownLite, { ...props, style: { padding: 16 } });
+
+createElement(FluxdownRaw, { ...props, plugins });
+
+// @ts-expect-error Raw requires an explicit plugin selection.
+createElement(FluxdownRaw, { text: 'Taro consumer' });
+
+// @ts-expect-error Taro containers accept CSS property values or a style string.
+createElement(Fluxdown, { text: 'Taro consumer', style: { padding: true } });
+
+// @ts-expect-error Taro components apply their own host property conversion.
+createElement(Fluxdown, { text: 'Taro consumer', getProps: () => ({}) });
+`
+        : '';
+
+      for (const extension of ['mts', 'cts']) {
+        await writeFile(
+          path.join(consumer, '__tests__', `taro-types.${extension}`),
+          taroImports + taroTypes,
+        );
+      }
+
+      await writeFile(
+        path.join(consumer, 'tsconfig.taro.json'),
+        JSON.stringify({
+          compilerOptions: {
+            module: 'NodeNext',
+            moduleResolution: 'NodeNext',
+            target: 'ES2022',
+            strict: true,
+            noEmit: true,
+            jsx: 'react-jsx',
+            // Taro's declarations include optional platform SDKs and use its standard skipLibCheck setting.
+            skipLibCheck: true,
+          },
+          files: ['__tests__/taro-types.mts', '__tests__/taro-types.cts'],
+        }),
+      );
+
+      run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.taro.json')]);
+    }
+
     if (specifiers.includes('@fluxdown/core')) {
       // Check Core alone: importing every plugin above can mask missing augmentations.
       const coreTypes = `
@@ -614,6 +700,30 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
     const lynx = await checkLynxConsumer(consumer, artifacts);
 
     if (specifiers.includes('fluxdown') || nativeArtifacts.length) {
+      if (taroSpecifiers.length) {
+        // Taro 4 requires React 18 types; keep the React 19 dependency tree separate.
+        const consumerManifest = await readManifest(consumer);
+
+        await writeFile(
+          path.join(consumer, 'package.json'),
+          JSON.stringify({
+            ...consumerManifest,
+            dependencies: Object.fromEntries(
+              Object.entries(consumerManifest.dependencies ?? {}).filter(
+                ([name]) => !isTaroPackage(name) && !name.startsWith('@tarojs/'),
+              ),
+            ),
+            overrides: Object.fromEntries(
+              artifacts
+                .filter(({ manifest }) => !isTaroPackage(manifest.name))
+                .map(({ manifest }) => [manifest.name, `$${manifest.name}`]),
+            ),
+          }),
+        );
+
+        await rm(path.join(consumer, 'node_modules'), { recursive: true, force: true });
+      }
+
       run(
         'npm',
         [
@@ -640,6 +750,7 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
       run('node', ['__tests__/smoke.mjs'], { cwd: consumer });
       run('node', ['__tests__/smoke.cjs'], { cwd: consumer });
       run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')]);
+
       if (specifiers.includes('@fluxdown/react-base'))
         run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.react-base.json')]);
       console.log(

@@ -7,6 +7,7 @@ export const PLUGIN_TAG_LABELS = {
   mapper: 'Mapper',
   'lynx-plugins': 'lynx-plugins',
   'solid-plugins': 'solid-plugins',
+  'taro-plugins': 'taro-plugins',
   'vue-plugins': 'vue-plugins',
   'react-plugins': 'react-plugins',
   'react-native-plugins': 'react-native-plugins',

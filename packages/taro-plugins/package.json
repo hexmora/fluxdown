@@ -1,0 +1,142 @@
+{
+  "name": "@fluxdown/taro-plugins",
+  "version": "0.1.0",
+  "description": "Taro render slots and plugin presets for Fluxdown.",
+  "keywords": [
+    "hast",
+    "markdown",
+    "plugins",
+    "react",
+    "renderer",
+    "streaming",
+    "taro"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/taro-plugins"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss",
+    "./dist/esm/**/*.browser.js",
+    "./dist/cjs/**/*.browser.cjs"
+  ],
+  "exports": {
+    "./typings": "./src/typings/index.ts",
+    "./base": "./src/base/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts",
+    "./*": "./src/presets/*/index.ts",
+    "./styles.css": "./dist/esm/styles.css"
+  },
+  "publishConfig": {
+    "exports": {
+      "./typings": {
+        "import": {
+          "types": "./dist/esm/typings/index.d.ts"
+        },
+        "require": {
+          "types": "./dist/cjs/typings/index.d.cts"
+        }
+      },
+      "./base": {
+        "import": {
+          "types": "./dist/esm/base/index.d.ts",
+          "browser": "./dist/esm/base.browser.js",
+          "node": "./dist/esm/base.js",
+          "default": "./dist/esm/base.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/base/index.d.cts",
+          "browser": "./dist/cjs/base.browser.cjs",
+          "node": "./dist/cjs/base.cjs",
+          "default": "./dist/cjs/base.browser.cjs"
+        }
+      },
+      "./plugins/*": {
+        "import": {
+          "types": "./dist/esm/plugins/*/index.d.ts",
+          "browser": "./dist/esm/plugins/*.browser.js",
+          "node": "./dist/esm/plugins/*.js",
+          "default": "./dist/esm/plugins/*.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/plugins/*/index.d.cts",
+          "browser": "./dist/cjs/plugins/*.browser.cjs",
+          "node": "./dist/cjs/plugins/*.cjs",
+          "default": "./dist/cjs/plugins/*.browser.cjs"
+        }
+      },
+      "./*": {
+        "import": {
+          "types": "./dist/esm/presets/*/index.d.ts",
+          "browser": "./dist/esm/presets/*.browser.js",
+          "node": "./dist/esm/presets/*.js",
+          "default": "./dist/esm/presets/*.browser.js"
+        },
+        "require": {
+          "types": "./dist/cjs/presets/*/index.d.cts",
+          "browser": "./dist/cjs/presets/*.browser.cjs",
+          "node": "./dist/cjs/presets/*.cjs",
+          "default": "./dist/cjs/presets/*.browser.cjs"
+        }
+      },
+      "./styles.css": "./dist/esm/styles.css"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rslib build",
+    "lint": "oxlint .",
+    "test": "jest --config ../../jest.config.ts --selectProjects taro-plugins --runInBand",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/react-base-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@mathjax/mathjax-tex-font": "catalog:",
+    "@mathjax/src": "catalog:",
+    "@types/hast": "catalog:",
+    "classnames": "catalog:",
+    "katex": "catalog:",
+    "lodash-es": "catalog:",
+    "prismjs": "catalog:"
+  },
+  "devDependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@rslib/core": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/katex": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/prismjs": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "oxlint": "catalog:",
+    "stative": "workspace:^",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@tarojs/components": "catalog:taro-peer",
+    "@tarojs/taro": "catalog:taro-peer",
+    "react": "catalog:react-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

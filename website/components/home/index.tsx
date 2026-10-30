@@ -102,6 +102,10 @@ export const Home = () => {
               <strong>React</strong>
               <span>{copy.react}</span>
             </a>
+            <a className={styles.frameworkCard} href={href('/guide/vue/quick-start')}>
+              <strong>Vue 3</strong>
+              <span>{copy.react}</span>
+            </a>
             <a className={styles.frameworkCard} href={href('/guide/react-native/quick-start')}>
               <strong>React Native</strong>
               <span>{copy.react}</span>
@@ -110,12 +114,12 @@ export const Home = () => {
               <strong>Lynx</strong>
               <span>{copy.react}</span>
             </a>
-            <a className={styles.frameworkCard} href={href('/guide/vue/quick-start')}>
-              <strong>Vue 3</strong>
-              <span>{copy.react}</span>
-            </a>
             <a className={styles.frameworkCard} href={href('/guide/solid/quick-start')}>
               <strong>Solid</strong>
+              <span>{copy.react}</span>
+            </a>
+            <a className={styles.frameworkCard} href={href('/guide/taro/quick-start')}>
+              <strong>Taro</strong>
               <span>{copy.react}</span>
             </a>
             {UPCOMING_FRAMEWORKS.map((framework) => (

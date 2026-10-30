@@ -16,6 +16,11 @@
   },
   {
     "type": "dir-section-header",
+    "name": "vue",
+    "label": "Vue 3"
+  },
+  {
+    "type": "dir-section-header",
     "name": "react-native",
     "label": "React Native"
   },
@@ -26,13 +31,13 @@
   },
   {
     "type": "dir-section-header",
-    "name": "vue",
-    "label": "Vue 3"
+    "name": "solid",
+    "label": "Solid"
   },
   {
     "type": "dir-section-header",
-    "name": "solid",
-    "label": "Solid"
+    "name": "taro",
+    "label": "Taro"
   },
   {
     "type": "dir-section-header",

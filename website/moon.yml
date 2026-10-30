@@ -10,6 +10,8 @@ dependsOn:
   - solid
   - solid-plugins
   - stative
+  - taro
+  - taro-plugins
   - vue
   - vue-plugins
 
@@ -23,6 +25,7 @@ fileGroups:
     - /scripts/build/vue.ts
     - /scripts/build/solid.ts
     - /scripts/build/vite.ts
+    - /scripts/build/taro-web.ts
     - rspress.config.ts
     - env.d.ts
     - tsconfig.json

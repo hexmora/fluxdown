@@ -11,7 +11,7 @@ import { AnimationDemo } from '../../../../../../components';
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -49,18 +49,6 @@ defineProps<{ text: string }>();
 ```
 
 ```tsx
-import { Fluxdown } from '@fluxdown/solid';
-
-type MessageProps = {
-  text: string;
-};
-
-export function Message(props: MessageProps) {
-  return <Fluxdown streaming={{ effect: 'scale' }} text={props.text} />;
-}
-```
-
-```tsx
 import { Fluxdown } from '@fluxdown/react-native';
 
 type MessageProps = {
@@ -84,11 +72,35 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
+```tsx
+import { Fluxdown } from '@fluxdown/solid';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message(props: MessageProps) {
+  return <Fluxdown streaming={{ effect: 'scale' }} text={props.text} />;
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/taro';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
+  return <Fluxdown streaming={{ effect: 'scale' }} text={text} />;
+}
+```
+
 </FrameworkCodeTabs>
 
 Reduce the amount of change for a gentler entrance:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Solid', 'React Native', 'Lynx']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -136,25 +148,6 @@ defineProps<{ text: string }>();
 ```
 
 ```tsx
-import { Fluxdown } from '@fluxdown/solid';
-
-type MessageProps = {
-  text: string;
-};
-
-export function Message(props: MessageProps) {
-  return (
-    <Fluxdown
-      streaming={{
-        effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
-      }}
-      text={props.text}
-    />
-  );
-}
-```
-
-```tsx
 import { Fluxdown } from '@fluxdown/react-native';
 
 type MessageProps = {
@@ -175,6 +168,44 @@ export function Message({ text }: MessageProps) {
 
 ```tsx
 import { Fluxdown } from '@fluxdown/lynx';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message({ text }: MessageProps) {
+  return (
+    <Fluxdown
+      streaming={{
+        effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/solid';
+
+type MessageProps = {
+  text: string;
+};
+
+export function Message(props: MessageProps) {
+  return (
+    <Fluxdown
+      streaming={{
+        effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
+      }}
+      text={props.text}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/taro';
 
 type MessageProps = {
   text: string;

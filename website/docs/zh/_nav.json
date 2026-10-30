@@ -6,6 +6,12 @@
     "position": "left"
   },
   {
+    "text": "Vue",
+    "link": "/guide/vue/quick-start",
+    "activeMatch": "/guide/vue/",
+    "position": "left"
+  },
+  {
     "text": "Native",
     "link": "/guide/react-native/quick-start",
     "activeMatch": "/guide/react-native/",
@@ -18,15 +24,15 @@
     "position": "left"
   },
   {
-    "text": "Vue",
-    "link": "/guide/vue/quick-start",
-    "activeMatch": "/guide/vue/",
-    "position": "left"
-  },
-  {
     "text": "Solid",
     "link": "/guide/solid/quick-start",
     "activeMatch": "/guide/solid/",
+    "position": "left"
+  },
+  {
+    "text": "Taro",
+    "link": "/guide/taro/quick-start",
+    "activeMatch": "/guide/taro/",
     "position": "left"
   },
   {

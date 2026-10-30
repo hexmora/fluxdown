@@ -12,6 +12,19 @@ catalog:
   vite-plugin-solid: ^2.11.14
   "@solidjs/testing-library": ^0.8.10
   storybook-solidjs-vite: 10.7.4
+  "@tarojs/components-react": 4.3.1
+  "@tarojs/components": 4.3.1
+  "@tarojs/taro": 4.3.1
+  "@tarojs/taro-h5": 4.3.1
+  "@tarojs/runtime": 4.3.1
+  "@tarojs/shared": 4.3.1
+  "@tarojs/cli": 4.3.1
+  "@tarojs/webpack5-runner": 4.3.1
+  "@tarojs/plugin-framework-react": 4.3.1
+  "@tarojs/plugin-platform-h5": 4.3.1
+  "@tarojs/plugin-platform-weapp": 4.3.1
+  babel-preset-taro: 4.3.1
+  webpack: 5.91.0
   vue: ^3.5.44
   "@vue/server-renderer": ^3.5.44
   "@vue/test-utils": ^2.5.1
@@ -142,6 +155,12 @@ catalog:
 catalogs:
   solid-peer:
     solid-js: ^1.9.0
+  taro-peer:
+    "@tarojs/components": ^4.3.1
+    "@tarojs/taro": ^4.3.1
+  taro-react:
+    react: 18.3.1
+    react-dom: 18.3.1
   vue-peer:
     vue: ^3.5.0
   react-native-peer:
@@ -175,3 +194,6 @@ allowBuilds:
   core-js: false
   esbuild: true
   unrs-resolver: true
+  "@tarojs/binding": true
+  "@tarojs/cli": false
+  core-js-pure: false

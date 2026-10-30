@@ -47,4 +47,4 @@ Parsing and streaming scheduling run on the background thread; Lynx elements pre
 
 Set `streaming` to `false` when the request completes, is cancelled or fails. The component displays all text received so far and clears trailing effects.
 
-[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Solid, React Native, and Lynx together.
+[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, React Native, Lynx, Solid, and Taro together.
