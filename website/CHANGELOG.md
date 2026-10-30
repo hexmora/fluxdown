@@ -1,5 +1,13 @@
 # @fluxdown/website
 
+## 0.0.12
+
+### Patch Changes
+
+- b2b1fea: Document the Taro renderer in English and Chinese and include it in the shared demos and playground.
+- Updated dependencies [3c44059]
+  - @fluxdown/taro@0.1.1
+
 ## 0.0.11
 
 ### Patch Changes
