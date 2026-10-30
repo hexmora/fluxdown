@@ -37,7 +37,7 @@ Always pass the full message. If your data source emits individual chunks, appen
 Native slots support `scale`, `shad`, `chunk`, and `suffix`. Smoothing uses the animation frames provided by React Native, while native components present the visual effects. Clocks, spring settings, and effect combinations follow the [shared streaming configuration](../react/configuration.md#streaming).
 
 - `scale`: text fades in while growing and sharpening from a blurred state.
-- `shad`: a gradient mask reveals the trailing text.
+- `shad`: each newly visible character fades in on its own clock.
 - `chunk`: each incoming text fragment fades in as a group.
 - `suffix`: a cursor or dot pulses at the end of the text.
 

@@ -13,7 +13,7 @@ Fluxdown 让 Markdown 在生成的过程中也保持好读。它把断续到达�
 | 在 iOS、Android 或 React Native Web 中展示内容 | [React Native 快速开始](./react-native/quick-start.md) · `@fluxdown/react-native` |
 | 在 ReactLynx 应用里展示 Markdown 与流式内容    | [Lynx 快速开始](./lynx/quick-start.md) · `@fluxdown/lynx`                         |
 | 在 Solid 应用里展示 Markdown 与流式内容        | [Solid 快速开始](./solid/quick-start.md) · `@fluxdown/solid`                      |
-| 在 Taro 应用里展示 Markdown 与流式内容 | [Taro 快速开始](./taro/quick-start.md) · `@fluxdown/taro` |
+| 在 Taro 应用里展示 Markdown 与流式内容         | [Taro 快速开始](./taro/quick-start.md) · `@fluxdown/taro`                         |
 | 接入其他框架，或自己决定内容如何呈现           | [Core 快速开始](./core/quick-start.md) · `@fluxdown/core`                         |
 
 框架组件提供可直接使用的展示层；Core 负责框架无关的 Markdown 处理。两者共享语法、修复和流式能力。

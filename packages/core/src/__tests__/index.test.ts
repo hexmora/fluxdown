@@ -1,10 +1,10 @@
 import {
-  BaseSmoothScheduler,
-  BaseSmoothTicker,
-  IntervalSmoothTicker,
-  RafSmoothTicker,
+  BaseSmoothDriver,
+  BaseSmoothInterpolator,
+  IntervalSmoothDriver,
+  RafSmoothDriver,
   Smooth,
-  SpringSmoothScheduler,
+  SpringSmoothInterpolator,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 
 import { BaseRenderer, BaseRenderPlugin } from '..';
@@ -14,12 +14,12 @@ describe('core public exports', () => {
     for (const declaration of [
       BaseRenderer,
       BaseRenderPlugin,
-      BaseSmoothScheduler,
-      BaseSmoothTicker,
-      IntervalSmoothTicker,
-      RafSmoothTicker,
+      BaseSmoothInterpolator,
+      BaseSmoothDriver,
+      IntervalSmoothDriver,
+      RafSmoothDriver,
       Smooth,
-      SpringSmoothScheduler,
+      SpringSmoothInterpolator,
     ]) {
       expect(typeof declaration).toBe('function');
     }

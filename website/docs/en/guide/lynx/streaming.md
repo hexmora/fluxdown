@@ -37,11 +37,11 @@ Setting `streaming` to `true` enables trailing syntax repair, smoothing and the 
 Four effects are included:
 
 - `scale`: text appears from a blurred, smaller state.
-- `shad`: a gradient progressively reveals trailing text.
+- `shad`: each newly visible character fades in on its own clock.
 - `chunk`: new text chunks fade in.
 - `suffix`: a pulsing cursor or dot follows the text.
 
-Parsing and streaming scheduling run on the background thread; Lynx elements present the effects. Smoothing uses an animation-frame clock when available, with a timer fallback. See [React configuration](../react/configuration.md#streaming) for clocks, schedulers and effect combinations.
+Parsing and streaming scheduling run on the background thread; Lynx elements present the effects. Smoothing uses an animation-frame clock when available, with a timer fallback. See [React configuration](../react/configuration.md#streaming) for drivers, interpolation and effect combinations.
 
 ## Finish or cancel
 

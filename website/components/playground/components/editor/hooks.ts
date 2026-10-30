@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 
 import type { Renderer } from '../../../demo/components/renderer-preview';
 import type { Locale } from '../../../type';
-import type { EditorEffect } from './type';
+import type { AnimationSpeed, EditorEffect, EditorTuning } from './type';
 
 import { getStreamSample, RENDERERS } from '../../../demo';
 import { useStream } from '../../../hooks';
+import { CHUNK_PACES, DEFAULT_TUNING } from './consts';
+import { createClockDriver, createTunableSpring, PlaybackClock } from './utils';
 
 const RENDERER_STORAGE_KEY = 'fluxdown:playground:renderer';
 
@@ -42,7 +44,19 @@ export const useEditor = (lang: Locale) => {
 
   const [playback, setPlayback] = useState(false);
 
-  const stream = useStream(playback ? text : '', false);
+  const [speed, setSpeed] = useState<AnimationSpeed>(1);
+
+  const [clock] = useState(() => new PlaybackClock());
+
+  // One driver class per editor, so speed changes reach the running spring without replacing it.
+  const [driver] = useState(() => createClockDriver(clock));
+
+  const [tuning, setTuning] = useState(DEFAULT_TUNING);
+
+  const [spring] = useState(() => createTunableSpring(DEFAULT_TUNING));
+
+  // Arrivals follow both the playback speed and the chosen pace.
+  const stream = useStream(playback ? text : '', false, speed / CHUNK_PACES[tuning.pace]);
 
   const previewText = playback ? stream.text : text;
 
@@ -70,6 +84,22 @@ export const useEditor = (lang: Locale) => {
 
   const resetContent = () => updateText(getStreamSample(lang));
 
+  const changeSpeed = (value: AnimationSpeed) => {
+    clock.setRate(value);
+
+    setSpeed(value);
+  };
+
+  const changeTuning = (patch: Partial<EditorTuning>) => {
+    const next = { ...tuning, ...patch };
+
+    if (patch.frequency !== undefined || patch.dampingRatio !== undefined) {
+      spring.retune(next);
+    }
+
+    setTuning(next);
+  };
+
   return {
     renderer,
     setRenderer,
@@ -80,6 +110,12 @@ export const useEditor = (lang: Locale) => {
     setRepair,
     effect,
     setEffect,
+    speed,
+    changeSpeed,
+    driver,
+    interpolation: spring.Interpolator,
+    tuning,
+    changeTuning,
     playback,
     stream,
     previewText,

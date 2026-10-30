@@ -17,8 +17,8 @@ import type { SmoothPosition } from '../states/smooth-cursor/states';
 
 import { Smooth } from '..';
 import { restoreGlobals, stubGlobal } from '../../../../../../../scripts/testing/globals';
-import { StepSmoothScheduler } from '../modules/scheduler/__tests__/utils';
-import { FakeSmoothTicker, mockAnimationFrames } from '../modules/ticker/__tests__/utils';
+import { FakeSmoothDriver, mockAnimationFrames } from '../modules/driver/__tests__/utils';
+import { StepSmoothInterpolator } from '../modules/interpolation/__tests__/utils';
 import { SmoothCursor } from '../states';
 import { createArrayBlock } from './block';
 
@@ -96,7 +96,7 @@ test.each([
   { request: false, cancel: true },
   { request: false, cancel: false },
 ])(
-  'Smooth supplies its scheduler and an available ticker with RAF request=$request, cancel=$cancel',
+  'Smooth supplies its interpolation and an available driver with RAF request=$request, cancel=$cancel',
   ({ request, cancel }) => {
     jest.useFakeTimers();
 
@@ -157,8 +157,8 @@ test('SmoothCursor can be constructed lazily and releases only its own resources
       {
         source: toClosure(source),
         enabled: toClosure(false),
-        ticker: toClosure(ReactiveState.of(FakeSmoothTicker)),
-        scheduler: toClosure(ReactiveState.of(StepSmoothScheduler)),
+        driver: toClosure(ReactiveState.of(FakeSmoothDriver)),
+        interpolation: toClosure(ReactiveState.of(StepSmoothInterpolator)),
       },
     ]),
   );

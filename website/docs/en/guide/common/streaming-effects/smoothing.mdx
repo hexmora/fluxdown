@@ -15,9 +15,9 @@ When a chunk arrives, the buffer grows first and the visible boundary follows. P
 
 ## How the spring sets the pace
 
-The built-in `spring` scheduler adjusts speed using the distance between the visible position and the waiting content. A larger backlog speeds up output; as the visible position approaches the end, the speed settles. Each frame keeps the previous frame's velocity so updates flow into one another.
+The built-in `spring` interpolation moves the visible position like a damped spring pulled toward the end of the received content. A larger backlog pulls harder, so output speeds up; as the visible position approaches the end, it slows down and settles without passing the end. When new content arrives, the spring keeps its current position and velocity and starts pulling toward the new end, so updates flow into one another.
 
-The scheduler calculates progress from elapsed time and carries fractional characters into the next update. Text can advance between network updates, without a fixed delay for every character. The demo uses the same `SpringSmoothScheduler` as the `Smooth` mapper.
+The interpolator computes the position from elapsed time with the spring's exact solution, not by stepping frame by frame. The result does not depend on the frame rate, and no error builds up over a long response. Text can advance between network updates, without a fixed delay for every character. The demo uses the same `SpringSmoothInterpolator` as the `Smooth` mapper.
 
 ## Use it in your application
 
@@ -121,16 +121,16 @@ export function Message({ text, isStreaming }: MessageProps) {
 
 </FrameworkCodeTabs>
 
-You can also select the scheduler explicitly and add an [animation effect](./animation/index.mdx):
+You can also select the interpolation explicitly and add an [animation effect](./animation/index.mdx):
 
 <FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
 import {
-  RafSmoothTicker,
+  RafSmoothDriver,
   Smooth,
-  SpringSmoothScheduler,
+  SpringSmoothInterpolator,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
 
@@ -139,8 +139,8 @@ const mappers: MapperPluggable[] = [
     Smooth,
     {
       enabled: true,
-      ticker: RafSmoothTicker,
-      scheduler: SpringSmoothScheduler,
+      driver: RafSmoothDriver,
+      interpolation: SpringSmoothInterpolator,
     },
   ],
   [Shad, { enabled: true }],
@@ -158,7 +158,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -177,7 +177,7 @@ defineProps<{ text: string }>();
 <template>
   <Fluxdown
     :streaming="{
-      smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+      smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
       effect: 'shad',
     }"
     :text="text"
@@ -196,7 +196,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -216,7 +216,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -236,7 +236,7 @@ export function Message(props: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={props.text}
@@ -256,7 +256,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}

@@ -44,7 +44,7 @@ export function Message({ text, pending }: MessageProps) {
         pending && {
           repairEnding: true,
           smooth: true,
-          effect: ['shad', { length: 3, maskWidth: 18 }],
+          effect: ['shad', { length: 6, duration: 600 }],
         }
       }
       text={text}
@@ -59,14 +59,14 @@ export function Message({ text, pending }: MessageProps) {
 | `smooth`       | 让收到的内容平滑显示，默认开启。                    |
 | `effect`       | 选择末尾效果，默认为 `scale`，设为 `false` 可关闭。 |
 
-关闭 `smooth` 可以保留原始片段的到达节奏。自定义时钟与调度器见 [Core 流式输出](../core/streaming.md)。
+关闭 `smooth` 可以保留原始片段的到达节奏。自定义驱动与插值方式见 [Core 流式输出](../core/streaming.md)。
 
 ## 四种末尾效果
 
 | 效果     | 表现                                        |
 | -------- | ------------------------------------------- |
 | `scale`  | 新文字放大到正常尺寸，同时从模糊变清晰。    |
-| `shad`   | 末尾文字通过渐变遮罩逐步显现。              |
+| `shad`   | 每个新出现的字符按各自的时钟淡入。          |
 | `chunk`  | 每个新片段淡入，搭配 `smooth: false` 使用。 |
 | `suffix` | 在末尾显示标记，提示内容仍在生成。          |
 

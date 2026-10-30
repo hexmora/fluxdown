@@ -1,18 +1,12 @@
-import { Text } from 'react-native';
+import { Easing } from 'react-native';
 
 import type { ShadProps } from '../../../../../base';
 
-import { ShadContent } from './components/content';
+import { AppearText } from '../../../../../base';
 
-export const ShadRenderer = ({ active, isActive, leading, offset }: ShadProps) => {
-  if (isActive) {
-    return <ShadContent leading={leading} active={active} offset={offset} />;
-  }
-
-  return (
-    <Text>
-      {leading}
-      {active}
-    </Text>
-  );
-};
+// Linear alpha over time reads as an even gradient across the tail at a steady pace.
+export const ShadRenderer = ({ children, duration, start }: ShadProps) => (
+  <AppearText duration={duration} easing={Easing.linear} start={start}>
+    {children}
+  </AppearText>
+);

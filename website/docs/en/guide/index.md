@@ -13,7 +13,7 @@ Use it for AI conversations, live writing, streaming reports, or any interface w
 | Render on iOS, Android, or React Native Web               | [React Native quick start](./react-native/quick-start.md) · `@fluxdown/react-native` |
 | Display Markdown and streaming content in a ReactLynx app | [Lynx quick start](./lynx/quick-start.md) · `@fluxdown/lynx`                         |
 | Display Markdown and streaming content in a Solid app     | [Solid quick start](./solid/quick-start.md) · `@fluxdown/solid`                      |
-| Display Markdown and streaming content in a Taro app | [Taro quick start](./taro/quick-start.md) · `@fluxdown/taro` |
+| Display Markdown and streaming content in a Taro app      | [Taro quick start](./taro/quick-start.md) · `@fluxdown/taro`                         |
 | Use another framework or control how content is presented | [Core quick start](./core/quick-start.md) · `@fluxdown/core`                         |
 
 Framework components provide a ready-to-use presentation layer. Core handles Markdown independently of any UI framework. Both share the same syntax, repair, and streaming capabilities.

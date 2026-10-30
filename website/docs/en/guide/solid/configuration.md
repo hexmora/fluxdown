@@ -57,9 +57,9 @@ Repair unfinished syntax at the end of the message. This only controls trailing 
 
 **Default:** `true` when using a streaming object
 
-Reveal received content gradually. `true` uses the spring scheduler and selects `raf` when animation frames are available, otherwise `interval`. `false` reveals received content immediately.
+Reveal received content gradually. `true` uses the spring interpolation and selects the `raf` driver when animation frames are available, otherwise `interval`. `false` reveals received content immediately.
 
-Use an object to select a ticker and scheduler:
+Use an object to select a driver and interpolation:
 
 ```tsx
 <Fluxdown
@@ -67,20 +67,20 @@ Use an object to select a ticker and scheduler:
   streaming={{
     smooth: {
       enabled: true,
-      ticker: 'raf',
-      scheduler: 'spring',
+      driver: 'raf',
+      interpolation: 'spring',
     },
   }}
 />
 ```
 
-| Field       | Type                                       | Default  | Meaning                                         |
-| ----------- | ------------------------------------------ | -------- | ----------------------------------------------- |
-| `enabled`   | `boolean`                                  | `false`  | Enable progressive output when using an object. |
-| `ticker`    | `'raf' \| 'interval' \| SmoothTickerClass` | Required | Clock that drives output.                       |
-| `scheduler` | `'spring' \| SmoothSchedulerClass`         | Required | Decide how much content to reveal on each tick. |
+| Field           | Type                                       | Default                    | Meaning                                         |
+| --------------- | ------------------------------------------ | -------------------------- | ----------------------------------------------- |
+| `enabled`       | `boolean`                                  | `false`                    | Enable progressive output when using an object. |
+| `driver`        | `'raf' \| 'interval' \| SmoothDriverClass` | `'raf'`, else `'interval'` | Clock that drives output.                       |
+| `interpolation` | `'spring' \| SmoothInterpolatorClass`      | `'spring'`                 | Turn elapsed time into visible progress.        |
 
-> Import `SmoothConfig` from `@fluxdown/solid`. Custom ticker and scheduler types come from `@fluxdown/core-plugins/plugins/mapper/smooth`.
+> Import `SmoothConfig` from `@fluxdown/solid`. Custom driver and interpolator types come from `@fluxdown/core-plugins/plugins/mapper/smooth`. The old `ticker` and `scheduler` names still work until the next major version but are deprecated.
 
 ### streaming.effect <span className="field-tag">Optional</span> {#streamingeffect}
 
@@ -115,15 +115,15 @@ For example, combine an entrance effect and a trailing dot:
 
 Named effects are enabled automatically. Each also accepts `enabled: false` to turn it off. `disabled: true` excludes a plugin, and a lower `priority` makes it run earlier.
 
-| Effect   | Option      | Type                          | Default    | Meaning                                                           |
-| -------- | ----------- | ----------------------------- | ---------- | ----------------------------------------------------------------- |
-| `scale`  | `duration`  | `number`                      | `200`      | Entrance duration in milliseconds.                                |
-| `scale`  | `from`      | `number`                      | `0`        | Starting scale, between `0` and `1`.                              |
-| `scale`  | `blur`      | `number`                      | `0.08`     | Starting blur in `em`.                                            |
-| `shad`   | `length`    | `number`                      | `10`       | Maximum number of characters in the shaded tail.                  |
-| `shad`   | `maskWidth` | `number`                      | `15`       | Gradient width in pixels.                                         |
-| `chunk`  | `duration`  | `number`                      | `400`      | Fade-in duration in milliseconds. Use with `smooth: false`.       |
-| `suffix` | `type`      | `'cursor' \| 'dot' \| string` | `'cursor'` | Marker shape. Custom strings need a matching slot implementation. |
+| Effect   | Option     | Type                          | Default    | Meaning                                                           |
+| -------- | ---------- | ----------------------------- | ---------- | ----------------------------------------------------------------- |
+| `scale`  | `duration` | `number`                      | `200`      | Entrance duration in milliseconds.                                |
+| `scale`  | `from`     | `number`                      | `0`        | Starting scale, between `0` and `1`.                              |
+| `scale`  | `blur`     | `number`                      | `0.08`     | Starting blur in `em`.                                            |
+| `shad`   | `length`   | `number`                      | `10`       | Number of characters the fade aims to keep in flight at once.     |
+| `shad`   | `duration` | `number`                      | `400`      | Longest fade for one character, in milliseconds.                  |
+| `chunk`  | `duration` | `number`                      | `400`      | Fade-in duration in milliseconds. Use with `smooth: false`.       |
+| `suffix` | `type`     | `'cursor' \| 'dot' \| string` | `'cursor'` | Marker shape. Custom strings need a matching slot implementation. |
 
 Effect fields can also receive readable closures, following the Core mapper configuration model. See [Animation](../common/streaming-effects/animation/index.mdx) for demos and [Mapper plugins](../core/plugins/mapper.mdx) for writing a custom effect.
 

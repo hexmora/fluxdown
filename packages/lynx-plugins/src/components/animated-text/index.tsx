@@ -48,6 +48,8 @@ export const AnimatedText = ({
 
   const duration = native?.duration ?? 0;
 
+  const easing = native?.easing ?? 'cubic-bezier(0, 0, 0.58, 1)';
+
   const handle = useMainThreadRef<MainThread.Animation | null>(null);
 
   const ref = useCallback(
@@ -76,11 +78,11 @@ export const AnimatedText = ({
       handle.current = element.animate([{ color: 'transparent' }, { color: String(color) }], {
         duration,
         delay,
-        easing: 'cubic-bezier(0, 0, 0.58, 1)',
+        easing,
         fill: 'both',
       });
     },
-    [arrival, color, duration],
+    [arrival, color, duration, easing],
   );
 
   return (

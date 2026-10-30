@@ -2,7 +2,7 @@ import { sumBy } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
 import { once, S, useCombine, useCreate, useMap } from 'stative';
 
-import type { IScheduler } from '../../../../modules';
+import type { IInterpolator } from '../../../../modules';
 import type { CursorPositionInputs, SmoothPosition } from './type';
 
 import { Completed } from '../../../completed';
@@ -14,16 +14,16 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
   revisions,
   ticks,
   enabled: _enabled,
-  ticker,
-  scheduler: _scheduler,
+  driver,
+  interpolation: _interpolation,
 }: CursorPositionInputs) {
-  const configuration = useCombine(revisions, _enabled, ticker, _scheduler);
+  const configuration = useCombine(revisions, _enabled, driver, _interpolation);
 
   const completion = useCreate(S([Completed, { source: configuration }]));
 
   let index = sumBy(revisions.value.value, 'length');
 
-  let scheduler: IScheduler | null = null;
+  let interpolator: IInterpolator | null = null;
 
   return useMap(
     [configuration, ticks, completion],
@@ -32,7 +32,7 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
         return previous[1];
       }
 
-      const [[currentRevisions, enabled, , Scheduler], frame, completed] = current;
+      const [[currentRevisions, enabled, , Interpolator], frame, completed] = current;
 
       const [[previousRevisions], previousFrame] = previous?.[0] ?? current;
 
@@ -50,45 +50,53 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
       index = preserved;
 
       if (!enabled) {
-        scheduler = null;
+        interpolator = null;
       } else if (frame) {
         const previousTotal = sumBy(previousRevisions, 'length');
 
-        const previousScheduler = scheduler;
+        const previousInterpolator = interpolator;
 
-        if (!scheduler || scheduler.constructor !== Scheduler) {
-          scheduler = new Scheduler();
+        if (!interpolator || interpolator.constructor !== Interpolator) {
+          interpolator = new Interpolator();
         }
 
-        const resumed = !frame.ticker.running && index < total;
+        const resumed = !frame.driver.running && index < total;
 
-        const timestamp = resumed ? frame.ticker.start() : frame.timestamp;
+        const timestamp = resumed ? frame.driver.start() : frame.timestamp;
 
-        if (scheduler !== previousScheduler || frame.ticker !== previousFrame?.ticker || reset) {
-          scheduler.start(timestamp, index);
+        if (
+          interpolator !== previousInterpolator ||
+          frame.driver !== previousFrame?.driver ||
+          reset
+        ) {
+          interpolator.start(timestamp, index);
 
-          scheduler.push(total - index);
+          interpolator.push(total - index);
         } else {
           if (resumed) {
-            scheduler.resume(timestamp);
+            interpolator.resume(timestamp);
           }
 
           if (total < previousTotal) {
-            scheduler.reset(index);
+            interpolator.reset(index);
 
-            scheduler.push(total - index);
+            interpolator.push(total - index);
           } else if (total > previousTotal) {
-            scheduler.push(total - previousTotal);
+            interpolator.push(total - previousTotal);
           }
 
           if (!resumed && frame !== previousFrame) {
-            index = Math.min(total, index + Math.max(0, scheduler.tick(frame.timestamp)));
+            index = Math.min(total, index + Math.max(0, interpolator.tick(frame.timestamp)));
           }
         }
       }
 
-      if (index === total && frame?.ticker.running && (completed || !scheduler || scheduler.idle)) {
-        frame.ticker.stop();
+      if (
+        index === total &&
+        frame?.driver.running &&
+        (completed || !interpolator || interpolator.idle)
+      ) {
+        frame.driver.stop();
       }
 
       if (completed && index === total) {
