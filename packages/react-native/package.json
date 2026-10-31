@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/react-native",
-  "version": "0.2.2",
+  "version": "0.2.1",
   "description": "React Native components for streaming Markdown.",
   "keywords": [
     "hast",

@@ -6,7 +6,12 @@ import path from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import semver from 'semver';
 
-import type { BrowserCheckResult, LynxCheckResult } from './types.ts';
+import type {
+  BrowserCheckResult,
+  LynxCheckResult,
+  ReactNativeCheckResult,
+  SvelteCheckResult,
+} from './types.ts';
 
 export const RELEASE_REPOSITORY = 'hexmora/fluxdown';
 export const RELEASE_REGISTRY = 'https://registry.npmjs.org/';
@@ -71,7 +76,13 @@ export interface ReleaseArtifactManifest {
   publishable: boolean;
   tools: { node: string; npm: string; pnpm: string; changesets: string };
   candidate?: StableCandidate;
-  verification: { nodeEntries: number; browser: BrowserCheckResult[]; lynx?: LynxCheckResult };
+  verification: {
+    nodeEntries: number;
+    browser: BrowserCheckResult[];
+    lynx?: LynxCheckResult;
+    svelte?: SvelteCheckResult;
+    native?: ReactNativeCheckResult;
+  };
   packages: ArtifactPackage[];
 }
 
@@ -190,6 +201,49 @@ function validateLynxVerification(value: unknown, packages: string[]): void {
   }
 }
 
+function validateSvelteVerification(value: unknown, packages: string[]): void {
+  const verification = record(value, 'Svelte verification');
+  const { specifiers } = verification;
+
+  assert(Array.isArray(specifiers) && specifiers.length > 0, 'Missing Svelte entry verification');
+  assert.equal(new Set(specifiers).size, specifiers.length, 'Duplicate Svelte entry verification');
+
+  for (const specifier of specifiers) {
+    nonempty(specifier, 'Svelte entry specifier');
+
+    const name = packages.find((pkg) => specifier === pkg || specifier.startsWith(`${pkg}/`));
+
+    assert(name, `Svelte entry does not belong to an artifact package: ${specifier}`);
+
+    if (specifier !== name) safeRelativePath(specifier.slice(name.length + 1));
+  }
+
+  for (const name of packages) {
+    assert(
+      specifiers.some((specifier) => specifier === name || specifier.startsWith(`${name}/`)),
+      `Missing Svelte package verification: ${name}`,
+    );
+  }
+
+  for (const field of ['client', 'server', 'declarations', 'styles']) {
+    assert.equal(verification[field], true, `Missing Svelte ${field} verification`);
+  }
+}
+
+function validateReactNativeVerification(value: unknown, packages: string[]): void {
+  const verification = record(value, 'React Native verification');
+
+  assert(
+    Array.isArray(verification.packages) && verification.packages.length > 0,
+    'Missing React Native package verification',
+  );
+  assert.deepEqual(
+    [...verification.packages].toSorted(),
+    [...packages].toSorted(),
+    'React Native verification differs from artifact packages',
+  );
+}
+
 export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest {
   const manifest = record(value, 'release artifact manifest');
 
@@ -300,11 +354,31 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
 
   assert(!taroPackages.length || taroVerified, 'Missing Taro browser verification');
 
-  // Existing artifacts predate Lynx evidence and remain valid for recovery.
+  const sveltePackages = [...names].filter(
+    (name) => name === '@fluxdown/svelte' || name === '@fluxdown/svelte-plugins',
+  );
+
+  if (sveltePackages.length || verification.svelte !== undefined) {
+    validateSvelteVerification(verification.svelte, sveltePackages);
+  }
+
+  const nativePackages = [...names].filter(
+    (name) => name === '@fluxdown/react-native' || name === '@fluxdown/react-native-plugins',
+  );
+
+  if (verification.native !== undefined) {
+    validateReactNativeVerification(verification.native, nativePackages);
+  }
+
+  const verifiedPackageCount =
+    (verification.lynx === undefined ? 0 : lynxPackages.length) +
+    (taroVerified ? taroPackages.length : 0) +
+    sveltePackages.length +
+    (verification.native === undefined ? 0 : nativePackages.length);
+
+  // Existing Node-verified artifacts remain valid for recovery.
   assert(
-    Number(verification.nodeEntries) > 0 ||
-      (lynxPackages.length === names.size && verification.lynx !== undefined) ||
-      (taroPackages.length === names.size && taroVerified),
+    Number(verification.nodeEntries) > 0 || verifiedPackageCount === names.size,
     'Missing consumer verification',
   );
 

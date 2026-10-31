@@ -50,3 +50,15 @@ export interface LynxCheckResult {
   nativeAssets: string[];
   webAssets: string[];
 }
+
+export interface SvelteCheckResult {
+  specifiers: string[];
+  client: boolean;
+  server: boolean;
+  declarations: boolean;
+  styles: boolean;
+}
+
+export interface ReactNativeCheckResult {
+  packages: string[];
+}

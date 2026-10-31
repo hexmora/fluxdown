@@ -1,11 +1,5 @@
 # @fluxdown/react-native
 
-## 0.2.2
-
-### Patch Changes
-
-- 0824793: Allow the full-rendering integration test enough time to initialize its lazy-loaded engines on CI. Runtime behavior is unchanged.
-
 ## 0.2.1
 
 ### Patch Changes
