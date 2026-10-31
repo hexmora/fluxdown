@@ -31,6 +31,7 @@ import {
 } from './check-package.ts';
 import { checkReactNativePacks, REACT_NATIVE_PACKAGES } from './check-react-native-packs.ts';
 import { checkReactPacks } from './check-react-packs.ts';
+import { checkSvelteConsumer } from './check-svelte-consumer.ts';
 import {
   assertPublishEnvironment,
   assertSourceSha,
@@ -703,7 +704,10 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
     );
 
     const browser = await checkBrowserConsumer(consumer, artifacts);
+
     const lynx = await checkLynxConsumer(consumer, artifacts);
+
+    const svelte = await checkSvelteConsumer(consumer, artifacts);
 
     if (specifiers.includes('fluxdown') || nativeArtifacts.length) {
       if (taroSpecifiers.length) {
@@ -801,7 +805,15 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
     if (specifiers.includes('fluxdown/lite'))
       await checkReactPacks(consumer, nativeArtifacts.length > 0);
 
-    return { nodeEntries: specifiers.length, browser, ...(lynx ? { lynx } : {}) };
+    return {
+      nodeEntries: specifiers.length,
+      browser,
+      ...(lynx ? { lynx } : {}),
+      ...(svelte ? { svelte } : {}),
+      ...(nativeArtifacts.length
+        ? { native: { packages: nativeArtifacts.map(({ manifest }) => manifest.name) } }
+        : {}),
+    };
   } finally {
     if (process.env.FLUXDOWN_KEEP_CONSUMER === '1') {
       console.log(`Preserved isolated consumer for inspection: ${consumer}`);

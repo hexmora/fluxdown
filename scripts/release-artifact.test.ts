@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import type { ReleaseArtifactManifest } from './release-artifact.ts';
-import type { LynxCheckResult } from './types.ts';
+import type { LynxCheckResult, SvelteCheckResult } from './types.ts';
 
 import { validateReleaseManifest } from './release-artifact.ts';
 
@@ -224,5 +224,141 @@ for (const field of ['cssBytes', 'selectors', 'cssAssets', 'format'] as const) {
     };
 
     assert.throws(() => validateReleaseManifest(artifact), /Missing Taro browser verification/);
+  });
+}
+
+function svelteVerification(): SvelteCheckResult {
+  return {
+    specifiers: ['@fluxdown/svelte', '@fluxdown/svelte/lite', '@fluxdown/svelte-plugins/lite'],
+    client: true,
+    server: true,
+    declarations: true,
+    styles: true,
+  };
+}
+
+test('accepts Svelte-only artifacts after component, server, declaration, and style verification', () => {
+  const artifact = manifest(['@fluxdown/svelte', '@fluxdown/svelte-plugins']);
+
+  artifact.verification = { nodeEntries: 0, browser: [], svelte: svelteVerification() };
+
+  assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+test('accepts mixed Svelte and Native artifacts when each selected package was verified', () => {
+  const artifact = manifest([
+    '@fluxdown/svelte',
+    '@fluxdown/svelte-plugins',
+    '@fluxdown/react-native',
+  ]);
+
+  artifact.verification = {
+    nodeEntries: 0,
+    browser: [],
+    svelte: svelteVerification(),
+    native: { packages: ['@fluxdown/react-native'] },
+  };
+
+  assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+test('accepts the Svelte plugin package through its subpath exports without a root entry', () => {
+  const artifact = manifest(['@fluxdown/svelte-plugins']);
+
+  artifact.verification = {
+    nodeEntries: 0,
+    browser: [],
+    svelte: { ...svelteVerification(), specifiers: ['@fluxdown/svelte-plugins/lite'] },
+  };
+
+  assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+test('requires Native verification in a mixed Svelte and Native artifact', () => {
+  const artifact = manifest([
+    '@fluxdown/svelte',
+    '@fluxdown/svelte-plugins',
+    '@fluxdown/react-native',
+  ]);
+
+  artifact.verification = { nodeEntries: 0, browser: [], svelte: svelteVerification() };
+
+  assert.throws(() => validateReleaseManifest(artifact), /Missing consumer verification/);
+});
+
+test('requires Svelte verification even when Node entries passed', () => {
+  const artifact = manifest(['@fluxdown/svelte']);
+
+  artifact.verification = { nodeEntries: 1, browser: [] };
+
+  assert.throws(() => validateReleaseManifest(artifact), /Svelte verification/);
+});
+
+test('Svelte verification cannot replace verification for another package', () => {
+  const artifact = manifest(['@fluxdown/svelte', '@fluxdown/svelte-plugins', '@fluxdown/core']);
+
+  artifact.verification = { nodeEntries: 0, browser: [], svelte: svelteVerification() };
+
+  assert.throws(() => validateReleaseManifest(artifact), /Missing consumer verification/);
+});
+
+for (const field of ['client', 'server', 'declarations', 'styles'] as const) {
+  test(`rejects missing Svelte ${field} verification`, () => {
+    const artifact = manifest(['@fluxdown/svelte', '@fluxdown/svelte-plugins']);
+
+    artifact.verification = {
+      nodeEntries: 0,
+      browser: [],
+      svelte: { ...svelteVerification(), [field]: false },
+    };
+
+    assert.throws(() => validateReleaseManifest(artifact), /Missing Svelte .* verification/);
+  });
+}
+
+for (const specifiers of [
+  [],
+  ['@fluxdown/svelte', '@fluxdown/svelte'],
+  ['@fluxdown/svelte'],
+  ['@fluxdown/svelte', '@fluxdown/svelte-plugins-other/lite'],
+  ['@fluxdown/svelte', '@fluxdown/svelte-plugins/../core'],
+]) {
+  test(`rejects incomplete or unrelated Svelte entries: ${specifiers.join(', ')}`, () => {
+    const artifact = manifest(['@fluxdown/svelte', '@fluxdown/svelte-plugins']);
+
+    artifact.verification = {
+      nodeEntries: 0,
+      browser: [],
+      svelte: { ...svelteVerification(), specifiers },
+    };
+
+    assert.throws(() => validateReleaseManifest(artifact));
+  });
+}
+
+test('accepts Native-only artifacts after the packed Native consumer passed', () => {
+  const artifact = manifest(['@fluxdown/react-native']);
+
+  artifact.verification = {
+    nodeEntries: 0,
+    browser: [],
+    native: { packages: ['@fluxdown/react-native'] },
+  };
+
+  assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+for (const packages of [
+  [],
+  ['@fluxdown/react-native', '@fluxdown/react-native'],
+  ['@fluxdown/react-native', '@fluxdown/react-native-plugins'],
+  ['@fluxdown/core'],
+]) {
+  test(`rejects incomplete or unrelated Native packages: ${packages.join(', ')}`, () => {
+    const artifact = manifest(['@fluxdown/react-native']);
+
+    artifact.verification = { nodeEntries: 1, browser: [], native: { packages } };
+
+    assert.throws(() => validateReleaseManifest(artifact));
   });
 }
