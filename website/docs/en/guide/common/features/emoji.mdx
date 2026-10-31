@@ -2,7 +2,7 @@ import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs
 
 # Emoji shortcodes
 
-`EmojiPlugin` converts GitHub-style emoji shortcodes such as `:smile:` and `:+1:` into Unicode emoji. The Full components for React, Vue, React Native, Lynx, Solid, and Taro include it by default; Lite components can add it as needed.
+`EmojiPlugin` converts GitHub-style emoji shortcodes such as `:smile:` and `:+1:` into Unicode emoji. The Full components for React, Vue, Svelte, React Native, Lynx, Solid, and Taro include it by default; Lite components can add it as needed.
 
 <FrameworkCodeTabs>
 
@@ -22,6 +22,14 @@ import { Fluxdown } from '@fluxdown/vue';
 <template>
   <Fluxdown text="Hello :smile: Great work :+1:" />
 </template>
+```
+
+```svelte
+<script lang="ts">
+  import { Fluxdown } from '@fluxdown/svelte';
+</script>
+
+<Fluxdown text="Hello :smile: Great work :+1:" />
 ```
 
 ```tsx
@@ -70,7 +78,7 @@ Inline code and fenced code blocks preserve their source. For example, `` `:smil
 
 All Full components include `EmojiPlugin` without manual registration. For Core or a Lite component, install the matching plugin package:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```sh
 pnpm add @fluxdown/core-plugins
@@ -82,6 +90,10 @@ pnpm add @fluxdown/react-base-plugins
 
 ```sh
 pnpm add @fluxdown/vue-plugins
+```
+
+```sh
+pnpm add @fluxdown/svelte-plugins
 ```
 
 ```sh
@@ -104,7 +116,7 @@ pnpm add @fluxdown/react-base-plugins
 
 For Core, add `EmojiRemarkPlugin` to the `remarks` input in the [quick start](../../core/quick-start.md). Components extend their presets through `plugins`:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import { EmojiRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/emoji';
@@ -136,6 +148,21 @@ defineProps<{ text: string }>();
 <template>
   <FluxdownLite :plugins="EmojiPlugin" :text="text" />
 </template>
+```
+
+```svelte
+<script lang="ts">
+  import { EmojiPlugin } from '@fluxdown/svelte-plugins/plugins/emoji';
+  import { FluxdownLite } from '@fluxdown/svelte/lite';
+
+  type MessageProps = {
+    text: string;
+  };
+
+  let { text }: MessageProps = $props();
+</script>
+
+<FluxdownLite plugins={EmojiPlugin} {text} />
 ```
 
 ```tsx
@@ -196,7 +223,7 @@ export function Message({ text }: MessageProps) {
 
 Include `EmojiPlugin` and `config` in the same plugin pack to disable this behavior. Core uses a remark plugin entry with `disabled` set:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
@@ -245,6 +272,26 @@ defineProps<{ text: string }>();
 <template>
   <Fluxdown :plugins="plugins" :text="text" />
 </template>
+```
+
+```svelte
+<script lang="ts">
+  import { EmojiPlugin } from '@fluxdown/svelte-plugins/plugins/emoji';
+  import { Fluxdown } from '@fluxdown/svelte';
+
+  const plugins = {
+    ...EmojiPlugin,
+    config: { 'remark-emoji': { disabled: true } },
+  };
+
+  type MessageProps = {
+    text: string;
+  };
+
+  let { text }: MessageProps = $props();
+</script>
+
+<Fluxdown {plugins} {text} />
 ```
 
 ```tsx

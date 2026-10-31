@@ -1,0 +1,11 @@
+@use "../../../../../styles/prefix" as *;
+
+:global {
+  .fluxdown-svelte-break-line-root {
+    line-height: inherit;
+
+    & + .fluxdown-svelte-break-line-root {
+      line-height: var(--#{$prefix}-typography-line-height-lg);
+    }
+  }
+}

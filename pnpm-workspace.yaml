@@ -31,6 +31,13 @@ catalog:
   "@vitejs/plugin-vue-jsx": ^5.1.6
   "@storybook/vue3-vite": 10.6.3
   vitest: ^5.0.5
+  svelte: 5.57.3
+  "@sveltejs/package": 3.0.1
+  "@sveltejs/vite-plugin-svelte": 7.3.1
+  svelte-preprocess: 6.0.5
+  svelte-check: 4.7.7
+  "@testing-library/svelte": 5.4.2
+  "@storybook/svelte-vite": 10.6.3
   "@lynx-js/react": 0.129.0
   "@lynx-js/react-rsbuild-plugin": 0.22.0
   "@lynx-js/types": 4.3.0
@@ -130,6 +137,7 @@ catalog:
   "@rslib/core": 1.0.0
   "@rsbuild/core": 2.2.3
   "@rsbuild/plugin-react": 2.1.0
+  "@rsbuild/plugin-svelte": 2.0.1
   "@rsbuild/plugin-sass": 2.0.1
   "@rsbuild/plugin-less": 2.0.1
   "@rsbuild/plugin-svgr": 2.0.5
@@ -163,6 +171,10 @@ catalogs:
     react-dom: 18.3.1
   vue-peer:
     vue: ^3.5.0
+  svelte:
+    typescript: npm:@typescript/typescript6@6.0.2
+  svelte-peer:
+    svelte: ^5.46.4
   react-native-peer:
     react: ^19.0.0
     react-native: ">=0.83.0 <1"
@@ -189,6 +201,7 @@ overrides:
   "@types/react-dom": "catalog:"
 
 allowBuilds:
+  svelte-preprocess: false
   "@swc/core": true
   "@parcel/watcher": true
   core-js: false

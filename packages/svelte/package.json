@@ -1,0 +1,122 @@
+{
+  "name": "@fluxdown/svelte",
+  "version": "0.0.0",
+  "description": "Svelte components for streaming Markdown with Fluxdown.",
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/svelte"
+  },
+  "files": [
+    "dist/esm",
+    "!dist/esm/**/__tests__/**",
+    "!dist/esm/**/*.test.*",
+    "!dist/esm/**/*.scss",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss"
+  ],
+  "types": "./src/packs/full/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/packs/full/index.ts",
+      "svelte": "./src/packs/full/index.ts"
+    },
+    "./full": {
+      "types": "./src/packs/full/index.ts",
+      "svelte": "./src/packs/full/index.ts"
+    },
+    "./lite": {
+      "types": "./src/packs/lite/index.ts",
+      "svelte": "./src/packs/lite/index.ts"
+    },
+    "./raw": {
+      "types": "./src/packs/raw/index.ts",
+      "svelte": "./src/packs/raw/index.ts"
+    }
+  },
+  "publishConfig": {
+    "types": "./dist/esm/packs/full/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/esm/packs/full/index.d.ts",
+        "svelte": "./dist/esm/packs/full/index.js",
+        "default": "./dist/esm/packs/full/index.js"
+      },
+      "./full": {
+        "types": "./dist/esm/packs/full/index.d.ts",
+        "svelte": "./dist/esm/packs/full/index.js",
+        "default": "./dist/esm/packs/full/index.js"
+      },
+      "./lite": {
+        "types": "./dist/esm/packs/lite/index.d.ts",
+        "svelte": "./dist/esm/packs/lite/index.js",
+        "default": "./dist/esm/packs/lite/index.js"
+      },
+      "./raw": {
+        "types": "./dist/esm/packs/raw/index.d.ts",
+        "svelte": "./dist/esm/packs/raw/index.js",
+        "default": "./dist/esm/packs/raw/index.js"
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "svelte-package -i src -o dist/esm --tsconfig tsconfig.build.json",
+    "lint": "oxlint .",
+    "test": "vitest run && vitest run --config vite.ssr.config.ts",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json",
+    "prepack": "tsx ../../scripts/check-package.ts --source",
+    "dev": "storybook dev -p 6009 --no-open",
+    "storybook": "pnpm run dev",
+    "build:storybook": "storybook build"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/svelte-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@types/hast": "catalog:",
+    "lodash-es": "catalog:",
+    "shallow-equal": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/svelte-vite": "catalog:",
+    "@sveltejs/package": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/svelte": "catalog:",
+    "@types/katex": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/prismjs": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "sass": "catalog:",
+    "storybook": "catalog:",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "svelte-preprocess": "catalog:",
+    "typescript": "catalog:svelte",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "svelte": "catalog:svelte-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

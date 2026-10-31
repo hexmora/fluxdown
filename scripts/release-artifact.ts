@@ -24,6 +24,8 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/vue',
   '@fluxdown/lynx-plugins',
   '@fluxdown/lynx',
+  '@fluxdown/svelte-plugins',
+  '@fluxdown/svelte',
   '@fluxdown/react-hooks',
   '@fluxdown/react-base',
   '@fluxdown/react-base-plugins',

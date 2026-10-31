@@ -1,0 +1,12 @@
+@use "../../../../../styles/prefix" as *;
+
+:global {
+  .fluxdown-svelte-emphasis-root {
+    color: inherit;
+    font-style: italic;
+
+    > strong {
+      font-weight: var(--#{$prefix}-typography-font-weight-bold);
+    }
+  }
+}

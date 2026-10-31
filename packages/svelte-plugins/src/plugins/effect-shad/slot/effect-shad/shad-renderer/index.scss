@@ -1,0 +1,23 @@
+:global(.fluxdown-svelte-effect-shad) {
+  // Fading runs wrap naturally across lines, including their whitespace.
+  display: inline;
+
+  &.active {
+    // Linear opacity over time reads as an even gradient across the tail at a steady pace.
+    animation: fluxdown-svelte-shad-appear var(--fluxdown-shad-duration) linear both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes -global-fluxdown-svelte-shad-appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

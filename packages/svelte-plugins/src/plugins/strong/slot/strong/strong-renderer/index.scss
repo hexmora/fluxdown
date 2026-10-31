@@ -1,0 +1,12 @@
+@use "../../../../../styles/prefix" as *;
+
+:global {
+  .fluxdown-svelte-strong-root {
+    color: var(--#{$prefix}-colors-fg);
+    font-weight: var(--#{$prefix}-typography-font-weight-bold);
+
+    > em {
+      font-style: italic;
+    }
+  }
+}

@@ -1,25 +1,20 @@
 import type { KeyboardEvent, ReactNode } from 'react';
 
-import { Children, useId, useState } from 'react';
+import { Children, useId } from 'react';
+
+import type { CodeFramework } from './hooks';
 
 import { useLocale } from '../hooks';
+import { DEFAULT_FRAMEWORKS } from './consts';
+import { useCodeFramework } from './hooks';
 import styles from './index.module.scss';
 
-export type CodeFramework = 'Core' | 'React' | 'Vue' | 'React Native' | 'Lynx' | 'Solid' | 'Taro';
+export type { CodeFramework } from './hooks';
 
 interface FrameworkCodeTabsProps {
   children: ReactNode;
-  frameworks?: CodeFramework[];
+  frameworks?: readonly CodeFramework[];
 }
-
-const DEFAULT_FRAMEWORKS: CodeFramework[] = [
-  'React',
-  'Vue',
-  'React Native',
-  'Lynx',
-  'Solid',
-  'Taro',
-];
 
 export const FrameworkCodeTabs = ({
   children,
@@ -29,7 +24,12 @@ export const FrameworkCodeTabs = ({
 
   const { lang } = useLocale();
 
-  const [active, setActive] = useState(0);
+  const [preferredFramework, setFramework] = useCodeFramework();
+
+  const active = Math.max(
+    0,
+    frameworks.findIndex((value) => value === preferredFramework),
+  );
 
   const panels = Children.toArray(children).filter(
     (child) => typeof child !== 'string' || child.trim().length > 0,
@@ -51,7 +51,7 @@ export const FrameworkCodeTabs = ({
 
     event.preventDefault();
 
-    setActive(next);
+    setFramework(frameworks[next]);
 
     document.getElementById(`${id}-tab-${next}`)?.focus();
   };
@@ -70,7 +70,7 @@ export const FrameworkCodeTabs = ({
             className={styles.tab}
             id={`${id}-tab-${index}`}
             key={framework}
-            onClick={() => setActive(index)}
+            onClick={() => setFramework(framework)}
             onKeyDown={(event) => onKeyDown(event, index)}
             role="tab"
             tabIndex={active === index ? 0 : -1}

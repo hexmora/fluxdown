@@ -1,0 +1,62 @@
+@use "../../../../../styles/prefix" as *;
+
+:global {
+  .fluxdown-svelte-code-prism-root {
+    .token.comment,
+    .token.prolog,
+    .token.doctype,
+    .token.cdata {
+      color: var(--#{$prefix}-syntax-comment);
+    }
+
+    .token.keyword,
+    .token.atrule {
+      color: var(--#{$prefix}-syntax-keyword);
+    }
+
+    .token.string,
+    .token.char,
+    .token.attr-value,
+    .token.tag {
+      color: var(--#{$prefix}-syntax-string);
+    }
+
+    .token.number,
+    .token.boolean,
+    .token.constant {
+      color: var(--#{$prefix}-syntax-number);
+    }
+
+    .token.function,
+    .token.class-name {
+      color: var(--#{$prefix}-syntax-function);
+    }
+
+    .token.property,
+    .token.variable,
+    .token.attr-name {
+      color: var(--#{$prefix}-syntax-variable);
+    }
+
+    .token.punctuation,
+    .token.operator {
+      color: var(--#{$prefix}-syntax-punctuation);
+    }
+
+    .token.inserted {
+      color: var(--#{$prefix}-syntax-inserted);
+    }
+
+    .token.deleted {
+      color: var(--#{$prefix}-syntax-deleted);
+    }
+
+    .token.bold {
+      font-weight: bold;
+    }
+
+    .token.italic {
+      font-style: italic;
+    }
+  }
+}

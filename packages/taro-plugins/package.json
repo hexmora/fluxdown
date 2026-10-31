@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/taro-plugins",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Taro render slots and plugin presets for Fluxdown.",
   "keywords": [
     "hast",

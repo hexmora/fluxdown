@@ -45,4 +45,4 @@ Native slots support `scale`, `shad`, `chunk`, and `suffix`. Smoothing uses the 
 
 Set `streaming` to `false` when the request finishes, is cancelled, or fails. Fluxdown displays all received content and clears the trailing effects. Your app can also pause its data source or visual effects when it enters the background.
 
-[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, React Native, Lynx, Solid, and Taro together.
+[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, React Native, Lynx, Solid, and Taro together.

@@ -99,9 +99,9 @@ When finished, you can turn smoothing off to show the remaining content immediat
 smoothEnabled.next(false);
 ```
 
-`Shad` marks each newly visible character with its own fade. Its `enabled`, `length`, and `duration` options accept plain values or readable closures; `length` is how many characters it aims to keep fading at once (default `10`), and `duration` is the longest fade in milliseconds (default `400`), shortened while more characters are in flight. Your renderer must support those nodes to produce a visual fade. The React, Vue, React Native, Lynx, Solid and Taro presets include the corresponding render plugin.
+`Shad` marks each newly visible character with its own fade. Its `enabled`, `length`, and `duration` options accept plain values or readable closures; `length` is how many characters it aims to keep fading at once (default `10`), and `duration` is the longest fade in milliseconds (default `400`), shortened while more characters are in flight. Your renderer must support those nodes to produce a visual fade. The React, Vue, Svelte, React Native, Lynx, Solid and Taro presets include the corresponding render plugin.
 
-`Scale` adds character and word markers for a per-character entrance. Like `Smooth`, its `enabled`, `duration`, `from`, and `blur` options accept plain values or readable closures. Your renderer must handle the markers; the React, Vue, React Native, Lynx, Solid and Taro components expose the simpler [`streaming.effect`](../common/streaming-effects/animation/index.mdx) configuration.
+`Scale` adds character and word markers for a per-character entrance. Like `Smooth`, its `enabled`, `duration`, `from`, and `blur` options accept plain values or readable closures. Your renderer must handle the markers; the React, Vue, Svelte, React Native, Lynx, Solid and Taro components expose the simpler [`streaming.effect`](../common/streaming-effects/animation/index.mdx) configuration.
 
 ## Clean up
 

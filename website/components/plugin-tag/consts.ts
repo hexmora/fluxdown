@@ -12,4 +12,5 @@ export const PLUGIN_TAG_LABELS = {
   'react-plugins': 'react-plugins',
   'react-native-plugins': 'react-native-plugins',
   'react-base-plugins': 'react-base-plugins',
+  'svelte-plugins': 'svelte-plugins',
 };
