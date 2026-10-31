@@ -1,8 +1,7 @@
 export const COPY = {
   zh: {
     label: '渲染库对比',
-    renderers: '选择渲染库（可多选）',
-    empty: '选择要对比的渲染库',
+    renderers: '选择渲染库（至少选择一个，可多选）',
     static: '静态',
     streaming: '流式',
     effect: '动画效果',
@@ -11,8 +10,7 @@ export const COPY = {
   },
   en: {
     label: 'Renderer comparison',
-    renderers: 'Choose renderers (multiple selections)',
-    empty: 'Choose a renderer to compare',
+    renderers: 'Choose renderers (select at least one)',
     static: 'Static',
     streaming: 'Streaming',
     effect: 'Effect',

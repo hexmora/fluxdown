@@ -10,5 +10,10 @@
     "name": "features",
     "label": "其他功能",
     "collapsed": false
+  },
+  {
+    "type": "file",
+    "name": "features/renderers",
+    "label": "横向演示"
   }
 ]

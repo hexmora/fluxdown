@@ -71,8 +71,12 @@
       color: var(--site-accent);
     }
 
-    &:hover {
+    &:hover:not(:disabled) {
       border-color: var(--site-accent);
+    }
+
+    &:disabled {
+      cursor: default;
     }
   }
 }
@@ -160,17 +164,6 @@
 
 .content {
   padding: 20px;
-}
-
-.empty {
-  display: grid;
-  place-items: center;
-  height: var(--preview-height);
-  min-height: 360px;
-  margin: 0 !important;
-  padding: 24px;
-  color: var(--site-muted);
-  font-size: 13px;
 }
 
 .footer {

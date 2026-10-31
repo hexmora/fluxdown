@@ -2,7 +2,7 @@
 import { useDark } from '@rspress/core/runtime';
 import { useState } from 'react';
 
-import type { PreviewEffect, Renderer } from '../renderer-preview';
+import type { PreviewEffect } from '../renderer-preview';
 import type { RendererPanelProps } from './type';
 
 import { useBottomScroll } from '../../../bottom-scroll';
@@ -14,6 +14,7 @@ import { RendererPreview, RENDERERS } from '../renderer-preview';
 import { StreamingControls } from '../streaming-controls';
 import { StreamingFrame } from '../streaming-frame';
 import { COPY, EFFECTS, MODES } from './consts';
+import { useRenderers } from './hooks';
 import styles from './index.module.scss';
 
 const RendererPanel = ({ label, ...props }: RendererPanelProps) => {
@@ -57,7 +58,7 @@ export const RendererDemo = () => {
 
   const [effect, setEffect] = useState<PreviewEffect>('scale');
 
-  const [selected, setSelected] = useState<Renderer[]>(() => RENDERERS.map(({ value }) => value));
+  const { selected, toggleRenderer } = useRenderers();
 
   const text = mode === 'static' ? source : stream.text;
 
@@ -93,14 +94,9 @@ export const RendererDemo = () => {
             {RENDERERS.map(({ value, label }) => (
               <button
                 aria-pressed={selected.includes(value)}
+                disabled={selected.length === 1 && selected.includes(value)}
                 key={value}
-                onClick={() => {
-                  setSelected((current) => {
-                    return current.includes(value)
-                      ? current.filter((item) => item !== value)
-                      : [...current, value];
-                  });
-                }}
+                onClick={() => toggleRenderer(value)}
                 type="button"
               >
                 {label}
@@ -142,25 +138,21 @@ export const RendererDemo = () => {
             />
           </div>
         </div>
-        {selected.length > 0 ? (
-          <section aria-label={labels.scroll} className={styles.row} tabIndex={0}>
-            {RENDERERS.filter(({ value }) => selected.includes(value)).map(({ value, label }) => (
-              <RendererPanel
-                build={DEMO_BUILD}
-                cycle={stream.cycle}
-                dark={dark}
-                key={value}
-                label={label}
-                reducedMotion={!!stream.reducedMotion}
-                renderer={value}
-                streaming={streaming}
-                text={text}
-              />
-            ))}
-          </section>
-        ) : (
-          <output className={styles.empty}>{labels.empty}</output>
-        )}
+        <section aria-label={labels.scroll} className={styles.row} tabIndex={0}>
+          {RENDERERS.filter(({ value }) => selected.includes(value)).map(({ value, label }) => (
+            <RendererPanel
+              build={DEMO_BUILD}
+              cycle={stream.cycle}
+              dark={dark}
+              key={value}
+              label={label}
+              reducedMotion={!!stream.reducedMotion}
+              renderer={value}
+              streaming={streaming}
+              text={text}
+            />
+          ))}
+        </section>
         <div className={styles.footer}>{labels.hint}</div>
       </StreamingFrame>
     </div>
