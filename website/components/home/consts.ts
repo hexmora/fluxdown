@@ -39,7 +39,7 @@ export const COPY = {
       {
         title: '不被框架限制',
         description:
-          '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React、Vue、Svelte、React Native、Lynx、Solid 与 Taro 组件开始。',
+          '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React、Vue、Svelte、React Native、Lynx、Solid、Taro 与 Angular 组件开始。',
         link: '认识 Fluxdown Core',
         path: '/guide/core/quick-start',
       },
@@ -105,7 +105,7 @@ export const COPY = {
       {
         title: 'Free to choose a framework',
         description:
-          'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React, Vue, Svelte, React Native, Lynx, Solid and Taro components.',
+          'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React, Vue, Svelte, React Native, Lynx, Solid, Taro and Angular components.',
         link: 'Meet Fluxdown Core',
         path: '/guide/core/quick-start',
       },

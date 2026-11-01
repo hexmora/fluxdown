@@ -42,6 +42,12 @@
     "position": "left"
   },
   {
+    "text": "Angular",
+    "link": "/guide/angular/quick-start",
+    "activeMatch": "/guide/angular/",
+    "position": "left"
+  },
+  {
     "text": "Core",
     "link": "/guide/core/quick-start",
     "activeMatch": "/guide/core/",

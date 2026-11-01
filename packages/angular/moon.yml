@@ -1,0 +1,22 @@
+language: typescript
+layer: library
+
+tasks:
+  build:
+    inputs:
+      - /scripts/prepare-angular.ts
+  test:
+    inputs:
+      - /packages/angular/vitest.config.ts
+      - /packages/angular/angular.json
+  dev:
+    command: pnpm run dev
+    preset: server
+  build-storybook:
+    command: pnpm run build:storybook
+    deps: ["^:build"]
+    inputs:
+      - "**/*"
+      - /packages/*/src/**/*
+      - /pnpm-lock.yaml
+    outputs: [storybook-static]

@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "paths": {
+      "@fluxdown/angular/raw": ["./src/raw.ts"],
+      "@fluxdown/angular-plugins/*": [
+        "../angular-plugins/src/*/index.ts",
+        "../angular-plugins/src/presets/*/index.ts"
+      ]
+    }
+  },
+  "include": ["src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"]
+}

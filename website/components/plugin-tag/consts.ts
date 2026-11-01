@@ -5,6 +5,7 @@ export const PLUGIN_TAG_LABELS = {
   rehype: 'Rehype',
   repair: 'Repair',
   mapper: 'Mapper',
+  'angular-plugins': 'angular-plugins',
   'lynx-plugins': 'lynx-plugins',
   'solid-plugins': 'solid-plugins',
   'taro-plugins': 'taro-plugins',

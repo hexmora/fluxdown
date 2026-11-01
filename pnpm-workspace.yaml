@@ -8,6 +8,8 @@ catalogMode: strict
 verifyDepsBeforeRun: error
 
 catalog:
+  "@babel/core": 8.0.5
+  babel-loader: 10.1.1
   solid-js: ^1.9.17
   vite-plugin-solid: ^2.11.14
   "@solidjs/testing-library": ^0.8.10
@@ -25,6 +27,20 @@ catalog:
   "@tarojs/plugin-platform-weapp": 4.3.1
   babel-preset-taro: 4.3.1
   webpack: 5.91.0
+  "@angular/animations": 22.2.3
+  "@angular/common": 22.2.3
+  "@angular/core": 22.2.3
+  "@angular/compiler": 22.2.3
+  "@angular/compiler-cli": 22.2.3
+  "@angular/platform-browser": 22.2.3
+  "@angular/cli": 22.2.5
+  "@angular/build": 22.2.5
+  "@angular-devkit/build-angular": 22.2.5
+  "@angular-devkit/core": 22.2.5
+  "@angular-devkit/architect": 0.2202.5
+  "@storybook/angular": 10.6.5
+  ng-packagr: 22.2.5
+  zone.js: ~0.16.0
   vue: ^3.5.44
   "@vue/server-renderer": ^3.5.44
   "@vue/test-utils": ^2.5.1
@@ -108,7 +124,7 @@ catalog:
   unified: ^11.0.5
   "@types/katex": ^0.16.8
   "@types/prismjs": ^1.26.5
-  "@types/hast": ^3.0.4
+  "@types/hast": 3.0.4
   "@types/mathjax": ^0.0.40
   "@types/react": ^18.3.31
   "@types/react-dom": ^18.3.7
@@ -168,6 +184,14 @@ catalogs:
   taro-react:
     react: 18.3.1
     react-dom: 18.3.1
+  angular:
+    typescript: 6.0.3
+    storybook: 10.6.5
+    "@storybook/addon-docs": 10.6.5
+  angular-peer:
+    "@angular/platform-browser": ^22.0.0
+    "@angular/common": ^22.0.0
+    "@angular/core": ^22.0.0
   vue-peer:
     vue: ^3.5.0
   svelte:
@@ -196,6 +220,7 @@ packageExtensions:
       "@storybook/react-vite": ^10.4.4
 
 overrides:
+  "@types/hast": "catalog:"
   "@types/react": "catalog:"
   "@types/react-dom": "catalog:"
 
@@ -209,3 +234,5 @@ allowBuilds:
   "@tarojs/binding": true
   "@tarojs/cli": false
   core-js-pure: false
+  lmdb: true
+  msgpackr-extract: true

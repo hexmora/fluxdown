@@ -126,6 +126,10 @@ export const Home = () => {
               <strong>Taro</strong>
               <span>{copy.react}</span>
             </a>
+            <a className={styles.frameworkCard} href={href('/guide/angular/quick-start')}>
+              <strong>Angular</strong>
+              <span>{copy.react}</span>
+            </a>
           </div>
           <div className={styles.branch} aria-hidden="true" />
           <a

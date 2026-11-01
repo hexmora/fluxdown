@@ -1,0 +1,11 @@
+language: typescript
+layer: library
+
+tasks:
+  build:
+    inputs:
+      - /scripts/prepare-angular.ts
+  test:
+    inputs:
+      - /packages/angular/vitest.config.ts
+      - /packages/angular/angular.json

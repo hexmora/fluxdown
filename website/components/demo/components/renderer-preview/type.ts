@@ -2,7 +2,15 @@ import type { BlockCompilerConfig } from '@fluxdown/core';
 
 export type PreviewBuild = Partial<Omit<BlockCompilerConfig, 'repairEnding'>>;
 
-export type Renderer = 'react' | 'vue' | 'svelte' | 'react-native' | 'lynx' | 'solid' | 'taro';
+export type Renderer =
+  | 'react'
+  | 'vue'
+  | 'svelte'
+  | 'react-native'
+  | 'lynx'
+  | 'solid'
+  | 'taro'
+  | 'angular';
 
 export type PreviewEffect = 'scale' | 'shad' | 'chunk' | 'suffix';
 

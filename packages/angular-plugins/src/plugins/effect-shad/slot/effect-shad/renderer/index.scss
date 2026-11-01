@@ -1,0 +1,26 @@
+@use "../../../../../styles/prefix" as *;
+
+.fluxdown-angular-effect-shad-root {
+  display: inline;
+
+  .fluxdown-angular-effect-shad-leading {
+    display: inline;
+  }
+
+  .fluxdown-angular-effect-shad-active {
+    display: inline;
+    mask-image: linear-gradient(to right, #000, transparent);
+  }
+
+  .fluxdown-angular-effect-shad-mask,
+  .fluxdown-angular-effect-shad-maskHidden {
+    position: relative;
+    display: inline-block;
+    background-image: linear-gradient(to right, transparent, var(--#{$prefix}-colors-bg));
+    pointer-events: none;
+  }
+
+  .fluxdown-angular-effect-shad-maskHidden {
+    opacity: 0;
+  }
+}

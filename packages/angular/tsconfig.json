@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "stative",
+    "types": ["node", "vitest/globals"]
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true
+  },
+  "include": ["src", "stories", "vitest.config.ts", ".storybook/**/*"]
+}

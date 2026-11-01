@@ -30,7 +30,7 @@ jobs:
       - name: Set up pnpm and Node.js
         uses: pnpm/setup@c8e77b72cd6022852162c92aa10e7e72b7209c9b # v2
         with:
-          runtime: node@24.14.1
+          runtime: node@24.22.1
           cache: true
           install: false
 

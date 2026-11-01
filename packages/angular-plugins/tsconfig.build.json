@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "allowImportingTsExtensions": false,
+    "types": [],
+    "paths": {
+      "@fluxdown/core": ["../core/dist/esm/index.d.ts"],
+      "@fluxdown/types": ["../types/dist/esm/index.d.ts"],
+      "@fluxdown/utils": ["../utils/dist/esm/index.d.ts"],
+      "stative": ["../stative/dist/esm/index.d.ts"],
+      "@fluxdown/core-plugins/*": ["../core-plugins/dist/esm/*/index.d.ts"]
+    }
+  },
+  "angularCompilerOptions": {
+    "compilationMode": "partial"
+  },
+  "exclude": ["src/**/__tests__/**", "src/**/*.test.ts", "src/**/*.spec.ts"]
+}

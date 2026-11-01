@@ -15,6 +15,7 @@ Fluxdown 让 Markdown 在生成的过程中也保持好读。它把断续到达�
 | 在 ReactLynx 应用里展示 Markdown 与流式内容    | [Lynx 快速开始](./lynx/quick-start.md) · `@fluxdown/lynx`                         |
 | 在 Solid 应用里展示 Markdown 与流式内容        | [Solid 快速开始](./solid/quick-start.md) · `@fluxdown/solid`                      |
 | 在 Taro 应用里展示 Markdown 与流式内容         | [Taro 快速开始](./taro/quick-start.md) · `@fluxdown/taro`                         |
+| 在 Angular 应用里展示 Markdown 与流式内容      | [Angular 快速开始](./angular/quick-start.md) · `@fluxdown/angular`                |
 | 接入其他框架，或自己决定内容如何呈现           | [Core 快速开始](./core/quick-start.md) · `@fluxdown/core`                         |
 
 框架组件提供可直接使用的展示层；Core 负责框架无关的 Markdown 处理。两者共享语法、修复和流式能力。
@@ -29,6 +30,6 @@ Fluxdown 让 Markdown 在生成的过程中也保持好读。它把断续到达�
 
 ## 一套核心，多种界面
 
-Fluxdown 的核心基于 [stative](../stative/index.md) 构建，用同一条响应式数据流连接文本、配置与输出。React、Vue、Svelte、React Native、Lynx、Solid 与 Taro 已提供开箱即用的组件。
+Fluxdown 的核心基于 [stative](../stative/index.md) 构建，用同一条响应式数据流连接文本、配置与输出。React、Vue、Svelte、React Native、Lynx、Solid、Taro 与 Angular 已提供开箱即用的组件。
 
-第一次接入时，从 [React](./react/quick-start.md)、[Vue 3](./vue/quick-start.md)、[Svelte](./svelte/quick-start.md)、[React Native](./react-native/quick-start.md)、[Lynx](./lynx/quick-start.md)、[Solid](./solid/quick-start.md) 或 [Taro](./taro/quick-start.md) 的快速开始文档入手。需要自行处理输出时，再阅读 Core 部分。
+第一次接入时，从 [React](./react/quick-start.md)、[Vue 3](./vue/quick-start.md)、[Svelte](./svelte/quick-start.md)、[React Native](./react-native/quick-start.md)、[Lynx](./lynx/quick-start.md)、[Solid](./solid/quick-start.md)、[Taro](./taro/quick-start.md) 或 [Angular](./angular/quick-start.md) 的快速开始文档入手。需要自行处理输出时，再阅读 Core 部分。

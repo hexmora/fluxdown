@@ -1,0 +1,232 @@
+{
+  "name": "@fluxdown/angular-plugins",
+  "version": "0.1.0",
+  "description": "Angular render slots and plugin presets for Fluxdown.",
+  "keywords": [
+    "angular",
+    "hast",
+    "markdown",
+    "plugins",
+    "renderer",
+    "streaming"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/angular-plugins"
+  },
+  "files": [
+    "dist/fesm2022",
+    "dist/types",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss",
+    "**/*.less"
+  ],
+  "exports": {
+    "./base": "./src/base/index.ts",
+    "./typings": "./src/typings/index.ts",
+    "./full": "./src/presets/full/index.ts",
+    "./lite": "./src/presets/lite/index.ts",
+    "./plugins/blockquote": "./src/plugins/blockquote/index.ts",
+    "./plugins/break-line": "./src/plugins/break-line/index.ts",
+    "./plugins/cjk": "./src/plugins/cjk/index.ts",
+    "./plugins/code": "./src/plugins/code/index.ts",
+    "./plugins/code-pele": "./src/plugins/code-pele/index.ts",
+    "./plugins/code-prism": "./src/plugins/code-prism/index.ts",
+    "./plugins/code-shiki": "./src/plugins/code-shiki/index.ts",
+    "./plugins/effect-chunk": "./src/plugins/effect-chunk/index.ts",
+    "./plugins/effect-scale": "./src/plugins/effect-scale/index.ts",
+    "./plugins/effect-shad": "./src/plugins/effect-shad/index.ts",
+    "./plugins/effect-suffix": "./src/plugins/effect-suffix/index.ts",
+    "./plugins/emoji": "./src/plugins/emoji/index.ts",
+    "./plugins/emphasis": "./src/plugins/emphasis/index.ts",
+    "./plugins/fallback": "./src/plugins/fallback/index.ts",
+    "./plugins/heading": "./src/plugins/heading/index.ts",
+    "./plugins/image": "./src/plugins/image/index.ts",
+    "./plugins/link": "./src/plugins/link/index.ts",
+    "./plugins/list": "./src/plugins/list/index.ts",
+    "./plugins/paragraph": "./src/plugins/paragraph/index.ts",
+    "./plugins/patch": "./src/plugins/patch/index.ts",
+    "./plugins/strong": "./src/plugins/strong/index.ts",
+    "./plugins/table": "./src/plugins/table/index.ts",
+    "./plugins/tex": "./src/plugins/tex/index.ts",
+    "./plugins/tex-katex": "./src/plugins/tex-katex/index.ts",
+    "./plugins/tex-mathjax-katex": "./src/plugins/tex-mathjax-katex/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      "./base": {
+        "types": "./dist/types/fluxdown-angular-plugins-base.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-base.mjs"
+      },
+      "./typings": {
+        "types": "./dist/types/fluxdown-angular-plugins-typings.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-typings.mjs"
+      },
+      "./full": {
+        "types": "./dist/types/fluxdown-angular-plugins-full.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-full.mjs"
+      },
+      "./lite": {
+        "types": "./dist/types/fluxdown-angular-plugins-lite.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-lite.mjs"
+      },
+      "./plugins/blockquote": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-blockquote.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-blockquote.mjs"
+      },
+      "./plugins/break-line": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-break-line.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-break-line.mjs"
+      },
+      "./plugins/cjk": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-cjk.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-cjk.mjs"
+      },
+      "./plugins/code": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-code.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-code.mjs"
+      },
+      "./plugins/code-pele": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-code-pele.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-code-pele.mjs"
+      },
+      "./plugins/code-prism": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-code-prism.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-code-prism.mjs"
+      },
+      "./plugins/code-shiki": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-code-shiki.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-code-shiki.mjs"
+      },
+      "./plugins/effect-chunk": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-effect-chunk.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-effect-chunk.mjs"
+      },
+      "./plugins/effect-scale": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-effect-scale.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-effect-scale.mjs"
+      },
+      "./plugins/effect-shad": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-effect-shad.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-effect-shad.mjs"
+      },
+      "./plugins/effect-suffix": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-effect-suffix.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-effect-suffix.mjs"
+      },
+      "./plugins/emoji": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-emoji.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-emoji.mjs"
+      },
+      "./plugins/emphasis": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-emphasis.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-emphasis.mjs"
+      },
+      "./plugins/fallback": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-fallback.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-fallback.mjs"
+      },
+      "./plugins/heading": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-heading.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-heading.mjs"
+      },
+      "./plugins/image": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-image.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-image.mjs"
+      },
+      "./plugins/link": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-link.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-link.mjs"
+      },
+      "./plugins/list": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-list.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-list.mjs"
+      },
+      "./plugins/paragraph": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-paragraph.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-paragraph.mjs"
+      },
+      "./plugins/patch": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-patch.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-patch.mjs"
+      },
+      "./plugins/strong": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-strong.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-strong.mjs"
+      },
+      "./plugins/table": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-table.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-table.mjs"
+      },
+      "./plugins/tex": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-tex.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-tex.mjs"
+      },
+      "./plugins/tex-katex": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-tex-katex.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-tex-katex.mjs"
+      },
+      "./plugins/tex-mathjax-katex": {
+        "types": "./dist/types/fluxdown-angular-plugins-plugins-tex-mathjax-katex.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-plugins-plugins-tex-mathjax-katex.mjs"
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json -c tsconfig.build.json",
+    "lint": "oxlint .",
+    "test": "pnpm --dir ../angular exec ng test angular-plugins --watch=false",
+    "typecheck": "ngc --noEmit -p tsconfig.json",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@mathjax/mathjax-tex-font": "catalog:",
+    "@mathjax/src": "catalog:",
+    "@types/hast": "catalog:",
+    "katex": "catalog:",
+    "lodash-es": "catalog:",
+    "pele": "catalog:",
+    "prismjs": "catalog:",
+    "shiki": "catalog:",
+    "stative": "workspace:^",
+    "tslib": "catalog:"
+  },
+  "devDependencies": {
+    "@angular/compiler": "catalog:",
+    "@angular/compiler-cli": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/prismjs": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "ng-packagr": "catalog:",
+    "oxlint": "catalog:",
+    "rxjs": "catalog:",
+    "sass": "catalog:",
+    "typescript": "catalog:angular",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@angular/common": "catalog:angular-peer",
+    "@angular/core": "catalog:angular-peer",
+    "@angular/platform-browser": "catalog:angular-peer"
+  },
+  "engines": {
+    "node": ">=24.15.0"
+  }
+}
