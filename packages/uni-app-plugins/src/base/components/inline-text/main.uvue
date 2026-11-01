@@ -1,0 +1,113 @@
+<script setup lang="ts">
+import { getTextUnits } from '@fluxdown/hast';
+import { computed, shallowRef, watch } from 'vue';
+
+import type { InlineTextProps } from './type';
+
+import { InheritedText } from '../inherited-text';
+import { toText } from '../inherited-text/utils';
+import { MaskedText } from '../masked-text';
+import { InlinePart } from './components/part';
+
+const props = withDefaults(defineProps<InlineTextProps>(), { tail: true });
+
+const text = computed(() => props.parts.map((part) => part.text).join(''));
+
+const parts = computed(() => {
+  let offset = 0;
+
+  return props.parts.flatMap((part) =>
+    [...getTextUnits(part.text)].map((text) => {
+      const key = offset;
+
+      offset += 1;
+
+      return { key, part: { ...part, text } };
+    }),
+  );
+});
+
+const active = computed(() => props.parts.find((part) => part.effect)?.effect?.type);
+
+const kind = shallowRef(active.value);
+
+watch(active, (value) => {
+  if (value) {
+    kind.value = value;
+  }
+});
+
+const mask = computed(() => {
+  const last = props.parts.at(-1)?.effect;
+
+  return last?.type === 'shad' && last.maskText ? last : null;
+});
+</script>
+
+<template>
+  <InheritedText v-slot="{ textStyle, attributes }">
+    <view class="fluxdown-inline-text" v-bind="attributes">
+      <view class="fluxdown-inline-text__placeholder" :style="{ opacity: kind ? 0 : 1 }">
+        <text
+          :style="[
+            textStyle,
+            {
+              position: 'relative',
+              left: '0px',
+              top: '0px',
+              opacity: textStyle.opacity ?? 1,
+              whiteSpace: 'nowrap',
+            },
+          ]"
+          >{{ toText(text) }}</text
+        >
+      </view>
+      <view v-if="kind" class="fluxdown-inline-text__effect" aria-hidden="true">
+        <MaskedText
+          v-if="kind === 'shad'"
+          :text="text"
+          :text-style="textStyle"
+          :mask-text="mask?.maskText ?? ''"
+          :trailing-text="mask?.trailingText ?? ''"
+          :tail="props.tail"
+        />
+        <template v-else>
+          <InlinePart
+            v-for="{ part, key } in parts"
+            :key="key"
+            :node="part"
+            :text-style="textStyle"
+          />
+        </template>
+      </view>
+    </view>
+  </InheritedText>
+</template>
+
+<style>
+.fluxdown-inline-text {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.fluxdown-inline-text__placeholder {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.fluxdown-inline-text__effect {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  overflow: visible;
+}
+</style>

@@ -18,6 +18,10 @@ export class FakeSmoothTicker extends BaseSmoothTicker {
     return this.active;
   }
 
+  override now() {
+    return this.timestamp;
+  }
+
   start() {
     if (this.active) {
       throw new Error('Cannot start a running ticker');

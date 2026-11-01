@@ -1,0 +1,11 @@
+language: typescript
+layer: library
+
+tasks:
+  build:
+    inputs:
+      - vite.config.ts
+  test:
+    inputs:
+      - vitest.config.ts
+      - vitest.setup.ts

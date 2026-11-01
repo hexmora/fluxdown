@@ -1,0 +1,14 @@
+<script setup lang="ts">
+import { provideInlineFlow } from './context';
+
+provideInlineFlow();
+</script>
+
+<template>
+  <view
+    class="fluxdown-inline-flow"
+    style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; overflow: visible; min-width: 0"
+  >
+    <slot />
+  </view>
+</template>

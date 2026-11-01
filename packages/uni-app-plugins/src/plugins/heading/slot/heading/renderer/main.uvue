@@ -1,0 +1,33 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import { InheritedText } from '../../../../../base/components/inherited-text';
+import { InlineFlow } from '../../../../../base/components/inline-flow';
+import { getBlockStyle, useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+</script>
+
+<template>
+  <view
+    class="fluxdown-heading"
+    :style="{
+      ...getBlockStyle(`h${props.level}`, theme.tokens),
+    }"
+  >
+    <InheritedText
+      :style="{
+        fontSize: `${theme.tokens.heading[`h${props.level}`].fontSize}px`,
+        lineHeight: `${theme.tokens.heading[`h${props.level}`].fontSize * theme.tokens.heading[`h${props.level}`].lineHeight}px`,
+        fontWeight: theme.tokens.heading[`h${props.level}`].fontWeight,
+        ...(props.level <= 2
+          ? { letterSpacing: `${theme.tokens.heading[`h${props.level}`].fontSize * -0.025}px` }
+          : {}),
+        color: props.level >= 5 ? theme.tokens.colors.fgMuted : theme.tokens.colors.fg,
+      }"
+      ><InlineFlow><slot /></InlineFlow
+    ></InheritedText>
+  </view>
+</template>

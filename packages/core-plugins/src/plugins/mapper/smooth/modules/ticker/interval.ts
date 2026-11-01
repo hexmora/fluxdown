@@ -1,7 +1,6 @@
 import { assert } from '@fluxdown/utils';
 
 import { BaseSmoothTicker } from './base';
-import { getNow } from './utils';
 
 export class IntervalSmoothTicker extends BaseSmoothTicker {
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -23,9 +22,9 @@ export class IntervalSmoothTicker extends BaseSmoothTicker {
 
     assert(!this.running, 'Cannot start a running ticker');
 
-    const timestamp = getNow();
+    const timestamp = this.now();
 
-    this.timer = setInterval(() => this.subject.next(getNow()), this.interval);
+    this.timer = setInterval(() => this.subject.next(this.now()), this.interval);
 
     return timestamp;
   }

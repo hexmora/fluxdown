@@ -1,0 +1,32 @@
+<script setup lang="ts">
+import { PRESET_FULL_PLUGINS } from '@fluxdown/uni-app-plugins/full';
+import { shallowRef } from 'vue';
+
+import type { FluxdownRef } from '../raw';
+
+import { useMergePlugins } from '../../hooks';
+import { PRESET_PROPS } from '../raw/consts';
+import { FluxdownRaw } from '../raw';
+
+defineOptions({ name: 'Fluxdown' });
+
+const props = defineProps(PRESET_PROPS);
+
+const raw = shallowRef<FluxdownRef>();
+
+const plugins = useMergePlugins(PRESET_FULL_PLUGINS, () => props.plugins);
+
+defineExpose({
+  get value() {
+    return raw.value?.value;
+  },
+
+  destroy() {
+    raw.value?.destroy();
+  },
+});
+</script>
+
+<template>
+  <FluxdownRaw v-bind="props" :plugins="plugins" ref="raw" />
+</template>

@@ -1,0 +1,17 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { FormulaImageProps } from './type';
+
+import { SvgImage } from '../svg-image';
+
+const props = defineProps<FormulaImageProps>();
+
+const source = computed(() => {
+  return props.render(props.tex, props.mode ?? 'inline', props.fontSize, props.color);
+});
+</script>
+
+<template>
+  <SvgImage :source="source"><slot /></SvgImage>
+</template>
