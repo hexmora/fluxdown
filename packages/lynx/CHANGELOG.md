@@ -1,5 +1,13 @@
 # @fluxdown/lynx
 
+## 0.3.1
+
+### Patch Changes
+
+- 0889ca7: Clarify streaming Markdown package descriptions and keywords, and link each package to its framework's documentation.
+- Updated dependencies [0889ca7]
+  - @fluxdown/core@0.12.7
+
 ## 0.3.0
 
 ### Minor Changes
