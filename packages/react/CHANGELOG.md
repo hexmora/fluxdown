@@ -1,5 +1,12 @@
 # fluxdown
 
+## 0.14.2
+
+### Patch Changes
+
+- 10b06f2: Clarify streaming Markdown package descriptions and keywords, and link each package to its framework's documentation.
+- 10b06f2: Include React DOM plugin configuration types from the public type entry so isolated consumers can configure plugins such as `slot-code-header` without importing an unrelated plugin entry.
+
 ## 0.14.1
 
 ### Patch Changes

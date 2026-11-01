@@ -1,6 +1,6 @@
 {
   "name": "fluxdown",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "description": "Streaming Markdown renderer for React AI chat, with syntax repair, smooth output, and customizable components.",
   "keywords": [
     "ai-chat",
