@@ -1,16 +1,19 @@
 {
   "name": "fluxdown",
   "version": "0.14.1",
-  "description": "React wrapper around @fluxdown/core for high-performance rendering of streaming Markdown text.",
+  "description": "Streaming Markdown renderer for React AI chat, with syntax repair, smooth output, and customizable components.",
   "keywords": [
+    "ai-chat",
     "hast",
     "llm",
     "markdown",
+    "markdown-renderer",
     "react",
     "renderer",
-    "streaming"
+    "streaming",
+    "streaming-markdown"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://hexmora.github.io/fluxdown/guide/react/quick-start.html",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

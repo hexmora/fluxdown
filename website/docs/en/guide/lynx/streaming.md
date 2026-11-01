@@ -1,4 +1,9 @@
-# Streaming content
+---
+title: Streaming Markdown in Lynx
+description: Render streaming Markdown in ReactLynx with Fluxdown. Pass accumulated text, configure smoothing and Lynx effects, and finish or cancel the response.
+---
+
+# Streaming Markdown in Lynx {#streaming-content}
 
 Pass accumulated text to `text` and control `streaming` with your request state:
 

@@ -1,4 +1,9 @@
-# Streaming content
+---
+title: Streaming Markdown in React Native
+description: Render streaming Markdown in React Native with Fluxdown. Connect message text, configure native animation effects, and finish or cancel a response.
+---
+
+# Streaming Markdown in React Native {#streaming-content}
 
 React Native shares the same streaming pipeline as React. Pass accumulated text and use the request state to control `streaming`:
 

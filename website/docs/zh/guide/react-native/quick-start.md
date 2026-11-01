@@ -1,4 +1,9 @@
-# 快速开始
+---
+title: React Native Markdown 渲染器
+description: 在 Expo 或 React Native 项目中接入 Fluxdown，以原生 Text、View 组件渲染 Markdown，同一份组件代码可用于 iOS、Android 与 Web。
+---
+
+# React Native Markdown 渲染器快速开始 {#快速开始}
 
 React Native 版把 Markdown 渲染成 `Text`、`View` 等原生组件，沿用 React 版的解析、流式修复和插件机制。iOS、Android 与 React Native Web 使用同一份组件代码。
 

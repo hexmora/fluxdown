@@ -1,17 +1,21 @@
 {
   "name": "@fluxdown/react-native",
   "version": "0.2.2",
-  "description": "React Native components for streaming Markdown.",
+  "description": "Streaming Markdown renderer for React Native AI chat, with native components, syntax repair, and smooth output.",
   "keywords": [
+    "ai-chat",
+    "expo",
     "hast",
     "llm",
     "markdown",
+    "markdown-renderer",
     "react",
     "react-native",
     "renderer",
-    "streaming"
+    "streaming",
+    "streaming-markdown"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://hexmora.github.io/fluxdown/guide/react-native/quick-start.html",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

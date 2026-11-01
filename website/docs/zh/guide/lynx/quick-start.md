@@ -1,4 +1,9 @@
-# 快速开始
+---
+title: Lynx Markdown 渲染器
+description: 在 ReactLynx 项目中安装 Fluxdown，以 Lynx 元素渲染 Markdown。通过组件示例展示内容、接入流式文本，并了解样式与插槽的使用方式。
+---
+
+# Lynx Markdown 渲染器快速开始 {#快速开始}
 
 Lynx 版将 Markdown 渲染成 `text`、`view` 等 Lynx 元素。它基于 Core 实现，提供语法修复、平滑输出和可替换的渲染插槽。
 

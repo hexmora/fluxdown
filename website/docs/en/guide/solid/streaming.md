@@ -1,4 +1,9 @@
-# Streaming content
+---
+title: Streaming Markdown in SolidJS
+description: Render streaming Markdown in SolidJS with signals and Fluxdown. Read text chunks, configure syntax repair and effects, and manage independent message state.
+---
+
+# Streaming Markdown in SolidJS {#streaming-content}
 
 Append incoming chunks to a signal and pass its value to `text`. `streaming` controls unfinished syntax repair, smooth output and trailing effects.
 

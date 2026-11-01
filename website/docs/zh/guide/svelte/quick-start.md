@@ -1,4 +1,9 @@
-# 快速开始
+---
+title: Svelte Markdown 渲染器
+description: 在 Svelte 5 或 SvelteKit 中使用 Fluxdown，渲染 Markdown 与流式文本。了解组件安装、基础示例，以及 Full、Lite 和 Raw 的选择。
+---
+
+# Svelte Markdown 渲染器快速开始 {#快速开始}
 
 Svelte 版基于 Core 实现，提供语法修复、平滑输出和可替换的渲染插槽。组件使用 Svelte 5，可用于已有的 Svelte 或 SvelteKit 项目。
 

@@ -8,7 +8,8 @@
     "dev": "pnpm run build:renderers && rspress dev --host 127.0.0.1",
     "build": "pnpm run build:renderers && rspress build",
     "preview": "rspress preview --host 127.0.0.1",
-    "check": "pnpm run typecheck && pnpm run lint && pnpm run build",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run check:seo",
+    "check:seo": "tsx seo/check.ts",
     "lint": "oxlint .",
     "typecheck": "pnpm run build:renderers && tsc --noEmit && tsc --noEmit -p lynx/tsconfig.json",
     "build:renderers": "pnpm --filter @fluxdown/vue-plugins --filter @fluxdown/vue --filter @fluxdown/solid-plugins --filter @fluxdown/solid build && pnpm --workspace-root exec moon run angular:build"

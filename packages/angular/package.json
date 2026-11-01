@@ -1,16 +1,19 @@
 {
   "name": "@fluxdown/angular",
   "version": "0.2.0",
-  "description": "Angular components for streaming Markdown.",
+  "description": "Streaming Markdown renderer for Angular AI chat, with standalone components, syntax repair, and smooth output.",
   "keywords": [
+    "ai-chat",
     "angular",
     "hast",
     "llm",
     "markdown",
+    "markdown-renderer",
     "renderer",
-    "streaming"
+    "streaming",
+    "streaming-markdown"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://hexmora.github.io/fluxdown/guide/angular/quick-start.html",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

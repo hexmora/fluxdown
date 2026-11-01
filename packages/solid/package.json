@@ -1,16 +1,21 @@
 {
   "name": "@fluxdown/solid",
   "version": "0.2.0",
-  "description": "Solid components for streaming Markdown.",
+  "description": "Streaming Markdown renderer for SolidJS AI chat, with syntax repair, smooth output, and customizable components.",
   "keywords": [
+    "ai-chat",
     "hast",
     "llm",
     "markdown",
+    "markdown-renderer",
     "renderer",
     "solid",
-    "streaming"
+    "solid-js",
+    "solidjs",
+    "streaming",
+    "streaming-markdown"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://hexmora.github.io/fluxdown/guide/solid/quick-start.html",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },
