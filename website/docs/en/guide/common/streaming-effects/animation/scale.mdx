@@ -11,7 +11,7 @@ import { AnimationDemo } from '../../../../../../components';
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -110,11 +110,29 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
+```ts
+import type { StreamingConfig } from '@fluxdown/angular';
+
+import { Component, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown [streaming]="streaming" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly streaming: StreamingConfig = { effect: 'scale' };
+}
+```
+
 </FrameworkCodeTabs>
 
 Reduce the amount of change for a gentler entrance:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -251,6 +269,26 @@ export function Message({ text }: MessageProps) {
       text={text}
     />
   );
+}
+```
+
+```ts
+import type { StreamingConfig } from '@fluxdown/angular';
+
+import { Component, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown [streaming]="streaming" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly streaming: StreamingConfig = {
+    effect: ['scale', { duration: 250, from: 0.5, blur: 0.04 }],
+  };
 }
 ```
 

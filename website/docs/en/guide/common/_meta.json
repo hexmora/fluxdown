@@ -10,5 +10,10 @@
     "name": "features",
     "label": "Other features",
     "collapsed": false
+  },
+  {
+    "type": "file",
+    "name": "features/renderers",
+    "label": "Side-by-side demo"
   }
 ]

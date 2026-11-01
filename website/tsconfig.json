@@ -8,7 +8,10 @@
       "@fluxdown/vue": ["../packages/vue/dist/esm/packs/full/index.d.ts"],
       "@fluxdown/vue-plugins/typings": ["../packages/vue-plugins/dist/esm/typings/index.d.ts"],
       "@fluxdown/solid": ["../packages/solid/dist/esm/packs/full/index.d.ts"],
-      "@fluxdown/solid-plugins/typings": ["../packages/solid-plugins/dist/esm/typings/index.d.ts"]
+      "@fluxdown/solid-plugins/typings": ["../packages/solid-plugins/dist/esm/typings/index.d.ts"],
+      "@fluxdown/angular": ["../packages/angular/dist/types/fluxdown-angular.d.ts"],
+      "@fluxdown/angular/*": ["../packages/angular/dist/*"],
+      "@fluxdown/angular-plugins/*": ["../packages/angular-plugins/dist/*"]
     },
     "customConditions": ["svelte"]
   },

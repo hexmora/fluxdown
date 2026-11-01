@@ -2,7 +2,7 @@ import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs
 
 # Emoji 短码
 
-`EmojiPlugin` 将 `:smile:`、`:+1:` 等 GitHub 风格的 emoji 短码转换为 Unicode 表情。React、Vue、Svelte、React Native、Lynx、Solid 和 Taro 的 Full 组件默认包含此插件，Lite 组件可按需添加。
+`EmojiPlugin` 将 `:smile:`、`:+1:` 等 GitHub 风格的 emoji 短码转换为 Unicode 表情。React、Vue、Svelte、React Native、Lynx、Solid、Taro 和 Angular 的 Full 组件默认包含此插件，Lite 组件可按需添加。
 
 <FrameworkCodeTabs>
 
@@ -64,6 +64,18 @@ export function Message() {
 }
 ```
 
+```ts
+import { Component } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown text="Hello :smile: Great work :+1:" />`,
+})
+export class Message {}
+```
+
 </FrameworkCodeTabs>
 
 输出为「Hello 😄 Great work 👍」。表情使用系统字体，具体外观取决于设备。
@@ -78,7 +90,7 @@ export function Message() {
 
 各框架的 Full 组件已内置 `EmojiPlugin`，无需手动注册。使用 Core 或 Lite 组件时，先安装对应的插件包：
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
 
 ```sh
 pnpm add @fluxdown/core-plugins
@@ -112,11 +124,15 @@ pnpm add @fluxdown/solid-plugins
 pnpm add @fluxdown/react-base-plugins
 ```
 
+```sh
+pnpm add @fluxdown/angular-plugins
+```
+
 </FrameworkCodeTabs>
 
 Core 将 `EmojiRemarkPlugin` 加入[快速开始](../../core/quick-start.md)的 `remarks` 输入；组件则通过 `plugins` 扩展预设：
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
 
 ```ts
 import { EmojiRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/emoji';
@@ -217,13 +233,30 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
+```ts
+import { Component, input } from '@angular/core';
+import { FluxdownLite } from '@fluxdown/angular/lite';
+import { EmojiPlugin } from '@fluxdown/angular-plugins/plugins/emoji';
+
+@Component({
+  selector: 'app-message',
+  imports: [FluxdownLite],
+  template: `<fluxdown-lite [plugins]="plugins" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly plugins = EmojiPlugin;
+}
+```
+
 </FrameworkCodeTabs>
 
 ## 关闭转换
 
 将 `EmojiPlugin` 与 `config` 放在同一个插件包中，可以按需禁用此功能。Core 使用带 `disabled` 配置的 remark 插件条目：
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
 
 ```ts
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
@@ -375,6 +408,28 @@ export function Message({ text }: MessageProps) {
       text={text}
     />
   );
+}
+```
+
+```ts
+import type { IPluginItem } from '@fluxdown/angular-plugins/typings';
+
+import { Component, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+import { EmojiPlugin } from '@fluxdown/angular-plugins/plugins/emoji';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown [plugins]="plugins" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly plugins: IPluginItem = {
+    ...EmojiPlugin,
+    config: { 'remark-emoji': { disabled: true } },
+  };
 }
 ```
 

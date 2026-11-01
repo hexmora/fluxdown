@@ -389,7 +389,7 @@
 
 .architecture {
   margin: 120px auto 0;
-  max-width: 820px;
+  max-width: 920px;
 
   @media (max-width: 760px) {
     margin-top: 88px;
@@ -406,15 +406,15 @@
   position: relative;
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 12px;
 
   &::after {
     content: "";
     position: absolute;
     bottom: -18px;
-    left: calc((100% - 72px) / 14);
-    right: calc((100% - 72px) / 14);
+    left: calc((100% - 84px) / 16);
+    right: calc((100% - 84px) / 16);
     height: 1px;
     background: var(--site-line-strong);
     pointer-events: none;
@@ -517,8 +517,8 @@
   @media (max-width: 700px) {
     grid-column: span 2;
 
-    &:last-child {
-      grid-column: 3 / span 2;
+    &:nth-last-child(2) {
+      grid-column: 2 / span 2;
     }
 
     &::before,
@@ -528,8 +528,8 @@
   }
 
   @media (max-width: 520px) {
-    &:last-child {
-      grid-column: 2 / span 2;
+    &:nth-last-child(2) {
+      grid-column: span 2;
     }
   }
 }

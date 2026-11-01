@@ -1,5 +1,26 @@
 # @fluxdown/website
 
+## 0.0.14
+
+### Patch Changes
+
+- e591342: Add Angular components and plugin presets for static and streaming Markdown, including raw, lite, and full entry points, configurable slots, themes, patches, and all four streaming effects.
+
+  Add English and Chinese Angular guides and include Angular in the shared examples, renderer comparisons, homepage, and playground.
+
+- 9be0371: Promote the side-by-side demo in the guide navigation and remember its renderer selection, defaulting to React, Vue, and Svelte while keeping at least one renderer selected.
+- Updated dependencies [e591342]
+  - @fluxdown/angular@0.2.0
+
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [fd73816]
+- Updated dependencies [fd73816]
+  - @fluxdown/react-native@0.2.2
+  - @fluxdown/svelte@0.1.0
+
 ## 0.0.12
 
 ### Patch Changes

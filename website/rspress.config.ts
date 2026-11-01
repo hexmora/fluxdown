@@ -1,3 +1,4 @@
+import linkerPlugin from '@angular/compiler-cli/linker/babel';
 import { pluginLess } from '@rsbuild/plugin-less';
 import { pluginSass } from '@rsbuild/plugin-sass';
 import { pluginSvelte } from '@rsbuild/plugin-svelte';
@@ -79,6 +80,10 @@ export default defineConfig({
       aliasStrategy: 'prefer-alias',
       alias: {
         ...taroWebAliases(),
+        '@fluxdown/angular': fileURLToPath(new URL('../packages/angular/dist', import.meta.url)),
+        '@fluxdown/angular-plugins': fileURLToPath(
+          new URL('../packages/angular-plugins/dist', import.meta.url),
+        ),
         // Workspace demos share the same React instance as the documentation theme.
         react: fileURLToPath(new URL('./node_modules/react', import.meta.url)),
         'react-dom': fileURLToPath(new URL('./node_modules/react-dom', import.meta.url)),
@@ -136,6 +141,20 @@ export default defineConfig({
       rspack: {
         module: {
           rules: [
+            {
+              // Link the Angular Package Format before bundling the browser preview.
+              test: /\.m?js$/,
+              include: [
+                /[/\\]@angular[/\\]/,
+                /[/\\]packages[/\\]angular(?:-plugins)?[/\\]dist[/\\]/,
+              ],
+              loader: 'babel-loader',
+              options: {
+                plugins: [linkerPlugin],
+                compact: false,
+                cacheDirectory: true,
+              },
+            },
             {
               // Taro's Stencil fallback carries a redundant webpackExports hint.
               // Keep its pure annotations while Rspack infers the dynamic import.

@@ -8,10 +8,5 @@
     "type": "file",
     "name": "cjk",
     "label": "CJK support"
-  },
-  {
-    "type": "file",
-    "name": "renderers",
-    "label": "Side-by-side demo"
   }
 ]

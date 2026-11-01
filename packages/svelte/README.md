@@ -16,4 +16,4 @@ pnpm add @fluxdown/svelte
 
 Pass the complete message received so far as `text`, and set `streaming` to `false` when it ends. Use `@fluxdown/svelte/lite` for `FluxdownLite`, or `@fluxdown/svelte/raw` for `FluxdownRaw` with your own plugins.
 
-[Documentation](https://hexmora.github.io/fluxdown/guide/svelte/quick-start) · [Plugins](../svelte-plugins) · [MIT](../../LICENSE)
+[Documentation](https://hexmora.github.io/fluxdown/guide/svelte/quick-start.html) · [Plugins](../svelte-plugins) · [MIT](../../LICENSE)

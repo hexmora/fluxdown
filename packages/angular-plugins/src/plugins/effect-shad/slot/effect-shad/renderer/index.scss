@@ -1,0 +1,25 @@
+@use "../../../../../styles/prefix" as *;
+
+.fluxdown-angular-effect-shad-root {
+  // Fading runs wrap naturally across lines, including their whitespace.
+  display: inline;
+
+  &.fluxdown-angular-effect-shad-active {
+    // Linear opacity over time reads as an even gradient across the tail at a steady pace.
+    animation: fluxdown-angular-effect-shad-appear var(--#{$prefix}-shad-duration) linear both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes fluxdown-angular-effect-shad-appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

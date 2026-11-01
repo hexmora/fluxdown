@@ -28,7 +28,7 @@
     "format": "moon run workspace:format",
     "format:check": "moon run workspace:format-check",
     "lint": "moon run :lint",
-    "prepare": "husky",
+    "prepare": "husky && tsx scripts/prepare-angular.ts",
     "test": "moon run :test",
     "typecheck": "moon run :typecheck",
     "check": "moon run --concurrency 4 :typecheck :lint :test",
@@ -83,7 +83,7 @@
     "yaml": "catalog:"
   },
   "engines": {
-    "node": ">=24.14.0",
+    "node": ">=24.15.0",
     "pnpm": "11.6.0"
   },
   "packageManager": "pnpm@11.6.0"

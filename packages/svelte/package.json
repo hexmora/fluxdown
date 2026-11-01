@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/svelte",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Svelte components for streaming Markdown with Fluxdown.",
   "homepage": "https://hexmora.github.io/fluxdown/",
   "bugs": {

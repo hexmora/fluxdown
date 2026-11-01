@@ -1,2 +1,2 @@
 export * from './packs';
-export * from './plugins';
+export type * from './plugins.js';

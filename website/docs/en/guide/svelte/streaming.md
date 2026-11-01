@@ -52,4 +52,4 @@ Set `effect: false` to keep smoothing without a visual effect. See [Configuratio
 
 Set `streaming` to `false` when the request finishes, is cancelled or fails. The component displays all received content and removes trailing effects. Unmounting also cleans up its subscriptions and animations.
 
-[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, React Native, Lynx, Solid, and Taro together.
+[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, React Native, Lynx, Solid, Taro, and Angular together.

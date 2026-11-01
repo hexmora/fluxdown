@@ -19,10 +19,12 @@ import type {
 } from './release-artifact.ts';
 import type { PackageArtifact, WorkspacePackage } from './types.ts';
 
+import { checkAngularConsumer } from './check-angular-consumer.ts';
 import { checkBrowserConsumer } from './check-browser.ts';
 import { checkLynxConsumer } from './check-lynx-consumer.ts';
 import {
   checkPackage,
+  isAngularPackage,
   isLynxPackage,
   isSveltePackage,
   isTaroPackage,
@@ -31,6 +33,7 @@ import {
 } from './check-package.ts';
 import { checkReactNativePacks, REACT_NATIVE_PACKAGES } from './check-react-native-packs.ts';
 import { checkReactPacks } from './check-react-packs.ts';
+import { checkSvelteConsumer } from './check-svelte-consumer.ts';
 import {
   assertPublishEnvironment,
   assertSourceSha,
@@ -293,7 +296,8 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
   );
 
   const nodeArtifacts = artifacts.filter(
-    ({ manifest }) => !REACT_NATIVE_PACKAGES.includes(manifest.name),
+    ({ manifest }) =>
+      !REACT_NATIVE_PACKAGES.includes(manifest.name) && !isAngularPackage(manifest.name),
   );
 
   const consumer = await mkdtemp(path.join(tmpdir(), 'fluxdown-consumer-'));
@@ -310,7 +314,10 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
           nodeArtifacts.map((artifact) => [artifact.manifest.name, `file:${artifact.tarball}`]),
         ),
         overrides: Object.fromEntries(
-          artifacts.map((artifact) => [artifact.manifest.name, `$${artifact.manifest.name}`]),
+          [...nodeArtifacts, ...nativeArtifacts].map((artifact) => [
+            artifact.manifest.name,
+            `$${artifact.manifest.name}`,
+          ]),
         ),
       }),
     );
@@ -703,7 +710,12 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
     );
 
     const browser = await checkBrowserConsumer(consumer, artifacts);
+
     const lynx = await checkLynxConsumer(consumer, artifacts);
+
+    const svelte = await checkSvelteConsumer(consumer, artifacts);
+
+    const angular = await checkAngularConsumer(consumer, artifacts);
 
     if (specifiers.includes('fluxdown') || nativeArtifacts.length) {
       if (taroSpecifiers.length) {
@@ -801,7 +813,16 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
     if (specifiers.includes('fluxdown/lite'))
       await checkReactPacks(consumer, nativeArtifacts.length > 0);
 
-    return { nodeEntries: specifiers.length, browser, ...(lynx ? { lynx } : {}) };
+    return {
+      nodeEntries: specifiers.length,
+      browser,
+      ...(lynx ? { lynx } : {}),
+      ...(svelte ? { svelte } : {}),
+      ...(angular ? { angular } : {}),
+      ...(nativeArtifacts.length
+        ? { native: { packages: nativeArtifacts.map(({ manifest }) => manifest.name) } }
+        : {}),
+    };
   } finally {
     if (process.env.FLUXDOWN_KEEP_CONSUMER === '1') {
       console.log(`Preserved isolated consumer for inspection: ${consumer}`);

@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/website",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "private": true,
   "homepage": "https://hexmora.github.io/fluxdown/",
   "type": "module",
@@ -11,9 +11,13 @@
     "check": "pnpm run typecheck && pnpm run lint && pnpm run build",
     "lint": "oxlint .",
     "typecheck": "pnpm run build:renderers && tsc --noEmit && tsc --noEmit -p lynx/tsconfig.json",
-    "build:renderers": "pnpm --filter @fluxdown/vue-plugins --filter @fluxdown/vue --filter @fluxdown/solid-plugins --filter @fluxdown/solid build"
+    "build:renderers": "pnpm --filter @fluxdown/vue-plugins --filter @fluxdown/vue --filter @fluxdown/solid-plugins --filter @fluxdown/solid build && pnpm --workspace-root exec moon run angular:build"
   },
   "dependencies": {
+    "@angular/common": "catalog:",
+    "@angular/core": "catalog:",
+    "@angular/platform-browser": "catalog:",
+    "@fluxdown/angular": "workspace:^",
     "@fluxdown/core": "workspace:^",
     "@fluxdown/core-plugins": "workspace:^",
     "@fluxdown/react-native": "workspace:^",
@@ -31,12 +35,15 @@
     "react-dom": "catalog:",
     "react-native-svg": "catalog:",
     "react-native-web": "catalog:",
+    "rxjs": "catalog:",
     "solid-js": "catalog:",
     "stative": "workspace:^",
     "svelte": "catalog:",
     "vue": "catalog:"
   },
   "devDependencies": {
+    "@angular/compiler-cli": "catalog:",
+    "@babel/core": "catalog:",
     "@fluxdown/lynx": "workspace:^",
     "@lynx-js/react": "catalog:",
     "@lynx-js/react-rsbuild-plugin": "catalog:",
@@ -53,9 +60,10 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "babel-loader": "catalog:",
     "less": "catalog:",
     "oxlint": "catalog:",
     "sass": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:angular"
   }
 }

@@ -25,7 +25,7 @@ Choose your framework above each example. Pass the Core example’s `mappers` to
 
 Enabling `streaming` uses spring smoothing by default:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -134,11 +134,27 @@ export function Message({ text, isStreaming }: MessageProps) {
 }
 ```
 
+```ts
+import { Component, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown [streaming]="isStreaming()" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly isStreaming = input(false);
+}
+```
+
 </FrameworkCodeTabs>
 
 You can also select the interpolation explicitly and add an [animation effect](./animation/index.mdx):
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -300,10 +316,31 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
+```ts
+import type { StreamingConfig } from '@fluxdown/angular';
+
+import { Component, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown [streaming]="streaming" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly streaming: StreamingConfig = {
+    smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
+    effect: 'shad',
+  };
+}
+```
+
 </FrameworkCodeTabs>
 
 Always pass the complete text received so far to `text`. Setting `streaming` to `false` reveals the remaining buffer immediately. Keep smoothing enabled if you want the remaining content to finish appearing gradually.
 
-Core uses the same `Smooth` mapper to produce trimmed content blocks, so the renderer does not need to schedule character updates. See [Core state and updates](../../core/streaming.md#enable-smooth-output) for integration and your framework’s configuration for all options: [React](../../react/configuration.md#streamingsmooth), [Vue](../../vue/configuration.md#streamingsmooth), [Svelte](../../svelte/configuration.md), [React Native](../../react-native/configuration.md), [Lynx](../../lynx/configuration.md), [Solid](../../solid/configuration.md#streamingsmooth), or [Taro](../../taro/configuration.md).
+Core uses the same `Smooth` mapper to produce trimmed content blocks, so the renderer does not need to schedule character updates. See [Core state and updates](../../core/streaming.md#enable-smooth-output) for integration and your framework’s configuration for all options: [React](../../react/configuration.md#streamingsmooth), [Vue](../../vue/configuration.md#streamingsmooth), [Svelte](../../svelte/configuration.md), [React Native](../../react-native/configuration.md), [Lynx](../../lynx/configuration.md), [Solid](../../solid/configuration.md#streamingsmooth), [Taro](../../taro/configuration.md), or [Angular](../../angular/configuration.md#streamingsmooth).
 
 The reactive Core example owns its `MutableState`: call `isStreaming.next(false)` when receiving finishes, then dispose `active` and `isStreaming` with `.destroy()` after destroying Core.

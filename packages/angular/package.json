@@ -1,0 +1,116 @@
+{
+  "name": "@fluxdown/angular",
+  "version": "0.2.0",
+  "description": "Angular components for streaming Markdown.",
+  "keywords": [
+    "angular",
+    "hast",
+    "llm",
+    "markdown",
+    "renderer",
+    "streaming"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/angular"
+  },
+  "files": [
+    "dist/fesm2022",
+    "dist/types",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss",
+    "**/*.less"
+  ],
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./lite": "./src/lite.ts",
+    "./raw": "./src/raw.ts"
+  },
+  "publishConfig": {
+    "main": "./dist/fesm2022/fluxdown-angular.mjs",
+    "module": "./dist/fesm2022/fluxdown-angular.mjs",
+    "types": "./dist/types/fluxdown-angular.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/types/fluxdown-angular.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular.mjs"
+      },
+      "./lite": {
+        "types": "./dist/types/fluxdown-angular-lite.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-lite.mjs"
+      },
+      "./raw": {
+        "types": "./dist/types/fluxdown-angular-raw.d.ts",
+        "default": "./dist/fesm2022/fluxdown-angular-raw.mjs"
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json -c tsconfig.build.json",
+    "lint": "oxlint .",
+    "test": "ng test angular --watch=false",
+    "typecheck": "ngc --noEmit -p tsconfig.json",
+    "prepack": "tsx ../../scripts/check-package.ts --source",
+    "dev": "ng run angular:storybook --no-open",
+    "storybook": "ng run angular:storybook",
+    "build:storybook": "ng run angular:build-storybook"
+  },
+  "dependencies": {
+    "@fluxdown/angular-plugins": "workspace:^",
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "lodash-es": "catalog:",
+    "shallow-equal": "catalog:",
+    "stative": "workspace:^",
+    "tslib": "catalog:"
+  },
+  "devDependencies": {
+    "@angular-devkit/architect": "catalog:",
+    "@angular-devkit/build-angular": "catalog:",
+    "@angular-devkit/core": "catalog:",
+    "@angular/animations": "catalog:",
+    "@angular/build": "catalog:",
+    "@angular/cli": "catalog:",
+    "@angular/compiler": "catalog:",
+    "@angular/compiler-cli": "catalog:",
+    "@angular/platform-browser": "catalog:",
+    "@storybook/addon-docs": "catalog:angular",
+    "@storybook/angular": "catalog:",
+    "@types/hast": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "ng-packagr": "catalog:",
+    "oxlint": "catalog:",
+    "rxjs": "catalog:",
+    "sass": "catalog:",
+    "storybook": "catalog:angular",
+    "typescript": "catalog:angular",
+    "vitest": "catalog:",
+    "zone.js": "catalog:"
+  },
+  "peerDependencies": {
+    "@angular/common": "catalog:angular-peer",
+    "@angular/core": "catalog:angular-peer"
+  },
+  "engines": {
+    "node": ">=24.15.0"
+  }
+}

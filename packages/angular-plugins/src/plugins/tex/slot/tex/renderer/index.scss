@@ -1,0 +1,15 @@
+@use "../../../../../styles/prefix" as *;
+
+.fluxdown-angular-tex-root {
+  color: inherit;
+  font-family: var(--#{$prefix}-typography-font-mono);
+  font-size: var(--#{$prefix}-code-font-size);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+
+  &:where([data-mode="display"]) {
+    display: block;
+    margin-block: var(--#{$prefix}-spacing-lg);
+    text-align: center;
+  }
+}

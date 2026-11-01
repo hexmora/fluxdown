@@ -105,6 +105,10 @@ export function resolveExport(
   return undefined;
 }
 
+export function isAngularPackage(name: string): boolean {
+  return name === '@fluxdown/angular' || name === '@fluxdown/angular-plugins';
+}
+
 export function isLynxPackage(name: string): boolean {
   return name === '@fluxdown/lynx' || name === '@fluxdown/lynx-plugins';
 }
@@ -181,6 +185,20 @@ async function checkExports(directory: string, source = false): Promise<PackageM
       assert(
         resolveExport(value, ['types', 'import'])?.endsWith('.d.ts'),
         `${label}${entry}: missing Svelte declarations`,
+      );
+
+      continue;
+    }
+
+    if (isAngularPackage(manifest.name)) {
+      assert(
+        resolveExport(value, ['import'])?.endsWith('.mjs'),
+        `${label}${entry}: Angular libraries must use Angular Package Format ESM`,
+      );
+
+      assert(
+        resolveExport(value, ['types', 'import'])?.endsWith('.d.ts'),
+        `${label}${entry}: missing Angular declarations`,
       );
 
       continue;
