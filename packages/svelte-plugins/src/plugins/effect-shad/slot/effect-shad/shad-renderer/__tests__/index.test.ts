@@ -1,71 +1,72 @@
 import type { Element } from 'hast';
 
+import { SHAD_DATA_ATTR, SHAD_FADE_VALUE } from '@fluxdown/core-plugins/plugins/mapper/shad';
 import { cleanup, render } from '@testing-library/svelte';
-import { afterEach, expect, test } from 'vitest';
+import { createRawSnippet } from 'svelte';
+import { afterEach, expect, test, vi } from 'vitest';
 
 import { ShadRenderer } from '..';
-import { getShadConfig } from '../../../../render/effect-shad/utils';
+import { getShadConfig, isShadNode } from '../../../../render/effect-shad/utils';
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
 
-test.each([
-  { maskWidth: undefined, expected: 15 },
-  { maskWidth: '24.5', expected: 24.5 },
-  { maskWidth: 'invalid', expected: 15 },
-  { maskWidth: Infinity, expected: 15 },
-  { maskWidth: -10, expected: 0 },
-  { maskWidth: 0, expected: 0 },
-])('renders maskWidth=$maskWidth without changing inline text', ({ maskWidth, expected }) => {
-  const node: Element = {
-    type: 'element',
-    tagName: 'span',
-    properties: { dataShadMaskWidth: maskWidth },
-    children: [],
-  };
-
-  const view = render(ShadRenderer, {
-    ...getShadConfig(node),
-    leading: 'leading',
-    active: 'active',
-    isActive: true,
-  });
-
-  const mask = view.container.querySelector('.mask') as HTMLElement;
-
-  expect(view.container.textContent).toBe('leadingactive');
-
-  expect(mask.style.width).toBe(`${expected}px`);
-
-  expect(mask.style.marginLeft).toBe(`${-expected}px`);
-
-  expect(view.container.firstElementChild?.hasAttribute('style')).toBe(false);
+  vi.restoreAllMocks();
 });
 
-test('retains the leading and active spans when the tail changes or settles', async () => {
-  const view = render(ShadRenderer, {
-    leading: 'a',
-    active: 'bc',
-    isActive: true,
-    maskWidth: 15,
-  });
+const children = createRawSnippet(() => ({ render: () => '<span>fade</span>' }));
 
-  const leading = view.container.querySelector('.leading');
+const fade = (properties: Element['properties']): Element => ({
+  type: 'element',
+  tagName: 'span',
+  properties: { [SHAD_DATA_ATTR]: SHAD_FADE_VALUE, ...properties },
+  children: [{ type: 'text', value: 'fade' }],
+});
 
-  const active = view.container.querySelector('.active');
+test('matches only fade spans', () => {
+  expect(isShadNode(fade({}))).toBe(true);
 
-  const mask = view.container.querySelector('.mask');
+  expect(isShadNode({ ...fade({}), tagName: 'div' })).toBe(false);
 
-  await view.rerender({ leading: 'ab', active: 'cd' });
+  expect(isShadNode(fade({ [SHAD_DATA_ATTR]: 'host' }))).toBe(false);
+});
 
-  expect(view.container.querySelector('.leading')).toBe(leading);
+test.each([
+  { properties: { dataShadStart: 120, dataShadDuration: 250 }, start: 120, duration: 250 },
+  { properties: { dataShadStart: '120', dataShadDuration: '250' }, start: 120, duration: 250 },
+  { properties: {}, start: -1, duration: 400 },
+  { properties: { dataShadStart: -20, dataShadDuration: -5 }, start: -1, duration: 0 },
+  { properties: { dataShadStart: 'x', dataShadDuration: Infinity }, start: -1, duration: 400 },
+])('reads start and duration from $properties', ({ properties, start, duration }) => {
+  expect(getShadConfig(fade(properties))).toEqual({ start, duration });
+});
 
-  expect(view.container.querySelector('.active')).toBe(active);
+test('resumes a fade from its own start time and settles once it has finished', () => {
+  const now = vi.spyOn(performance, 'now').mockReturnValue(1100);
 
-  expect(view.container.textContent).toBe('abcd');
+  const running = render(ShadRenderer, { children, start: 1000, duration: 400 });
 
-  await view.rerender({ leading: 'abcd', active: '', isActive: false });
+  const element = running.container.querySelector('[data-fluxdown-shad="fade"]') as HTMLElement;
 
-  expect(view.container.querySelector('.mask-hidden')).toBe(mask);
+  expect(element.classList.contains('active')).toBe(true);
 
-  expect(view.container.textContent).toBe('abcd');
+  expect(element.style.animationDelay).toBe('-100ms');
+
+  expect(element.style.getPropertyValue('--fluxdown-shad-duration')).toBe('400ms');
+
+  expect(element.textContent).toBe('fade');
+
+  running.unmount();
+
+  now.mockReturnValue(1500);
+
+  const settled = render(ShadRenderer, { children, start: 1000, duration: 400 });
+
+  expect(settled.container.querySelector('.active')).toBeNull();
+});
+
+test('does not animate content that was already settled', () => {
+  const view = render(ShadRenderer, { children, start: -1, duration: 400 });
+
+  expect(view.container.querySelector('.active')).toBeNull();
 });

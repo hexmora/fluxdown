@@ -1,29 +1,33 @@
 import type { ShadProps } from '@fluxdown/angular-plugins/typings';
 
-import { Component, input, ViewEncapsulation } from '@angular/core';
-import { RenderOutlet } from '@fluxdown/angular-plugins/base';
+import { Component, computed, input, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'fluxdown-shad',
-  imports: [RenderOutlet],
-  template: `<span class="fluxdown-angular-effect-shad-leading"
-      ><ng-container [fluxdownRender]="props().leading" /></span
-    ><span class="fluxdown-angular-effect-shad-active"
-      ><ng-container [fluxdownRender]="props().active" /></span
-    ><span
-      aria-hidden="true"
-      [class]="
-        props().isActive
-          ? 'fluxdown-angular-effect-shad-mask'
-          : 'fluxdown-angular-effect-shad-maskHidden'
-      "
-      [style.width.px]="props().maskWidth"
-      [style.margin-left.px]="-props().maskWidth"
-    ></span>`,
-  host: { class: 'fluxdown-angular-effect-shad-root' },
+  template: '<ng-content />',
+  host: {
+    class: 'fluxdown-angular-effect-shad-root',
+    '[class.fluxdown-angular-effect-shad-active]': 'active()',
+    '[style.--fluxdown-angular-shad-duration]': 'props().duration + "ms"',
+    '[style.animation-delay]': 'delay() + "ms"',
+    'data-fluxdown-shad': 'fade',
+  },
   styleUrl: './index.scss',
   encapsulation: ViewEncapsulation.None,
 })
 export class ShadRenderer {
   readonly props = input.required<ShadProps>();
+
+  private readonly start = computed(() => this.props().start);
+
+  // A negative delay resumes the fade from its own start when the node is re-created.
+  protected readonly delay = computed(() => {
+    const start = this.start();
+
+    return start >= 0 ? Math.min(0, start - performance.now()) : 0;
+  });
+
+  protected readonly active = computed(
+    () => this.start() >= 0 && this.delay() > -this.props().duration,
+  );
 }

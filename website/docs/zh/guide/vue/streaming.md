@@ -57,7 +57,7 @@ const props = defineProps<MessageProps>();
 const streaming: StreamingConfig = {
   repairEnding: true,
   smooth: true,
-  effect: ['shad', { length: 3, maskWidth: 18 }],
+  effect: ['shad', { length: 6, duration: 600 }],
 };
 </script>
 
@@ -72,14 +72,14 @@ const streaming: StreamingConfig = {
 | `smooth`       | 平滑显示新到达的内容，默认开启。                |
 | `effect`       | 选择末尾效果，默认 `scale`；设为 `false` 关闭。 |
 
-只想显示服务端原本的片段节奏，可以关闭 `smooth`。自定义 ticker 与 scheduler 的方式见 [Core 流式内容](../core/streaming.md)。
+只想显示服务端原本的片段节奏，可以关闭 `smooth`。自定义驱动与插值的方式见 [Core 流式内容](../core/streaming.md)。
 
 ## 四种末尾效果
 
 | 效果     | 呈现方式                                 |
 | -------- | ---------------------------------------- |
 | `scale`  | 新文字由模糊、缩小逐渐变得清晰。         |
-| `shad`   | 用渐变遮罩柔和地展开末尾。               |
+| `shad`   | 每个新出现的字符按各自的时钟淡入。       |
 | `chunk`  | 按收到的片段渐入，适合 `smooth: false`。 |
 | `suffix` | 在末尾显示标记，提示内容还在生成。       |
 

@@ -21,7 +21,7 @@ import type { HastRoot } from '../../../typings';
 import type { MapperInputs, MapperPluggable } from '../../base';
 
 import { Core } from '..';
-import { FakeSmoothTicker, StepSmoothScheduler } from '../../../__tests__/utils/smooth';
+import { FakeSmoothDriver, StepSmoothInterpolator } from '../../../__tests__/utils/smooth';
 import { BaseRenderer } from '../../../externals';
 
 type Block = IBlockState<HastRoot>;
@@ -32,13 +32,13 @@ class BlockRenderer extends BaseRenderer<HastRoot, ElementContent, Parent, Block
   }
 }
 
-class ManualTicker extends FakeSmoothTicker {
-  static instances: ManualTicker[] = [];
+class ManualDriver extends FakeSmoothDriver {
+  static instances: ManualDriver[] = [];
 
   constructor() {
     super();
 
-    ManualTicker.instances.push(this);
+    ManualDriver.instances.push(this);
   }
 }
 
@@ -63,8 +63,8 @@ const enabled: MapperPluggable = [
   Smooth,
   {
     enabled: true,
-    ticker: ManualTicker,
-    scheduler: StepSmoothScheduler,
+    driver: ManualDriver,
+    interpolation: StepSmoothInterpolator,
   },
 ];
 
@@ -105,20 +105,20 @@ const setup = (
   const read = () => core.value.value.map((block) => collectText(block.value.value));
 
   const tick = (timestamp: number) => {
-    const ticker = last(ManualTicker.instances);
+    const driver = last(ManualDriver.instances);
 
-    assert(ticker);
+    assert(driver);
 
-    ticker.tick(timestamp);
+    driver.tick(timestamp);
   };
 
   return { core, read, mappers, text, tick };
 };
 
 beforeEach(() => {
-  ManualTicker.instances = [];
+  ManualDriver.instances = [];
 
-  StepSmoothScheduler.instances = [];
+  StepSmoothInterpolator.instances = [];
 });
 
 afterEach(() => {
@@ -134,8 +134,8 @@ describe('Core mapper pipeline', () => {
         Smooth,
         {
           enabled: false,
-          ticker: ManualTicker,
-          scheduler: StepSmoothScheduler,
+          driver: ManualDriver,
+          interpolation: StepSmoothInterpolator,
         },
       ],
     ]);
@@ -146,15 +146,15 @@ describe('Core mapper pipeline', () => {
 
     expect(view.read()).toEqual(['complete immediately']);
 
-    expect(ManualTicker.instances).toHaveLength(0);
+    expect(ManualDriver.instances).toHaveLength(0);
   });
 
   test('configures default Smooth with empty mapper extras and preserves its progress', () => {
     const configs: PluggableConfigs<MapperConfigs> = {
       smooth: {
         enabled: render(true),
-        ticker: render(ReactiveState.of(ManualTicker)),
-        scheduler: render(ReactiveState.of(StepSmoothScheduler)),
+        driver: render(ReactiveState.of(ManualDriver)),
+        interpolation: render(ReactiveState.of(StepSmoothInterpolator)),
       },
     };
 
@@ -170,13 +170,13 @@ describe('Core mapper pipeline', () => {
 
     expect(view.read()).toEqual(['a']);
 
-    const ticker = last(ManualTicker.instances);
+    const driver = last(ManualDriver.instances);
 
     view.mappers.next([[Reverse], configs]);
 
     view.mappers.next([[], configs]);
 
-    expect(ManualTicker.instances).toEqual([ticker]);
+    expect(ManualDriver.instances).toEqual([driver]);
 
     view.tick(32);
 
@@ -281,7 +281,7 @@ describe('Core mapper pipeline', () => {
 
     expect(view.read()).toEqual(['a']);
 
-    const ticker = last(ManualTicker.instances)!;
+    const driver = last(ManualDriver.instances)!;
 
     view.mappers.next([enabled, observe, Reverse]);
 
@@ -291,9 +291,9 @@ describe('Core mapper pipeline', () => {
 
     expect(first(compiler.value.value)).toBe(compilerBlock);
 
-    expect(ManualTicker.instances).toEqual([ticker]);
+    expect(ManualDriver.instances).toEqual([driver]);
 
-    expect(ticker.destroyCalls).toBe(0);
+    expect(driver.destroyCalls).toBe(0);
 
     expect(destroyed).not.toHaveBeenCalled();
 
@@ -306,8 +306,8 @@ describe('Core mapper pipeline', () => {
         Smooth,
         {
           enabled: false,
-          ticker: ManualTicker,
-          scheduler: StepSmoothScheduler,
+          driver: ManualDriver,
+          interpolation: StepSmoothInterpolator,
         },
       ],
     ]);
@@ -316,7 +316,7 @@ describe('Core mapper pipeline', () => {
 
     expect(first(compiler.value.value)).toBe(compilerBlock);
 
-    expect(ticker.destroyCalls).toBe(1);
+    expect(driver.destroyCalls).toBe(1);
 
     expect(destroyed).toHaveBeenCalledTimes(1);
 
@@ -324,7 +324,7 @@ describe('Core mapper pipeline', () => {
 
     view.core.destroy();
 
-    expect(ticker.destroyCalls).toBe(1);
+    expect(driver.destroyCalls).toBe(1);
 
     expect(destroyed).toHaveBeenCalledTimes(1);
 

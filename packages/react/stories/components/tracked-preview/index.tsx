@@ -2,13 +2,16 @@ import { useRendersCount, useUpdate } from 'react-use';
 
 import type { TrackedPreviewProps } from './type';
 
+import { useResolvedTheme } from '../../../.storybook/theme-addon';
 import { Fluxdown } from '../../../src/packs/full';
+import { Button } from '../ui';
 
 export const TrackedPreview = ({
   actions,
   ariaLabel,
   config,
   patches,
+  streaming = { smooth: false },
   text,
 }: TrackedPreviewProps) => {
   const { repairEnding, ...build } = config;
@@ -17,32 +20,37 @@ export const TrackedPreview = ({
 
   const update = useUpdate();
 
+  const theme = useResolvedTheme();
+
   return (
-    <div className="playground-preview-body">
-      <div className="playground-preview-tools">
-        <output aria-label="Preview render count" className="playground-render-count">
-          <span className="playground-render-count-value" key={renderCount}>
-            {renderCount}
-          </span>
+    <section aria-label={ariaLabel} className="playground-pane">
+      <div className="playground-pane-heading">
+        <h2>Preview</h2>
+
+        <output
+          aria-label="Preview render count"
+          className="playground-render-count"
+          key={renderCount}
+        >
+          {renderCount}
         </output>
 
         {actions}
 
-        <button onClick={update} type="button">
-          Re-render preview
-        </button>
+        <Button onClick={update}>Re-render</Button>
       </div>
 
-      <section aria-label={ariaLabel} className="playground-preview-content">
+      <div className="playground-preview-content">
         {text.length > 0 ? (
           <Fluxdown
             build={build}
             patches={patches}
-            streaming={{ repairEnding, smooth: false }}
+            streaming={{ ...streaming, repairEnding }}
             text={text}
+            theme={theme}
           />
         ) : null}
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };

@@ -1,3 +1,3 @@
-import type { BlockRevisionsInputs, SmoothSchedulerInputs } from './states';
+import type { BlockRevisionsInputs, SmoothInterpolatorInputs } from './states';
 
-export interface SmoothCursorInputs<T> extends BlockRevisionsInputs<T>, SmoothSchedulerInputs {}
+export interface SmoothCursorInputs<T> extends BlockRevisionsInputs<T>, SmoothInterpolatorInputs {}

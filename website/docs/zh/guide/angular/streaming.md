@@ -61,7 +61,7 @@ export class Message {
   readonly streaming: StreamingConfig = {
     repairEnding: true,
     smooth: true,
-    effect: ['shad', { length: 3, maskWidth: 18 }],
+    effect: ['shad', { length: 6, duration: 600 }],
   };
 }
 ```
@@ -79,7 +79,7 @@ export class Message {
 | 效果     | 呈现方式                                 |
 | -------- | ---------------------------------------- |
 | `scale`  | 新文字由模糊、缩小逐渐变得清晰。         |
-| `shad`   | 用渐变遮罩柔和地展开末尾。               |
+| `shad`   | 每个新出现的字符按各自的时钟淡入。       |
 | `chunk`  | 按收到的片段渐入，适合 `smooth: false`。 |
 | `suffix` | 在末尾显示标记，提示内容还在生成。       |
 
@@ -92,7 +92,7 @@ export class Message {
 />
 ```
 
-`effect` 也接受 `[名称, 配置]` 或多个效果的数组。完整字段见[自定义配置](./configuration.md)，实时演示见[动画效果](../common/streaming-effects/animation/index.mdx)。自定义 ticker 与 scheduler 的方式见 [Core 流式内容](../core/streaming.md)。
+`effect` 也接受 `[名称, 配置]` 或多个效果的数组。完整字段见[自定义配置](./configuration.md)，实时演示见[动画效果](../common/streaming-effects/animation/index.mdx)。自定义驱动与插值方式见 [Core 流式内容](../core/streaming.md)。
 
 ## 多条消息
 

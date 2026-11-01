@@ -3,7 +3,7 @@ import { AnimationDemo } from '../../../../../../components';
 
 # 末尾渐变
 
-`shad` 使用移动渐变，让末尾文字逐渐显现。已经显示的内容保持不变，最后几个字符随着流式输出慢慢变得清晰。
+`shad` 让每个新出现的字符从透明渐变到不透明。每个字符从出现的那一刻起独立播放自己的淡入，不再跟随显示进度，因此输出暂停时渐变也会自然完成。已经显示的内容保持不变。
 
 <AnimationDemo effect="shad" />
 
@@ -130,7 +130,7 @@ export function Message({ text }: MessageProps) {
 
 </FrameworkCodeTabs>
 
-平滑化默认启用。按排版需要调整末尾字符数与渐变宽度：
+平滑化默认启用。以下示例保持更短的渐变尾部，并允许更长的淡入：
 
 <FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
@@ -141,7 +141,7 @@ import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
 
 const mappers: MapperPluggable[] = [
   [Smooth, { enabled: true }],
-  [Shad, { enabled: true, length: 3, maskWidth: 18 }],
+  [Shad, { enabled: true, length: 6, duration: 600 }],
 ];
 ```
 
@@ -155,7 +155,7 @@ type MessageProps = {
 export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
-      streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+      streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
       text={text}
     />
   );
@@ -171,7 +171,7 @@ defineProps<{ text: string }>();
 
 <template>
   <Fluxdown
-    :streaming="{ effect: ['shad', { length: 3, maskWidth: 18 }] }"
+    :streaming="{ effect: ['shad', { length: 6, duration: 600 }] }"
     :text="text"
   />
 </template>
@@ -189,7 +189,7 @@ defineProps<{ text: string }>();
 </script>
 
 <Fluxdown
-  streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+  streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
   {text}
 />
 ```
@@ -209,7 +209,7 @@ export class Message {
   readonly text = input.required<string>();
 
   readonly streaming: StreamingConfig = {
-    effect: ['shad', { length: 3, maskWidth: 18 }],
+    effect: ['shad', { length: 6, duration: 600 }],
   };
 }
 ```
@@ -224,7 +224,7 @@ type MessageProps = {
 export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
-      streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+      streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
       text={text}
     />
   );
@@ -241,7 +241,7 @@ type MessageProps = {
 export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
-      streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+      streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
       text={text}
     />
   );
@@ -258,7 +258,7 @@ type MessageProps = {
 export function Message(props: MessageProps) {
   return (
     <Fluxdown
-      streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+      streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
       text={props.text}
     />
   );
@@ -275,7 +275,7 @@ type MessageProps = {
 export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
-      streaming={{ effect: ['shad', { length: 3, maskWidth: 18 }] }}
+      streaming={{ effect: ['shad', { length: 6, duration: 600 }] }}
       text={text}
     />
   );
@@ -283,6 +283,10 @@ export function Message({ text }: MessageProps) {
 ```
 
 </FrameworkCodeTabs>
+
+## 渐变如何自适应
+
+字符到达越快，同时在淡入的字符就越多。为了让渐变尾部大约保持 `length` 个字符，当在播字符超过 `length` 时，新到的一批字符会使用更短的淡入：时长为 `duration × length ÷ 在播字符数`。在播字符不多时，每批都使用完整的 `duration`。因此一次性到达的大段文字会很快稳定，较慢的输出则会柔和地淡入。
 
 ## 配置
 
@@ -302,12 +306,14 @@ export function Message({ text }: MessageProps) {
 
 **默认值：** `10`
 
-参与渐变的末尾字符数。小数向下取整，负数和非有限值按 `0` 处理。
+渐变希望同时保持在淡入中的字符数。小数向下取整；`0` 关闭渐变，负数按 `0` 处理，非有限值使用默认值。
 
-### maskWidth <span className="field-tag">可选</span> {#maskwidth}
+### duration <span className="field-tag">可选</span> {#duration}
 
 **类型：** `number`
 
-**默认值：** `15`
+**默认值：** `400`
 
-渐变遮罩宽度，单位为像素。`0` 隐藏遮罩，负数按 `0` 处理，非有限值使用默认宽度。
+单个字符最长的淡入时长，单位为毫秒，在播字符不超过 `length` 时使用。负数按 `0` 处理，非有限值使用默认时长。
+
+> 早期版本使用渐变遮罩为固定宽度的末尾着色。`maskWidth` 和 `hideDelay` 已随遮罩一起移除。

@@ -4,12 +4,7 @@ import { assert } from '@fluxdown/utils';
 
 import type { LynxRenderMatchParams, LynxRenderParams } from '../../../../base';
 
-import {
-  BaseLynxRenderPlugin,
-  createTypeOfSlot,
-  getTextContent,
-  isElementWithTag,
-} from '../../../../base';
+import { BaseLynxRenderPlugin, createTypeOfSlot } from '../../../../base';
 import { getShadConfig, isShadNode } from './utils';
 
 const Shad = /*#__PURE__*/ createTypeOfSlot('Shad');
@@ -23,20 +18,7 @@ declare global {
 const renderNode = ({ node, renderChildren }: LynxRenderParams) => {
   assert(isShadNode(node));
 
-  const [leading, active] = node.children;
-
-  assert(leading && isElementWithTag(leading, 'span'));
-
-  assert(active && isElementWithTag(active, 'span'));
-
-  return (
-    <Shad
-      {...getShadConfig(node)}
-      active={renderChildren(active)}
-      isActive={getTextContent(active).length > 0}
-      leading={renderChildren(leading)}
-    />
-  );
+  return <Shad {...getShadConfig(node)}>{renderChildren(node)}</Shad>;
 };
 
 export class EffectShadRenderPlugin extends BaseLynxRenderPlugin {

@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 
 import { FluxdownLite } from '../packs/lite';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 
 describe('streaming effects', () => {
   test('animates appends as stable chunk batches without smoothing', async () => {
@@ -96,24 +96,30 @@ describe('streaming effects', () => {
     expect(animated.map((span) => span.element.textContent).join('')).toContain('👨‍👩‍👧‍👦');
   });
 
-  test('shad masks only the active tail without duplicating source text', async () => {
+  test('shad fades appended characters on their own clock without duplicating source text', async () => {
+    vi.spyOn(performance, 'now').mockReturnValue(1000);
+
     const wrapper = mount(FluxdownLite, {
       props: { text: 'first', streaming: { smooth: false, effect: 'shad' } },
     });
+
+    expect(wrapper.find('[data-fluxdown-shad]').exists()).toBe(false);
 
     await wrapper.setProps({ text: 'first appended' });
 
     expect(wrapper.text()).toBe('first appended');
 
-    const masks = wrapper
-      .findAll('[aria-hidden="true"]')
-      .filter((item) => (item.element as HTMLElement).style.width !== '');
+    const fades = wrapper.findAll('[data-fluxdown-shad="fade"]');
 
-    expect(masks.length).toBeGreaterThan(0);
+    expect(fades.map((item) => item.text()).join('')).toBe('appended');
 
-    expect(masks.every((item) => (item.element as HTMLElement).style.width.endsWith('px'))).toBe(
-      true,
-    );
+    expect(
+      fades.every((item) =>
+        (item.element as HTMLElement).style
+          .getPropertyValue(`--${PREFIX}-shad-duration`)
+          .endsWith('ms'),
+      ),
+    ).toBe(true);
   });
 
   test.each([
@@ -162,11 +168,15 @@ describe('streaming effects', () => {
   });
 
   test.each(['scale', 'shad', 'suffix', 'chunk'] as const)(
-    'reveals smooth content with %s and destroys its ticker',
+    'reveals smooth content with %s and destroys its driver',
     async (effect) => {
-      const ticker = createManualTicker();
+      const driver = createManualDriver();
 
-      const smooth = { enabled: true, ticker: ticker.Ticker, scheduler: createStepScheduler(2) };
+      const smooth = {
+        enabled: true,
+        driver: driver.Driver,
+        interpolation: createStepInterpolator(2),
+      };
 
       const wrapper = mount(FluxdownLite, {
         props: { text: 'first', streaming: { smooth, effect } },
@@ -174,25 +184,25 @@ describe('streaming effects', () => {
 
       await wrapper.setProps({ text: 'first\n\n**second**' });
 
-      ticker.current().tick(16);
+      driver.current().tick(16);
 
       await nextTick();
 
       expect(wrapper.text()).toBe('firstse');
 
-      ticker.current().tick(32);
+      driver.current().tick(32);
 
       await nextTick();
 
       expect(wrapper.text()).toBe('firstseco');
 
-      ticker.current().tick(48);
+      driver.current().tick(48);
 
       await nextTick();
 
       expect(wrapper.get('strong').text()).toBe('second');
 
-      const instance = ticker.current();
+      const instance = driver.current();
 
       wrapper.unmount();
 

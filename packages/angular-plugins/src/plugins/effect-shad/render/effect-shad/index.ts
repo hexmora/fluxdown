@@ -3,12 +3,7 @@ import type {
   AngularRenderParams,
 } from '@fluxdown/angular-plugins/typings';
 
-import {
-  BaseAngularRenderPlugin,
-  createTypeOfSlot,
-  getTextContent,
-  isElementWithTag,
-} from '@fluxdown/angular-plugins/base';
+import { BaseAngularRenderPlugin, createTypeOfSlot } from '@fluxdown/angular-plugins/base';
 import { assert } from '@fluxdown/utils';
 
 import { getShadConfig, isShadNode } from './utils';
@@ -25,17 +20,12 @@ export class EffectShadRenderPlugin extends BaseAngularRenderPlugin {
   render({ node, renderChildren }: AngularRenderParams) {
     assert(isShadNode(node));
 
-    const [leading, active] = node.children;
-
-    assert(leading && isElementWithTag(leading, 'span'));
-
-    assert(active && isElementWithTag(active, 'span'));
+    const config = getShadConfig(node);
 
     return Shad({
-      ...getShadConfig(node),
-      active: renderChildren(active),
-      isActive: getTextContent(active).length > 0,
-      leading: renderChildren(leading),
+      ...config,
+      key: config.start,
+      children: renderChildren(node),
     });
   }
 }

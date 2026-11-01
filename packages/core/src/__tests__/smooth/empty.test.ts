@@ -3,7 +3,7 @@ import {
   firstBlock,
   latest,
   paragraph,
-  PrimarySmoothTicker,
+  PrimarySmoothDriver,
   resetSmoothTests,
   root,
   setupSmooth,
@@ -49,7 +49,7 @@ describe('Smooth empty blocks', () => {
 
     expect(forkContent).not.toHaveBeenCalled();
 
-    latest(PrimarySmoothTicker.instances).tick(16);
+    latest(PrimarySmoothDriver.instances).tick(16);
 
     const advanced = harness.state.value.value;
 
@@ -83,12 +83,12 @@ describe('Smooth empty blocks', () => {
 
     harness.source.next([a.block, empty.block, b.block]);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     expect(forkA).toHaveBeenCalledTimes(1);
 
     for (const time of [16, 32, 48]) {
-      ticker.tick(time);
+      driver.tick(time);
     }
 
     expect(harness.state.value.value.map((block) => block.meta.value.key)).toEqual(['a']);
@@ -97,7 +97,7 @@ describe('Smooth empty blocks', () => {
 
     expect(forkB).not.toHaveBeenCalled();
 
-    ticker.tick(64);
+    driver.tick(64);
 
     const output = harness.state.value.value;
 
@@ -115,7 +115,7 @@ describe('Smooth empty blocks', () => {
 
     expect(forkB).toHaveBeenCalledTimes(1);
 
-    ticker.tick(80);
+    driver.tick(80);
 
     harness.source.next([a.block, empty.block]);
 

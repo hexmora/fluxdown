@@ -33,7 +33,7 @@ Setting `streaming` to `true` enables trailing repair, smoothing and the `scale`
 Four effects are included:
 
 - `scale`: reveals text from a smaller, blurred state.
-- `shad`: reveals trailing text through a gradient.
+- `shad`: fades each newly visible character in on its own clock.
 - `chunk`: fades in newly received text segments.
 - `suffix`: adds a pulsing cursor or dot at the end.
 
@@ -46,7 +46,7 @@ Use `chunk` with `smooth: false` to reveal the received chunks directly:
 />
 ```
 
-Set `effect: false` to keep smoothing without a visual effect. See [Configuration](./configuration.md#streaming) for clocks, schedulers and combined effects.
+Set `effect: false` to keep smoothing without a visual effect. See [Configuration](./configuration.md#streaming) for drivers, interpolation and combined effects.
 
 ## Finish or cancel
 

@@ -1,20 +1,8 @@
-.fluxdown-shad {
-  &-active {
-    position: relative;
-    vertical-align: baseline;
-    overflow: visible;
-  }
-
-  &-prefix {
-    position: absolute;
-    left: 0;
-    top: 0;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  &-mask {
-    position: relative;
-    pointer-events: none;
+.fluxdown-shad-active {
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    text {
+      animation-play-state: paused;
+    }
   }
 }

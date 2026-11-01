@@ -61,7 +61,7 @@ export class Message {
   readonly streaming: StreamingConfig = {
     repairEnding: true,
     smooth: true,
-    effect: ['shad', { length: 3, maskWidth: 18 }],
+    effect: ['shad', { length: 6, duration: 600 }],
   };
 }
 ```
@@ -79,7 +79,7 @@ export class Message {
 | Effect   | Appearance                                                |
 | -------- | --------------------------------------------------------- |
 | `scale`  | New characters grow and become clear as their blur fades. |
-| `shad`   | A gradient mask reveals the trailing text.                |
+| `shad`   | Each newly visible character fades in on its own clock.   |
 | `chunk`  | Fades in received chunks; useful with `smooth: false`.    |
 | `suffix` | Shows a trailing marker while content is being generated. |
 
@@ -92,7 +92,7 @@ Keep the original network chunks and fade them in individually:
 />
 ```
 
-`effect` also accepts `[name, config]` or an array of effects. See [configuration](./configuration.md) for the fields and [animation effects](../common/streaming-effects/animation/index.mdx) for live examples. Custom tickers and schedulers are covered in [Core streaming](../core/streaming.md).
+`effect` also accepts `[name, config]` or an array of effects. See [configuration](./configuration.md) for the fields and [animation effects](../common/streaming-effects/animation/index.mdx) for live examples. Custom drivers and interpolation are covered in [Core streaming](../core/streaming.md).
 
 ## Multiple messages
 

@@ -37,7 +37,7 @@ export function Message({ text, pending }: MessageProps) {
 原生插槽支持 `scale`、`shad`、`chunk` 和 `suffix`。平滑输出使用 React Native 提供的动画帧；末尾视觉效果由原生组件呈现。时钟、弹簧参数和效果组合沿用[通用流式配置](../react/configuration.md#streaming)。
 
 - `scale`：文字从模糊、缩小的状态淡入。
-- `shad`：末尾文字通过渐变遮罩逐步显现。
+- `shad`：每个新出现的字符按各自的时钟淡入。
 - `chunk`：收到的文本片段整体淡入。
 - `suffix`：在末尾显示呼吸闪烁的光标或圆点。
 

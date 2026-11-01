@@ -15,9 +15,9 @@ import { SpringDemo } from '../../../../../components';
 
 ## 弹簧如何调整节奏
 
-内置的 `spring` 调度器用显示位置和待显示内容之间的距离调整速度。积压内容较多时，输出加快；接近末尾时，速度逐步收敛。它保留前一帧的速度，让后续更新衔接起来。
+内置的 `spring` 插值把显示位置看作一个被拉向已收到内容末尾的阻尼弹簧。积压内容越多，拉力越大，输出越快；接近末尾时逐步减速，并在不越过末尾的情况下停稳。收到新内容时，弹簧保留当前的位置和速度，转而拉向新的末尾，让前后更新自然衔接。
 
-调度器按经过的时间计算进度，再把不足一个字符的部分留到下一次更新。这样，文字可以在两次网络更新之间继续显示，也不需要为每个字符设置固定延时。上面的演示使用与 `Smooth` mapper 相同的 `SpringSmoothScheduler`。
+插值器直接用弹簧运动的精确解，根据经过的时间计算位置，而不是逐帧累加。因此结果不受帧率影响，长回复中也不会积累误差。文字可以在两次网络更新之间继续显示，也不需要为每个字符设置固定延时。上面的演示使用与 `Smooth` mapper 相同的 `SpringSmoothInterpolator`。
 
 ## 在应用中使用
 
@@ -152,16 +152,16 @@ export function Message({ text, isStreaming }: MessageProps) {
 
 </FrameworkCodeTabs>
 
-也可以显式指定调度器，并配合[动画效果](./animation/index.mdx)使用：
+也可以显式指定插值方式，并配合[动画效果](./animation/index.mdx)使用：
 
 <FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
 import {
-  RafSmoothTicker,
+  RafSmoothDriver,
   Smooth,
-  SpringSmoothScheduler,
+  SpringSmoothInterpolator,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
 
@@ -170,8 +170,8 @@ const mappers: MapperPluggable[] = [
     Smooth,
     {
       enabled: true,
-      ticker: RafSmoothTicker,
-      scheduler: SpringSmoothScheduler,
+      driver: RafSmoothDriver,
+      interpolation: SpringSmoothInterpolator,
     },
   ],
   [Shad, { enabled: true }],
@@ -189,7 +189,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -208,7 +208,7 @@ defineProps<{ text: string }>();
 <template>
   <Fluxdown
     :streaming="{
-      smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+      smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
       effect: 'shad',
     }"
     :text="text"
@@ -229,7 +229,7 @@ defineProps<{ text: string }>();
 
 <Fluxdown
   streaming={{
-    smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+    smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
     effect: 'shad',
   }}
   {text}
@@ -251,7 +251,7 @@ export class Message {
   readonly text = input.required<string>();
 
   readonly streaming: StreamingConfig = {
-    smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+    smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
     effect: 'shad',
   };
 }
@@ -268,7 +268,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -288,7 +288,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -308,7 +308,7 @@ export function Message(props: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={props.text}
@@ -328,7 +328,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}

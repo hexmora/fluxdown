@@ -98,6 +98,7 @@
     "shallow-equal": "catalog:"
   },
   "devDependencies": {
+    "@base-ui/react": "catalog:",
     "@fluxdown/core": "workspace:^",
     "@fluxdown/core-plugins": "workspace:^",
     "@fluxdown/types": "workspace:^",

@@ -37,11 +37,11 @@ export function Message({ text, pending }: MessageProps) {
 内置四种效果：
 
 - `scale`：文字从模糊、缩小的状态显现。
-- `shad`：末尾文字通过渐变逐步显现。
+- `shad`：每个新出现的字符按各自的时钟淡入。
 - `chunk`：新增文本片段逐步淡入。
 - `suffix`：在末尾显示呼吸闪烁的光标或圆点。
 
-解析和流式调度在后台线程执行，视觉效果由 Lynx 元素呈现。平滑输出会选择可用的动画帧时钟，没有时使用定时器。时钟、调度器和效果组合的配置见 [React 的自定义配置](../react/configuration.md#streaming)。
+解析和流式调度在后台线程执行，视觉效果由 Lynx 元素呈现。平滑输出会选择可用的动画帧时钟，没有时使用定时器。驱动、插值和效果组合的配置见 [React 的自定义配置](../react/configuration.md#streaming)。
 
 ## 完成与取消
 

@@ -1,1 +1,0 @@
-export const SHAD_AUTO_HIDE_TIMEOUT = 200;

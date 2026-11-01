@@ -5,12 +5,7 @@ import { createMemo } from 'solid-js';
 
 import type { SolidRenderMatchParams, SolidRenderParams } from '../../../../base';
 
-import {
-  BaseSolidRenderPlugin,
-  createTypeOfSlot,
-  getTextContent,
-  isElementWithTag,
-} from '../../../../base';
+import { BaseSolidRenderPlugin, createTypeOfSlot } from '../../../../base';
 import { getShadConfig, isShadNode } from './utils';
 
 const Shad = /*#__PURE__*/ createTypeOfSlot('Shad');
@@ -35,29 +30,6 @@ export class EffectShadRenderPlugin extends BaseSolidRenderPlugin {
       return props.node;
     });
 
-    const leading = createMemo(() => {
-      const child = node().children[0];
-
-      assert(child && isElementWithTag(child, 'span'));
-
-      return child;
-    });
-
-    const active = createMemo(() => {
-      const child = node().children[1];
-
-      assert(child && isElementWithTag(child, 'span'));
-
-      return child;
-    });
-
-    return (
-      <Shad
-        {...getShadConfig(node())}
-        active={props.renderChildren(active)}
-        isActive={getTextContent(active()).length > 0}
-        leading={props.renderChildren(leading)}
-      />
-    );
+    return <Shad {...getShadConfig(node())}>{props.renderChildren()}</Shad>;
   }
 }

@@ -57,7 +57,7 @@ const props = defineProps<MessageProps>();
 const streaming: StreamingConfig = {
   repairEnding: true,
   smooth: true,
-  effect: ['shad', { length: 3, maskWidth: 18 }],
+  effect: ['shad', { length: 6, duration: 600 }],
 };
 </script>
 
@@ -72,14 +72,14 @@ const streaming: StreamingConfig = {
 | `smooth`       | Reveal incoming content smoothly. Enabled by default.                     |
 | `effect`       | Choose a trailing effect. Defaults to `scale`; use `false` to disable it. |
 
-Turn off `smooth` to keep the original chunk timing. See [Core streaming](../core/streaming.md) for custom tickers and schedulers.
+Turn off `smooth` to keep the original chunk timing. See [Core streaming](../core/streaming.md) for custom drivers and interpolation.
 
 ## Four trailing effects
 
 | Effect   | Presentation                                                |
 | -------- | ----------------------------------------------------------- |
 | `scale`  | New text sharpens as it grows to its final size.            |
-| `shad`   | A gradient mask gently reveals the trailing text.           |
+| `shad`   | Each newly visible character fades in on its own clock.     |
 | `chunk`  | Each incoming chunk fades in. Use with `smooth: false`.     |
 | `suffix` | A trailing marker indicates that content is still arriving. |
 
