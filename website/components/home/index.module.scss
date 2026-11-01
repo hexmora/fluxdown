@@ -279,13 +279,12 @@
     font-size: 13px;
     line-height: 1.75;
     background: transparent !important;
-    padding: 25px 28px;
+    padding: 10px;
   }
 
   @media (max-width: 760px) {
     :global(pre) {
       font-size: 12px;
-      padding: 22px 18px;
     }
   }
 }
