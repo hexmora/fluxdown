@@ -5,5 +5,7 @@ export type StreamingPreviewProps = {
 
   reducedMotion: boolean | null;
 
+  playing: boolean;
+
   children: ReactNode;
 };

@@ -20,7 +20,11 @@ export const ChunkDemo = () => {
   return (
     <div data-demo="chunk" ref={stream.containerRef}>
       <StreamingFrame caption={labels.caption} controls={stream} label={labels.label}>
-        <StreamingPreview label={labels.label} reducedMotion={stream.reducedMotion}>
+        <StreamingPreview
+          playing={stream.playing}
+          label={labels.label}
+          reducedMotion={stream.reducedMotion}
+        >
           <Fluxdown
             key={stream.cycle}
             streaming={stream.reducedMotion ? false : { smooth: false, effect: 'chunk' }}

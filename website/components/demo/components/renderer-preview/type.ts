@@ -1,5 +1,7 @@
 import type { BlockCompilerConfig } from '@fluxdown/core';
 
+import type { BottomScrollMode } from '../../../bottom-scroll';
+
 export type PreviewBuild = Partial<Omit<BlockCompilerConfig, 'repairEnding'>>;
 
 export type Renderer =
@@ -26,6 +28,7 @@ export interface RendererPreviewProps {
   renderer: Renderer;
   text: string;
   streaming?: PreviewStreaming;
+  scrollMode?: BottomScrollMode;
   build?: PreviewBuild;
   dark: boolean;
   cycle?: number;

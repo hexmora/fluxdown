@@ -22,7 +22,11 @@ export const AnimationDemo = ({ effect }: AnimationDemoProps) => {
   return (
     <div data-demo={effect} ref={stream.containerRef}>
       <StreamingFrame caption={labels[effect]} controls={stream} label={labels[effect]}>
-        <StreamingPreview label={labels[effect]} reducedMotion={stream.reducedMotion}>
+        <StreamingPreview
+          playing={stream.playing}
+          label={labels[effect]}
+          reducedMotion={stream.reducedMotion}
+        >
           <Fluxdown
             key={stream.cycle}
             streaming={stream.reducedMotion ? false : { smooth: true, repairEnding: true, effect }}
