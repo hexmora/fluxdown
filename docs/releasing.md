@@ -18,6 +18,20 @@ pnpm publish:dry-run
 Commit the Changeset with the code. Do not manually bump versions or edit release
 changelogs. The dry run builds and checks actual packages without publishing.
 
+To check a partial release before preparing its version PR, repeat `--check-packages`
+with every package in the intended release:
+
+```sh
+pnpm publish:dry-run -- \
+  --check-packages fluxdown \
+  --check-packages @fluxdown/angular
+```
+
+This runs the same archive and consumer checks with only those local packages;
+unselected dependencies resolve from npm. The option requires an explicit stable
+`--dry-run` and cannot be used with beta, preparation, or publication. Without it,
+the dry run checks all public packages.
+
 Use `workspace:^` for internal runtime dependencies and keep updates compatible
 within the published range. In-range updates do not require Changesets for
 unchanged dependents. If a dependent must require a newer dependency version,

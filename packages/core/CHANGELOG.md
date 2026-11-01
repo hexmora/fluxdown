@@ -1,11 +1,5 @@
 # @fluxdown/core
 
-## 0.12.7
-
-### Patch Changes
-
-- 10b06f2: Clarify streaming Markdown package descriptions and keywords, and link each package to its framework's documentation.
-
 ## 0.12.6
 
 ### Patch Changes

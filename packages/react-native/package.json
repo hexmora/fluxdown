@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/react-native",
-  "version": "0.2.3",
+  "version": "0.2.2",
   "description": "Streaming Markdown renderer for React Native AI chat, with native components, syntax repair, and smooth output.",
   "keywords": [
     "ai-chat",
