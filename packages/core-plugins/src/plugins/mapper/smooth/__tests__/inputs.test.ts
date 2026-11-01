@@ -123,6 +123,8 @@ test.each([
     if (request && cancel) {
       expect(frames.request).toHaveBeenCalledTimes(1);
 
+      jest.advanceTimersByTime(1000);
+
       frames.frame(1)(1000);
     } else {
       expect(frames.request).not.toHaveBeenCalled();

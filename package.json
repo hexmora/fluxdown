@@ -63,6 +63,7 @@
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
     "@vitejs/plugin-vue-jsx": "catalog:",
     "babel-jest": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",

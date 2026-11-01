@@ -28,12 +28,14 @@ import {
   isLynxPackage,
   isSveltePackage,
   isTaroPackage,
+  isUniAppPackage,
   publicEntries,
   readManifest,
 } from './check-package.ts';
 import { checkReactNativePacks, REACT_NATIVE_PACKAGES } from './check-react-native-packs.ts';
 import { checkReactPacks } from './check-react-packs.ts';
 import { checkSvelteConsumer } from './check-svelte-consumer.ts';
+import { checkUniAppConsumer } from './check-uni-app-consumer.ts';
 import {
   assertPublishEnvironment,
   assertSourceSha,
@@ -400,7 +402,8 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
         ({ manifest }) =>
           !isLynxPackage(manifest.name) &&
           !isSveltePackage(manifest.name) &&
-          !isTaroPackage(manifest.name),
+          !isTaroPackage(manifest.name) &&
+          !isUniAppPackage(manifest.name),
       )
       .flatMap(({ manifest, files }) =>
         publicEntries(manifest, files).map(
@@ -767,6 +770,8 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
 
     const angular = await checkAngularConsumer(consumer, artifacts);
 
+    const uniApp = await checkUniAppConsumer(consumer, artifacts);
+
     if (specifiers.includes('fluxdown') || nativeArtifacts.length) {
       if (taroSpecifiers.length) {
         // Taro 4 requires React 18 types; keep the React 19 dependency tree separate.
@@ -872,6 +877,7 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
       ...(lynx ? { lynx } : {}),
       ...(svelte ? { svelte } : {}),
       ...(angular ? { angular } : {}),
+      ...(uniApp ? { uniApp } : {}),
       ...(nativeArtifacts.length
         ? { native: { packages: nativeArtifacts.map(({ manifest }) => manifest.name) } }
         : {}),

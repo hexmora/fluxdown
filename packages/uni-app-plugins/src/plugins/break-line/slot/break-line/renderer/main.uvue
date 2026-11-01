@@ -1,0 +1,9 @@
+<script setup lang="ts">
+import type { SlotBaseProps } from '../../../../../base/slot/type';
+
+defineProps<SlotBaseProps>();
+</script>
+
+<template>
+  <view class="fluxdown-break-line" style="width: 100%; height: 0" />
+</template>

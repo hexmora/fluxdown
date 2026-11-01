@@ -1,0 +1,72 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { RendererProps } from './type';
+
+import { InheritedText } from '../../../../../base/components/inherited-text';
+import { InlineFlow } from '../../../../../base/components/inline-flow';
+import { isHastElement } from '../../../../../base/render';
+import { useTheme } from '../../../../../base/theme';
+import { getInlineCodeStyle, getInlineCodeTextStyle } from './utils';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+
+const inlineCode = computed(() => {
+  const parent = props.parents?.at(-1);
+
+  return props.tagName === 'code' && !(parent && isHastElement(parent, 'pre'));
+});
+</script>
+
+<template>
+  <InheritedText v-if="inlineCode" v-bind="$attrs" v-slot="{ textStyle }">
+    <view class="fluxdown-inline-code" :style="getInlineCodeStyle(theme.tokens)">
+      <InheritedText :style="getInlineCodeTextStyle(theme.tokens, textStyle)"
+        ><slot
+      /></InheritedText>
+    </view>
+  </InheritedText>
+  <InheritedText
+    v-bind="$attrs"
+    v-else-if="props.tagName === 'code'"
+    :style="{
+      fontFamily: theme.tokens.typography.fontMono,
+      fontSize: `${theme.tokens.code.fontSize}px`,
+    }"
+    ><slot
+  /></InheritedText>
+  <InheritedText
+    v-bind="$attrs"
+    v-else-if="props.tagName === 'del'"
+    :style="{ textDecorationLine: 'line-through' }"
+    ><slot
+  /></InheritedText>
+  <InheritedText
+    v-bind="$attrs"
+    v-else-if="props.tagName === 'input'"
+    :text="props.checked ? '☑ ' : '☐ '"
+  />
+  <view
+    v-bind="$attrs"
+    v-else-if="props.tagName === 'hr'"
+    :style="{
+      height: '1px',
+      backgroundColor: theme.tokens.colors.border,
+      marginTop: '24px',
+      marginBottom: '24px',
+    }"
+  />
+  <view
+    v-bind="$attrs"
+    v-else-if="props.tagName === 'tr'"
+    style="display: flex; flex-direction: row"
+    ><slot
+  /></view>
+  <InlineFlow v-else-if="props.tagName === 'li'"><slot /></InlineFlow>
+  <view v-bind="$attrs" v-else-if="['div', 'thead', 'tbody', 'tfoot'].includes(props.tagName)"
+    ><slot
+  /></view>
+  <InheritedText v-bind="$attrs" v-else><slot /></InheritedText>
+</template>

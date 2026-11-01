@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - packages/uni-app/playground
   - website
 
 catalogMode: strict
@@ -174,6 +175,9 @@ catalog:
   "@svgr/plugin-jsx": 8.1.0
   core-js: ^3.51.0
   background-only: 0.0.1
+  "@dcloudio/uni-app-x": 0.7.134
+  "@vitejs/plugin-vue": ^6.0.10
+  vue-tsc: ^3.3.13
 
 catalogs:
   solid-peer:
@@ -207,6 +211,22 @@ catalogs:
   react-peer:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
+  uni-app-peer:
+    vue: ^3.4.21
+  uni-app-cli:
+    "@rollup/plugin-commonjs": ^29.0.2
+    "@babel/core": ^7.29.7
+    "@babel/plugin-transform-unicode-property-regex": ^7.29.7
+    "@dcloudio/uni-app": 3.0.0-5030320261023001
+    "@dcloudio/uni-components": 3.0.0-5030320261023001
+    "@dcloudio/uni-h5": 3.0.0-5030320261023001
+    "@dcloudio/uni-cli-shared": 3.0.0-5030320261023001
+    "@dcloudio/vite-plugin-uni": 3.0.0-5030320261023001
+    "@dcloudio/uni-uts-v1": 3.0.0-5030320261023001
+    vite: 5.2.8
+    vue: 3.4.21
+  vue-language-tools:
+    typescript: npm:@typescript/typescript6@6.0.2
 
 packageExtensions:
   # Perfectionist and its typescript-eslint utilities still use the legacy

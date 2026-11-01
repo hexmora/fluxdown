@@ -1,0 +1,169 @@
+<script setup lang="ts">
+import type { MaskedTextProps } from './type';
+
+import { useMask } from './hooks';
+import { getBandOpacity } from './utils';
+
+const props = withDefaults(defineProps<MaskedTextProps>(), { tail: true });
+
+const { measurement, text, frame, drawing, bandCount } = useMask(props);
+</script>
+
+<template>
+  <view
+    class="fluxdown-masked-text"
+    :style="
+      props.textStyle.backgroundColor ? { backgroundColor: props.textStyle.backgroundColor } : {}
+    "
+  >
+    <view class="fluxdown-masked-text__placeholder" style="opacity: 0">
+      <text :flatten="false" :style="[props.textStyle, { whiteSpace: 'nowrap' }]"
+        >{{ text }}</text
+      >
+    </view>
+    <view
+      class="fluxdown-masked-text__drawing"
+      :style="{
+        left: `${frame.left}px`,
+        width: `${frame.prefixWidth + frame.activeWidth}px`,
+        height: `${frame.height}px`,
+      }"
+      aria-hidden="true"
+    >
+      <view
+        class="fluxdown-masked-text__prefix"
+        :style="{ width: `${frame.prefixWidth}px`, height: `${frame.height}px` }"
+      >
+        <text
+          :flatten="false"
+          :style="[
+            props.textStyle,
+            {
+              position: 'absolute',
+              left: `${-frame.left}px`,
+              top: '0px',
+              width: `${frame.width}px`,
+              height: `${frame.height}px`,
+              whiteSpace: 'nowrap',
+              backgroundColor: 'transparent',
+            },
+          ]"
+          >{{ text }}</text
+        >
+      </view>
+      <view
+        v-if="drawing"
+        class="fluxdown-masked-text__active"
+        :style="{ width: `${frame.activeWidth}px`, height: `${frame.height}px` }"
+      >
+        <view
+          v-for="index in bandCount"
+          :key="index"
+          class="fluxdown-masked-text__band"
+          :style="{
+            width: `${frame.step}px`,
+            height: `${frame.height}px`,
+            opacity: getBandOpacity(frame, index) * Number(props.textStyle.opacity ?? 1),
+          }"
+        >
+          <text
+            :flatten="false"
+            :style="[
+              props.textStyle,
+              {
+                position: 'absolute',
+                left: `${-frame.start - (index - 1) * frame.step}px`,
+                top: '0px',
+                width: `${frame.width}px`,
+                height: `${frame.height}px`,
+                whiteSpace: 'nowrap',
+                opacity: 1,
+                backgroundColor: 'transparent',
+              },
+            ]"
+            >{{ text }}</text
+          >
+        </view>
+      </view>
+    </view>
+    <view
+      class="fluxdown-masked-text__measurement"
+      :style="{ width: `${measurement.width}px` }"
+      aria-hidden="true"
+    >
+      <text
+        :id="measurement.textId"
+        :flatten="false"
+        :style="[measurement.textStyle, { alignSelf: 'flex-start', whiteSpace: 'nowrap' }]"
+        >{{ measurement.text }}</text
+      >
+      <text
+        :id="measurement.maskId"
+        :flatten="false"
+        :style="[measurement.textStyle, { alignSelf: 'flex-start', whiteSpace: 'nowrap' }]"
+        >{{ measurement.maskText }}</text
+      >
+      <text
+        :id="measurement.trailingId"
+        :flatten="false"
+        :style="[measurement.textStyle, { alignSelf: 'flex-start', whiteSpace: 'nowrap' }]"
+        >{{ measurement.trailingText }}</text
+      >
+    </view>
+  </view>
+</template>
+
+<style>
+.fluxdown-masked-text {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.fluxdown-masked-text__placeholder {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.fluxdown-masked-text__drawing {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fluxdown-masked-text__prefix,
+.fluxdown-masked-text__active {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.fluxdown-masked-text__band {
+  position: relative;
+  top: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.fluxdown-masked-text__measurement {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  opacity: 0;
+  pointer-events: none;
+}
+</style>

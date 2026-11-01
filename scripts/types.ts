@@ -70,3 +70,13 @@ export interface AngularCheckResult {
 export interface ReactNativeCheckResult {
   packages: string[];
 }
+
+export interface UniAppCheckResult {
+  specifiers: string[];
+
+  typeEntries: number;
+
+  webAssets: string[];
+
+  compilerVersion: string;
+}

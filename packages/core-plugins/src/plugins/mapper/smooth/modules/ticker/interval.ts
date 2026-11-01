@@ -18,14 +18,18 @@ export class IntervalSmoothTicker extends BaseSmoothTicker {
     return this.timer !== null;
   }
 
+  now() {
+    return getNow();
+  }
+
   start() {
     assert(!this.destroyed, 'Cannot start a destroyed ticker');
 
     assert(!this.running, 'Cannot start a running ticker');
 
-    const timestamp = getNow();
+    const timestamp = this.now();
 
-    this.timer = setInterval(() => this.subject.next(getNow()), this.interval);
+    this.timer = setInterval(() => this.subject.next(this.now()), this.interval);
 
     return timestamp;
   }

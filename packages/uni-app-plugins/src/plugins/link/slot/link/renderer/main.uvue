@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import { InheritedText } from '../../../../../base/components/inherited-text';
+import { useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+
+const open = () => {
+  if (props.onPress) {
+    props.onPress(props.href);
+
+    return;
+  }
+
+  if (!/^([a-z][a-z0-9+.-]*:|\/\/|#)/i.test(props.href)) {
+    uni.navigateTo({ url: props.href });
+  }
+};
+</script>
+
+<template>
+  <InheritedText
+    class="fluxdown-link"
+    :style="{ color: theme.tokens.colors.accent, textDecorationLine: 'underline' }"
+    @click="open"
+    ><slot
+  /></InheritedText>
+</template>

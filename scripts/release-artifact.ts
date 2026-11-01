@@ -12,6 +12,7 @@ import type {
   LynxCheckResult,
   ReactNativeCheckResult,
   SvelteCheckResult,
+  UniAppCheckResult,
 } from './types.ts';
 
 export const RELEASE_REPOSITORY = 'hexmora/fluxdown';
@@ -26,6 +27,8 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/core',
   '@fluxdown/solid-plugins',
   '@fluxdown/solid',
+  '@fluxdown/uni-app-plugins',
+  '@fluxdown/uni-app',
   '@fluxdown/angular-plugins',
   '@fluxdown/angular',
   '@fluxdown/vue-plugins',
@@ -86,6 +89,7 @@ export interface ReleaseArtifactManifest {
     svelte?: SvelteCheckResult;
     angular?: AngularCheckResult;
     native?: ReactNativeCheckResult;
+    uniApp?: UniAppCheckResult;
   };
   packages: ArtifactPackage[];
 }
@@ -286,6 +290,56 @@ function validateReactNativeVerification(value: unknown, packages: string[]): vo
   );
 }
 
+function validateUniAppVerification(value: unknown, packages: string[]): void {
+  const verification = record(value, 'uni-app verification');
+
+  const { specifiers, typeEntries, webAssets } = verification;
+
+  nonempty(verification.compilerVersion, 'uni-app compiler version');
+
+  assert(Array.isArray(specifiers) && specifiers.length > 0, 'Missing uni-app entry verification');
+
+  assert(
+    specifiers.every((specifier, index) => specifiers.indexOf(specifier) === index),
+    'Duplicate uni-app entry verification',
+  );
+
+  for (const specifier of specifiers) {
+    nonempty(specifier, 'uni-app entry specifier');
+
+    const name = packages.find((pkg) => specifier === pkg || specifier.startsWith(`${pkg}/`));
+
+    assert(name, `uni-app entry does not belong to an artifact package: ${specifier}`);
+
+    if (specifier !== name) {
+      safeRelativePath(specifier.slice(name.length + 1));
+    }
+  }
+
+  for (const name of packages) {
+    assert(
+      specifiers.some((specifier) => specifier === name || specifier.startsWith(`${name}/`)),
+      `Missing uni-app package verification: ${name}`,
+    );
+  }
+
+  assert.equal(typeEntries, specifiers.length, 'Incomplete uni-app declaration verification');
+
+  assert(Array.isArray(webAssets) && webAssets.length > 0, 'Missing uni-app web assets');
+
+  assert(
+    webAssets.every((asset, index) => webAssets.indexOf(asset) === index),
+    'Duplicate uni-app web assets',
+  );
+
+  webAssets.forEach(safeRelativePath);
+
+  assert(
+    webAssets.includes('index.html') && webAssets.some((asset) => asset.endsWith('.js')),
+    'Incomplete uni-app H5 output',
+  );
+}
+
 export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest {
   const manifest = record(value, 'release artifact manifest');
 
@@ -420,11 +474,20 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
     validateReactNativeVerification(verification.native, nativePackages);
   }
 
+  const uniAppPackages = [...names].filter(
+    (name) => name === '@fluxdown/uni-app' || name === '@fluxdown/uni-app-plugins',
+  );
+
+  if (uniAppPackages.length || verification.uniApp !== undefined) {
+    validateUniAppVerification(verification.uniApp, uniAppPackages);
+  }
+
   const verifiedPackageCount =
     (verification.lynx === undefined ? 0 : lynxPackages.length) +
     (taroVerified ? taroPackages.length : 0) +
     sveltePackages.length +
     angularPackages.length +
+    uniAppPackages.length +
     (verification.native === undefined ? 0 : nativePackages.length);
 
   // Existing Node-verified artifacts remain valid for recovery.

@@ -1,0 +1,29 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { RendererProps } from './type';
+
+import { InheritedText } from '../../../../../base/components/inherited-text';
+import { isTextNode } from '../../../../../base/slot/components/render-nodes/utils';
+import { ScaleText } from '../../../../../base/components/scale-text';
+
+const props = defineProps<RendererProps>();
+
+const text = computed(() => (props.children?.every(isTextNode) ? props.children.join('') : null));
+</script>
+
+<template>
+  <InheritedText v-slot="{ textStyle, attributes }">
+    <ScaleText
+      v-if="text !== null"
+      v-bind="attributes"
+      :text="text ?? ''"
+      :text-style="textStyle"
+      :start="props.start"
+      :duration="props.duration"
+      :from="props.from"
+      :blur="props.blur"
+    />
+    <slot v-else />
+  </InheritedText>
+</template>

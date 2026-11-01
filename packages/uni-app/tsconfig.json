@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": [
+      "node",
+      "vitest/globals",
+      "@dcloudio/uni-app-x/types/native/global",
+      "@dcloudio/uni-app-x/types/uni/global"
+    ],
+    "jsx": "preserve"
+  },
+  "vueCompilerOptions": {
+    "extensions": [".vue", ".uvue"]
+  },
+  "include": [
+    "src",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "stories",
+    ".storybook/**/*"
+  ]
+}

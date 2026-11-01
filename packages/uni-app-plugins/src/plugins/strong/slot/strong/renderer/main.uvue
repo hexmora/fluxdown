@@ -1,0 +1,18 @@
+<script setup lang="ts">
+import type { SlotBaseProps } from '../../../../../base/slot/type';
+
+import { InheritedText } from '../../../../../base/components/inherited-text';
+import { useTheme } from '../../../../../base/theme';
+
+const theme = useTheme();
+
+defineProps<SlotBaseProps>();
+</script>
+
+<template>
+  <InheritedText
+    class="fluxdown-strong"
+    :style="{ fontWeight: theme.tokens.typography.fontWeight.bold }"
+    ><slot
+  /></InheritedText>
+</template>

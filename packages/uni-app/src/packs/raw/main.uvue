@@ -1,0 +1,137 @@
+<script setup lang="ts">
+import type { MapperPluggable } from '@fluxdown/core';
+import type { PluggableConfigs, PluginSet } from '@fluxdown/types';
+import type { UniRenderExtraParams, UniRenderNode } from '@fluxdown/uni-app-plugins/base';
+
+import { Core, isPluggablesEqual, isPluginSetEqual } from '@fluxdown/core';
+import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-plugins/presets/mapper';
+import {
+  getUniProps,
+  provideSlots,
+  provideTheme,
+  useStateOf,
+} from '@fluxdown/uni-app-plugins/base';
+import { castArray, uniqueId } from 'lodash-es';
+import { shallowEqual } from 'shallow-equal';
+import { D, render, S } from 'stative';
+import { computed, onScopeDispose } from 'vue';
+
+import { RootReconciler } from '../../components/root-reconciler';
+import { EL, EO } from '../../consts';
+import { provideRender } from '../../context/render';
+import { usePlugins } from '../../hooks';
+import { UniRenderer } from '../../modules/uni-renderer';
+import {
+  isPatchesEqual,
+  toBuildConfig,
+  toEffectMappers,
+  toEffects,
+  toSmoothConfig,
+  toStreamingConfig,
+} from '../utils';
+import { RAW_PROPS } from './consts';
+
+defineOptions({ name: 'FluxdownRaw' });
+
+const props = defineProps(RAW_PROPS);
+
+const streaming = computed(() => toStreamingConfig(props.streaming));
+
+const effects = computed(() =>
+  toEffectMappers(toEffects(streaming.value.effect), PRESET_MAPPER_PLUGINS),
+);
+
+const idPrefix = uniqueId('fluxdown-');
+
+const build = useStateOf(
+  () =>
+    toBuildConfig({
+      base: props.build ?? EO,
+      repairEnding: streaming.value.repairEnding,
+      idPrefix,
+    }),
+  shallowEqual,
+);
+
+const patches = useStateOf(() => props.patches ?? EL, isPatchesEqual);
+
+const text = useStateOf(() => props.text);
+
+const plugins = computed(() => castArray(props.plugins));
+
+const _remarks = usePlugins(() => plugins.value, 'remarks');
+
+const _rehypes = usePlugins(() => plugins.value, 'rehypes');
+
+const _repairs = usePlugins(() => plugins.value, 'repairs');
+
+const _mappers = usePlugins(() => plugins.value, 'mappers');
+
+const _renders = usePlugins(() => plugins.value, 'renders');
+
+const slots = usePlugins(() => plugins.value, 'slots');
+
+const remarks = useStateOf(() => _remarks.value, isPluggablesEqual);
+
+const rehypes = useStateOf(() => _rehypes.value, isPluggablesEqual);
+
+const repairs = useStateOf(() => _repairs.value, isPluggablesEqual);
+
+const mappers = useStateOf<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>>(
+  () => [[..._mappers.value, ...effects.value], { smooth: toSmoothConfig(streaming.value.smooth) }],
+  isPluginSetEqual,
+);
+
+const renders = useStateOf(() => _renders.value, isPluggablesEqual);
+
+const core = render(
+  S([
+    Core<UniRenderNode, UniRenderExtraParams>,
+    {
+      Renderer: D(UniRenderer),
+      build,
+      patches,
+      rehypes,
+      remarks,
+      renders,
+      repairs,
+      mappers,
+      text,
+    },
+  ]),
+);
+
+const theme = provideTheme(() => props.theme ?? 'light');
+
+const style = computed(() => {
+  const { colors, typography } = theme.value.tokens;
+
+  return {
+    color: colors.fg,
+    ...(typography.fontSans ? { fontFamily: typography.fontSans } : {}),
+    fontSize: `${typography.fontSize.md}px`,
+    lineHeight: `${typography.fontSize.md * typography.lineHeight.md}px`,
+  };
+});
+
+provideRender({ getProps: getUniProps });
+
+provideSlots(() => slots.value);
+
+defineExpose(core);
+
+onScopeDispose(() => core.destroy());
+</script>
+
+<template>
+  <view class="fluxdown" :style="style">
+    <RootReconciler :value="core.value" />
+  </view>
+</template>
+
+<style>
+.fluxdown {
+  display: flex;
+  flex-direction: column;
+}
+</style>

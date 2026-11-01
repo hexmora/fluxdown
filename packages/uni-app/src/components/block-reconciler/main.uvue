@@ -1,0 +1,49 @@
+<script setup lang="ts">
+import { RenderNodes, useStateValue, useTheme } from '@fluxdown/uni-app-plugins/base';
+import { toState } from 'stative';
+import { computed } from 'vue';
+
+import type { BlockReconcilerProps } from './type';
+
+import { useRender } from '../../context/render';
+import { EMPTY_ROOT } from './consts';
+import { normalizeBlockSpacing } from './spacing';
+import { renderParentChildren } from './utils';
+
+const props = defineProps<BlockReconcilerProps>();
+
+const { getProps } = useRender();
+
+const root = useStateValue(() => props.block.value);
+
+const meta = useStateValue(() => props.block.meta);
+
+const first = computed(() => meta.value.currentIndex === 0);
+
+const last = computed(() => meta.value.currentIndex === meta.value.blockCount - 1);
+
+const blocks = useStateValue(() => toState(props.blocks));
+
+const previous = useStateValue(
+  () => blocks.value[meta.value.currentIndex - 1]?.value ?? EMPTY_ROOT,
+);
+
+const theme = useTheme();
+
+const patches = computed(() => toState(props.patches));
+
+const plugins = useStateValue(() => toState(props.plugins));
+
+const nodes = computed(() =>
+  normalizeBlockSpacing(
+    renderParentChildren(root.value, [root.value], patches.value, plugins.value, getProps),
+    { first: first.value, last: last.value },
+    previous.value,
+    theme.value.tokens,
+  ),
+);
+</script>
+
+<template>
+  <RenderNodes :nodes="nodes" :tail="last" />
+</template>

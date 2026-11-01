@@ -1,0 +1,18 @@
+import type { IPluggableConfig } from '@fluxdown/types';
+
+import { BaseSlotPlugin } from '../../../../base';
+import { ParagraphRenderer } from './renderer';
+
+declare global {
+  interface UniSlotConfigs {
+    'slot-paragraph': IPluggableConfig<void>;
+  }
+}
+
+export class ParagraphSlotPlugin extends BaseSlotPlugin<'Paragraph'> {
+  static readonly key = 'slot-paragraph';
+
+  readonly Component = ParagraphRenderer;
+
+  readonly type = 'Paragraph';
+}

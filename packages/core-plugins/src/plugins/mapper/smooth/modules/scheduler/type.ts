@@ -12,8 +12,10 @@ export interface IScheduler {
 
   /**
    * Add newly available visible units to the target position.
+   * An optional arrival timestamp uses the same clock as start() and tick().
+   * Progress accumulated at arrival is returned by the next tick().
    */
-  push(length: number): void;
+  push(length: number, timestamp?: number): void;
 
   /**
    * Reset progress and the target to the supplied absolute position.

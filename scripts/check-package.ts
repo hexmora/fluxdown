@@ -117,6 +117,10 @@ export function isTaroPackage(name: string): boolean {
   return name === '@fluxdown/taro' || name === '@fluxdown/taro-plugins';
 }
 
+export function isUniAppPackage(name: string): boolean {
+  return name === '@fluxdown/uni-app' || name === '@fluxdown/uni-app-plugins';
+}
+
 export function isSveltePackage(name: string): boolean {
   return name === '@fluxdown/svelte' || name === '@fluxdown/svelte-plugins';
 }
@@ -176,6 +180,20 @@ async function checkExports(directory: string, source = false): Promise<PackageM
   }
 
   for (const [entry, value] of publicEntries(manifest, files)) {
+    if (isUniAppPackage(manifest.name)) {
+      assert(
+        resolveExport(value, ['import'])?.endsWith('.js'),
+        `${label}${entry}: uni-app libraries must preserve ESM for the target compiler`,
+      );
+
+      assert(
+        resolveExport(value, ['types', 'import'])?.endsWith('.d.ts'),
+        `${label}${entry}: missing uni-app declarations`,
+      );
+
+      continue;
+    }
+
     if (isSveltePackage(manifest.name)) {
       assert(
         resolveExport(value, ['svelte', 'import'])?.endsWith('.js'),

@@ -446,3 +446,73 @@ for (const packages of [
     assert.throws(() => validateReleaseManifest(artifact));
   });
 }
+
+function uniAppVerification(specifiers = ['@fluxdown/uni-app', '@fluxdown/uni-app-plugins/full']) {
+  return {
+    specifiers,
+    typeEntries: specifiers.length,
+    compilerVersion: '3.0.0-5030320261023001',
+    webAssets: ['assets/consumer.js', 'index.html'],
+  };
+}
+
+test('accepts uni-app-only artifacts after strict declarations and official H5 compilation', () => {
+  const artifact = manifest(['@fluxdown/uni-app', '@fluxdown/uni-app-plugins']);
+
+  artifact.verification = { nodeEntries: 0, browser: [], uniApp: uniAppVerification() };
+
+  assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+test('requires compiler evidence for uni-app even when Node verification passes', () => {
+  const artifact = manifest(['fluxdown', '@fluxdown/uni-app']);
+
+  artifact.verification = { nodeEntries: 10, browser: [] };
+
+  assert.throws(() => validateReleaseManifest(artifact), /Invalid uni-app verification/);
+});
+
+test('accepts a release containing both target-compiled renderers without Node entries', () => {
+  const artifact = manifest(['@fluxdown/lynx', '@fluxdown/uni-app']);
+
+  artifact.verification = {
+    nodeEntries: 0,
+    browser: [],
+    lynx: lynxVerification(),
+    uniApp: uniAppVerification(['@fluxdown/uni-app']),
+  };
+
+  assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+test('uni-app compilation cannot replace other packages Node verification', () => {
+  const artifact = manifest(['fluxdown', '@fluxdown/uni-app']);
+
+  artifact.verification = {
+    nodeEntries: 0,
+    browser: [],
+    uniApp: uniAppVerification(['@fluxdown/uni-app']),
+  };
+
+  assert.throws(() => validateReleaseManifest(artifact), /Missing consumer verification/);
+});
+
+for (const evidence of [
+  { ...uniAppVerification(), compilerVersion: '' },
+  { ...uniAppVerification(), typeEntries: 0 },
+  { ...uniAppVerification(), webAssets: [] },
+  { ...uniAppVerification(), webAssets: ['index.html'] },
+  { ...uniAppVerification(), webAssets: ['../consumer.js', 'index.html'] },
+  { ...uniAppVerification(), webAssets: ['consumer.js', 'consumer.js', 'index.html'] },
+  uniAppVerification(['@fluxdown/uni-app']),
+  uniAppVerification(['@fluxdown/uni-app', '@fluxdown/core']),
+  uniAppVerification(['@fluxdown/uni-app', '@fluxdown/uni-app', '@fluxdown/uni-app-plugins/full']),
+]) {
+  test(`rejects incomplete uni-app evidence ${JSON.stringify(evidence)}`, () => {
+    const artifact = manifest(['@fluxdown/uni-app', '@fluxdown/uni-app-plugins']);
+
+    artifact.verification = { nodeEntries: 1, browser: [], uniApp: evidence };
+
+    assert.throws(() => validateReleaseManifest(artifact));
+  });
+}

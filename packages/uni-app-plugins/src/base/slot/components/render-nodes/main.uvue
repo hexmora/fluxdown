@@ -1,0 +1,76 @@
+<script setup lang="ts">
+import { computed, inject, onScopeDispose, provide, shallowRef } from 'vue';
+
+import type { RenderNodesProps } from './type';
+
+import { InheritedText } from '../../../components/inherited-text';
+import { useInlineFlow } from '../../../components/inline-flow/context';
+import { useSlotPlugins } from '../../context';
+import { getInlineText } from '../../utils/inline';
+import { RenderTailContext } from './context';
+import { normalizeInlineNodes } from './inline';
+import { flattenNodes, getNodeKey, isComponentNode, isSlotNode } from './utils';
+
+defineOptions({ name: 'FluxdownRenderNodes' });
+
+const props = withDefaults(defineProps<RenderNodesProps>(), { tail: true });
+
+const parentTail = inject(RenderTailContext, null);
+
+const tail = computed(() => parentTail?.value !== false && props.tail !== false);
+
+provide(RenderTailContext, tail);
+
+const slots = useSlotPlugins();
+
+const inline = useInlineFlow();
+
+const ready = shallowRef(false);
+
+let disposed = false;
+
+// Break recursive native construction without waiting for an empty outlet to paint.
+void Promise.resolve().then(() => {
+  if (!disposed) {
+    ready.value = true;
+  }
+});
+
+onScopeDispose(() => {
+  disposed = true;
+});
+
+const entries = computed(() => {
+  if (!ready.value) {
+    return [];
+  }
+
+  return inline
+    ? normalizeInlineNodes(props.nodes, slots.value, tail.value)
+    : flattenNodes(props.nodes);
+});
+</script>
+
+<template>
+  <template v-for="(node, index) in entries" :key="getNodeKey(node, index)">
+    <component v-if="isComponentNode(node)" :is="node.component" v-bind="node.props" />
+    <component
+      v-else-if="isSlotNode(node)"
+      :is="slots[node.type]?.at(-1)?.Component"
+      v-bind="{ ...slots[node.type]?.at(-1)?.props, ...node.props, children: node.children }"
+    >
+      <FluxdownRenderNodes
+        v-if="node.children"
+        :nodes="node.children ?? []"
+        :tail="tail && index === entries.length - 1"
+      />
+    </component>
+    <InheritedText v-else :text="getInlineText(node)" />
+  </template>
+  <view
+    class="fluxdown-render-nodes__anchor"
+    :flatten="false"
+    aria-hidden="true"
+    style="width: 0px; height: 0px; flex-shrink: 0"
+  />
+</template>

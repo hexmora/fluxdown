@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "outDir": "dist/.types",
+    "types": [
+      "node",
+      "@dcloudio/uni-app-x/types/native/global",
+      "@dcloudio/uni-app-x/types/uni/global"
+    ],
+    "ignoreDeprecations": "6.0",
+    "rootDir": "../.."
+  },
+  "include": ["src"],
+  "exclude": ["src/**/__tests__/**"]
+}

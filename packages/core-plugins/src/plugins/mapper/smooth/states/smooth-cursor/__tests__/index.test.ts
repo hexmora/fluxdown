@@ -12,7 +12,7 @@ import {
   toClosure,
 } from 'stative';
 
-import type { SmoothSchedulerClass } from '../../..';
+import type { SmoothSchedulerClass, SmoothTickerClass } from '../../..';
 import type { SmoothPosition } from '../states';
 
 import { SmoothCursor } from '..';
@@ -25,6 +25,7 @@ const setupCursor = (
   initial: IBlockState<number[]>[] = [],
   active = true,
   Scheduler: SmoothSchedulerClass = StepSmoothScheduler,
+  Ticker: SmoothTickerClass = PrimarySmoothTicker,
 ) => {
   const source = MutableState.of(initial);
 
@@ -36,7 +37,7 @@ const setupCursor = (
       {
         source: toClosure(source),
         enabled: toClosure(enabled),
-        ticker: toClosure(ReactiveState.of(PrimarySmoothTicker)),
+        ticker: toClosure(ReactiveState.of(Ticker)),
         scheduler: toClosure(ReactiveState.of(Scheduler)),
       },
     ]),
@@ -48,6 +49,163 @@ const setupCursor = (
 beforeEach(resetSmoothTests);
 
 describe('SmoothCursor', () => {
+  test('seeds newly started content at its arrival instead of decaying an empty old frame', () => {
+    class Ticker extends PrimarySmoothTicker {
+      now() {
+        return 100;
+      }
+    }
+
+    class Scheduler extends SpringSmoothScheduler {
+      protected override readonly defaultTuple = [1000, 0, 0, 0, 1000];
+    }
+
+    const block = createArrayBlock<number>([]);
+
+    const { cursor } = setupCursor([block.block], true, Scheduler, Ticker);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    block.source.next(Array<number>(10).fill(0));
+
+    const ticker = latest(PrimarySmoothTicker.instances);
+
+    ticker.tick(101);
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    cursor.destroy();
+  });
+
+  test.each([
+    { name: 'shortened content', values: [0, 1, 2], prefixLength: 3, expected: 3 },
+    { name: 'a rewritten prefix', values: [10, 11, 12], prefixLength: 0, expected: 1 },
+  ])('resets timing at the arrival of $name', ({ values, prefixLength, expected }) => {
+    let timestamp = 0;
+
+    class Ticker extends PrimarySmoothTicker {
+      now() {
+        return timestamp;
+      }
+    }
+
+    class Scheduler extends SpringSmoothScheduler {
+      protected override readonly defaultTuple = [1000, 0, 0, 0, 1000];
+    }
+
+    const block = createArrayBlock<number>([]);
+
+    const state: IBlockState<number[]> = block.block;
+
+    const prefix = MutableState.of(Infinity);
+
+    state.prevPrefixLength = prefix;
+
+    const { cursor } = setupCursor([state], true, Scheduler, Ticker);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    batch(() => {
+      block.source.next(Array.from({ length: 10 }, (_, index) => index));
+
+      prefix.next(10);
+    });
+
+    const ticker = latest(PrimarySmoothTicker.instances);
+
+    timestamp = 2;
+
+    ticker.tick(2);
+
+    expect(cursor.value.value.charIndex).toBe(2);
+
+    timestamp = 100;
+
+    batch(() => {
+      block.source.next(values);
+
+      prefix.next(prefixLength);
+    });
+
+    timestamp = 101;
+
+    ticker.tick(101);
+
+    expect(cursor.value.value.charIndex).toBe(expected);
+
+    cursor.destroy();
+  });
+
+  test('uses the custom ticker clock for arrivals without emitting between frames', () => {
+    let timestamp = 0;
+
+    class Ticker extends PrimarySmoothTicker {
+      now() {
+        return timestamp;
+      }
+    }
+
+    class Scheduler extends SpringSmoothScheduler {
+      protected override readonly defaultTuple = [1000, 0, 0, 1000, 1000];
+    }
+
+    const block = createArrayBlock<number>([]);
+
+    const { cursor } = setupCursor([block.block], true, Scheduler, Ticker);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    block.source.next([1, 2]);
+
+    const ticker = latest(PrimarySmoothTicker.instances);
+
+    timestamp = 10;
+
+    block.source.next(Array<number>(10).fill(0));
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    ticker.tick(10);
+
+    expect(cursor.value.value.charIndex).toBe(2);
+
+    timestamp = 15;
+
+    ticker.tick(15);
+
+    expect(cursor.value.value.charIndex).toBe(7);
+
+    cursor.destroy();
+  });
+
+  test('keeps custom tickers without now and one-argument schedulers compatible', () => {
+    const block = createArrayBlock<number>([]);
+
+    const { cursor } = setupCursor([block.block]);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    block.source.next([1]);
+
+    const scheduler = latest(StepSmoothScheduler.instances);
+
+    const push = jest.spyOn(scheduler, 'push');
+
+    const ticker = latest(PrimarySmoothTicker.instances);
+
+    block.source.next([1, 2]);
+
+    expect(push).toHaveBeenCalledWith(1, undefined);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    ticker.tick(16);
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    cursor.destroy();
+  });
+
   test.each([
     { values: [], end: { blockIndex: -1, charIndex: 0 } },
     { values: [[], []], end: { blockIndex: 1, charIndex: 0 } },

@@ -21,3 +21,5 @@ CLAUDE.md
 .angular
 /packages/angular/**/ng-package.json
 /packages/angular-plugins/**/ng-package.json
+
+unpackage

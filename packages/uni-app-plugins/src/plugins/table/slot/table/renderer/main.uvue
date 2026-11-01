@@ -1,0 +1,45 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import { RenderNodes } from '../../../../../base/slot/components/render-nodes';
+import { getBlockStyle, useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+</script>
+
+<template>
+  <scroll-view
+    class="fluxdown-table"
+    direction="horizontal"
+    style="height: auto"
+    :style="getBlockStyle('table', theme.tokens)"
+  >
+    <view
+      :style="{
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: theme.tokens.colors.border,
+        borderRadius: `${theme.tokens.radius.lg}px`,
+        overflow: 'hidden',
+      }"
+    >
+      <view
+        v-for="(row, index) in props.rows"
+        :key="index"
+        :style="{
+          display: 'flex',
+          flexDirection: 'row',
+          borderBottomWidth: index < props.rows.length - 1 ? '1px' : '0px',
+          borderBottomStyle: 'solid',
+          borderBottomColor: theme.tokens.colors.border,
+          backgroundColor:
+            index > 0 && index % 2 === 0 ? theme.tokens.colors.surfaceSubtle : 'transparent',
+        }"
+      >
+        <RenderNodes :nodes="row" :tail="index === props.rows.length - 1" />
+      </view>
+    </view>
+  </scroll-view>
+</template>
