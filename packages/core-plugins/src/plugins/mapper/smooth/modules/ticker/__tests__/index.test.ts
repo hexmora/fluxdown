@@ -27,7 +27,9 @@ describe('ticker timestamps', () => {
 });
 
 describe('RafSmoothTicker', () => {
-  test('emits frame timestamps and cancels the pending frame on stop', () => {
+  test('emits the current timestamp and cancels the pending frame on stop', () => {
+    jest.spyOn(performance, 'now').mockReturnValue(10);
+
     const frames = mockAnimationFrames();
 
     const ticker = new RafSmoothTicker();
@@ -70,6 +72,8 @@ describe('RafSmoothTicker', () => {
   });
 
   test('ignores an old canceled callback after restart', () => {
+    jest.spyOn(performance, 'now').mockReturnValue(20);
+
     const frames = mockAnimationFrames();
 
     const ticker = new RafSmoothTicker();
@@ -98,6 +102,32 @@ describe('RafSmoothTicker', () => {
     expect(next).toHaveBeenCalledWith(20);
 
     expect(frames.request).toHaveBeenCalledTimes(3);
+
+    ticker.destroy();
+  });
+
+  test('keeps one clock origin when a native RAF timestamp uses system uptime', () => {
+    stubGlobal('performance', undefined);
+
+    const now = jest.spyOn(Date, 'now').mockReturnValue(1_793_216_721_406);
+
+    const frames = mockAnimationFrames();
+
+    const ticker = new RafSmoothTicker();
+
+    const next = jest.fn();
+
+    ticker.value.subscribe(next);
+
+    const start = ticker.start();
+
+    now.mockReturnValue(start + 16);
+
+    expect(ticker.now()).toBe(start + 16);
+
+    frames.frame(1)(132_216_050);
+
+    expect(next).toHaveBeenCalledWith(start + 16);
 
     ticker.destroy();
   });
@@ -218,6 +248,36 @@ describe('IntervalSmoothTicker', () => {
 });
 
 describe.each([RafSmoothTicker, IntervalSmoothTicker])('$name lifecycle', (Ticker) => {
+  test('uses its public clock for arrival reads, start, and emitted timestamps', () => {
+    jest.useFakeTimers();
+
+    const frames = mockAnimationFrames();
+
+    const ticker = new Ticker();
+
+    const now = jest.spyOn(ticker, 'now').mockReturnValue(42);
+
+    const next = jest.fn();
+
+    ticker.value.subscribe(next);
+
+    expect(ticker.now()).toBe(42);
+
+    expect(ticker.start()).toBe(42);
+
+    now.mockReturnValue(58);
+
+    if (ticker instanceof RafSmoothTicker) {
+      frames.frame(1)(100_000);
+    } else {
+      jest.advanceTimersByTime(17);
+    }
+
+    expect(next).toHaveBeenCalledWith(ticker.now());
+
+    ticker.destroy();
+  });
+
   test('rejects repeated starts and stops', () => {
     jest.useFakeTimers();
 

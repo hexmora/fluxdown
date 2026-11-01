@@ -1,7 +1,6 @@
 import { assert } from '@fluxdown/utils';
 
 import { BaseSmoothTicker } from './base';
-import { getNow } from './utils';
 
 export class RafSmoothTicker extends BaseSmoothTicker {
   private frame: number | null = null;
@@ -21,16 +20,17 @@ export class RafSmoothTicker extends BaseSmoothTicker {
 
     assert(!this.running, 'Cannot start a running ticker');
 
-    const timestamp = getNow();
+    const timestamp = this.now();
 
     const generation = ++this.generation;
 
-    const next = (time: number) => {
+    const next = () => {
       if (!this.running || generation !== this.generation) {
         return;
       }
 
-      this.subject.next(time);
+      // Native RAF callbacks may use a different clock origin from start().
+      this.subject.next(this.now());
 
       if (this.running && generation === this.generation) {
         this.frame = requestAnimationFrame(next);

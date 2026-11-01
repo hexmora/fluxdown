@@ -1,0 +1,30 @@
+{
+  "name": "@fluxdown/uni-app-playground",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "UNI_APP_X=true uni build -p h5",
+    "dev": "UNI_APP_X=true uni -p h5 --port 6012"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "catalog:uni-app-cli",
+    "@dcloudio/uni-components": "catalog:uni-app-cli",
+    "@dcloudio/uni-h5": "catalog:uni-app-cli",
+    "@fluxdown/uni-app": "workspace:^",
+    "@fluxdown/uni-app-plugins": "workspace:^",
+    "vue": "catalog:uni-app-cli"
+  },
+  "devDependencies": {
+    "@babel/core": "catalog:uni-app-cli",
+    "@babel/plugin-transform-unicode-property-regex": "catalog:uni-app-cli",
+    "@dcloudio/uni-app-x": "catalog:",
+    "@dcloudio/uni-cli-shared": "catalog:uni-app-cli",
+    "@dcloudio/uni-uts-v1": "catalog:uni-app-cli",
+    "@dcloudio/vite-plugin-uni": "catalog:uni-app-cli",
+    "@fluxdown/core": "workspace:^",
+    "@rollup/plugin-commonjs": "catalog:uni-app-cli",
+    "sass": "catalog:",
+    "vite": "catalog:uni-app-cli"
+  }
+}

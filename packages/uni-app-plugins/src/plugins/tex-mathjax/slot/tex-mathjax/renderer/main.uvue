@@ -1,0 +1,25 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import { FormulaImage, InheritedText } from '../../../../../base/components';
+import { renderMathjaxFormula } from '../../../../../base/math';
+import { TexRenderer } from '../../../../tex/slot/tex/renderer';
+
+const props = defineProps<RendererProps>();
+</script>
+
+<template>
+  <InheritedText v-slot="{ textStyle }">
+    <FormulaImage
+      class="fluxdown-tex-mathjax"
+      :tex="props.tex"
+      :mode="props.mode"
+      :font-size="Number.parseFloat(String(textStyle.fontSize)) || 16"
+      :color="String(textStyle.color ?? '#202123')"
+      :style="{ opacity: textStyle.opacity ?? 1 }"
+      :render="renderMathjaxFormula"
+    >
+      <TexRenderer :tex="props.tex" :mode="props.mode" />
+    </FormulaImage>
+  </InheritedText>
+</template>

@@ -1,0 +1,1 @@
+export const MEASUREMENT_REPETITIONS = 16;

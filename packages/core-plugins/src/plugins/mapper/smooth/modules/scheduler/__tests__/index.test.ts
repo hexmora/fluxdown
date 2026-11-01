@@ -1,5 +1,10 @@
 import { SpringSmoothScheduler } from '..';
-import { StepSmoothScheduler, TargetScheduler } from './utils';
+import {
+  getArrivalCompletion,
+  getIdleDistances,
+  StepSmoothScheduler,
+  TargetScheduler,
+} from './utils';
 
 describe('BaseSmoothScheduler', () => {
   test('provides defaults and retains an explicitly supplied tuple', () => {
@@ -61,6 +66,57 @@ describe('BaseSmoothScheduler', () => {
 });
 
 describe('SpringSmoothScheduler', () => {
+  test('integrates only the previously available content before an arrival', () => {
+    const scheduler = new SpringSmoothScheduler([1000, 0, 0, 1000, 1000]);
+
+    scheduler.start(0);
+
+    scheduler.push(2);
+
+    scheduler.push(8, 10);
+
+    expect(scheduler.tick(10)).toBe(2);
+
+    expect(scheduler.tick(15)).toBe(5);
+
+    expect(scheduler.tick(18)).toBe(3);
+  });
+
+  test.each(['start', 'reset'] as const)('clears pending arrival progress on %s', (operation) => {
+    const scheduler = new SpringSmoothScheduler([1000, 0, 0, 1000, 1000]);
+
+    scheduler.start(0);
+
+    scheduler.push(5);
+
+    scheduler.push(5, 3);
+
+    if (operation === 'start') {
+      scheduler.start(3);
+    } else {
+      scheduler.reset();
+    }
+
+    scheduler.push(1);
+
+    expect(scheduler.tick(4)).toBe(1);
+
+    expect(scheduler.tick(5)).toBe(0);
+  });
+
+  test('decays the same wall residence time independently of idle frame count', () => {
+    expect(getIdleDistances([100])).toEqual(getIdleDistances([25, 50, 75, 100]));
+  });
+
+  test('keeps source and frame phase differences from amplifying into a one-second tail', () => {
+    // Rounded timings from two real runs. The previous scheduler finished 1,003 ms apart.
+    const first = getArrivalCompletion(21.1, 24.3, 27.8);
+
+    const second = getArrivalCompletion(11.3, 14.4, 30.6);
+
+    expect(Math.abs(first - second)).toBeLessThan(100);
+  });
+
   test.each([
     {
       name: 'short initial content',
@@ -78,7 +134,7 @@ describe('SpringSmoothScheduler', () => {
       idle: [403],
       length: 18,
       timestamp: 483,
-      distance: 6,
+      distance: 1,
     },
   ])(
     'resumes consistently after idle frames with $name',
@@ -95,7 +151,7 @@ describe('SpringSmoothScheduler', () => {
     },
   );
 
-  test('retains speed when a frame exhausts the available buffer', () => {
+  test('decays only the time spent at the buffer wall within a frame', () => {
     const scheduler = new SpringSmoothScheduler([1000, 0, 0, 2, 1000]);
 
     scheduler.start(0);
@@ -106,7 +162,7 @@ describe('SpringSmoothScheduler', () => {
 
     scheduler.push(100);
 
-    expect([3, 4, 5, 6, 7].map((time) => scheduler.tick(time))).toEqual([1, 1, 1, 1, 1]);
+    expect([3, 4, 5, 6, 7].map((time) => scheduler.tick(time))).toEqual([0, 1, 1, 1, 1]);
   });
 
   test('resumes after waiting on an initially empty buffer', () => {
@@ -138,7 +194,7 @@ describe('SpringSmoothScheduler', () => {
 
     expect(scheduler.idle).toBe(false);
 
-    for (let frame = 1; frame <= 22; frame += 1) {
+    for (let frame = 1; frame <= 24; frame += 1) {
       expect(scheduler.tick(1 + frame * 16)).toBe(0);
     }
 
@@ -176,7 +232,7 @@ describe('SpringSmoothScheduler', () => {
 
     scheduler.start(0);
 
-    for (let frame = 1; frame <= 36; frame += 1) {
+    for (let frame = 1; frame <= 40; frame += 1) {
       expect(scheduler.tick(frame * 16)).toBe(0);
     }
 
@@ -417,34 +473,75 @@ describe('SpringSmoothScheduler', () => {
     ]);
   });
 
-  test.each(['start', 'reset'] as const)('retains fractional progress through %s', (operation) => {
-    const scheduler = new SpringSmoothScheduler();
+  test.each(['start', 'reset'] as const)('clears fractional progress through %s', (operation) => {
+    const scheduler = new SpringSmoothScheduler([1000, 0, 0, 1000, 1000]);
 
     scheduler.start(0);
 
-    scheduler.push(6);
+    scheduler.push(2);
 
-    for (const time of [16, 32, 48, 64, 80]) {
-      scheduler.tick(time);
-    }
+    expect(scheduler.tick(0.5)).toBe(0);
 
     if (operation === 'start') {
-      scheduler.start(100, 4);
-
-      scheduler.push(2);
-
-      expect(scheduler.tick(116)).toBe(1);
+      scheduler.start(0.5);
     } else {
-      scheduler.reset(4);
-
-      expect(scheduler.tick(96)).toBe(0);
-
-      scheduler.push(2);
-
-      expect([112, 128, 144, 160, 176].map((time) => scheduler.tick(time))).toEqual([
-        0, 1, 0, 0, 1,
-      ]);
+      scheduler.reset();
     }
+
+    scheduler.push(1);
+
+    expect([scheduler.tick(1), scheduler.tick(1.5)]).toEqual([0, 1]);
+  });
+
+  test.each(['start', 'reset'] as const)(
+    'discards fractional arrival progress before the first frame on %s',
+    (operation) => {
+      const tuple = [1000, 0, 0, 1000, 1000];
+
+      const scheduler = new SpringSmoothScheduler(tuple);
+
+      scheduler.start(0);
+
+      scheduler.push(1);
+
+      scheduler.push(1, 0.5);
+
+      if (operation === 'start') {
+        scheduler.start(0.5);
+      } else {
+        scheduler.reset();
+      }
+
+      scheduler.push(1);
+
+      const fresh = new SpringSmoothScheduler(tuple);
+
+      fresh.start(0.5);
+
+      fresh.push(1);
+
+      const timestamps = [1, 1.5];
+
+      expect(timestamps.map((timestamp) => scheduler.tick(timestamp))).toEqual(
+        timestamps.map((timestamp) => fresh.tick(timestamp)),
+      );
+    },
+  );
+
+  test('retains fractional arrival progress when resuming before the first frame', () => {
+    const scheduler = new SpringSmoothScheduler([1000, 0, 0, 1000, 1000]);
+
+    scheduler.start(0);
+
+    scheduler.push(1);
+
+    scheduler.push(1, 0.5);
+
+    scheduler.resume(10_000);
+
+    expect(scheduler.tick(10_000.5)).toBe(1);
+
+    expect(scheduler.tick(10_001.5)).toBe(1);
   });
 
   test('ignores repeated or backward timestamps without shifting forward timing', () => {

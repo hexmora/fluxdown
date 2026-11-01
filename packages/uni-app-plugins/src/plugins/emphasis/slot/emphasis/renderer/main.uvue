@@ -1,0 +1,11 @@
+<script setup lang="ts">
+import type { SlotBaseProps } from '../../../../../base/slot/type';
+
+import { InheritedText } from '../../../../../base/components/inherited-text';
+
+defineProps<SlotBaseProps>();
+</script>
+
+<template>
+  <InheritedText class="fluxdown-emphasis" :style="{ fontStyle: 'italic' }"><slot /></InheritedText>
+</template>

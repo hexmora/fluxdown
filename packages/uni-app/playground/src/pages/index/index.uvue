@@ -1,0 +1,142 @@
+<script setup lang="ts">
+import type { IPatchItem } from '@fluxdown/core';
+import type { StreamingConfig } from '@fluxdown/uni-app';
+import type { PresetKeys, Theme, UniRenderNode } from '@fluxdown/uni-app-plugins/typings';
+
+import { onLoad } from '@dcloudio/uni-app';
+import { Fluxdown } from '@fluxdown/uni-app';
+import { FluxdownLite } from '@fluxdown/uni-app/lite';
+import { computed, onUnmounted, ref } from 'vue';
+
+import { Mention } from './components/mention';
+import {
+  PATCH_CHARACTERS,
+  PATCH_MARKDOWN,
+  STORY_CHARACTERS,
+  STORY_MARKDOWN,
+  THEME_OVERRIDES,
+} from './consts';
+import { QuotePlugin } from './plugins';
+
+const text = ref(STORY_MARKDOWN);
+
+const preset = ref<PresetKeys>('light');
+
+const pack = ref('full');
+
+const scenario = ref('default');
+
+const streaming = ref<boolean | StreamingConfig>(false);
+
+const profile = ref(false);
+
+const Component = computed(() => pack.value === 'lite' ? FluxdownLite : Fluxdown);
+
+const theme = computed<Theme>(() => {
+  return scenario.value === 'theme' ? [preset.value, THEME_OVERRIDES] : preset.value;
+});
+
+const plugins = computed(() => scenario.value === 'slot' ? QuotePlugin : undefined);
+
+const toggleProfile = () => {
+  profile.value = !profile.value;
+};
+
+const patches: IPatchItem<UniRenderNode>[] = [{
+  key: 'person-ada',
+  range: [7, 11],
+  render() {
+    return {
+      component: Mention,
+      props: { label: '@Ada', onPress: toggleProfile },
+    };
+  },
+}];
+
+let timer: ReturnType<typeof setInterval> | undefined;
+
+onLoad((query) => {
+  preset.value = query?.theme === 'dark' ? 'dark' : 'light';
+
+  pack.value = query?.pack ?? 'full';
+
+  scenario.value = query?.scenario ?? 'default';
+
+  text.value = scenario.value === 'patch' ? PATCH_MARKDOWN : STORY_MARKDOWN;
+
+  const effect = query?.effect;
+
+  if (!effect || !['scale', 'shad', 'chunk', 'suffix'].includes(effect)) {
+    return;
+  }
+
+  const characters = scenario.value === 'patch' ? PATCH_CHARACTERS : STORY_CHARACTERS;
+
+  const batch = effect === 'chunk' ? 24 : 8;
+
+  let cursor = 0;
+
+  text.value = '';
+
+  streaming.value = {
+    smooth: effect !== 'chunk',
+    effect: effect as 'scale' | 'shad' | 'chunk' | 'suffix',
+  };
+
+  timer = setInterval(() => {
+    cursor = Math.min(characters.length, cursor + batch);
+
+    text.value = characters.slice(0, cursor).join('');
+
+    if (cursor === characters.length) {
+      clearInterval(timer);
+
+      streaming.value = false;
+    }
+  }, effect === 'chunk' ? 120 : 40);
+});
+
+onUnmounted(() => clearInterval(timer));
+</script>
+
+<template>
+  <scroll-view class="preview-scroll" scroll-y>
+    <view
+      class="preview"
+      :style="{ backgroundColor: preset === 'dark' ? '#212121' : '#ffffff' }"
+    >
+      <component
+        :is="Component"
+        :text="text"
+        :theme="theme"
+        :streaming="streaming"
+        :build="{ tex: true, footnote: true }"
+        :plugins="plugins"
+        :patches="scenario === 'patch' ? patches : undefined"
+      />
+      <text
+        v-if="profile"
+        class="profile"
+        :style="{ color: preset === 'dark' ? '#ffffff' : '#212121' }"
+      >
+        Ada Lovelace · Profile opened from a patch.
+      </text>
+    </view>
+  </scroll-view>
+</template>
+
+<style>
+.preview-scroll {
+  height: 100%;
+}
+
+.preview {
+  padding: 24px;
+  min-height: 100%;
+}
+
+.profile {
+  margin-top: 16px;
+  font-size: 16px;
+}
+</style>

@@ -1,0 +1,52 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import { InheritedText } from '../../../../../base/components/inherited-text';
+import { useTheme } from '../../../../../base/theme';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+
+const copy = () => {
+  uni.setClipboardData({ data: props.code });
+};
+</script>
+
+<template>
+  <view
+    class="fluxdown-code-header"
+    :style="{
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      boxSizing: 'border-box',
+      height: `${Math.max(44, theme.tokens.typography.fontSize.xs * theme.tokens.typography.lineHeight.sm + theme.tokens.spacing.sm * 2 + 1)}px`,
+      padding: `${theme.tokens.spacing.sm}px ${theme.tokens.spacing.md}px`,
+      borderBottomWidth: '1px',
+      borderBottomStyle: 'solid',
+      borderBottomColor: theme.tokens.colors.border,
+      backgroundColor: theme.tokens.colors.surfaceMuted,
+    }"
+  >
+    <InheritedText
+      :style="{
+        fontFamily: theme.tokens.typography.fontMono,
+        fontSize: `${theme.tokens.typography.fontSize.xs}px`,
+        lineHeight: `${theme.tokens.typography.fontSize.xs * theme.tokens.typography.lineHeight.sm}px`,
+        color: theme.tokens.colors.fgMuted,
+      }"
+      :text="props.language ?? 'plaintext'"
+    />
+    <InheritedText
+      :style="{
+        fontSize: `${theme.tokens.typography.fontSize.xs}px`,
+        lineHeight: `${theme.tokens.typography.fontSize.xs * theme.tokens.typography.lineHeight.sm}px`,
+        color: theme.tokens.colors.fgMuted,
+      }"
+      @click="copy"
+      text="Copy"
+    />
+  </view>
+</template>

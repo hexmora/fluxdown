@@ -1,0 +1,9 @@
+<script setup lang="ts">
+import type { PatchProps } from './type';
+
+const props = defineProps<PatchProps>();
+</script>
+
+<template>
+  <text class="patch" @click="props.onPress">{{ props.label }}</text>
+</template>

@@ -1,0 +1,167 @@
+<script setup lang="ts">
+import { computed, shallowRef, watch } from 'vue';
+
+import type { ScaleTextProps } from './type';
+
+import { useAppear } from '../../animation/hooks';
+import { toText } from '../inherited-text/utils';
+import { useTextWidth } from '../../composables/use-text-width';
+import { getScaleFrame } from './utils';
+
+const props = defineProps<ScaleTextProps>();
+
+const measurement = useTextWidth(props);
+
+const style = computed(() => ({
+  ...(props.textStyle.backgroundColor ? { backgroundColor: props.textStyle.backgroundColor } : {}),
+  ...(measurement.width.value === undefined ? {} : { width: `${measurement.width.value}px` }),
+}));
+
+const progress = useAppear(() => ({ start: props.start, duration: props.duration }));
+
+const active = computed(() => progress.value < 1);
+
+const retainedBlur = shallowRef<number>();
+
+watch(
+  () => (props.start >= 0 && active.value ? props.blur : undefined),
+  (blur) => {
+    if (blur !== undefined) {
+      retainedBlur.value = blur;
+    }
+  },
+  { immediate: true, flush: 'sync' },
+);
+
+const rendering = computed(() => retainedBlur.value !== undefined);
+
+const frame = computed(() => getScaleFrame(props, progress.value));
+
+const layout = computed(() => {
+  const fontSize = parseFloat(String(props.textStyle.fontSize ?? 16));
+
+  const padding =
+    Math.ceil(
+      (retainedBlur.value ?? props.blur) * fontSize * 8 +
+        (props.textStyle.fontStyle === 'italic' ? fontSize / 4 : 0),
+    ) + 1;
+
+  const offset = Math.ceil(fontSize * (props.text.length + 1) + padding * 2);
+
+  return { padding, offset };
+});
+
+const clipStyle = computed(() => {
+  const inset = `${-layout.value.padding}px`;
+
+  return { left: inset, right: inset, top: inset, bottom: inset };
+});
+
+const shadowStyle = computed(() => {
+  const { padding, offset } = layout.value;
+
+  return {
+    position: 'absolute' as const,
+    left: `${padding - (active.value ? offset : 0)}px`,
+    right: `${padding}px`,
+    top: `${padding}px`,
+    bottom: `${padding}px`,
+    opacity: 1,
+    color: active.value ? '#000000' : (props.textStyle.color ?? '#202123'),
+    backgroundColor: 'transparent',
+    overflow: 'visible' as const,
+    whiteSpace: 'nowrap' as const,
+    textShadow:
+      frame.value.blur === null
+        ? 'none'
+        : `${offset}px 0px ${frame.value.blur}px ${props.textStyle.color ?? '#202123'}`,
+  };
+});
+
+const text = computed(() => toText(props.text));
+</script>
+
+<template>
+  <view class="fluxdown-scale-text" :style="style">
+    <view class="fluxdown-scale-text__placeholder" :style="{ opacity: rendering ? 0 : 1 }">
+      <text
+        :flatten="false"
+        :style="[
+          props.textStyle,
+          {
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
+            opacity: props.textStyle.opacity ?? 1,
+          },
+        ]"
+        >{{ text }}</text
+      >
+    </view>
+    <view
+      v-if="rendering"
+      class="fluxdown-scale-text__animation"
+      aria-hidden="true"
+      :style="{ transform: `scale(${frame.scale})`, opacity: frame.opacity }"
+    >
+      <view class="fluxdown-scale-text__clip" :style="clipStyle">
+        <text :flatten="false" :style="[props.textStyle, shadowStyle]">{{ text }}</text>
+      </view>
+    </view>
+    <view
+      class="fluxdown-scale-text__measurement"
+      :style="{
+        width: `${measurement.maximumWidth.value}px`,
+      }"
+      aria-hidden="true"
+    >
+      <text
+        :id="measurement.id"
+        :flatten="false"
+        :style="measurement.style.value"
+        >{{ measurement.text.value }}</text
+      >
+    </view>
+  </view>
+</template>
+
+<style>
+.fluxdown-scale-text {
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+}
+
+.fluxdown-scale-text__placeholder {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.fluxdown-scale-text__animation {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 100%;
+}
+
+.fluxdown-scale-text__clip {
+  position: absolute;
+  overflow: hidden;
+}
+
+.fluxdown-scale-text__measurement {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: flex-start;
+  opacity: 0;
+  pointer-events: none;
+}
+</style>

@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import { shallowRef, watch } from 'vue';
+
+import type { SvgImageProps } from './type';
+
+const props = defineProps<SvgImageProps>();
+
+const failed = shallowRef(false);
+
+watch(
+  () => props.source,
+  () => {
+    failed.value = false;
+  },
+);
+</script>
+
+<template>
+  <image
+    v-if="props.source && !failed"
+    :src="props.source?.src ?? ''"
+    :style="{
+      width: `${props.source?.width ?? 0}px`,
+      height: `${props.source?.height ?? 0}px`,
+    }"
+    mode="aspectFit"
+    :fade-show="false"
+    @error="failed = true"
+  />
+  <slot v-else />
+</template>

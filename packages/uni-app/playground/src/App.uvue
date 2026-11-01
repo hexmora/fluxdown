@@ -1,0 +1,9 @@
+<script setup lang="ts">
+defineOptions({ name: 'FluxdownPlayground' });
+</script>
+
+<style>
+page {
+  background-color: #ffffff;
+}
+</style>

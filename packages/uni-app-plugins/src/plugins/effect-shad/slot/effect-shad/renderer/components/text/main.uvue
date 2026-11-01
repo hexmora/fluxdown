@@ -1,0 +1,30 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { ShadTextProps } from './type';
+
+import { InheritedText } from '../../../../../../../base/components/inherited-text';
+import { MaskedText } from '../../../../../../../base/components/masked-text';
+import { toShadWords } from './utils';
+
+const props = defineProps<ShadTextProps>();
+
+const words = computed(() =>
+  toShadWords(props.text, props.trailingText, props.prefix, props.offset),
+);
+</script>
+
+<template>
+  <InheritedText v-slot="{ textStyle, attributes }">
+    <MaskedText
+      v-for="word in words"
+      :key="word.key"
+      v-bind="attributes"
+      :text="word.text"
+      :text-style="textStyle"
+      :mask-text="word.trailing === undefined ? '' : props.maskText"
+      :trailing-text="word.trailing"
+      :tail="word.tail"
+    />
+  </InheritedText>
+</template>

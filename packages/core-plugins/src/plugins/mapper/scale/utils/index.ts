@@ -1,6 +1,6 @@
 import type { Element, ElementContent, Root as HastRoot, RootContent, Text } from 'hast';
 
-import { getTextUnits, isHiddenTagName } from '@fluxdown/hast';
+import { getTextUnits, getTextWords, isHiddenTagName } from '@fluxdown/hast';
 
 import type { ScaleCharacter, ScaleRootConfig } from './type';
 
@@ -23,41 +23,6 @@ const isForbidden = (node: Element) => {
     node.properties.dataType === 'block-math' ||
     node.properties.dataParserPatch === '1'
   );
-};
-
-const getWords = (text: string) => {
-  const segmenter =
-    typeof Intl === 'undefined' || typeof Intl.Segmenter !== 'function'
-      ? null
-      : new Intl.Segmenter(undefined, { granularity: 'word' });
-
-  const segments = segmenter
-    ? Array.from(segmenter.segment(text), ({ segment }) => segment)
-    : (text.match(/\s+|[\p{Script=Latin}\p{N}]+|[^\s]/gu) ?? []);
-
-  const words: string[] = [];
-
-  for (const segment of segments) {
-    const previous = words[words.length - 1];
-
-    const boundary = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u;
-
-    if (
-      previous &&
-      !/\s/.test(previous + segment) &&
-      (!boundary.test(previous + segment) ||
-        /^[\p{Pe}\p{Pf},.!?:;。、，．！？：；]/u.test(segment) ||
-        /[\p{Ps}\p{Pi}]$/u.test(previous))
-    ) {
-      words[words.length - 1] = previous + segment;
-
-      continue;
-    }
-
-    words.push(segment);
-  }
-
-  return words;
 };
 
 const toScaleCharacters = (
@@ -126,7 +91,7 @@ const createScaleText = (
 
   let settled = '';
 
-  for (const word of getWords(node.value)) {
+  for (const word of getTextWords(node.value)) {
     const length = Array.from(getTextUnits(word)).length;
 
     const selected = characters.slice(offset, offset + length);
