@@ -2,7 +2,7 @@ import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs
 
 # Emoji shortcodes
 
-`EmojiPlugin` converts GitHub-style emoji shortcodes such as `:smile:` and `:+1:` into Unicode emoji. The Full components for React, Vue, Svelte, React Native, Lynx, Solid, Taro, and Angular include it by default; Lite components can add it as needed.
+`EmojiPlugin` converts GitHub-style emoji shortcodes such as `:smile:` and `:+1:` into Unicode emoji. The Full components for React, Vue, Svelte, Angular, React Native, Lynx, Solid, and Taro include it by default; Lite components can add it as needed.
 
 <FrameworkCodeTabs>
 
@@ -30,6 +30,18 @@ import { Fluxdown } from '@fluxdown/vue';
 </script>
 
 <Fluxdown text="Hello :smile: Great work :+1:" />
+```
+
+```ts
+import { Component } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown text="Hello :smile: Great work :+1:" />`,
+})
+export class Message {}
 ```
 
 ```tsx
@@ -64,18 +76,6 @@ export function Message() {
 }
 ```
 
-```ts
-import { Component } from '@angular/core';
-import { Fluxdown } from '@fluxdown/angular';
-
-@Component({
-  selector: 'app-message',
-  imports: [Fluxdown],
-  template: `<fluxdown text="Hello :smile: Great work :+1:" />`,
-})
-export class Message {}
-```
-
 </FrameworkCodeTabs>
 
 The output is “Hello 😄 Great work 👍”. Emoji use the system font, so their appearance depends on the device.
@@ -90,7 +90,7 @@ Inline code and fenced code blocks preserve their source. For example, `` `:smil
 
 All Full components include `EmojiPlugin` without manual registration. For Core or a Lite component, install the matching plugin package:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```sh
 pnpm add @fluxdown/core-plugins
@@ -109,6 +109,10 @@ pnpm add @fluxdown/svelte-plugins
 ```
 
 ```sh
+pnpm add @fluxdown/angular-plugins
+```
+
+```sh
 pnpm add @fluxdown/react-base-plugins
 ```
 
@@ -124,15 +128,11 @@ pnpm add @fluxdown/solid-plugins
 pnpm add @fluxdown/react-base-plugins
 ```
 
-```sh
-pnpm add @fluxdown/angular-plugins
-```
-
 </FrameworkCodeTabs>
 
 For Core, add `EmojiRemarkPlugin` to the `remarks` input in the [quick start](../../core/quick-start.md). Components extend their presets through `plugins`:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import { EmojiRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/emoji';
@@ -179,6 +179,23 @@ defineProps<{ text: string }>();
 </script>
 
 <FluxdownLite plugins={EmojiPlugin} {text} />
+```
+
+```ts
+import { Component, input } from '@angular/core';
+import { FluxdownLite } from '@fluxdown/angular/lite';
+import { EmojiPlugin } from '@fluxdown/angular-plugins/plugins/emoji';
+
+@Component({
+  selector: 'app-message',
+  imports: [FluxdownLite],
+  template: `<fluxdown-lite [plugins]="plugins" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly plugins = EmojiPlugin;
+}
 ```
 
 ```tsx
@@ -233,30 +250,13 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
-```ts
-import { Component, input } from '@angular/core';
-import { FluxdownLite } from '@fluxdown/angular/lite';
-import { EmojiPlugin } from '@fluxdown/angular-plugins/plugins/emoji';
-
-@Component({
-  selector: 'app-message',
-  imports: [FluxdownLite],
-  template: `<fluxdown-lite [plugins]="plugins" [text]="text()" />`,
-})
-export class Message {
-  readonly text = input.required<string>();
-
-  readonly plugins = EmojiPlugin;
-}
-```
-
 </FrameworkCodeTabs>
 
 ## Disable conversion
 
 Include `EmojiPlugin` and `config` in the same plugin pack to disable this behavior. Core uses a remark plugin entry with `disabled` set:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
@@ -325,6 +325,28 @@ defineProps<{ text: string }>();
 </script>
 
 <Fluxdown {plugins} {text} />
+```
+
+```ts
+import type { IPluginItem } from '@fluxdown/angular-plugins/typings';
+
+import { Component, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+import { EmojiPlugin } from '@fluxdown/angular-plugins/plugins/emoji';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown [plugins]="plugins" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly plugins: IPluginItem = {
+    ...EmojiPlugin,
+    config: { 'remark-emoji': { disabled: true } },
+  };
+}
 ```
 
 ```tsx
@@ -408,28 +430,6 @@ export function Message({ text }: MessageProps) {
       text={text}
     />
   );
-}
-```
-
-```ts
-import type { IPluginItem } from '@fluxdown/angular-plugins/typings';
-
-import { Component, input } from '@angular/core';
-import { Fluxdown } from '@fluxdown/angular';
-import { EmojiPlugin } from '@fluxdown/angular-plugins/plugins/emoji';
-
-@Component({
-  selector: 'app-message',
-  imports: [Fluxdown],
-  template: `<fluxdown [plugins]="plugins" [text]="text()" />`,
-})
-export class Message {
-  readonly text = input.required<string>();
-
-  readonly plugins: IPluginItem = {
-    ...EmojiPlugin,
-    config: { 'remark-emoji': { disabled: true } },
-  };
 }
 ```
 

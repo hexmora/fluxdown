@@ -1,20 +1,26 @@
 import { withBase } from '@rspress/core/runtime';
-import { CodeBlockRuntime } from '@rspress/core/theme';
+import { CodeBlockRuntime, Link } from '@rspress/core/theme';
 
 import { CopyButton } from '../copy-button';
+import { FrameworkCodeTabs, useCodeFramework } from '../framework-code-tabs';
 import { useLocale } from '../hooks';
-import { ArrowIcon, ReactIcon } from '../icons';
+import { ArrowIcon } from '../icons';
 import { FeatureIcon, StreamingDemo } from './components';
 import { COPY, INSTALL_COMMAND } from './consts';
 import styles from './index.module.scss';
-import { getQuickStart } from './utils';
+import { getQuickStarts } from './utils';
 
 export const Home = () => {
   const { lang, href } = useLocale();
 
   const copy = COPY[lang];
 
-  const quickStart = getQuickStart(copy.codeComment);
+  const quickStarts = getQuickStarts(copy.codeComment);
+
+  const [framework] = useCodeFramework();
+
+  const quickStart =
+    quickStarts.find((example) => example.framework === framework) ?? quickStarts[0];
 
   return (
     <main className={styles.home}>
@@ -51,10 +57,10 @@ export const Home = () => {
               </div>
               <h3>{feature.title}</h3>
               <p>{feature.description}</p>
-              <a href={href(feature.path)}>
+              <Link href={href(feature.path)}>
                 {feature.link}
                 <ArrowIcon />
-              </a>
+              </Link>
             </article>
           ))}
         </div>
@@ -66,29 +72,21 @@ export const Home = () => {
           <p>{copy.quickDescription}</p>
         </div>
         <div className={styles.codeCard}>
-          <div className={styles.codeHeader}>
-            <div role="tablist" aria-label={lang === 'zh' ? '选择框架' : 'Choose a framework'}>
-              <button
-                aria-controls="react-example"
-                aria-selected="true"
-                id="react-tab"
-                role="tab"
-                type="button"
-              >
-                <ReactIcon />
-                React
-              </button>
-            </div>
-            <span>Message.tsx</span>
-          </div>
-          <div aria-labelledby="react-tab" id="react-example" role="tabpanel" tabIndex={0}>
-            <CodeBlockRuntime code={quickStart} lang="tsx" wrapCode />
-          </div>
+          <FrameworkCodeTabs frameworks={quickStarts.map((example) => example.framework)}>
+            {quickStarts.map((example) => (
+              <CodeBlockRuntime
+                code={example.code}
+                key={example.framework}
+                lang={example.lang}
+                wrapCode
+              />
+            ))}
+          </FrameworkCodeTabs>
         </div>
-        <a className={styles.textLink} href={href('/guide/react/quick-start')}>
+        <Link className={styles.textLink} href={href(`/guide/${quickStart.renderer}/quick-start`)}>
           {copy.quickLink}
           <ArrowIcon />
-        </a>
+        </Link>
       </section>
 
       <section className={styles.architecture} aria-labelledby="architecture-title">
@@ -98,41 +96,41 @@ export const Home = () => {
         </div>
         <div className={styles.diagram}>
           <div className={styles.renderers}>
-            <a className={styles.frameworkCard} href={href('/guide/react/quick-start')}>
+            <Link className={styles.frameworkCard} href={href('/guide/react/quick-start')}>
               <strong>React</strong>
               <span>{copy.react}</span>
-            </a>
-            <a className={styles.frameworkCard} href={href('/guide/vue/quick-start')}>
+            </Link>
+            <Link className={styles.frameworkCard} href={href('/guide/vue/quick-start')}>
               <strong>Vue 3</strong>
               <span>{copy.react}</span>
-            </a>
-            <a className={styles.frameworkCard} href={href('/guide/svelte/quick-start')}>
+            </Link>
+            <Link className={styles.frameworkCard} href={href('/guide/svelte/quick-start')}>
               <strong>Svelte</strong>
               <span>{copy.react}</span>
-            </a>
-            <a className={styles.frameworkCard} href={href('/guide/react-native/quick-start')}>
-              <strong>React Native</strong>
-              <span>{copy.react}</span>
-            </a>
-            <a className={styles.frameworkCard} href={href('/guide/lynx/quick-start')}>
-              <strong>Lynx</strong>
-              <span>{copy.react}</span>
-            </a>
-            <a className={styles.frameworkCard} href={href('/guide/solid/quick-start')}>
-              <strong>Solid</strong>
-              <span>{copy.react}</span>
-            </a>
-            <a className={styles.frameworkCard} href={href('/guide/taro/quick-start')}>
-              <strong>Taro</strong>
-              <span>{copy.react}</span>
-            </a>
-            <a className={styles.frameworkCard} href={href('/guide/angular/quick-start')}>
+            </Link>
+            <Link className={styles.frameworkCard} href={href('/guide/angular/quick-start')}>
               <strong>Angular</strong>
               <span>{copy.react}</span>
-            </a>
+            </Link>
+            <Link className={styles.frameworkCard} href={href('/guide/react-native/quick-start')}>
+              <strong>React Native</strong>
+              <span>{copy.react}</span>
+            </Link>
+            <Link className={styles.frameworkCard} href={href('/guide/lynx/quick-start')}>
+              <strong>Lynx</strong>
+              <span>{copy.react}</span>
+            </Link>
+            <Link className={styles.frameworkCard} href={href('/guide/solid/quick-start')}>
+              <strong>Solid</strong>
+              <span>{copy.react}</span>
+            </Link>
+            <Link className={styles.frameworkCard} href={href('/guide/taro/quick-start')}>
+              <strong>Taro</strong>
+              <span>{copy.react}</span>
+            </Link>
           </div>
           <div className={styles.branch} aria-hidden="true" />
-          <a
+          <Link
             aria-labelledby="core-label core-description"
             className={styles.layerCard}
             href={href('/guide/core/quick-start')}
@@ -143,9 +141,9 @@ export const Home = () => {
               <span id="core-description">{copy.core}</span>
             </div>
             <ArrowIcon />
-          </a>
+          </Link>
           <div className={styles.connector} aria-hidden="true" />
-          <a
+          <Link
             aria-labelledby="stative-label stative-description"
             className={styles.layerCard}
             href={href('/stative/')}
@@ -160,7 +158,7 @@ export const Home = () => {
               <span id="stative-description">{copy.foundation}</span>
             </div>
             <ArrowIcon />
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -177,10 +175,10 @@ export const Home = () => {
 
       <section className={styles.closing}>
         <h2>{copy.finalTitle}</h2>
-        <a className={styles.primaryLink} href={href('/guide/react/quick-start')}>
+        <Link className={styles.primaryLink} href={href('/guide/react/quick-start')}>
           {copy.finalButton}
           <ArrowIcon />
-        </a>
+        </Link>
       </section>
 
       <footer className={styles.footer}>

@@ -1,57 +1,56 @@
 [
   {
-    "text": "React",
-    "link": "/guide/react/quick-start",
-    "activeMatch": "/guide/react/",
-    "position": "left"
-  },
-  {
-    "text": "Vue",
-    "link": "/guide/vue/quick-start",
-    "activeMatch": "/guide/vue/",
-    "position": "left"
-  },
-  {
-    "text": "Svelte",
-    "link": "/guide/svelte/quick-start",
-    "activeMatch": "/guide/svelte/",
-    "position": "left"
-  },
-  {
-    "text": "Native",
-    "link": "/guide/react-native/quick-start",
-    "activeMatch": "/guide/react-native/",
-    "position": "left"
-  },
-  {
-    "text": "Lynx",
-    "link": "/guide/lynx/quick-start",
-    "activeMatch": "/guide/lynx/",
-    "position": "left"
-  },
-  {
-    "text": "Solid",
-    "link": "/guide/solid/quick-start",
-    "activeMatch": "/guide/solid/",
-    "position": "left"
-  },
-  {
-    "text": "Taro",
-    "link": "/guide/taro/quick-start",
-    "activeMatch": "/guide/taro/",
-    "position": "left"
-  },
-  {
-    "text": "Angular",
-    "link": "/guide/angular/quick-start",
-    "activeMatch": "/guide/angular/",
-    "position": "left"
-  },
-  {
-    "text": "Core",
-    "link": "/guide/core/quick-start",
-    "activeMatch": "/guide/core/",
-    "position": "left"
+    "text": "文档",
+    "link": "/guide/",
+    "activeMatch": "/guide/",
+    "position": "left",
+    "items": [
+      {
+        "text": "React",
+        "link": "/guide/react/quick-start",
+        "activeMatch": "/guide/react/"
+      },
+      {
+        "text": "Vue",
+        "link": "/guide/vue/quick-start",
+        "activeMatch": "/guide/vue/"
+      },
+      {
+        "text": "Svelte",
+        "link": "/guide/svelte/quick-start",
+        "activeMatch": "/guide/svelte/"
+      },
+      {
+        "text": "Angular",
+        "link": "/guide/angular/quick-start",
+        "activeMatch": "/guide/angular/"
+      },
+      {
+        "text": "React Native",
+        "link": "/guide/react-native/quick-start",
+        "activeMatch": "/guide/react-native/"
+      },
+      {
+        "text": "Lynx",
+        "link": "/guide/lynx/quick-start",
+        "activeMatch": "/guide/lynx/"
+      },
+      {
+        "text": "Solid",
+        "link": "/guide/solid/quick-start",
+        "activeMatch": "/guide/solid/"
+      },
+      {
+        "text": "Taro",
+        "link": "/guide/taro/quick-start",
+        "activeMatch": "/guide/taro/"
+      },
+      {
+        "text": "Core",
+        "link": "/guide/core/quick-start",
+        "activeMatch": "/guide/core/"
+      }
+    ]
   },
   {
     "text": "Playground",

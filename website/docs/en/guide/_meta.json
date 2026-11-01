@@ -30,6 +30,12 @@
   },
   {
     "type": "dir",
+    "name": "angular",
+    "label": "Angular",
+    "collapsed": true
+  },
+  {
+    "type": "dir",
     "name": "react-native",
     "label": "React Native",
     "collapsed": true
@@ -50,12 +56,6 @@
     "type": "dir",
     "name": "taro",
     "label": "Taro",
-    "collapsed": true
-  },
-  {
-    "type": "dir",
-    "name": "angular",
-    "label": "Angular",
     "collapsed": true
   },
   {

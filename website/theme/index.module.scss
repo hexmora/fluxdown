@@ -76,6 +76,40 @@
 
   .rp-nav-menu__item {
     font-weight: 500;
+
+    // Keyboard focus opens the menu; pointer focus must not keep it open after mouseleave.
+    &:has(:focus-visible) > .rp-hover-group--hidden {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    // Rspress also opens on click; keyboard activation may have no mouseleave.
+    &:not(:hover):not(:has(:focus-visible)) > .rp-hover-group {
+      visibility: hidden;
+      opacity: 0;
+      transition:
+        opacity 0.3s ease-in-out,
+        visibility 0s linear 0.15s;
+    }
+  }
+
+  .rp-nav a:focus-visible {
+    color: var(--rp-c-brand);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  // Keep linked groups accessible on touch screens without intercepting their links.
+  .rp-nav-screen-menu-item[href]:has(+ .rp-nav-screen-menu-item__group) {
+    .rp-nav-screen-menu-item__arrow {
+      display: none;
+    }
+
+    + .rp-nav-screen-menu-item__group {
+      grid-template-rows: 1fr !important;
+    }
   }
 
   .rp-doc {
@@ -214,6 +248,26 @@
       line-height: 1.4;
       letter-spacing: 0;
       white-space: nowrap;
+    }
+  }
+
+  .rp-tabs:has(> .rp-tabs__content > .rp-tabs__content__item > .rp-codeblock) {
+    min-width: 0;
+
+    > .rp-tabs__label {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: thin;
+
+      &::-webkit-scrollbar {
+        display: block;
+        height: 4px;
+      }
+
+      > .rp-tabs__label__item {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
     }
   }
 
