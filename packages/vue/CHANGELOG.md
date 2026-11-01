@@ -1,13 +1,5 @@
 # @fluxdown/vue
 
-## 0.2.1
-
-### Patch Changes
-
-- 517bd72: Clarify streaming Markdown package descriptions and keywords, and link each package to its framework's documentation.
-- Updated dependencies [517bd72]
-  - @fluxdown/core@0.12.7
-
 ## 0.2.0
 
 ### Minor Changes

@@ -389,6 +389,7 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
       .join('\n');
 
     let typeSmoke = '';
+    let reactTypes = '';
 
     if (specifiers.includes('@fluxdown/core-plugins/presets/remark')) {
       const presetSmoke = `
@@ -454,15 +455,20 @@ ${baseRenderSmoke}`;
     }
 
     if (specifiers.includes('fluxdown')) {
-      typeSmoke += `\nimport { createElement } from 'react';\nimport { Fluxdown } from 'fluxdown';\ncreateElement(Fluxdown, { text: 'consumer', streaming: true });\n`;
-      typeSmoke += `
+      reactTypes = `
+import { createElement } from 'react';
+import { Fluxdown, type IPluginItem, type PluginConfigs } from 'fluxdown';
 import { FluxdownLite } from 'fluxdown/lite';
 import { FluxdownRaw } from 'fluxdown/raw';
 import { PRESET_LITE_PLUGINS } from '@fluxdown/react-plugins/lite';
 import { CodePrismPlugin } from '@fluxdown/react-plugins/plugins/code-prism';
 import { TexKatexPlugin } from '@fluxdown/react-plugins/plugins/tex-katex';
-import type { IPluginItem, PluginConfigs } from '@fluxdown/react-base-plugins/typings';
-const config: PluginConfigs = { 'slot-code-header': { disabled: true } };
+import type { PluginConfigs as BasePluginConfigs } from '@fluxdown/react-base-plugins/typings';
+
+createElement(Fluxdown, { text: 'consumer', streaming: true });
+const config: PluginConfigs = {
+  'slot-code-header': { disabled: true },
+} satisfies BasePluginConfigs;
 const plugin: IPluginItem = { ...CodePrismPlugin, config };
 createElement(FluxdownLite, { text: 'consumer', plugins: [plugin, TexKatexPlugin] });
 
@@ -559,6 +565,22 @@ ${renderSmoke}`;
     );
 
     run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')]);
+
+    if (reactTypes) {
+      // Keep wrapper checks separate: importing every plugin can mask missing augmentations.
+      for (const extension of ['mts', 'cts']) {
+        await writeFile(path.join(consumer, '__tests__', `react-types.${extension}`), reactTypes);
+      }
+
+      await writeFile(
+        path.join(consumer, 'tsconfig.react.json'),
+        JSON.stringify({
+          extends: './tsconfig.json',
+          files: ['__tests__/react-types.mts', '__tests__/react-types.cts'],
+        }),
+      );
+      run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.react.json')]);
+    }
 
     const taroSpecifiers = nodeArtifacts
       .filter(({ manifest }) => isTaroPackage(manifest.name))
@@ -768,6 +790,9 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
       run('node', ['__tests__/smoke.mjs'], { cwd: consumer });
       run('node', ['__tests__/smoke.cjs'], { cwd: consumer });
       run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')]);
+
+      if (reactTypes)
+        run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.react.json')]);
 
       if (specifiers.includes('@fluxdown/react-base'))
         run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.react-base.json')]);

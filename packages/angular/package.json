@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/angular",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "description": "Streaming Markdown renderer for Angular AI chat, with standalone components, syntax repair, and smooth output.",
   "keywords": [
     "ai-chat",
