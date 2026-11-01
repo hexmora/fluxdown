@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/svelte",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Streaming Markdown renderer for Svelte 5 AI chat, with syntax repair, smooth output, and customizable components.",
   "keywords": [
     "ai-chat",
