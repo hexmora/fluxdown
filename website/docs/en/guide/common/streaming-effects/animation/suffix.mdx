@@ -13,7 +13,7 @@ Switch the content type to inspect different endings. Pause or replay the stream
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -73,6 +73,26 @@ defineProps<{ text: string }>();
   streaming={{ effect: ['suffix', { type: 'cursor' }] }}
   {text}
 />
+```
+
+```ts
+import type { StreamingConfig } from '@fluxdown/angular';
+
+import { Component, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown [streaming]="streaming" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly streaming: StreamingConfig = {
+    effect: ['suffix', { type: 'cursor' }],
+  };
+}
 ```
 
 ```tsx
@@ -143,33 +163,13 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
-```ts
-import type { StreamingConfig } from '@fluxdown/angular';
-
-import { Component, input } from '@angular/core';
-import { Fluxdown } from '@fluxdown/angular';
-
-@Component({
-  selector: 'app-message',
-  imports: [Fluxdown],
-  template: `<fluxdown [streaming]="streaming" [text]="text()" />`,
-})
-export class Message {
-  readonly text = input.required<string>();
-
-  readonly streaming: StreamingConfig = {
-    effect: ['suffix', { type: 'cursor' }],
-  };
-}
-```
-
 </FrameworkCodeTabs>
 
 Use `type: 'dot'` for a circular marker. `effect: 'suffix'` uses the block cursor by default. Both shapes inherit the current text color and scale with the text. Their breathing animation respects `prefers-reduced-motion`.
 
 The marker remains visible while the effect is enabled. Set `streaming` to `false` when the response finishes, or set the suffix's `enabled` option to `false` to keep other streaming behavior active:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -244,6 +244,31 @@ defineProps<{ text: string; isStreaming: boolean }>();
   }}
   {text}
 />
+```
+
+```ts
+import type { StreamingConfig } from '@fluxdown/angular';
+
+import { Component, input, computed } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown [streaming]="streaming()" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly isStreaming = input(false);
+
+  readonly streaming = computed<StreamingConfig>(() => {
+    return {
+      smooth: true,
+      effect: ['suffix', { type: 'dot', enabled: this.isStreaming() }],
+    };
+  });
+}
 ```
 
 ```tsx
@@ -330,36 +355,11 @@ export function Message({ text, isStreaming }: MessageProps) {
 }
 ```
 
-```ts
-import type { StreamingConfig } from '@fluxdown/angular';
-
-import { Component, input, computed } from '@angular/core';
-import { Fluxdown } from '@fluxdown/angular';
-
-@Component({
-  selector: 'app-message',
-  imports: [Fluxdown],
-  template: `<fluxdown [streaming]="streaming()" [text]="text()" />`,
-})
-export class Message {
-  readonly text = input.required<string>();
-
-  readonly isStreaming = input(false);
-
-  readonly streaming = computed<StreamingConfig>(() => {
-    return {
-      smooth: true,
-      effect: ['suffix', { type: 'dot', enabled: this.isStreaming() }],
-    };
-  });
-}
-```
-
 </FrameworkCodeTabs>
 
 Combine the marker with an entrance effect:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'React Native', 'Lynx', 'Solid', 'Taro', 'Angular']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -421,6 +421,26 @@ defineProps<{ text: string }>();
   streaming={{ effect: ['scale', ['suffix', { type: 'dot' }]] }}
   {text}
 />
+```
+
+```ts
+import type { StreamingConfig } from '@fluxdown/angular';
+
+import { Component, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown [streaming]="streaming" [text]="text()" />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly streaming: StreamingConfig = {
+    effect: ['scale', ['suffix', { type: 'dot' }]],
+  };
+}
 ```
 
 ```tsx
@@ -488,26 +508,6 @@ export function Message({ text }: MessageProps) {
       text={text}
     />
   );
-}
-```
-
-```ts
-import type { StreamingConfig } from '@fluxdown/angular';
-
-import { Component, input } from '@angular/core';
-import { Fluxdown } from '@fluxdown/angular';
-
-@Component({
-  selector: 'app-message',
-  imports: [Fluxdown],
-  template: `<fluxdown [streaming]="streaming" [text]="text()" />`,
-})
-export class Message {
-  readonly text = input.required<string>();
-
-  readonly streaming: StreamingConfig = {
-    effect: ['scale', ['suffix', { type: 'dot' }]],
-  };
 }
 ```
 
@@ -656,6 +656,65 @@ defineProps<{ text: string }>();
   streaming={{ effect: ['suffix', { type: 'smile' }] }}
   {text}
 />
+```
+
+```ts
+import type {
+  AngularRenderMatchParams,
+  AngularRenderParams,
+} from '@fluxdown/angular-plugins/typings';
+import type { StreamingConfig } from '@fluxdown/angular';
+
+import { Component, input } from '@angular/core';
+import {
+  BaseAngularRenderPlugin,
+  createComponentNode,
+} from '@fluxdown/angular-plugins/base';
+import { SuffixRenderer } from '@fluxdown/angular-plugins/plugins/effect-suffix';
+import { Fluxdown } from '@fluxdown/angular';
+import {
+  isSuffixNode,
+  SUFFIX_DATA_ATTR,
+} from '@fluxdown/core-plugins/plugins/mapper/suffix';
+
+class SmileRenderPlugin extends BaseAngularRenderPlugin {
+  static readonly key = 'render-smile';
+
+  match({ node }: AngularRenderMatchParams) {
+    return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
+  }
+
+  render({ node }: AngularRenderParams) {
+    if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
+      return null;
+    }
+
+    return createComponentNode(
+      SuffixRenderer,
+      { Raw: null, type: 'smile' },
+      { tagName: 'span', children: '🙂' },
+    );
+  }
+}
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown
+    [plugins]="plugins"
+    [streaming]="streaming"
+    [text]="text()"
+  />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+
+  readonly plugins = { renders: [SmileRenderPlugin] };
+
+  readonly streaming: StreamingConfig = {
+    effect: ['suffix', { type: 'smile' }],
+  };
+}
 ```
 
 ```tsx
@@ -847,65 +906,6 @@ export function Message({ text }: MessageProps) {
       text={text}
     />
   );
-}
-```
-
-```ts
-import type {
-  AngularRenderMatchParams,
-  AngularRenderParams,
-} from '@fluxdown/angular-plugins/typings';
-import type { StreamingConfig } from '@fluxdown/angular';
-
-import { Component, input } from '@angular/core';
-import {
-  BaseAngularRenderPlugin,
-  createComponentNode,
-} from '@fluxdown/angular-plugins/base';
-import { SuffixRenderer } from '@fluxdown/angular-plugins/plugins/effect-suffix';
-import { Fluxdown } from '@fluxdown/angular';
-import {
-  isSuffixNode,
-  SUFFIX_DATA_ATTR,
-} from '@fluxdown/core-plugins/plugins/mapper/suffix';
-
-class SmileRenderPlugin extends BaseAngularRenderPlugin {
-  static readonly key = 'render-smile';
-
-  match({ node }: AngularRenderMatchParams) {
-    return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
-  }
-
-  render({ node }: AngularRenderParams) {
-    if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
-      return null;
-    }
-
-    return createComponentNode(
-      SuffixRenderer,
-      { Raw: null, type: 'smile' },
-      { tagName: 'span', children: '🙂' },
-    );
-  }
-}
-
-@Component({
-  selector: 'app-message',
-  imports: [Fluxdown],
-  template: `<fluxdown
-    [plugins]="plugins"
-    [streaming]="streaming"
-    [text]="text()"
-  />`,
-})
-export class Message {
-  readonly text = input.required<string>();
-
-  readonly plugins = { renders: [SmileRenderPlugin] };
-
-  readonly streaming: StreamingConfig = {
-    effect: ['suffix', { type: 'smile' }],
-  };
 }
 ```
 

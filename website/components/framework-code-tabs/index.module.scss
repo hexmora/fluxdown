@@ -1,5 +1,6 @@
 .root {
   min-width: 0;
+  max-width: 100%;
   margin: 24px 0;
   overflow: hidden;
   border: 1px solid var(--site-line);
@@ -12,6 +13,7 @@
   align-items: center;
   gap: 4px;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   padding: 7px;
   border-bottom: 1px solid var(--site-line);
   background: var(--site-surface);
@@ -20,6 +22,7 @@
 
 .tab {
   flex: 0 0 auto;
+  white-space: nowrap;
   padding: 7px 12px;
   border: 1px solid transparent;
   border-radius: 7px;

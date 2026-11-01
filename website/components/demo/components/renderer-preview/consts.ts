@@ -2,9 +2,9 @@ export const RENDERERS = [
   { value: 'react', label: 'React' },
   { value: 'vue', label: 'Vue' },
   { value: 'svelte', label: 'Svelte' },
+  { value: 'angular', label: 'Angular' },
   { value: 'react-native', label: 'React Native' },
   { value: 'lynx', label: 'Lynx' },
   { value: 'solid', label: 'Solid' },
   { value: 'taro', label: 'Taro' },
-  { value: 'angular', label: 'Angular' },
 ] as const;

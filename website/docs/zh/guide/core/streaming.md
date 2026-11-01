@@ -99,9 +99,9 @@ const mappers: MapperPluggable[] = [[Smooth, { enabled: active }]];
 smoothEnabled.next(false);
 ```
 
-`Shad` 为每个新出现的字符标记独立的淡入。`enabled`、`length` 和 `duration` 配置支持普通值或可读闭包；`length` 是希望同时淡入的字符数，默认为 `10`；`duration` 是最长淡入时长，单位为毫秒，默认为 `400`，在播字符较多时会自动缩短。需要渲染器支持相应节点才能表现为视觉效果，React、Vue、Svelte、React Native、Lynx、Solid、Taro 与 Angular 预设已包含对应的渲染插件。
+`Shad` 为每个新出现的字符标记独立的淡入。`enabled`、`length` 和 `duration` 配置支持普通值或可读闭包；`length` 是希望同时淡入的字符数，默认为 `10`；`duration` 是最长淡入时长，单位为毫秒，默认为 `400`，在播字符较多时会自动缩短。需要渲染器支持相应节点才能表现为视觉效果，React、Vue、Svelte、Angular、React Native、Lynx、Solid 与 Taro 预设已包含对应的渲染插件。
 
-`Scale` 为逐字入场效果生成字符和词标记。与 `Smooth` 一样，`enabled`、`duration`、`from` 和 `blur` 配置支持普通值或可读闭包。自定义渲染器需要处理这些标记；React、Vue、Svelte、React Native、Lynx、Solid、Taro 与 Angular 组件可直接使用更简洁的 [`streaming.effect`](../common/streaming-effects/animation/index.mdx) 配置。
+`Scale` 为逐字入场效果生成字符和词标记。与 `Smooth` 一样，`enabled`、`duration`、`from` 和 `blur` 配置支持普通值或可读闭包。自定义渲染器需要处理这些标记；React、Vue、Svelte、Angular、React Native、Lynx、Solid 与 Taro 组件可直接使用更简洁的 [`streaming.effect`](../common/streaming-effects/animation/index.mdx) 配置。
 
 ## 清理资源
 

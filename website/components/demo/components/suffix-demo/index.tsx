@@ -77,7 +77,11 @@ export const SuffixDemo = () => {
           </div>
         )}
         <div data-suffix-preview={sample}>
-          <StreamingPreview label={labels.label} reducedMotion={stream.reducedMotion}>
+          <StreamingPreview
+            playing={stream.playing}
+            label={labels.label}
+            reducedMotion={stream.reducedMotion}
+          >
             <Fluxdown
               key={stream.cycle}
               plugins={{ renders: customRenderer ? [SmileRenderPlugin] : [] }}

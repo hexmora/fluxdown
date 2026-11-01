@@ -76,11 +76,147 @@
 
   .rp-nav-menu__item {
     font-weight: 500;
+
+    // Keyboard focus opens the menu; pointer focus must not keep it open after mouseleave.
+    &:has(:focus-visible) > .rp-hover-group--hidden {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    // Rspress also opens on click; keyboard activation may have no mouseleave.
+    &:not(:hover):not(:has(:focus-visible)) > .rp-hover-group {
+      visibility: hidden;
+      opacity: 0;
+      transition:
+        opacity 0.3s ease-in-out,
+        visibility 0s linear 0.15s;
+    }
+  }
+
+  .rp-nav a:focus-visible {
+    color: var(--rp-c-brand);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  // Keep linked groups accessible on touch screens without intercepting their links.
+  .rp-nav-screen-menu-item[href]:has(+ .rp-nav-screen-menu-item__group) {
+    .rp-nav-screen-menu-item__arrow {
+      display: none;
+    }
+
+    + .rp-nav-screen-menu-item__group {
+      grid-template-rows: 1fr !important;
+    }
   }
 
   .rp-doc {
     h1 {
       letter-spacing: -0.04em;
+    }
+
+    details.agent-assistance {
+      --agent-assistance-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+      margin: 24px 0 32px;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--site-line);
+      border-radius: 12px;
+      background: var(--site-surface);
+      cursor: auto;
+
+      &:hover {
+        background: var(--site-surface);
+      }
+
+      > summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        border-bottom: 1px solid transparent;
+        list-style: none;
+        color: var(--site-ink);
+        font-weight: 500;
+        line-height: 1.6;
+        cursor: pointer;
+        -webkit-user-select: none;
+        user-select: none;
+        transition:
+          background-color 220ms ease,
+          border-color 220ms ease,
+          color 220ms ease;
+
+        &::-webkit-details-marker {
+          display: none;
+        }
+
+        &::before {
+          content: "";
+          flex: 0 0 6px;
+          width: 6px;
+          height: 6px;
+          border-right: 1.5px solid currentColor;
+          border-bottom: 1.5px solid currentColor;
+          transform: rotate(-45deg);
+          transition: transform 420ms var(--agent-assistance-ease);
+        }
+
+        &:hover {
+          background: var(--site-accent-tint);
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--site-accent) !important;
+          outline-offset: -3px;
+        }
+      }
+
+      &[open] > summary {
+        border-bottom-color: var(--site-line);
+        background: var(--site-accent-tint);
+        color: var(--site-accent);
+
+        &::before {
+          transform: rotate(45deg);
+        }
+      }
+
+      > .agent-assistance-content {
+        min-height: 0;
+        overflow: hidden;
+
+        > p {
+          margin: 16px 18px 12px;
+          color: var(--site-muted);
+          font-size: 14px;
+        }
+
+        > .rp-codeblock {
+          margin: 0 18px 18px;
+          border-radius: 10px;
+        }
+      }
+
+      @supports selector(::details-content) and (transition-behavior: allow-discrete) {
+        &::details-content {
+          display: grid;
+          grid-template-rows: 0fr;
+          opacity: 0;
+          transition:
+            grid-template-rows 420ms var(--agent-assistance-ease),
+            opacity 220ms ease,
+            content-visibility 420ms allow-discrete;
+        }
+
+        &[open]::details-content {
+          grid-template-rows: 1fr;
+          opacity: 1;
+        }
+      }
     }
 
     .preset-upgrade {
@@ -115,6 +251,26 @@
     }
   }
 
+  .rp-tabs:has(> .rp-tabs__content > .rp-tabs__content__item > .rp-codeblock) {
+    min-width: 0;
+
+    > .rp-tabs__label {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: thin;
+
+      &::-webkit-scrollbar {
+        display: block;
+        height: 4px;
+      }
+
+      > .rp-tabs__label__item {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+    }
+  }
+
   .rp-toc-item {
     .field-tag {
       display: none;
@@ -124,6 +280,17 @@
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
+    }
+
+    .rp-doc details.agent-assistance {
+      &::details-content {
+        transition: none;
+      }
+
+      > summary,
+      > summary::before {
+        transition: none;
+      }
     }
   }
 }

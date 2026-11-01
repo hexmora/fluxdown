@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import type { BottomScrollMode } from '../../../bottom-scroll';
 import type { Renderer } from '../../../demo/components/renderer-preview';
 import type { Locale } from '../../../type';
 import type { AnimationSpeed, EditorEffect, EditorTuning } from './type';
@@ -14,6 +15,8 @@ const RENDERER_STORAGE_KEY = 'fluxdown:playground:renderer';
 export const useEditor = (lang: Locale) => {
   const [renderer, setRendererState] = useState<Renderer>('react');
 
+  const [editing, setEditing] = useState(false);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem(RENDERER_STORAGE_KEY);
@@ -26,6 +29,7 @@ export const useEditor = (lang: Locale) => {
   }, []);
 
   const setRenderer = (value: Renderer) => {
+    setEditing(false);
     setRendererState(value);
     try {
       localStorage.setItem(RENDERER_STORAGE_KEY, value);
@@ -61,6 +65,7 @@ export const useEditor = (lang: Locale) => {
   const previewText = playback ? stream.text : text;
 
   const updateText = (value: string) => {
+    setEditing(true);
     setPlayback(false);
 
     setText(value);
@@ -68,6 +73,7 @@ export const useEditor = (lang: Locale) => {
 
   const togglePlayback = () => {
     if (!playback) {
+      setEditing(false);
       setPlayback(true);
 
       return;
@@ -82,7 +88,18 @@ export const useEditor = (lang: Locale) => {
     stream.toggle();
   };
 
-  const resetContent = () => updateText(getStreamSample(lang));
+  const resetContent = () => {
+    setEditing(false);
+    setPlayback(false);
+    setText(getStreamSample(lang));
+  };
+
+  let scrollMode: BottomScrollMode = 'static';
+  if (playback) {
+    scrollMode = stream.playing ? 'active' : 'idle';
+  } else if (editing) {
+    scrollMode = 'active';
+  }
 
   const changeSpeed = (value: AnimationSpeed) => {
     clock.setRate(value);
@@ -119,6 +136,7 @@ export const useEditor = (lang: Locale) => {
     playback,
     stream,
     previewText,
+    scrollMode,
     updateText,
     togglePlayback,
     resetContent,

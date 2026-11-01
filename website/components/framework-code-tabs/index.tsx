@@ -9,6 +9,7 @@ import { DEFAULT_FRAMEWORKS } from './consts';
 import { useCodeFramework } from './hooks';
 import styles from './index.module.scss';
 
+export { useCodeFramework } from './hooks';
 export type { CodeFramework } from './hooks';
 
 interface FrameworkCodeTabsProps {

@@ -3,11 +3,11 @@ export const CODE_FRAMEWORKS = [
   'React',
   'Vue',
   'Svelte',
+  'Angular',
   'React Native',
   'Lynx',
   'Solid',
   'Taro',
-  'Angular',
 ] as const;
 
 export const DEFAULT_FRAMEWORKS = CODE_FRAMEWORKS.slice(1);

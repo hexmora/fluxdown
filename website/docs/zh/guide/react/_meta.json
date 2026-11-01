@@ -30,5 +30,12 @@
     "name": "features",
     "label": "其他功能",
     "collapsed": false
+  },
+  {
+    "type": "dir",
+    "name": "migration",
+    "label": "迁移指南",
+    "collapsible": true,
+    "collapsed": true
   }
 ]

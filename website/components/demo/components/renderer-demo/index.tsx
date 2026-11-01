@@ -2,6 +2,7 @@
 import { useDark } from '@rspress/core/runtime';
 import { useState } from 'react';
 
+import type { BottomScrollMode } from '../../../bottom-scroll';
 import type { PreviewEffect } from '../renderer-preview';
 import type { RendererPanelProps } from './type';
 
@@ -18,7 +19,7 @@ import { useRenderers } from './hooks';
 import styles from './index.module.scss';
 
 const RendererPanel = ({ label, ...props }: RendererPanelProps) => {
-  const scroll = useBottomScroll(props.reducedMotion ?? false);
+  const scroll = useBottomScroll(props.reducedMotion ?? false, props.scrollMode ?? 'static');
 
   return (
     <section aria-label={label} className={styles.panel} data-renderer={props.renderer}>
@@ -61,6 +62,11 @@ export const RendererDemo = () => {
   const { selected, toggleRenderer } = useRenderers();
 
   const text = mode === 'static' ? source : stream.text;
+
+  let scrollMode: BottomScrollMode = 'static';
+  if (mode === 'streaming' && !stream.reducedMotion) {
+    scrollMode = stream.playing ? 'active' : 'idle';
+  }
 
   const streaming = mode === 'streaming' &&
     !stream.complete &&
@@ -148,6 +154,7 @@ export const RendererDemo = () => {
               label={label}
               reducedMotion={!!stream.reducedMotion}
               renderer={value}
+              scrollMode={scrollMode}
               streaming={streaming}
               text={text}
             />

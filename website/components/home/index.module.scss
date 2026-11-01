@@ -256,12 +256,13 @@
 }
 
 .codeCard {
+  min-width: 0;
   text-align: left;
-  border: 1px solid var(--site-line);
-  background: var(--site-surface);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px -14px #14213616;
+
+  :global([data-framework-code]) {
+    margin: 0;
+    box-shadow: 0 8px 24px -14px #14213616;
+  }
 
   :global(.rp-codeblock) {
     margin: 0;
@@ -285,34 +286,6 @@
     :global(pre) {
       font-size: 12px;
       padding: 22px 18px;
-    }
-  }
-}
-
-.codeHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 22px;
-  border-bottom: 1px solid var(--site-line);
-  font-size: 12px;
-  color: var(--site-muted);
-
-  button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 17px 1px 16px;
-    border: 0;
-    border-bottom: 2px solid var(--site-accent);
-    margin-bottom: -1px;
-    background: transparent;
-    color: var(--site-ink);
-    font-size: 13px;
-    cursor: pointer;
-
-    svg {
-      color: var(--site-accent);
     }
   }
 }

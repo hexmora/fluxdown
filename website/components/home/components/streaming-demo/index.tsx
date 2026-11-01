@@ -3,6 +3,8 @@ import { useDark } from '@rspress/core/runtime';
 import { Fluxdown } from 'fluxdown';
 import { useId } from 'react';
 
+import type { BottomScrollMode } from '../../../bottom-scroll';
+
 import { useBottomScroll } from '../../../bottom-scroll';
 import { DEMO_BUILD, DEMO_PLUGINS, getDemoTheme, getStreamSample } from '../../../demo';
 import { useLocale, useStream } from '../../../hooks';
@@ -18,8 +20,12 @@ export const StreamingDemo = () => {
   const reducedMotion = useReducedMotion();
   const stream = useStream(getStreamSample(lang), reducedMotion);
   const { expanded, toggleExpanded } = useSourcePanel();
-  const preview = useBottomScroll(reducedMotion);
-  const source = useBottomScroll(reducedMotion);
+  let scrollMode: BottomScrollMode = 'static';
+  if (!reducedMotion) {
+    scrollMode = stream.playing ? 'active' : 'idle';
+  }
+  const preview = useBottomScroll(reducedMotion, scrollMode);
+  const source = useBottomScroll(reducedMotion, scrollMode);
   const sourceId = useId();
 
   return (

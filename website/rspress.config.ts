@@ -57,6 +57,39 @@ export default defineConfig({
   markdown: {
     defaultWrapCode: true,
     link: { checkDeadLinks: true, checkAnchors: true },
+    shiki: {
+      transformers: [
+        {
+          name: 'markdown-syntax-colors',
+          preprocess(_code, options) {
+            if (
+              !['markdown', 'md'].includes(options.lang) ||
+              !('theme' in options) ||
+              typeof options.theme !== 'object'
+            ) {
+              return;
+            }
+
+            // Keep the default palette, adding colors for Markdown headings and list markers.
+            options.theme = {
+              ...options.theme,
+              name: 'markdown-css-variables',
+              tokenColors: [
+                ...(options.theme.tokenColors ?? []),
+                {
+                  scope: 'markup.heading.markdown',
+                  settings: { foreground: 'var(--shiki-token-keyword)', fontStyle: 'bold' },
+                },
+                {
+                  scope: 'punctuation.definition.list.begin.markdown',
+                  settings: { foreground: 'var(--shiki-token-constant)' },
+                },
+              ],
+            };
+          },
+        },
+      ],
+    },
   },
   themeConfig: {
     darkMode: 'auto',

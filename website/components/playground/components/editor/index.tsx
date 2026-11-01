@@ -36,12 +36,13 @@ export const Editor = ({ lang }: EditorProps) => {
     playback,
     stream,
     previewText,
+    scrollMode,
     updateText,
     togglePlayback,
     resetContent,
   } = useEditor(lang);
 
-  const preview = useBottomScroll(false);
+  const preview = useBottomScroll(false, scrollMode, renderer);
 
   const playLabel = stream.playing ? copy.pause : copy.play;
 
@@ -286,6 +287,7 @@ export const Editor = ({ lang }: EditorProps) => {
                   build={DEMO_BUILD}
                   dark={dark}
                   renderer={renderer}
+                  scrollMode={scrollMode}
                   streaming={compute(() => {
                     if (!playback || stream.complete) {
                       return false;

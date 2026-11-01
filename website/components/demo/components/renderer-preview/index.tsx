@@ -18,6 +18,7 @@ export const RendererPreview = ({
   renderer,
   text,
   streaming = false,
+  scrollMode = 'static',
   build,
   dark,
   cycle = 0,
@@ -37,9 +38,9 @@ export const RendererPreview = ({
       dark,
       cycle,
       reducedMotion,
-      follow: !!streaming,
+      scrollMode,
     }),
-    [text, streaming, build, dark, cycle, reducedMotion],
+    [text, streaming, build, dark, cycle, reducedMotion, scrollMode],
   );
 
   const props = { text, streaming, build, theme };

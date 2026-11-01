@@ -39,7 +39,7 @@ export const COPY = {
       {
         title: '不被框架限制',
         description:
-          '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React、Vue、Svelte、React Native、Lynx、Solid、Taro 与 Angular 组件开始。',
+          '框架无关的 Core 管理解析与响应式更新。直接构建自己的渲染方式，或从开箱即用的 React、Vue、Svelte、Angular、React Native、Lynx、Solid 与 Taro 组件开始。',
         link: '认识 Fluxdown Core',
         path: '/guide/core/quick-start',
       },
@@ -52,10 +52,10 @@ export const COPY = {
       },
     ],
     quickTitle: '几行代码，就能开始。',
-    quickDescription: '把收到的文字交给 Fluxdown。以下以 React 版组件为例。',
+    quickDescription: '选择你的框架，把收到的文字交给 Fluxdown。',
     codeComment: '// text 是截至目前收到的完整消息',
     quickLink: '阅读接入指南',
-    organizationsTitle: '他们也在用',
+    organizationsTitle: '谁在使用',
     organizationsNote: '你的组织也在使用 Fluxdown？',
     organizationsLink: '联系维护者，加入这里。',
     architectureTitle: '一个核心，更多可能。',
@@ -105,7 +105,7 @@ export const COPY = {
       {
         title: 'Free to choose a framework',
         description:
-          'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React, Vue, Svelte, React Native, Lynx, Solid, Taro and Angular components.',
+          'A framework-independent Core handles parsing and reactive updates. Build your own renderer, or get started with the ready-made React, Vue, Svelte, Angular, React Native, Lynx, Solid and Taro components.',
         link: 'Meet Fluxdown Core',
         path: '/guide/core/quick-start',
       },
@@ -118,8 +118,7 @@ export const COPY = {
       },
     ],
     quickTitle: 'A few lines. A good beginning.',
-    quickDescription:
-      'Give Fluxdown the words as they arrive. This example uses the React component.',
+    quickDescription: 'Choose your framework and give Fluxdown the words as they arrive.',
     codeComment: '// text is the full message received so far',
     quickLink: 'Read the quick start',
     organizationsTitle: 'In good company',
