@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "md-editor-v3",
+    "label": "md-editor-v3"
+  },
+  {
+    "type": "file",
+    "name": "vue-markdown-render",
+    "label": "vue-markdown-render"
+  }
+]

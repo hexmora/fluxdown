@@ -18,5 +18,12 @@
     "type": "dir",
     "name": "plugins",
     "label": "Using and writing plugins"
+  },
+  {
+    "type": "dir",
+    "name": "migration",
+    "label": "Migration guides",
+    "collapsible": true,
+    "collapsed": true
   }
 ]
