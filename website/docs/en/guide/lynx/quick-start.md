@@ -1,4 +1,9 @@
-# Quick start
+---
+title: Lynx Markdown Renderer
+description: Add Fluxdown to a ReactLynx project and render Markdown with Lynx elements. Install the component, display a message, and connect streaming text.
+---
+
+# Lynx Markdown renderer quick start {#quick-start}
 
 Fluxdown for Lynx renders Markdown as Lynx `text`, `view` and other elements. Built on Core, it provides syntax repair, smooth streaming and replaceable render slots.
 

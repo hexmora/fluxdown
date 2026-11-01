@@ -1,4 +1,9 @@
-# 流式内容
+---
+title: Lynx 流式 Markdown 渲染
+description: 在 ReactLynx 中用 Fluxdown 渲染流式 Markdown，传入累积文本、配置平滑输出与 Lynx 动画效果，并处理响应完成或取消时的状态。
+---
+
+# 在 Lynx 中渲染流式 Markdown {#流式内容}
 
 把累积文本传给 `text`，用请求状态控制 `streaming`：
 

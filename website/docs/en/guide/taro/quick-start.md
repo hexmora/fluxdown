@@ -1,4 +1,9 @@
-# Quick start
+---
+title: Taro Markdown Renderer
+description: Render Markdown with Fluxdown in a Taro React app. Install the component and styles, connect streaming text, and configure H5 or mini-program builds.
+---
+
+# Taro Markdown renderer quick start {#quick-start}
 
 Use Fluxdown in a Taro React project to render Markdown with Taro components. Parsing, streaming and plugin configuration follow the same API as the React renderer.
 

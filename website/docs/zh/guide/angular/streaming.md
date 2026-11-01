@@ -1,4 +1,9 @@
-# 流式内容
+---
+title: Angular 流式 Markdown 渲染
+description: 在 Angular 中通过 signal 与 Fluxdown 渲染流式 Markdown。连接异步文本迭代器、配置输出效果，并通过消息 ID 管理组件状态。
+---
+
+# 在 Angular 中渲染流式 Markdown {#流式内容}
 
 把收到的片段追加到 signal 中，传给 `text`。`streaming` 控制未完成语法的修复、平滑输出和末尾效果。
 

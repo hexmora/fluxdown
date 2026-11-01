@@ -1,16 +1,22 @@
 {
   "name": "@fluxdown/taro",
   "version": "0.1.1",
-  "description": "Taro components for streaming Markdown.",
+  "description": "Streaming Markdown renderer for Taro React AI chat in H5 and mini programs, with syntax repair and smooth output.",
   "keywords": [
+    "ai-chat",
     "hast",
     "llm",
     "markdown",
+    "markdown-renderer",
+    "mini-program",
+    "react",
     "renderer",
     "streaming",
-    "taro"
+    "streaming-markdown",
+    "taro",
+    "weapp"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://hexmora.github.io/fluxdown/guide/taro/quick-start.html",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

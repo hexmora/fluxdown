@@ -1,4 +1,9 @@
-# 流式内容
+---
+title: Taro 流式 Markdown 渲染
+description: 在 Taro React 项目中用 Fluxdown 渲染流式 Markdown，累积文本片段、配置平滑输出与动画效果，并管理消息的播放状态。
+---
+
+# 在 Taro 中渲染流式 Markdown {#流式内容}
 
 将当前已收到的完整文本传给 `text`，用 `streaming` 控制末尾语法修复、平滑输出和动画效果。请求层继续负责数据传输与取消。
 

@@ -1,4 +1,9 @@
-# 流式内容
+---
+title: Vue 3 流式 Markdown 渲染
+description: 在 Vue 3 中用响应式文本连接 Fluxdown，渲染流式 Markdown。示例涵盖异步文本流、语法修复、平滑效果和消息状态隔离。
+---
+
+# 在 Vue 3 中渲染流式 Markdown {#流式内容}
 
 把收到的片段追加到响应式字符串中，传给 `text`。`streaming` 控制未完成语法的修复、平滑输出和末尾效果。
 

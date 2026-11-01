@@ -1,16 +1,20 @@
 {
   "name": "@fluxdown/vue",
   "version": "0.2.0",
-  "description": "Vue 3 components for streaming Markdown.",
+  "description": "Streaming Markdown renderer for Vue 3 AI chat, with syntax repair, smooth output, and customizable components.",
   "keywords": [
+    "ai-chat",
     "hast",
     "llm",
     "markdown",
+    "markdown-renderer",
     "renderer",
     "streaming",
-    "vue"
+    "streaming-markdown",
+    "vue",
+    "vue3"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://hexmora.github.io/fluxdown/guide/vue/quick-start.html",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

@@ -1,16 +1,20 @@
 {
   "name": "@fluxdown/core",
   "version": "0.12.6",
-  "description": "Headless pure-computation utilities for turning streaming Markdown strings into HAST structures.",
+  "description": "Framework-independent core for streaming Markdown parsing, syntax repair, and reactive content blocks in AI apps.",
   "keywords": [
+    "ai-chat",
     "hast",
     "headless",
     "llm",
     "markdown",
+    "markdown-parser",
+    "reactive",
     "streaming",
+    "streaming-markdown",
     "unified"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://hexmora.github.io/fluxdown/guide/core/quick-start.html",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

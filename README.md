@@ -2,17 +2,17 @@
   <img src="./docs/assets/logo.png" alt="Fluxdown" width="480" />
 </p>
 
-**A Markdown renderer built for streaming.**
+# Fluxdown — Streaming Markdown for AI apps
 
-[Website](https://hexmora.github.io/fluxdown/) · [Playground](https://hexmora.github.io/fluxdown/playground.html) · [Documentation](./website/docs/en/guide/index.md) · [简体中文](./docs/README.zh-CN.md)
+[Website](https://hexmora.github.io/fluxdown/) · [Playground](https://hexmora.github.io/fluxdown/playground.html) · [Documentation](https://hexmora.github.io/fluxdown/guide/index.html) · [简体中文](./docs/README.zh-CN.md)
 
-Fluxdown keeps streaming Markdown readable, from unfinished syntax to the final response. Use it for AI conversations, live writing, and other interfaces where text keeps growing.
+Fluxdown renders streaming Markdown for AI chat and live writing in React, Vue 3, Svelte 5, Angular, React Native, Lynx, SolidJS, and Taro. Its shared core keeps content readable from unfinished syntax to the final response.
 
 - **Smooth streaming.** Reveal incoming text gradually and handle unfinished links, emphasis, and code.
 - **Less repeated work.** Block-level caching reuses stable content as the message grows.
 - **Familiar Markdown.** Render GFM tables, task lists, strikethrough, and autolinks, with code highlighting and optional math.
 - **Adaptable presentation.** Customize themes, replace components, or extend parsing and rendering with plugins.
-- **A framework-independent core.** Use built-in components for React, Vue 3, Svelte 5, Angular, React Native, Lynx, Solid, and Taro, or build your own renderer.
+- **A framework-independent core.** Share parsing, syntax repair, and reactive content blocks across frameworks, or build your own renderer.
 
 ## Get started
 
@@ -43,7 +43,7 @@ If your bundler does not load the styles automatically, add this to your app's g
 import "fluxdown/styles.css";
 ```
 
-See the quick starts for [React](./website/docs/en/guide/react/quick-start.md), [Vue 3](./website/docs/en/guide/vue/quick-start.md), [Svelte 5](./website/docs/en/guide/svelte/quick-start.md), [Angular](./website/docs/en/guide/angular/quick-start.md), [React Native](./website/docs/en/guide/react-native/quick-start.md), [Lynx](./website/docs/en/guide/lynx/quick-start.md), [Solid](./website/docs/en/guide/solid/quick-start.md), and [Taro](./website/docs/en/guide/taro/quick-start.md) for more examples.
+See the quick starts for [React](https://hexmora.github.io/fluxdown/guide/react/quick-start.html), [Vue 3](https://hexmora.github.io/fluxdown/guide/vue/quick-start.html), [Svelte 5](https://hexmora.github.io/fluxdown/guide/svelte/quick-start.html), [Angular](https://hexmora.github.io/fluxdown/guide/angular/quick-start.html), [React Native](https://hexmora.github.io/fluxdown/guide/react-native/quick-start.html), [Lynx / ReactLynx](https://hexmora.github.io/fluxdown/guide/lynx/quick-start.html), [SolidJS](https://hexmora.github.io/fluxdown/guide/solid/quick-start.html), and [Taro React](https://hexmora.github.io/fluxdown/guide/taro/quick-start.html) for more examples.
 
 ## Packages
 
@@ -55,18 +55,18 @@ See the quick starts for [React](./website/docs/en/guide/react/quick-start.md), 
 | [`@fluxdown/angular`](./packages/angular)           | Ready-to-use Markdown rendering in Angular.                         |
 | [`@fluxdown/react-native`](./packages/react-native) | Ready-to-use Markdown rendering in React Native.                    |
 | [`@fluxdown/lynx`](./packages/lynx)                 | Ready-to-use Markdown rendering in ReactLynx.                       |
-| [`@fluxdown/solid`](./packages/solid)               | Ready-to-use Markdown rendering in Solid.                           |
-| [`@fluxdown/taro`](./packages/taro)                 | Ready-to-use Markdown rendering in Taro.                            |
+| [`@fluxdown/solid`](./packages/solid)               | Ready-to-use Markdown rendering in SolidJS.                         |
+| [`@fluxdown/taro`](./packages/taro)                 | Ready-to-use Markdown rendering in Taro React.                      |
 | [`@fluxdown/core`](./packages/core)                 | Parsing, repair, and reactive content blocks for a custom renderer. |
 | [`stative`](./packages/stative)                     | Composable state and derived computations, also used by Core.       |
 
 ## Documentation
 
-- [Streaming](./website/docs/en/guide/react/streaming.md) — connect incoming text and control streaming effects.
-- [Styling](./website/docs/en/guide/react/customization.md) — adjust themes, typography, and layout.
-- [Plugins](./website/docs/en/guide/react/plugins.md) — customize syntax, content, and interactions.
-- [Core](./website/docs/en/guide/core/quick-start.md) — work with reactive content blocks directly.
-- [Stative](./website/docs/en/stative/getting-started.md) — create and compose state flows.
+- [React streaming](https://hexmora.github.io/fluxdown/guide/react/streaming.html) — connect incoming text and control streaming effects.
+- [React styling](https://hexmora.github.io/fluxdown/guide/react/customization.html) — adjust themes, typography, and layout.
+- [React plugins](https://hexmora.github.io/fluxdown/guide/react/plugins.html) — customize syntax, content, and interactions.
+- [Core](https://hexmora.github.io/fluxdown/guide/core/quick-start.html) — work with reactive content blocks directly.
+- [Stative](https://hexmora.github.io/fluxdown/stative/getting-started.html) — create and compose state flows.
 
 ## Contributing
 

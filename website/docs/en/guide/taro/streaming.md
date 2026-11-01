@@ -1,4 +1,9 @@
-# Streaming content
+---
+title: Streaming Markdown in Taro
+description: Render streaming Markdown in a Taro React app with Fluxdown. Accumulate incoming text, configure smoothing and effects, and manage message playback state.
+---
+
+# Streaming Markdown in Taro {#streaming-content}
 
 Pass the complete text received so far to `text`. Use `streaming` to control unfinished syntax repair, smooth output and trailing effects. Your request layer handles the transport and cancellation.
 

@@ -24,6 +24,7 @@ fileGroups:
     - docs/**/*
     - components/**/*
     - theme/**/*
+    - seo/**/*
     - lynx/**/*
     - /scripts/prepare-angular.ts
     - /scripts/build/lynx-workspace.ts
@@ -70,4 +71,8 @@ tasks:
     command: pnpm run lint
     inputs: ["@group(sources)", .oxlintrc.json, /.oxlintrc.json, /packages/react/.oxlintrc.json]
   check:
-    deps: [typecheck, lint, build]
+    deps: [typecheck, lint, test]
+  test:
+    command: pnpm run check:seo
+    deps: [build]
+    inputs: ["@group(sources)"]

@@ -1,4 +1,9 @@
-# 快速开始
+---
+title: SolidJS Markdown 渲染器
+description: 在 SolidJS 中使用 Fluxdown 渲染 Markdown 与流式消息。了解组件安装、响应式文本接入，以及主题和插件的使用方式。
+---
+
+# SolidJS Markdown 渲染器快速开始 {#快速开始}
 
 Fluxdown 为 Solid 提供 Markdown 组件。它基于同一个 Core，支持静态内容、流式修复、平滑输出和末尾效果，用主题与插件调整呈现方式。
 

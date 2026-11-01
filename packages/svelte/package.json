@@ -1,8 +1,18 @@
 {
   "name": "@fluxdown/svelte",
   "version": "0.1.0",
-  "description": "Svelte components for streaming Markdown with Fluxdown.",
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "description": "Streaming Markdown renderer for Svelte 5 AI chat, with syntax repair, smooth output, and customizable components.",
+  "keywords": [
+    "ai-chat",
+    "llm",
+    "markdown",
+    "markdown-renderer",
+    "streaming",
+    "streaming-markdown",
+    "svelte",
+    "sveltekit"
+  ],
+  "homepage": "https://hexmora.github.io/fluxdown/guide/svelte/quick-start.html",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

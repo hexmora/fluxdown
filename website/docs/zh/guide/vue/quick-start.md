@@ -1,4 +1,9 @@
-# 快速开始
+---
+title: Vue 3 Markdown 渲染器
+description: 在 Vue 3 单文件组件中接入 Fluxdown，展示 Markdown 与流式内容。了解安装、累积文本接入，以及主题和插件的使用入口。
+---
+
+# Vue 3 Markdown 渲染器快速开始 {#快速开始}
 
 Fluxdown 为 Vue 3 提供 Markdown 组件。它基于同一个 Core，支持静态内容、流式修复、平滑输出和末尾效果，用主题与插件调整呈现方式。
 
