@@ -2,6 +2,7 @@ import type { LynxViewElement } from '@lynx-js/web-core/client';
 
 import '@lynx-js/web-core/client';
 
+import type { BottomScrollMode } from '../components/bottom-scroll/utils';
 import type { LynxDemoData } from './type';
 
 import { createBottomScroll } from '../components/bottom-scroll/utils';
@@ -9,6 +10,7 @@ import './host.scss';
 
 let view: LynxViewElement | undefined;
 let reducedMotion: boolean | undefined;
+let scrollMode: BottomScrollMode = 'static';
 let stopFollowing: (() => void) | undefined;
 
 const viewport = document.createElement('main');
@@ -36,14 +38,14 @@ window.addEventListener('message', (event: MessageEvent) => {
 
   const data = event.data.data as LynxDemoData;
 
+  scrollMode = data.scrollMode;
+
   document.documentElement.style.colorScheme = data.dark ? 'dark' : 'light';
 
-  // A newly opened static preview starts at the top. Once streaming begins,
-  // retain follow intent through the final layout and smooth-streaming flush.
-  if ((data.follow || stopFollowing) && reducedMotion !== data.reducedMotion) {
+  if (reducedMotion !== data.reducedMotion) {
     stopFollowing?.();
     reducedMotion = data.reducedMotion;
-    stopFollowing = createBottomScroll(viewport, content, reducedMotion);
+    stopFollowing = createBottomScroll(viewport, content, reducedMotion, () => scrollMode);
   }
 
   if (view) {

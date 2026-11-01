@@ -1,3 +1,6 @@
+// Idle preserves an existing follow session while a new, paused preview stays at the top.
+export type BottomScrollMode = 'static' | 'active' | 'idle';
+
 const BOTTOM_TOLERANCE = 1;
 const FOLLOW_TIME = 100;
 
@@ -5,15 +8,37 @@ export const createBottomScroll = (
   viewport: HTMLElement,
   content: HTMLElement,
   reducedMotion: boolean,
+  getMode: () => BottomScrollMode = () => 'active',
 ) => {
   const bottom = () => Math.max(0, viewport.scrollHeight - viewport.clientHeight);
   const atBottom = () => bottom() - viewport.scrollTop <= BOTTOM_TOLERANCE;
-  let following = atBottom();
+
+  viewport.scrollTop = 0;
+
+  let enabled = getMode() === 'active';
+  let following = true;
+  let height: number | undefined;
+  let started = false;
   let lastTop = viewport.scrollTop;
   let frame = 0;
   let lastTime = 0;
   let touchY = 0;
   let draggingScrollbar = false;
+
+  const canFollow = () => {
+    // Static assets never start following. Idle preserves an existing playback
+    // or editing session through delayed layout, but cannot enable a new pane.
+    const mode = getMode();
+    if (mode === 'static') {
+      enabled = false;
+    } else if (mode === 'active') {
+      enabled = true;
+    }
+    if (!enabled) {
+      started = false;
+    }
+    return enabled;
+  };
 
   const stop = () => {
     cancelAnimationFrame(frame);
@@ -47,7 +72,13 @@ export const createBottomScroll = (
   const tick = (time: number) => {
     frame = 0;
     observeScroll();
-    if (!following || draggingScrollbar || !viewport.clientWidth || !viewport.clientHeight) {
+    if (
+      !canFollow() ||
+      !following ||
+      draggingScrollbar ||
+      !viewport.clientWidth ||
+      !viewport.clientHeight
+    ) {
       return;
     }
 
@@ -69,7 +100,7 @@ export const createBottomScroll = (
   };
 
   const follow = () => {
-    if (!following || draggingScrollbar || frame) {
+    if (!canFollow() || !started || !following || draggingScrollbar || frame) {
       return;
     }
 
@@ -77,11 +108,26 @@ export const createBottomScroll = (
     frame = requestAnimationFrame(tick);
   };
 
-  const onResize = () => {
+  const onResize = (entries: ResizeObserverEntry[]) => {
+    const entry = entries.find(({ target }) => target === content);
+
+    if (entry) {
+      const nextHeight = entry.contentRect.height;
+
+      if (height !== undefined) {
+        started ||= nextHeight > height;
+        height = nextHeight;
+      } else if (nextHeight > 0) {
+        // Empty async hosts (including their padding) are not the initial content.
+        // Keep the first rendered layout at the top; follow subsequent growth.
+        height = nextHeight;
+      }
+    }
+
     // Consume browser clamps now, before another resize moves the bottom again.
     observeScroll();
     // Replaying clears the scroll range. The next stream should follow again.
-    if (bottom() === 0) {
+    if (height !== undefined && bottom() === 0) {
       following = true;
       lastTop = viewport.scrollTop;
     }
@@ -116,6 +162,14 @@ export const createBottomScroll = (
       return;
     }
 
+    // Preserve End's follow intent even if the next chunk moves the bottom
+    // before the browser delivers its native scroll event.
+    if (event.key === 'End') {
+      following = true;
+      follow();
+      return;
+    }
+
     const upward =
       event.key === 'ArrowUp' ||
       event.key === 'PageUp' ||
@@ -143,7 +197,7 @@ export const createBottomScroll = (
   };
 
   const observer = new ResizeObserver(onResize);
-  observer.observe(content, { box: 'border-box' });
+  observer.observe(content);
   observer.observe(viewport);
   viewport.addEventListener('scroll', onScroll, { passive: true });
   viewport.addEventListener('wheel', onWheel, { passive: true });
