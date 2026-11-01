@@ -1,11 +1,5 @@
 # fluxdown
 
-## 0.14.2
-
-### Patch Changes
-
-- 517bd72: Clarify streaming Markdown package descriptions and keywords, and link each package to its framework's documentation.
-
 ## 0.14.1
 
 ### Patch Changes

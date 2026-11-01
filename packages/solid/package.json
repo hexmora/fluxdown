@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/solid",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "description": "Streaming Markdown renderer for SolidJS AI chat, with syntax repair, smooth output, and customizable components.",
   "keywords": [
     "ai-chat",

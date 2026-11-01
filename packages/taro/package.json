@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/taro",
-  "version": "0.1.2",
+  "version": "0.1.1",
   "description": "Streaming Markdown renderer for Taro React AI chat in H5 and mini programs, with syntax repair and smooth output.",
   "keywords": [
     "ai-chat",
