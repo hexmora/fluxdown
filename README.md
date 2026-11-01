@@ -6,7 +6,7 @@
 
 [Website](https://hexmora.github.io/fluxdown/) · [Playground](https://hexmora.github.io/fluxdown/playground.html) · [Documentation](https://hexmora.github.io/fluxdown/guide/index.html) · [简体中文](./docs/README.zh-CN.md)
 
-Fluxdown renders streaming Markdown for AI chat and live writing in React, Vue 3, Svelte 5, Angular, React Native, Lynx, SolidJS, and Taro. Its shared core keeps content readable from unfinished syntax to the final response.
+Fluxdown renders streaming Markdown for AI chat and live writing in React, Vue 3, Svelte 5, Angular, React Native, Lynx, SolidJS, Taro, and uni-app. Its shared core keeps content readable from unfinished syntax to the final response.
 
 - **Smooth streaming.** Reveal incoming text gradually and handle unfinished links, emphasis, and code.
 - **Less repeated work.** Block-level caching reuses stable content as the message grows.
@@ -43,7 +43,7 @@ If your bundler does not load the styles automatically, add this to your app's g
 import "fluxdown/styles.css";
 ```
 
-See the quick starts for [React](https://hexmora.github.io/fluxdown/guide/react/quick-start.html), [Vue 3](https://hexmora.github.io/fluxdown/guide/vue/quick-start.html), [Svelte 5](https://hexmora.github.io/fluxdown/guide/svelte/quick-start.html), [Angular](https://hexmora.github.io/fluxdown/guide/angular/quick-start.html), [React Native](https://hexmora.github.io/fluxdown/guide/react-native/quick-start.html), [Lynx / ReactLynx](https://hexmora.github.io/fluxdown/guide/lynx/quick-start.html), [SolidJS](https://hexmora.github.io/fluxdown/guide/solid/quick-start.html), and [Taro React](https://hexmora.github.io/fluxdown/guide/taro/quick-start.html) for more examples.
+See the quick starts for [React](https://hexmora.github.io/fluxdown/guide/react/quick-start.html), [Vue 3](https://hexmora.github.io/fluxdown/guide/vue/quick-start.html), [Svelte 5](https://hexmora.github.io/fluxdown/guide/svelte/quick-start.html), [Angular](https://hexmora.github.io/fluxdown/guide/angular/quick-start.html), [React Native](https://hexmora.github.io/fluxdown/guide/react-native/quick-start.html), [Lynx / ReactLynx](https://hexmora.github.io/fluxdown/guide/lynx/quick-start.html), [SolidJS](https://hexmora.github.io/fluxdown/guide/solid/quick-start.html), [Taro React](https://hexmora.github.io/fluxdown/guide/taro/quick-start.html), and [uni-app](https://hexmora.github.io/fluxdown/guide/uni-app/quick-start.html) for more examples.
 
 ## Packages
 
@@ -57,6 +57,7 @@ See the quick starts for [React](https://hexmora.github.io/fluxdown/guide/react/
 | [`@fluxdown/lynx`](./packages/lynx)                 | Ready-to-use Markdown rendering in ReactLynx.                       |
 | [`@fluxdown/solid`](./packages/solid)               | Ready-to-use Markdown rendering in SolidJS.                         |
 | [`@fluxdown/taro`](./packages/taro)                 | Ready-to-use Markdown rendering in Taro React.                      |
+| [`@fluxdown/uni-app`](./packages/uni-app)           | Ready-to-use Markdown rendering in uni-app x Vapor.                 |
 | [`@fluxdown/core`](./packages/core)                 | Parsing, repair, and reactive content blocks for a custom renderer. |
 | [`stative`](./packages/stative)                     | Composable state and derived computations, also used by Core.       |
 

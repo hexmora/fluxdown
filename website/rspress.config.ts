@@ -12,6 +12,7 @@ import { lynxDemo } from './lynx/plugin';
 import { seo } from './seo/plugin';
 import { sessionAppearance } from './theme/appearance/plugin';
 import { sessionLocale } from './theme/locale/plugin';
+import { uniAppDemo } from './uni-app/plugin';
 
 export default defineConfig({
   root: 'docs',
@@ -44,6 +45,7 @@ export default defineConfig({
   plugins: [
     seo(),
     lynxDemo(),
+    uniAppDemo(),
     {
       name: 'static-search-links',
       modifySearchIndexData(pages) {

@@ -46,6 +46,11 @@
         "activeMatch": "/guide/taro/"
       },
       {
+        "text": "uni-app",
+        "link": "/guide/uni-app/quick-start",
+        "activeMatch": "/guide/uni-app/"
+      },
+      {
         "text": "Core",
         "link": "/guide/core/quick-start",
         "activeMatch": "/guide/core/"

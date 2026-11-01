@@ -2,7 +2,7 @@ import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs
 
 # CJK 支持
 
-`CjkPlugin` 改善中文、日文和韩文的 Markdown 解析，支持 CJK 标点附近的斜体、加粗与删除线，并避免把这些标点包含在自动识别的裸链接中。React、Vue、Svelte、Angular、React Native、Lynx、Solid 和 Taro 的 Full 组件默认包含此插件，Lite 组件可按需添加。
+`CjkPlugin` 改善中文、日文和韩文的 Markdown 解析，支持 CJK 标点附近的斜体、加粗与删除线，并避免把这些标点包含在自动识别的裸链接中。React、Vue、Svelte、Angular、React Native、Lynx、Solid、Taro 和 uni-app 的 Full 组件默认包含此插件，Lite 组件可按需添加。
 
 <FrameworkCodeTabs>
 
@@ -76,6 +76,16 @@ export function Message() {
 }
 ```
 
+```vue title="components/message/main.uvue"
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+</script>
+
+<template>
+  <Fluxdown text="这是**加粗。**文字。" />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 其中「加粗。」会显示为粗体，无需在定界符两侧添加空格。
@@ -98,7 +108,7 @@ Markdown 定界符可以紧邻 CJK 标点：
 
 各框架的 Full 组件已内置 `CjkPlugin`，无需手动注册。使用 Core 或 Lite 组件时，先安装对应的插件包：
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```sh
 pnpm add @fluxdown/core-plugins
@@ -136,11 +146,15 @@ pnpm add @fluxdown/solid-plugins
 pnpm add @fluxdown/react-base-plugins
 ```
 
+```sh
+pnpm add @fluxdown/uni-app-plugins
+```
+
 </FrameworkCodeTabs>
 
 Core 将 `CjkRemarkPlugin` 加入[快速开始](../../core/quick-start.md)的 `remarks` 输入；组件则通过 `plugins` 扩展预设：
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import { CjkRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/cjk';
@@ -258,13 +272,30 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
+```vue title="components/message/main.uvue"
+<script setup lang="ts">
+import { CjkPlugin } from '@fluxdown/uni-app-plugins/plugins/cjk';
+import { FluxdownLite } from '@fluxdown/uni-app/lite';
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <FluxdownLite :plugins="CjkPlugin" :text="text" />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 ## 关闭 CJK 支持
 
 将 `CjkPlugin` 与 `config` 放在同一个插件包中，可以按需禁用此功能。Core 使用带 `disabled` 配置的 remark 插件条目：
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
@@ -418,6 +449,25 @@ export function Message({ text }: MessageProps) {
     />
   );
 }
+```
+
+```vue title="components/message/main.uvue"
+<script setup lang="ts">
+import { CjkPlugin } from '@fluxdown/uni-app-plugins/plugins/cjk';
+import { Fluxdown } from '@fluxdown/uni-app';
+
+const plugins = { ...CjkPlugin, config: { 'remark-cjk': { disabled: true } } };
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown :plugins="plugins" :text="text" />
+</template>
 ```
 
 </FrameworkCodeTabs>

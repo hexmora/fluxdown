@@ -5,7 +5,15 @@
       "style": {
         "navigationStyle": "custom"
       }
+    },
+    // #ifdef WEB
+    {
+      "path": "pages/website/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
     }
+    // #endif
   ],
   "globalStyle": {
     "backgroundColor": "#ffffff"

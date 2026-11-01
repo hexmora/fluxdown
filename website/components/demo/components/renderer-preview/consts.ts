@@ -7,4 +7,5 @@ export const RENDERERS = [
   { value: 'lynx', label: 'Lynx' },
   { value: 'solid', label: 'Solid' },
   { value: 'taro', label: 'Taro' },
+  { value: 'uni-app', label: 'uni-app' },
 ] as const;

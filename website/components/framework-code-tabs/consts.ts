@@ -8,6 +8,7 @@ export const CODE_FRAMEWORKS = [
   'Lynx',
   'Solid',
   'Taro',
+  'uni-app',
 ] as const;
 
 export const DEFAULT_FRAMEWORKS = CODE_FRAMEWORKS.slice(1);

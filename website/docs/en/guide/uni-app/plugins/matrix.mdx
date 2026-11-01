@@ -1,0 +1,62 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# Plugin matrix
+
+## Component variants
+
+All three entry points share their props. Choose the preset you need:
+
+| Component      | Import                                          | Purpose                                                                           |
+| -------------- | ----------------------------------------------- | --------------------------------------------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/uni-app` or `@fluxdown/uni-app/full` | Full preset with Prism highlighting, MathJax formulas, CJK, and emoji shortcodes. |
+| `FluxdownLite` | `@fluxdown/uni-app/lite`                        | Basic Markdown and streaming effects; add other capabilities as needed.           |
+| `FluxdownRaw`  | `@fluxdown/uni-app/raw`                         | Requires explicit `plugins` to assemble your own capabilities.                    |
+
+## All plugins
+
+Composition includes inherited plugin types. A check means the preset includes the plugin by default.
+
+| Plugin               | Composition                                           | Package                              |      Lite       |      Full       |
+| -------------------- | ----------------------------------------------------- | ------------------------------------ | :-------------: | :-------------: |
+| `BlockquotePlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`          | <PluginTag type="remark" />                           | <PluginTag type="uni-app-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> |                 |
+| `CodePrismPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`        | <PluginTag type="remark" />                           | <PluginTag type="uni-app-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`        | <PluginTag type="render" />                           | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> |                 |
+| `TexMathjaxPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> |                 | <PresetCheck /> |
+
+`TexPlugin` preserves formula source. `TexMathjaxPlugin` generates formula images with MathJax. Both require `build.tex: true` to parse formula syntax.
+
+### Package
+
+<PluginTag type="uni-app-plugins" /> means `@fluxdown/uni-app-plugins`, which
+provides uni-app composite plugins, render plugins, and slots.
+
+### Import paths
+
+> Import from `@fluxdown/uni-app-plugins/plugins/<directory>`. Remove the `Plugin` suffix and convert the remaining name to lowercase with hyphens: `CodePrismPlugin` becomes `code-prism`.
+
+```ts
+import { CodePrismPlugin } from '@fluxdown/uni-app-plugins/plugins/code-prism';
+import { TexMathjaxPlugin } from '@fluxdown/uni-app-plugins/plugins/tex-mathjax';
+```
+
+> Import `PRESET_FULL_PLUGINS` from `@fluxdown/uni-app-plugins/full` and `PRESET_LITE_PLUGINS` from `@fluxdown/uni-app-plugins/lite`.
+
+Add capabilities through `plugins`; see [Composite plugins](./aggregate.md) for declaration and composition.

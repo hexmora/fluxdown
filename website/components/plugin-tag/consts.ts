@@ -9,6 +9,7 @@ export const PLUGIN_TAG_LABELS = {
   'lynx-plugins': 'lynx-plugins',
   'solid-plugins': 'solid-plugins',
   'taro-plugins': 'taro-plugins',
+  'uni-app-plugins': 'uni-app-plugins',
   'vue-plugins': 'vue-plugins',
   'react-plugins': 'react-plugins',
   'react-native-plugins': 'react-native-plugins',

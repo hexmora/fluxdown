@@ -51,4 +51,4 @@ Pass the full text received so far. Set `streaming` to `false` when the request 
 - [Streaming content](./streaming.md): control smoothing and end-of-stream effects.
 - [Styling guide](./customization.md): change native colors, fonts, and layout.
 - [Plugin matrix](./plugins/matrix.mdx): choose Full, Lite, or your own set.
-- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, and Taro together.
+- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, Taro, and uni-app together.

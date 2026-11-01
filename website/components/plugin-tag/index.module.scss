@@ -63,6 +63,10 @@
     --tag-dark-color: #a9c9f2;
   }
 
+  &[data-type="uni-app-plugins"] {
+    --tag-color: #4b9b58;
+  }
+
   &[data-type="taro-plugins"] {
     --tag-color: #3c64a6;
     --tag-dark-color: #aecbff;

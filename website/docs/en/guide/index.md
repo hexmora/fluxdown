@@ -16,6 +16,7 @@ Use it for AI conversations, live writing, streaming reports, or any interface w
 | Display Markdown and streaming content in a ReactLynx app | [Lynx quick start](./lynx/quick-start.md) · `@fluxdown/lynx`                         |
 | Display Markdown and streaming content in a Solid app     | [Solid quick start](./solid/quick-start.md) · `@fluxdown/solid`                      |
 | Display Markdown and streaming content in a Taro app      | [Taro quick start](./taro/quick-start.md) · `@fluxdown/taro`                         |
+| Display Markdown and streaming content in a uni-app x app | [uni-app quick start](./uni-app/quick-start.md) · `@fluxdown/uni-app`                |
 | Use another framework or control how content is presented | [Core quick start](./core/quick-start.md) · `@fluxdown/core`                         |
 
 Framework components provide a ready-to-use presentation layer. Core handles Markdown independently of any UI framework. Both share the same syntax, repair, and streaming capabilities.
@@ -30,6 +31,6 @@ Framework components provide a ready-to-use presentation layer. Core handles Mar
 
 ## One core, different interfaces
 
-Fluxdown is built on [stative](../stative/index.md), which connects text, configuration, and output in a single reactive data flow. React, Vue, Svelte, Angular, React Native, Lynx, Solid, and Taro have ready-to-use integrations.
+Fluxdown is built on [stative](../stative/index.md), which connects text, configuration, and output in a single reactive data flow. React, Vue, Svelte, Angular, React Native, Lynx, Solid, Taro, and uni-app have ready-to-use integrations.
 
-Start with the quick start for [React](./react/quick-start.md), [Vue 3](./vue/quick-start.md), [Svelte](./svelte/quick-start.md), [Angular](./angular/quick-start.md), [React Native](./react-native/quick-start.md), [Lynx](./lynx/quick-start.md), [Solid](./solid/quick-start.md), or [Taro](./taro/quick-start.md). Explore Core when you need to handle the output yourself.
+Start with the quick start for [React](./react/quick-start.md), [Vue 3](./vue/quick-start.md), [Svelte](./svelte/quick-start.md), [Angular](./angular/quick-start.md), [React Native](./react-native/quick-start.md), [Lynx](./lynx/quick-start.md), [Solid](./solid/quick-start.md), [Taro](./taro/quick-start.md), or [uni-app](./uni-app/quick-start.md). Explore Core when you need to handle the output yourself.

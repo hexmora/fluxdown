@@ -1,0 +1,62 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# 插件矩阵
+
+## 组件分化
+
+三个入口共享参数，按需要选择预设：
+
+| 组件           | 导入入口                                        | 定位                                                         |
+| -------------- | ----------------------------------------------- | ------------------------------------------------------------ |
+| `Fluxdown`     | `@fluxdown/uni-app` 或 `@fluxdown/uni-app/full` | 完整预设，包含 Prism 高亮、MathJax 公式、CJK 和 emoji 短码。 |
+| `FluxdownLite` | `@fluxdown/uni-app/lite`                        | 基础 Markdown 和流式效果，按需添加能力。                     |
+| `FluxdownRaw`  | `@fluxdown/uni-app/raw`                         | 必须传入 `plugins`，自行组合能力。                           |
+
+## 全部插件
+
+「组成」包含继承的子插件类型；勾选表示预设默认包含此插件。
+
+| 插件                 | 组成                                                  | 所在包                               |      Lite       |      Full       |
+| -------------------- | ----------------------------------------------------- | ------------------------------------ | :-------------: | :-------------: |
+| `BlockquotePlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`          | <PluginTag type="remark" />                           | <PluginTag type="uni-app-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> |                 |
+| `CodePrismPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`        | <PluginTag type="remark" />                           | <PluginTag type="uni-app-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`        | <PluginTag type="render" />                           | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> | <PresetCheck /> |                 |
+| `TexMathjaxPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="uni-app-plugins" /> |                 | <PresetCheck /> |
+
+`TexPlugin` 保留公式源文本，`TexMathjaxPlugin` 使用 MathJax 生成公式图像。两者都需要 `build.tex: true` 才会解析公式语法。
+
+### 所在包
+
+<PluginTag type="uni-app-plugins" /> 对应 `@fluxdown/uni-app-plugins`，提供
+uni-app 的综合插件、渲染器与插槽。
+
+### 导入规则
+
+> 使用 `@fluxdown/uni-app-plugins/plugins/<插件目录>` 导入。目录名由插件名称去掉 `Plugin` 后缀，再转为小写中划线，例如 `CodePrismPlugin` 对应 `code-prism`。
+
+```ts
+import { CodePrismPlugin } from '@fluxdown/uni-app-plugins/plugins/code-prism';
+import { TexMathjaxPlugin } from '@fluxdown/uni-app-plugins/plugins/tex-mathjax';
+```
+
+> `PRESET_FULL_PLUGINS` 与 `PRESET_LITE_PLUGINS` 分别从 `@fluxdown/uni-app-plugins/full`、`@fluxdown/uni-app-plugins/lite` 导入。
+
+通过 `plugins` 添加所需能力，声明与组合方式见[综合插件](./aggregate.md)。

@@ -11,7 +11,7 @@ import { ChunkDemo } from '../../../../../../components';
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -137,11 +137,27 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
+```vue title="components/message/main.uvue"
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown :streaming="{ smooth: false, effect: 'chunk' }" :text="text" />
+</template>
+```
+
 </FrameworkCodeTabs>
 
 Always pass the complete Markdown received so far. Each group fades from transparent to opaque with an `ease-out` curve. An existing group's animation continues when another group arrives.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -286,6 +302,25 @@ export function Message({ text }: MessageProps) {
     />
   );
 }
+```
+
+```vue title="components/message/main.uvue"
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+};
+
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ smooth: false, effect: ['chunk', { duration: 300 }] }"
+    :text="text"
+  />
+</template>
 ```
 
 </FrameworkCodeTabs>

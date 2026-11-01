@@ -12,7 +12,8 @@ export type Renderer =
   | 'lynx'
   | 'solid'
   | 'taro'
-  | 'angular';
+  | 'angular'
+  | 'uni-app';
 
 export type PreviewEffect = 'scale' | 'shad' | 'chunk' | 'suffix';
 

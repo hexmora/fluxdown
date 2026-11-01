@@ -128,6 +128,10 @@ export const Home = () => {
               <strong>Taro</strong>
               <span>{copy.react}</span>
             </Link>
+            <Link className={styles.frameworkCard} href={href('/guide/uni-app/quick-start')}>
+              <strong>uni-app</strong>
+              <span>{copy.react}</span>
+            </Link>
           </div>
           <div className={styles.branch} aria-hidden="true" />
           <Link

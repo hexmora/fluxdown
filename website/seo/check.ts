@@ -5,7 +5,17 @@ import { fileURLToPath } from 'node:url';
 
 const output = fileURLToPath(new URL('../doc_build/', import.meta.url));
 const site = new URL('https://hexmora.github.io/fluxdown/');
-const frameworks = ['react', 'vue', 'svelte', 'angular', 'react-native', 'lynx', 'solid', 'taro'];
+const frameworks = [
+  'react',
+  'vue',
+  'svelte',
+  'angular',
+  'react-native',
+  'lynx',
+  'solid',
+  'taro',
+  'uni-app',
+];
 
 function decode(value: string): string {
   const entities: Record<string, string> = {
@@ -49,6 +59,12 @@ function pageFile(value: string): string {
   assert.ok(!file.split('/').includes('..'), `URL escapes the build output: ${value}`);
   assert.ok(!/(^|\/)404\.html$/.test(file), `404 page must not be indexed: ${value}`);
   assert.ok(!file.startsWith('lynx-demo/'), `Lynx iframe assets must not be indexed: ${value}`);
+
+  assert.ok(
+    !file.startsWith('uni-app-demo/'),
+    `uni-app iframe assets must not be indexed: ${value}`,
+  );
+
   assert.ok(!file.startsWith('static/'), `Static assets must not be indexed: ${value}`);
   return file;
 }
@@ -67,6 +83,7 @@ const files = (await readdir(output, { recursive: true }))
       file.endsWith('.html') &&
       !/(^|\/)404\.html$/.test(file) &&
       !file.startsWith('lynx-demo/') &&
+      !file.startsWith('uni-app-demo/') &&
       !file.startsWith('static/'),
   );
 
@@ -134,7 +151,7 @@ for (const route of routes) {
     assert.ok(/fluxdown/i.test(title), `${url}: title must identify Fluxdown`);
     const framework = route.split('/')[1]?.replace('-', ' ');
     assert.ok(
-      !framework || title.toLowerCase().includes(framework),
+      !framework || title.toLowerCase().replaceAll('-', ' ').includes(framework),
       `${url}: title omits its framework`,
     );
     assert.ok(!titles.has(title), `${url}: duplicate priority-page title: ${title}`);
