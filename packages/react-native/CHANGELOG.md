@@ -1,5 +1,11 @@
 # @fluxdown/react-native
 
+## 0.2.3
+
+### Patch Changes
+
+- 0889ca7: Clarify streaming Markdown package descriptions and keywords, and link each package to its framework's documentation.
+
 ## 0.2.2
 
 ### Patch Changes

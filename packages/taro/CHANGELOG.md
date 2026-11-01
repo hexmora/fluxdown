@@ -1,5 +1,11 @@
 # @fluxdown/taro
 
+## 0.1.2
+
+### Patch Changes
+
+- 0889ca7: Clarify streaming Markdown package descriptions and keywords, and link each package to its framework's documentation.
+
 ## 0.1.1
 
 ### Patch Changes
