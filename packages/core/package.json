@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/core",
-  "version": "0.12.7",
+  "version": "0.12.6",
   "description": "Framework-independent core for streaming Markdown parsing, syntax repair, and reactive content blocks in AI apps.",
   "keywords": [
     "ai-chat",

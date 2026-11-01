@@ -70,6 +70,11 @@ export async function checkAngularConsumer(
     }),
   );
 
+  const renderer = selected.find(({ manifest }) => manifest.name === '@fluxdown/angular');
+  const pluginsRange = renderer?.manifest.dependencies?.['@fluxdown/angular-plugins'];
+
+  assert(!renderer || pluginsRange, 'Angular renderer must declare its plugin dependency');
+
   await writeFile(
     path.join(directory, 'package.json'),
     JSON.stringify({
@@ -78,6 +83,8 @@ export async function checkAngularConsumer(
       type: 'module',
       dependencies: {
         ...Object.fromEntries(tools),
+        // The Raw fixture imports this package directly, including wrapper-only releases.
+        ...(pluginsRange ? { '@fluxdown/angular-plugins': pluginsRange } : {}),
         ...Object.fromEntries(
           selected.map(({ manifest, tarball }) => [manifest.name, `file:${tarball}`]),
         ),

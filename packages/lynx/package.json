@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/lynx",
-  "version": "0.3.1",
+  "version": "0.3.0",
   "description": "Streaming Markdown renderer for Lynx AI chat, with ReactLynx components, syntax repair, and smooth output.",
   "keywords": [
     "ai-chat",

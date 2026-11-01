@@ -60,6 +60,7 @@ export function parseReleaseOptions(args = process.argv.slice(2)) {
     options: {
       channel: { type: 'string' },
       package: { type: 'string', default: 'all' },
+      'check-packages': { type: 'string', multiple: true },
       'dry-run': { type: 'boolean', default: false },
       publish: { type: 'boolean', default: false },
       prepare: { type: 'boolean', default: false },
@@ -74,6 +75,32 @@ export function parseReleaseOptions(args = process.argv.slice(2)) {
     values.channel === undefined || values.channel === 'stable' || values.channel === 'beta',
     'Channel must be stable or beta',
   );
+
+  const checkPackages = values['check-packages'];
+
+  if (checkPackages) {
+    assert(
+      values['dry-run'] && !values.prepare && !values.publish && values.channel !== 'beta',
+      '--check-packages is only allowed with an explicit stable --dry-run',
+    );
+    assert(
+      checkPackages.every((name) => name.trim().length > 0),
+      '--check-packages requires a nonempty package name',
+    );
+
+    for (const name of checkPackages) {
+      assert(
+        (PUBLIC_PACKAGES as readonly string[]).includes(name),
+        `Unknown --check-packages package: ${name}`,
+      );
+    }
+
+    assert(
+      new Set(checkPackages).size === checkPackages.length,
+      '--check-packages must not contain duplicate packages',
+    );
+  }
+
   assert(!(values.publish && values['dry-run']), 'Cannot combine --dry-run and --publish');
   assert(
     !values.publish || values['from-artifact'],
@@ -115,6 +142,7 @@ export function parseReleaseOptions(args = process.argv.slice(2)) {
     output: values.output,
     candidate: values.candidate,
     artifact: values['from-artifact'],
+    checkPackages,
   };
 }
 
@@ -1092,7 +1120,9 @@ async function prepareRelease(options: ReturnType<typeof parseReleaseOptions>) {
   }
 
   const selectedNames = new Set(
-    candidate ? candidate.packages.map((pkg) => pkg.name) : PUBLIC_PACKAGES,
+    candidate
+      ? candidate.packages.map((pkg) => pkg.name)
+      : (options.checkPackages ?? PUBLIC_PACKAGES),
   );
 
   if (candidate) {
