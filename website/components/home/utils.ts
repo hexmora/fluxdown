@@ -119,4 +119,24 @@ export function Message(props: MessageProps) {
       lang: 'tsx',
       code: getComponentExample('@fluxdown/taro', comment),
     },
+    {
+      framework: 'uni-app',
+      renderer: 'uni-app',
+      lang: 'vue',
+      code: `<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/uni-app';
+
+type MessageProps = {
+  text: string;
+  isStreaming: boolean;
+};
+
+${comment}
+defineProps<MessageProps>();
+</script>
+
+<template>
+  <Fluxdown :text="text" :streaming="isStreaming" />
+</template>`,
+    },
   ] as const;

@@ -1,0 +1,86 @@
+<script setup lang="ts">
+import type { Theme } from '@fluxdown/uni-app-plugins/typings';
+
+import { Fluxdown } from '@fluxdown/uni-app';
+import { computed, onErrorCaptured, onMounted, onUnmounted, shallowRef } from 'vue';
+
+import type { PreviewData, PreviewOptions } from './type';
+
+const data = shallowRef<PreviewData>({ text: '', options: '{}', dark: false, cycle: 0 });
+
+const options = computed(() => JSON.parse(data.value.options) as PreviewOptions);
+
+const theme = computed<Theme>(() => [
+  data.value.dark ? 'dark' : 'light',
+  { tokens: { colors: { bg: 'transparent' } } },
+]);
+
+let observer: ResizeObserver | undefined;
+
+const send = (message: Record<string, unknown>) => {
+  window.parent.postMessage(message, window.location.origin);
+};
+
+const receive = (event: MessageEvent) => {
+  if (event.origin !== window.location.origin || event.source !== window.parent) {
+    return;
+  }
+
+  if (event.data?.type === 'uni-app-demo:connect') {
+    send({ type: 'uni-app-demo:ready' });
+  }
+
+  if (event.data?.type === 'uni-app-demo:update') {
+    data.value = event.data.data;
+
+    document.documentElement.style.colorScheme = data.value.dark ? 'dark' : 'light';
+  }
+};
+
+onErrorCaptured(() => {
+  send({ type: 'uni-app-demo:error' });
+});
+
+onMounted(() => {
+  window.addEventListener('message', receive);
+
+  const content = document.getElementById('markdown-content');
+
+  if (content) {
+    observer = new ResizeObserver(() => {
+      send({
+        type: 'uni-app-demo:resize',
+        height: Math.ceil(content.getBoundingClientRect().height),
+      });
+    });
+
+    observer.observe(content);
+  }
+
+  send({ type: 'uni-app-demo:ready' });
+});
+
+onUnmounted(() => {
+  window.removeEventListener('message', receive);
+
+  observer?.disconnect();
+});
+</script>
+
+<template>
+  <view id="markdown-content">
+    <Fluxdown
+      :key="data.cycle"
+      :build="options.build"
+      :streaming="options.streaming"
+      :text="data.text"
+      :theme="theme"
+    />
+  </view>
+</template>
+
+<style>
+page {
+  background-color: transparent;
+}
+</style>
