@@ -1,0 +1,9 @@
+@use "../../../../../styles/prefix" as *;
+
+.fluxdown-angular-break-line-root {
+  line-height: inherit;
+
+  & + & {
+    line-height: var(--#{$prefix}-typography-line-height-lg);
+  }
+}

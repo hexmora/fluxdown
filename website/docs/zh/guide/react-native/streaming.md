@@ -45,4 +45,4 @@ export function Message({ text, pending }: MessageProps) {
 
 请求完成、取消或出错后，将 `streaming` 设为 `false`。组件会显示已经收到的完整内容并清理末尾效果。应用退到后台时，也可以暂停自己的数据源或视觉效果。
 
-[横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、Svelte、React Native、Lynx、Solid 和 Taro 的静态与流式表现。
+[横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、Svelte、React Native、Lynx、Solid、Taro 和 Angular 的静态与流式表现。

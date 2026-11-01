@@ -19,10 +19,12 @@ import type {
 } from './release-artifact.ts';
 import type { PackageArtifact, WorkspacePackage } from './types.ts';
 
+import { checkAngularConsumer } from './check-angular-consumer.ts';
 import { checkBrowserConsumer } from './check-browser.ts';
 import { checkLynxConsumer } from './check-lynx-consumer.ts';
 import {
   checkPackage,
+  isAngularPackage,
   isLynxPackage,
   isSveltePackage,
   isTaroPackage,
@@ -294,7 +296,8 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
   );
 
   const nodeArtifacts = artifacts.filter(
-    ({ manifest }) => !REACT_NATIVE_PACKAGES.includes(manifest.name),
+    ({ manifest }) =>
+      !REACT_NATIVE_PACKAGES.includes(manifest.name) && !isAngularPackage(manifest.name),
   );
 
   const consumer = await mkdtemp(path.join(tmpdir(), 'fluxdown-consumer-'));
@@ -311,7 +314,10 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
           nodeArtifacts.map((artifact) => [artifact.manifest.name, `file:${artifact.tarball}`]),
         ),
         overrides: Object.fromEntries(
-          artifacts.map((artifact) => [artifact.manifest.name, `$${artifact.manifest.name}`]),
+          [...nodeArtifacts, ...nativeArtifacts].map((artifact) => [
+            artifact.manifest.name,
+            `$${artifact.manifest.name}`,
+          ]),
         ),
       }),
     );
@@ -709,6 +715,8 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
 
     const svelte = await checkSvelteConsumer(consumer, artifacts);
 
+    const angular = await checkAngularConsumer(consumer, artifacts);
+
     if (specifiers.includes('fluxdown') || nativeArtifacts.length) {
       if (taroSpecifiers.length) {
         // Taro 4 requires React 18 types; keep the React 19 dependency tree separate.
@@ -810,6 +818,7 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
       browser,
       ...(lynx ? { lynx } : {}),
       ...(svelte ? { svelte } : {}),
+      ...(angular ? { angular } : {}),
       ...(nativeArtifacts.length
         ? { native: { packages: nativeArtifacts.map(({ manifest }) => manifest.name) } }
         : {}),

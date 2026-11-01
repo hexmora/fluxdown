@@ -1,0 +1,10 @@
+@use "../../../../../styles/prefix" as *;
+
+.fluxdown-angular-strong-root {
+  color: var(--#{$prefix}-colors-fg);
+  font-weight: var(--#{$prefix}-typography-font-weight-bold);
+
+  > em {
+    font-style: italic;
+  }
+}

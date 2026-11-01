@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 import type { RendererPreviewProps } from './type';
 
 import { useLocale } from '../../../hooks';
+import { AngularPreview } from './components/angular-preview';
 import { LynxPreview } from './components/lynx-preview';
 import { SolidPreview } from './components/solid-preview';
 import { SveltePreview } from './components/svelte-preview';
@@ -54,6 +55,10 @@ export const RendererPreview = ({
         }
       />
     );
+  }
+
+  if (renderer === 'angular') {
+    return <AngularPreview key={cycle} {...props} />;
   }
 
   if (renderer === 'solid') {

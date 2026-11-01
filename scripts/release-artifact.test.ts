@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import type { ReleaseArtifactManifest } from './release-artifact.ts';
-import type { LynxCheckResult, SvelteCheckResult } from './types.ts';
+import type { AngularCheckResult, LynxCheckResult, SvelteCheckResult } from './types.ts';
 
 import { validateReleaseManifest } from './release-artifact.ts';
 
@@ -224,6 +224,90 @@ for (const field of ['cssBytes', 'selectors', 'cssAssets', 'format'] as const) {
     };
 
     assert.throws(() => validateReleaseManifest(artifact), /Missing Taro browser verification/);
+  });
+}
+
+function angularVerification(
+  names = ['@fluxdown/angular', '@fluxdown/angular-plugins'],
+): AngularCheckResult {
+  return {
+    specifiers: names.flatMap((name) => {
+      const entries =
+        name === '@fluxdown/angular'
+          ? ['', '/lite', '/raw']
+          : ['/base', '/typings', '/full', '/lite', '/plugins/paragraph'];
+
+      return entries.map((entry) => name + entry);
+    }),
+    declarations: true,
+    aot: true,
+    styles: true,
+    rendered: true,
+  };
+}
+
+for (const names of [
+  ['@fluxdown/angular'],
+  ['@fluxdown/angular-plugins'],
+  ['@fluxdown/angular', '@fluxdown/angular-plugins'],
+]) {
+  test(`accepts Angular AOT consumer verification for ${names.join(', ')}`, () => {
+    const artifact = manifest(names);
+
+    artifact.verification = { nodeEntries: 0, browser: [], angular: angularVerification(names) };
+
+    assert.equal(validateReleaseManifest(artifact), artifact);
+  });
+}
+
+test('requires Angular verification even when Node entries passed', () => {
+  const artifact = manifest(['@fluxdown/angular']);
+
+  artifact.verification = { nodeEntries: 1, browser: [] };
+
+  assert.throws(() => validateReleaseManifest(artifact), /Angular verification/);
+});
+
+test('Angular verification cannot replace verification for another package', () => {
+  const artifact = manifest(['@fluxdown/angular', '@fluxdown/angular-plugins', '@fluxdown/core']);
+
+  artifact.verification = { nodeEntries: 0, browser: [], angular: angularVerification() };
+
+  assert.throws(() => validateReleaseManifest(artifact), /Missing consumer verification/);
+});
+
+for (const field of ['declarations', 'aot', 'styles', 'rendered'] as const) {
+  test(`rejects missing Angular ${field} verification`, () => {
+    const artifact = manifest(['@fluxdown/angular', '@fluxdown/angular-plugins']);
+
+    artifact.verification = {
+      nodeEntries: 0,
+      browser: [],
+      angular: { ...angularVerification(), [field]: false },
+    };
+
+    assert.throws(() => validateReleaseManifest(artifact), /Missing Angular .* verification/);
+  });
+}
+
+for (const specifiers of [
+  [],
+  ['@fluxdown/angular', '@fluxdown/angular'],
+  ['@fluxdown/angular', '@fluxdown/angular/lite'],
+  ['@fluxdown/angular-plugins/base'],
+  [...angularVerification().specifiers, '@fluxdown/angular-plugins-other/lite'],
+  [...angularVerification().specifiers, '@fluxdown/angular-plugins/../core'],
+]) {
+  test(`rejects incomplete or unrelated Angular entries: ${specifiers.join(', ')}`, () => {
+    const artifact = manifest(['@fluxdown/angular', '@fluxdown/angular-plugins']);
+
+    artifact.verification = {
+      nodeEntries: 0,
+      browser: [],
+      angular: { ...angularVerification(), specifiers },
+    };
+
+    assert.throws(() => validateReleaseManifest(artifact));
   });
 }
 

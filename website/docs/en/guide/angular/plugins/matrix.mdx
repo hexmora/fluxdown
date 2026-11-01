@@ -1,0 +1,63 @@
+import { PluginTag, PresetCheck } from '../../../../../components';
+
+# Plugin matrix
+
+## Component variants
+
+All three entries share the same component API. Choose the default capabilities you need:
+
+| Component      | Entry                    | Purpose                                                         |
+| -------------- | ------------------------ | --------------------------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/angular`      | Full preset with highlighting, math and diagrams.               |
+| `FluxdownLite` | `@fluxdown/angular/lite` | Basic Markdown presentation, ready to extend.                   |
+| `FluxdownRaw`  | `@fluxdown/angular/raw`  | Supply the complete `plugins` list and choose every capability. |
+
+## All plugins
+
+Composition includes inherited plugin types. A check means the component includes that plugin by default; an empty cell means it can be added manually.
+
+| Plugin                  | Composition                                           | Package                              |      Lite       |      Full       |
+| ----------------------- | ----------------------------------------------------- | ------------------------------------ | :-------------: | :-------------: |
+| `BlockquotePlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`             | <PluginTag type="remark" />                           | <PluginTag type="angular-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> |                 |
+| `CodePelePlugin`        | <PluginTag type="slot" />                             | <PluginTag type="angular-plugins" /> |                 | <PresetCheck /> |
+| `CodePrismPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> |                 |                 |
+| `CodeShikiPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="angular-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PluginTag type="render" />                           | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> | <PresetCheck /> |                 |
+| `TexKatexPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> |                 |                 |
+| `TexMathjaxKatexPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="angular-plugins" /> |                 | <PresetCheck /> |
+
+### Package
+
+<PluginTag type="angular-plugins" /> refers to `@fluxdown/angular-plugins`,
+which provides aggregate plugins, renderers and slots for Angular.
+
+### Import rules
+
+> Import from `@fluxdown/angular-plugins/plugins/<plugin-directory>`. Remove the `Plugin` suffix and convert the name to lowercase kebab case: `CodeShikiPlugin` becomes `code-shiki`, and `TexMathjaxKatexPlugin` becomes `tex-mathjax-katex`.
+
+```ts
+import { CodeShikiPlugin } from '@fluxdown/angular-plugins/plugins/code-shiki';
+import { TexMathjaxKatexPlugin } from '@fluxdown/angular-plugins/plugins/tex-mathjax-katex';
+```
+
+> Import `PRESET_FULL_PLUGINS` from `@fluxdown/angular-plugins/full` and `PRESET_LITE_PLUGINS` from `@fluxdown/angular-plugins/lite`.
+
+Pass plugins through the component's `plugins` input. See [aggregate plugins](./aggregate.md) for declaration, composition and configuration.

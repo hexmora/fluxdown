@@ -1,0 +1,25 @@
+@use "../../../../../styles/prefix" as *;
+
+.fluxdown-angular-effect-chunk-root {
+  // Incoming batches wrap naturally across lines, including their whitespace.
+  display: inline;
+
+  &.fluxdown-angular-effect-chunk-active {
+    animation: fluxdown-angular-effect-chunk-appear var(--#{$prefix}-chunk-duration) ease-out
+      forwards;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes fluxdown-angular-effect-chunk-appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

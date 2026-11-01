@@ -7,6 +7,7 @@ import { gunzipSync } from 'node:zlib';
 import semver from 'semver';
 
 import type {
+  AngularCheckResult,
   BrowserCheckResult,
   LynxCheckResult,
   ReactNativeCheckResult,
@@ -25,6 +26,8 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/core',
   '@fluxdown/solid-plugins',
   '@fluxdown/solid',
+  '@fluxdown/angular-plugins',
+  '@fluxdown/angular',
   '@fluxdown/vue-plugins',
   '@fluxdown/vue',
   '@fluxdown/lynx-plugins',
@@ -81,6 +84,7 @@ export interface ReleaseArtifactManifest {
     browser: BrowserCheckResult[];
     lynx?: LynxCheckResult;
     svelte?: SvelteCheckResult;
+    angular?: AngularCheckResult;
     native?: ReactNativeCheckResult;
   };
   packages: ArtifactPackage[];
@@ -230,6 +234,44 @@ function validateSvelteVerification(value: unknown, packages: string[]): void {
   }
 }
 
+function validateAngularVerification(value: unknown, packages: string[]): void {
+  const verification = record(value, 'Angular verification');
+
+  const { specifiers } = verification;
+
+  assert(Array.isArray(specifiers) && specifiers.length > 0, 'Missing Angular entry verification');
+
+  assert.equal(new Set(specifiers).size, specifiers.length, 'Duplicate Angular entry verification');
+
+  for (const specifier of specifiers) {
+    nonempty(specifier, 'Angular entry specifier');
+
+    const name = packages.find((pkg) => specifier === pkg || specifier.startsWith(`${pkg}/`));
+
+    assert(name, `Angular entry does not belong to an artifact package: ${specifier}`);
+
+    if (specifier !== name) safeRelativePath(specifier.slice(name.length + 1));
+  }
+
+  for (const name of packages) {
+    const entries =
+      name === '@fluxdown/angular'
+        ? ['', '/lite', '/raw']
+        : ['/base', '/typings', '/full', '/lite'];
+
+    for (const entry of entries) {
+      assert(
+        specifiers.includes(name + entry),
+        `Missing Angular entry verification: ${name}${entry}`,
+      );
+    }
+  }
+
+  for (const field of ['declarations', 'aot', 'styles', 'rendered']) {
+    assert.equal(verification[field], true, `Missing Angular ${field} verification`);
+  }
+}
+
 function validateReactNativeVerification(value: unknown, packages: string[]): void {
   const verification = record(value, 'React Native verification');
 
@@ -362,6 +404,14 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
     validateSvelteVerification(verification.svelte, sveltePackages);
   }
 
+  const angularPackages = [...names].filter(
+    (name) => name === '@fluxdown/angular' || name === '@fluxdown/angular-plugins',
+  );
+
+  if (angularPackages.length || verification.angular !== undefined) {
+    validateAngularVerification(verification.angular, angularPackages);
+  }
+
   const nativePackages = [...names].filter(
     (name) => name === '@fluxdown/react-native' || name === '@fluxdown/react-native-plugins',
   );
@@ -374,6 +424,7 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
     (verification.lynx === undefined ? 0 : lynxPackages.length) +
     (taroVerified ? taroPackages.length : 0) +
     sveltePackages.length +
+    angularPackages.length +
     (verification.native === undefined ? 0 : nativePackages.length);
 
   // Existing Node-verified artifacts remain valid for recovery.

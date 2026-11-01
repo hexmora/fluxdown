@@ -99,9 +99,9 @@ When finished, you can turn smoothing off to show the remaining content immediat
 smoothEnabled.next(false);
 ```
 
-`Shad` adds fade markers to trailing content. Its `enabled`, `length`, and `maskWidth` options accept plain values or readable closures; `maskWidth` controls the fade width in pixels and defaults to `15`. Your renderer must support those nodes to produce a visual fade. The React, Vue, Svelte, React Native, Lynx, Solid and Taro presets include the corresponding render plugin.
+`Shad` adds fade markers to trailing content. Its `enabled`, `length`, and `maskWidth` options accept plain values or readable closures; `maskWidth` controls the fade width in pixels and defaults to `15`. Your renderer must support those nodes to produce a visual fade. The React, Vue, Svelte, React Native, Lynx, Solid, Taro, and Angular presets include the corresponding render plugin.
 
-`Scale` adds character and word markers for a per-character entrance. Like `Smooth`, its `enabled`, `duration`, `from`, and `blur` options accept plain values or readable closures. Your renderer must handle the markers; the React, Vue, Svelte, React Native, Lynx, Solid and Taro components expose the simpler [`streaming.effect`](../common/streaming-effects/animation/index.mdx) configuration.
+`Scale` adds character and word markers for a per-character entrance. Like `Smooth`, its `enabled`, `duration`, `from`, and `blur` options accept plain values or readable closures. Your renderer must handle the markers; the React, Vue, Svelte, React Native, Lynx, Solid, Taro, and Angular components expose the simpler [`streaming.effect`](../common/streaming-effects/animation/index.mdx) configuration.
 
 ## Clean up
 

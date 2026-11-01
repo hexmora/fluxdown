@@ -54,6 +54,12 @@
   },
   {
     "type": "dir",
+    "name": "angular",
+    "label": "Angular",
+    "collapsed": true
+  },
+  {
+    "type": "dir",
     "name": "core",
     "label": "Core",
     "collapsed": true

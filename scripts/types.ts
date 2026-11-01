@@ -59,6 +59,14 @@ export interface SvelteCheckResult {
   styles: boolean;
 }
 
+export interface AngularCheckResult {
+  specifiers: string[];
+  declarations: boolean;
+  aot: boolean;
+  styles: boolean;
+  rendered: boolean;
+}
+
 export interface ReactNativeCheckResult {
   packages: string[];
 }
