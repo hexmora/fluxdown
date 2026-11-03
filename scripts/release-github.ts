@@ -338,7 +338,9 @@ function packagesAt(commit: string) {
   assert(sha(commit), 'Invalid manifest commit');
   const entries = git('ls-tree', '-r', '--name-only', commit, '--', 'packages', 'website')
     .split('\n')
-    .filter((path) => /^(packages\/[^/]+|website)\/package\.json$/.test(path));
+    .filter((path) =>
+      /^(packages\/[^/]+|packages\/uni-app\/playground|website)\/package\.json$/.test(path),
+    );
   return new Map(
     entries.map((path) => {
       const manifest = JSON.parse(git('show', `${commit}:${path}`)) as {
