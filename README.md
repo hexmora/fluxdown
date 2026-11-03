@@ -4,7 +4,7 @@
 
 # Fluxdown — Streaming Markdown for AI apps
 
-[Website](https://hexmora.github.io/fluxdown/) · [Playground](https://hexmora.github.io/fluxdown/playground.html) · [Documentation](https://hexmora.github.io/fluxdown/guide/index.html) · [简体中文](./docs/README.zh-CN.md)
+[Website](https://fluxdown.dev/) · [Playground](https://fluxdown.dev/playground.html) · [Documentation](https://fluxdown.dev/guide/index.html) · [简体中文](./docs/README.zh-CN.md)
 
 Fluxdown renders streaming Markdown for AI chat and live writing in React, Vue 3, Svelte 5, Angular, React Native, Lynx, SolidJS, and Taro. Its shared core keeps content readable from unfinished syntax to the final response.
 
@@ -43,7 +43,7 @@ If your bundler does not load the styles automatically, add this to your app's g
 import "fluxdown/styles.css";
 ```
 
-See the quick starts for [React](https://hexmora.github.io/fluxdown/guide/react/quick-start.html), [Vue 3](https://hexmora.github.io/fluxdown/guide/vue/quick-start.html), [Svelte 5](https://hexmora.github.io/fluxdown/guide/svelte/quick-start.html), [Angular](https://hexmora.github.io/fluxdown/guide/angular/quick-start.html), [React Native](https://hexmora.github.io/fluxdown/guide/react-native/quick-start.html), [Lynx / ReactLynx](https://hexmora.github.io/fluxdown/guide/lynx/quick-start.html), [SolidJS](https://hexmora.github.io/fluxdown/guide/solid/quick-start.html), and [Taro React](https://hexmora.github.io/fluxdown/guide/taro/quick-start.html) for more examples.
+See the quick starts for [React](https://fluxdown.dev/guide/react/quick-start.html), [Vue 3](https://fluxdown.dev/guide/vue/quick-start.html), [Svelte 5](https://fluxdown.dev/guide/svelte/quick-start.html), [Angular](https://fluxdown.dev/guide/angular/quick-start.html), [React Native](https://fluxdown.dev/guide/react-native/quick-start.html), [Lynx / ReactLynx](https://fluxdown.dev/guide/lynx/quick-start.html), [SolidJS](https://fluxdown.dev/guide/solid/quick-start.html), and [Taro React](https://fluxdown.dev/guide/taro/quick-start.html) for more examples.
 
 ## Packages
 
@@ -62,11 +62,11 @@ See the quick starts for [React](https://hexmora.github.io/fluxdown/guide/react/
 
 ## Documentation
 
-- [React streaming](https://hexmora.github.io/fluxdown/guide/react/streaming.html) — connect incoming text and control streaming effects.
-- [React styling](https://hexmora.github.io/fluxdown/guide/react/customization.html) — adjust themes, typography, and layout.
-- [React plugins](https://hexmora.github.io/fluxdown/guide/react/plugins.html) — customize syntax, content, and interactions.
-- [Core](https://hexmora.github.io/fluxdown/guide/core/quick-start.html) — work with reactive content blocks directly.
-- [Stative](https://hexmora.github.io/fluxdown/stative/getting-started.html) — create and compose state flows.
+- [React streaming](https://fluxdown.dev/guide/react/streaming.html) — connect incoming text and control streaming effects.
+- [React styling](https://fluxdown.dev/guide/react/customization.html) — adjust themes, typography, and layout.
+- [React plugins](https://fluxdown.dev/guide/react/plugins.html) — customize syntax, content, and interactions.
+- [Core](https://fluxdown.dev/guide/core/quick-start.html) — work with reactive content blocks directly.
+- [Stative](https://fluxdown.dev/stative/getting-started.html) — create and compose state flows.
 
 ## Contributing
 

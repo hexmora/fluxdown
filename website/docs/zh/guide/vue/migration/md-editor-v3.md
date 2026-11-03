@@ -14,7 +14,7 @@
 # 参考文档
 
 - 原库：https://imzbf.github.io/md-editor-v3/en-US/api/
-- 目标：https://hexmora.github.io/fluxdown/zh/guide/vue/quick-start.html
+- 目标：https://fluxdown.dev/zh/guide/vue/quick-start.html
 
 # 迁移步骤
 

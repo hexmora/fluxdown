@@ -14,7 +14,7 @@ Migrate the project from vue-markdown-render to @fluxdown/vue. Implement the cha
 # References
 
 - Source: https://github.com/cloudacy/vue-markdown-render
-- Target: https://hexmora.github.io/fluxdown/guide/vue/quick-start.html
+- Target: https://fluxdown.dev/guide/vue/quick-start.html
 
 # Steps
 

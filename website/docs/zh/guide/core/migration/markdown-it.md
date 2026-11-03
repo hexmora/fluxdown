@@ -16,8 +16,8 @@ markdown-it 通常把 Markdown 转成 HTML 字符串；Core 则保留可订阅�
 # 参考
 
 - markdown-it：https://markdown-it.github.io/markdown-it/
-- Fluxdown Core：https://hexmora.github.io/fluxdown/zh/guide/core/quick-start.html
-- Core 插件：https://hexmora.github.io/fluxdown/zh/guide/core/plugins.html
+- Fluxdown Core：https://fluxdown.dev/zh/guide/core/quick-start.html
+- Core 插件：https://fluxdown.dev/zh/guide/core/plugins.html
 
 # 执行
 

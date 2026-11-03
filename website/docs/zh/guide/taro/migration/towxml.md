@@ -16,8 +16,8 @@
 # 参考文档
 
 - Towxml：https://github.com/sbfkcel/towxml/wiki
-- Fluxdown：https://hexmora.github.io/fluxdown/zh/guide/taro/quick-start.html
-- 自定义组件：https://hexmora.github.io/fluxdown/zh/guide/taro/plugins/slot.html
+- Fluxdown：https://fluxdown.dev/zh/guide/taro/quick-start.html
+- 自定义组件：https://fluxdown.dev/zh/guide/taro/plugins/slot.html
 
 # 执行方式
 

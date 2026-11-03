@@ -16,8 +16,8 @@ Migrate react-native-markdown-display to @fluxdown/react-native in this project.
 # References
 
 - Source: https://github.com/iamacup/react-native-markdown-display
-- Fluxdown: https://hexmora.github.io/fluxdown/guide/react-native/quick-start.html
-- Custom components: https://hexmora.github.io/fluxdown/guide/react-native/plugins/slot.html
+- Fluxdown: https://fluxdown.dev/guide/react-native/quick-start.html
+- Custom components: https://fluxdown.dev/guide/react-native/plugins/slot.html
 
 # Approach
 

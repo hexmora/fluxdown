@@ -14,7 +14,7 @@
 # 参考文档
 
 - 原库：https://github.com/pablo-abc/svelte-markdown
-- 目标：https://hexmora.github.io/fluxdown/zh/guide/svelte/quick-start.html
+- 目标：https://fluxdown.dev/zh/guide/svelte/quick-start.html
 
 # 迁移步骤
 

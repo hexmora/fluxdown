@@ -2,7 +2,7 @@
   "name": "@fluxdown/lynx-plugins",
   "version": "0.3.0",
   "description": "Lynx elements and render plugins for Fluxdown.",
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

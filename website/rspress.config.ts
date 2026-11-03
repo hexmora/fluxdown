@@ -15,8 +15,8 @@ import { sessionLocale } from './theme/locale/plugin';
 
 export default defineConfig({
   root: 'docs',
-  base: '/fluxdown/',
-  siteOrigin: 'https://hexmora.github.io',
+  base: '/',
+  siteOrigin: 'https://fluxdown.dev',
   title: 'Fluxdown',
   description:
     'Streaming Markdown for AI apps across web, native apps, and mini programs, with smooth output, syntax repair, and a shared reactive core.',
@@ -109,7 +109,7 @@ export default defineConfig({
       pluginSvgr(),
       pluginSvelte({ preprocessOptions: { typescript: false } }),
       sessionAppearance(),
-      sessionLocale('/fluxdown/'),
+      sessionLocale('/'),
       reactNativeWebPlugin(fileURLToPath(new URL('.', import.meta.url))),
     ],
     resolve: {

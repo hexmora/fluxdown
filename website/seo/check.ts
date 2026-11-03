@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const output = fileURLToPath(new URL('../doc_build/', import.meta.url));
-const site = new URL('https://hexmora.github.io/fluxdown/');
+const site = new URL('https://fluxdown.dev/');
 const frameworks = ['react', 'vue', 'svelte', 'angular', 'react-native', 'lynx', 'solid', 'taro'];
 
 function decode(value: string): string {

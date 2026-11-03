@@ -15,8 +15,8 @@ Migrate this React project's react-markdown usage to fluxdown while preserving c
 
 # References
 
-- Fluxdown: https://hexmora.github.io/fluxdown/guide/react/quick-start.html
-- Configuration and extensions: https://hexmora.github.io/fluxdown/guide/react/configuration.html
+- Fluxdown: https://fluxdown.dev/guide/react/quick-start.html
+- Configuration and extensions: https://fluxdown.dev/guide/react/configuration.html
 - react-markdown: https://github.com/remarkjs/react-markdown
 
 # Steps

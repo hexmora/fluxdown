@@ -16,8 +16,8 @@
 # 参考文档
 
 - 原库：https://github.com/iamacup/react-native-markdown-display
-- Fluxdown：https://hexmora.github.io/fluxdown/zh/guide/react-native/quick-start.html
-- 自定义组件：https://hexmora.github.io/fluxdown/zh/guide/react-native/plugins/slot.html
+- Fluxdown：https://fluxdown.dev/zh/guide/react-native/quick-start.html
+- 自定义组件：https://fluxdown.dev/zh/guide/react-native/plugins/slot.html
 
 # 执行方式
 
