@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const output = fileURLToPath(new URL('../doc_build/', import.meta.url));
 const site = new URL('https://fluxdown.dev/');
+const demoDirectories = ['lynx-demo', 'uni-app-demo'];
 const frameworks = [
   'react',
   'vue',
@@ -58,11 +59,9 @@ function pageFile(value: string): string {
   const file = decodeURIComponent(url.pathname.slice(site.pathname.length));
   assert.ok(!file.split('/').includes('..'), `URL escapes the build output: ${value}`);
   assert.ok(!/(^|\/)404\.html$/.test(file), `404 page must not be indexed: ${value}`);
-  assert.ok(!file.startsWith('lynx-demo/'), `Lynx iframe assets must not be indexed: ${value}`);
-
   assert.ok(
-    !file.startsWith('uni-app-demo/'),
-    `uni-app iframe assets must not be indexed: ${value}`,
+    !demoDirectories.some((directory) => file.startsWith(`${directory}/`)),
+    `Iframe demo assets must not be indexed: ${value}`,
   );
 
   assert.ok(!file.startsWith('static/'), `Static assets must not be indexed: ${value}`);
@@ -80,12 +79,12 @@ const files = (await readdir(output, { recursive: true }))
   .map((file) => file.split(path.sep).join('/'))
   .filter(
     (file) =>
-      file.endsWith('.html') &&
-      !/(^|\/)404\.html$/.test(file) &&
-      !file.startsWith('lynx-demo/') &&
-      !file.startsWith('uni-app-demo/') &&
-      !file.startsWith('static/'),
+      file.endsWith('.html') && !/(^|\/)404\.html$/.test(file) && !file.startsWith('static/'),
   );
+
+for (const directory of demoDirectories) {
+  assert.ok(files.includes(`${directory}/index.html`), `Missing iframe entry: ${directory}`);
+}
 
 const pages = new Map(
   (
@@ -103,6 +102,9 @@ const pages = new Map(
             ['robots', 'googlebot'].includes(item.name?.toLowerCase()) &&
             /\b(noindex|none)\b/i.test(item.content ?? ''),
         );
+        if (demoDirectories.some((directory) => file.startsWith(`${directory}/`))) {
+          assert.ok(noindex, `${url}: iframe demo must declare noindex`);
+        }
         if (noindex) {
           assert.ok(!sitemapUrls.has(url), `${url}: noindex page must not be in the sitemap`);
           return null;
@@ -179,5 +181,5 @@ for (const route of routes) {
 }
 
 process.stdout.write(
-  `Verified ${pages.size} canonical sitemap pages and SEO metadata for ${titles.size} priority pages.\n`,
+  `Verified ${pages.size} canonical sitemap pages, SEO metadata for ${titles.size} priority pages, and noindex for iframe demos.\n`,
 );

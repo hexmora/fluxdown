@@ -24,7 +24,7 @@ export function lynxDemo(): RspressPlugin {
           // These are static iframe assets, even when Rspress runs in dev mode.
           mode: 'production',
           source: { entry: { index: `${cwd}/lynx/host.ts` } },
-          html: { title: 'Fluxdown · Lynx' },
+          html: { title: 'Fluxdown · Lynx', meta: { robots: 'noindex' } },
           plugins: [pluginSass()],
           output,
         },

@@ -1,6 +1,6 @@
 # @fluxdown/uni-app
 
-uni-app x Vapor components for streaming Markdown. Requires HBuilderX 5.33 or later.
+Uni App x Vapor components for streaming Markdown. Requires HBuilderX 5.33 or later.
 
 [Quick start](https://fluxdown.dev/guide/uni-app/quick-start.html) covers the project configuration.
 
