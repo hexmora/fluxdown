@@ -14,7 +14,7 @@
 # 参考文档
 
 - 原库：https://github.com/jfcere/ngx-markdown
-- 目标：https://hexmora.github.io/fluxdown/zh/guide/angular/quick-start.html
+- 目标：https://fluxdown.dev/zh/guide/angular/quick-start.html
 
 # 迁移步骤
 

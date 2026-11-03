@@ -15,8 +15,8 @@ Migrate this React project's markdown-to-jsx usage to fluxdown, preserving conte
 
 # References
 
-- Fluxdown: https://hexmora.github.io/fluxdown/guide/react/quick-start.html
-- Configuration and extensions: https://hexmora.github.io/fluxdown/guide/react/configuration.html
+- Fluxdown: https://fluxdown.dev/guide/react/quick-start.html
+- Configuration and extensions: https://fluxdown.dev/guide/react/configuration.html
 - markdown-to-jsx: https://github.com/quantizor/markdown-to-jsx
 
 # Steps

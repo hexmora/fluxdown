@@ -16,8 +16,8 @@ Migrate the project's Marked processing pipeline to @fluxdown/core. Implement th
 # References
 
 - Marked: https://marked.js.org/
-- Fluxdown Core: https://hexmora.github.io/fluxdown/guide/core/quick-start.html
-- Configuration and plugins: https://hexmora.github.io/fluxdown/guide/core/configuration.html
+- Fluxdown Core: https://fluxdown.dev/guide/core/quick-start.html
+- Configuration and plugins: https://fluxdown.dev/guide/core/configuration.html
 
 # Work
 

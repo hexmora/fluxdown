@@ -14,7 +14,7 @@ Migrate the project's ngx-markdown display components to @fluxdown/angular. Impl
 # References
 
 - Source: https://github.com/jfcere/ngx-markdown
-- Target: https://hexmora.github.io/fluxdown/guide/angular/quick-start.html
+- Target: https://fluxdown.dev/guide/angular/quick-start.html
 
 # Steps
 

@@ -4,7 +4,7 @@ Streaming Markdown, ready for your React app.
 
 `fluxdown` renders Markdown with base styles, code highlighting, and copy buttons included. It supports GFM tables, task lists, strikethrough, and autolinks. During generation, it can smooth incoming text, repair unfinished syntax, and fade in trailing characters.
 
-[Documentation](../../website/docs/en/guide/react/quick-start.md) · [Playground](https://hexmora.github.io/fluxdown/playground.html) · [简体中文](./docs/README.zh-CN.md)
+[Documentation](../../website/docs/en/guide/react/quick-start.md) · [Playground](https://fluxdown.dev/playground.html) · [简体中文](./docs/README.zh-CN.md)
 
 ## Install
 

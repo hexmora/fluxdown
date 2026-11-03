@@ -14,7 +14,7 @@ Migrate the project's md-editor-v3 Markdown previews to @fluxdown/vue. Implement
 # References
 
 - Source: https://imzbf.github.io/md-editor-v3/en-US/api/
-- Target: https://hexmora.github.io/fluxdown/guide/vue/quick-start.html
+- Target: https://fluxdown.dev/guide/vue/quick-start.html
 
 # Steps
 

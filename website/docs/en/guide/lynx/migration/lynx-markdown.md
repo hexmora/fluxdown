@@ -17,8 +17,8 @@ Migrate rendering from Lynx's official Markdown element to @fluxdown/lynx. Make 
 
 - Source element: https://github.com/lynx-family/lynx-website/blob/main/docs/en/api/elements/built-in/markdown.mdx
 - Official examples: https://github.com/lynx-family/lynx-examples/tree/main/examples/markdown
-- Fluxdown: https://hexmora.github.io/fluxdown/guide/lynx/quick-start.html
-- Styles and interactions: https://hexmora.github.io/fluxdown/guide/lynx/customization.html
+- Fluxdown: https://fluxdown.dev/guide/lynx/quick-start.html
+- Styles and interactions: https://fluxdown.dev/guide/lynx/customization.html
 
 # Approach
 

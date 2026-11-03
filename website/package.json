@@ -2,7 +2,7 @@
   "name": "@fluxdown/website",
   "version": "0.0.14",
   "private": true,
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "type": "module",
   "scripts": {
     "dev": "pnpm run build:renderers && rspress dev --host 127.0.0.1",

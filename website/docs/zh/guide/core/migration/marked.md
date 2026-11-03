@@ -16,8 +16,8 @@
 # 参考
 
 - Marked：https://marked.js.org/
-- Fluxdown Core：https://hexmora.github.io/fluxdown/zh/guide/core/quick-start.html
-- 配置与插件：https://hexmora.github.io/fluxdown/zh/guide/core/configuration.html
+- Fluxdown Core：https://fluxdown.dev/zh/guide/core/quick-start.html
+- 配置与插件：https://fluxdown.dev/zh/guide/core/configuration.html
 
 # 执行
 

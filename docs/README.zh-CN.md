@@ -4,7 +4,7 @@
 
 # Fluxdown — 面向 AI 应用的流式 Markdown 渲染器
 
-[文档站](https://hexmora.github.io/fluxdown/zh/index.html) · [在线体验](https://hexmora.github.io/fluxdown/zh/playground.html) · [文档](https://hexmora.github.io/fluxdown/zh/guide/index.html) · [English](../README.md)
+[文档站](https://fluxdown.dev/zh/index.html) · [在线体验](https://fluxdown.dev/zh/playground.html) · [文档](https://fluxdown.dev/zh/guide/index.html) · [English](../README.md)
 
 Fluxdown 为 React、Vue 3、Svelte 5、Angular、React Native、Lynx、SolidJS 和 Taro 应用提供流式 Markdown 渲染，适用于 AI 对话与实时写作。共享核心让内容从尚未完成的语法到最终回复都保持可读。
 
@@ -43,7 +43,7 @@ export function Message({ text, isStreaming }: MessageProps) {
 import "fluxdown/styles.css";
 ```
 
-更多示例见 [React](https://hexmora.github.io/fluxdown/zh/guide/react/quick-start.html)、[Vue 3](https://hexmora.github.io/fluxdown/zh/guide/vue/quick-start.html)、[Svelte 5](https://hexmora.github.io/fluxdown/zh/guide/svelte/quick-start.html)、[Angular](https://hexmora.github.io/fluxdown/zh/guide/angular/quick-start.html)、[React Native](https://hexmora.github.io/fluxdown/zh/guide/react-native/quick-start.html)、[Lynx / ReactLynx](https://hexmora.github.io/fluxdown/zh/guide/lynx/quick-start.html)、[SolidJS](https://hexmora.github.io/fluxdown/zh/guide/solid/quick-start.html) 或 [Taro React](https://hexmora.github.io/fluxdown/zh/guide/taro/quick-start.html) 的快速上手文档。
+更多示例见 [React](https://fluxdown.dev/zh/guide/react/quick-start.html)、[Vue 3](https://fluxdown.dev/zh/guide/vue/quick-start.html)、[Svelte 5](https://fluxdown.dev/zh/guide/svelte/quick-start.html)、[Angular](https://fluxdown.dev/zh/guide/angular/quick-start.html)、[React Native](https://fluxdown.dev/zh/guide/react-native/quick-start.html)、[Lynx / ReactLynx](https://fluxdown.dev/zh/guide/lynx/quick-start.html)、[SolidJS](https://fluxdown.dev/zh/guide/solid/quick-start.html) 或 [Taro React](https://fluxdown.dev/zh/guide/taro/quick-start.html) 的快速上手文档。
 
 ## 包
 
@@ -62,11 +62,11 @@ import "fluxdown/styles.css";
 
 ## 文档
 
-- [React 流式内容](https://hexmora.github.io/fluxdown/zh/guide/react/streaming.html) — 接入文本流，调整流式效果。
-- [React 样式定制](https://hexmora.github.io/fluxdown/zh/guide/react/customization.html) — 调整主题、排版和布局。
-- [React 插件](https://hexmora.github.io/fluxdown/zh/guide/react/plugins.html) — 定制语法、内容和交互。
-- [Core](https://hexmora.github.io/fluxdown/zh/guide/core/quick-start.html) — 直接处理响应式内容块。
-- [Stative](https://hexmora.github.io/fluxdown/zh/stative/getting-started.html) — 创建和组合状态流。
+- [React 流式内容](https://fluxdown.dev/zh/guide/react/streaming.html) — 接入文本流，调整流式效果。
+- [React 样式定制](https://fluxdown.dev/zh/guide/react/customization.html) — 调整主题、排版和布局。
+- [React 插件](https://fluxdown.dev/zh/guide/react/plugins.html) — 定制语法、内容和交互。
+- [Core](https://fluxdown.dev/zh/guide/core/quick-start.html) — 直接处理响应式内容块。
+- [Stative](https://fluxdown.dev/zh/stative/getting-started.html) — 创建和组合状态流。
 
 ## 参与贡献
 
