@@ -1,5 +1,13 @@
 # @fluxdown/mdast
 
+## 0.7.3
+
+### Patch Changes
+
+- a6380c3: Move documentation links and package homepages to https://fluxdown.dev/.
+- Updated dependencies [a6380c3]
+  - @fluxdown/utils@0.7.3
+
 ## 0.7.2
 
 ### Patch Changes

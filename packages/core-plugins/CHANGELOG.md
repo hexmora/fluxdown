@@ -1,5 +1,23 @@
 # @fluxdown/core-presets
 
+## 0.13.0
+
+### Minor Changes
+
+- 65f128e: Require a current-clock reader for custom smooth tickers and provide the shared implementation on BaseSmoothTicker. Keep deterministic ticker fixtures on the same arrival and frame clock.
+
+### Patch Changes
+
+- a6380c3: Move documentation links and package homepages to https://fluxdown.dev/.
+- 65f128e: Integrate spring smoothing at source arrival times and decay buffer-wall momentum by elapsed time, preventing animation-frame phase differences from producing long output delays. Discard accumulated progress when starting or resetting a stream while retaining it on resume.
+- 65f128e: Add uni-app x Vapor components with full, lite, and raw presets, native render slots, theme customization, and streaming effects. Keep RAF smoothing on one clock origin in native hosts.
+- Updated dependencies [a6380c3]
+  - @fluxdown/hast@0.7.2
+  - @fluxdown/mdast@0.7.3
+  - @fluxdown/types@0.10.2
+  - @fluxdown/utils@0.7.3
+  - stative@2.1.1
+
 ## 0.12.3
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @fluxdown/react-native
 
+## 0.2.4
+
+### Patch Changes
+
+- a6380c3: Move documentation links and package homepages to https://fluxdown.dev/.
+- Updated dependencies [a6380c3]
+  - @fluxdown/react-base@0.14.2
+  - @fluxdown/react-base-plugins@0.11.2
+  - @fluxdown/react-native-plugins@0.2.2
+  - @fluxdown/utils@0.7.3
+
 ## 0.2.3
 
 ### Patch Changes
