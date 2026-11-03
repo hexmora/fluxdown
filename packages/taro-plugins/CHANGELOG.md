@@ -1,5 +1,15 @@
 # @fluxdown/taro-plugins
 
+## 0.1.2
+
+### Patch Changes
+
+- a6380c3: Move documentation links and package homepages to https://fluxdown.dev/.
+- Updated dependencies [a6380c3]
+  - @fluxdown/react-base-plugins@0.11.2
+  - @fluxdown/types@0.10.2
+  - @fluxdown/utils@0.7.3
+
 ## 0.1.1
 
 ### Patch Changes

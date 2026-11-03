@@ -1,5 +1,21 @@
 # @fluxdown/react-presets
 
+## 0.11.2
+
+### Patch Changes
+
+- a6380c3: Move documentation links and package homepages to https://fluxdown.dev/.
+- Updated dependencies [a6380c3]
+- Updated dependencies [65f128e]
+- Updated dependencies [65f128e]
+- Updated dependencies [65f128e]
+  - @fluxdown/core@0.12.8
+  - @fluxdown/core-plugins@0.13.0
+  - @fluxdown/react-hooks@0.2.1
+  - @fluxdown/types@0.10.2
+  - @fluxdown/utils@0.7.3
+  - stative@2.1.1
+
 ## 0.11.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/uni-app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Streaming Markdown renderer for uni-app x Vapor AI chat, with syntax repair, smooth output, and customizable components.",
   "keywords": [
     "ai-chat",
