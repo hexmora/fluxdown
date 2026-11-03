@@ -123,7 +123,7 @@ export default {
 <script setup lang="ts">
 import { Fluxdown } from '@fluxdown/uni-app';
 
-const text = '# Hello Fluxdown\n\nMarkdown for **uni-app**.';
+const text = '# Hello Fluxdown\n\nMarkdown for **Uni App**.';
 </script>
 
 <template>
