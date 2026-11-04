@@ -110,7 +110,15 @@ export function isAngularPackage(name: string): boolean {
 }
 
 export function isLynxPackage(name: string): boolean {
+  return isReactLynxPackage(name) || isVueLynxPackage(name);
+}
+
+export function isReactLynxPackage(name: string): boolean {
   return name === '@fluxdown/react-lynx' || name === '@fluxdown/react-lynx-plugins';
+}
+
+export function isVueLynxPackage(name: string): boolean {
+  return name === '@fluxdown/vue-lynx' || name === '@fluxdown/vue-lynx-plugins';
 }
 
 export function isTaroPackage(name: string): boolean {
@@ -223,16 +231,21 @@ async function checkExports(directory: string, source = false): Promise<PackageM
     }
 
     if (isLynxPackage(manifest.name)) {
+      const extension = isReactLynxPackage(manifest.name) ? '.jsx' : '.js';
+
       assert(
-        resolveExport(value, ['import'])?.endsWith('.jsx'),
-        `${label}${entry}: Lynx libraries must preserve JSX for the app compiler`,
+        resolveExport(value, ['import'])?.endsWith(extension),
+        `${label}${entry}: Lynx libraries must preserve ${extension} modules for the app compiler`,
       );
+
       assert(
         resolveExport(value, ['types', 'import'])?.endsWith('.d.ts'),
         `${label}${entry}: missing Lynx declarations`,
       );
+
       continue;
     }
+
     for (const environment of ['node', 'browser']) {
       for (const [format, extension, declaration] of [
         ['import', '.js', '.d.ts'],

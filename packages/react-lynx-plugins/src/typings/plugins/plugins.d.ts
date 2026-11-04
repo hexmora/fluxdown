@@ -4,6 +4,7 @@ import '../../plugins/blockquote';
 import '../../plugins/break-line';
 import '../../plugins/cjk';
 import '../../plugins/code';
+import '../../plugins/code-prism';
 import '../../plugins/code-shiki';
 import '../../plugins/effect-chunk';
 import '../../plugins/effect-scale';
@@ -21,7 +22,7 @@ import '../../plugins/patch';
 import '../../plugins/strong';
 import '../../plugins/table';
 import '../../plugins/tex';
-import '../../plugins/tex-svg';
+import '../../plugins/tex-mathjax';
 
 export type PluginConfigs = PluggableConfigs<MapperConfigs> &
   Partial<

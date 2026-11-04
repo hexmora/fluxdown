@@ -4,15 +4,10 @@ import { useMemo } from '@lynx-js/react';
 
 import type { CodeHighlighterProps } from '../../../../../base';
 
-import {
-  AnimatedText,
-  useDeferredUnmount,
-  useStatic,
-  useTextStyle,
-  useTheme,
-} from '../../../../../base';
+import { AnimatedText, useTextStyle, useTheme } from '../../../../../base';
 import { CodeHighlighterRenderer } from '../../../../code/slot/code-highlighter/renderer';
-import { createCodeHighlighter, createCodeTheme } from './utils';
+import { useHighlighter } from './hooks';
+import { createCodeTheme } from './utils';
 
 export const CodeShikiRenderer = ({
   code,
@@ -21,7 +16,7 @@ export const CodeShikiRenderer = ({
 }: CodeHighlighterProps) => {
   const { tokens } = useTheme();
 
-  const highlighter = useStatic(createCodeHighlighter);
+  const highlighter = useHighlighter();
 
   const textStyle = useTextStyle({
     fontFamily: tokens.typography.fontMono,
@@ -29,19 +24,24 @@ export const CodeShikiRenderer = ({
     lineHeight: tokens.code.lineHeight,
   });
 
-  useDeferredUnmount(() => highlighter.dispose());
-
   const lines = useMemo(() => {
-    highlighter.loadThemeSync(createCodeTheme(tokens));
+    if (!highlighter) return;
 
-    const lang = highlighter.getLoadedLanguages().includes(language) ? language : 'text';
+    try {
+      const lang = highlighter.getLoadedLanguages().includes(language) ? language : 'text';
 
-    return highlighter.codeToTokens(code.replace(/\t/g, '  '), { lang, theme: 'fluxdown' }).tokens;
+      return highlighter.codeToTokens(code.replace(/\t/g, '  '), {
+        lang,
+        theme: createCodeTheme(tokens),
+      }).tokens;
+    } catch (error) {
+      console.error(error);
+    }
   }, [code, highlighter, language, tokens]);
 
   return (
     <CodeHighlighterRenderer {...props} code={code} language={language}>
-      {lines.map((line, lineIndex) => (
+      {lines?.map((line, lineIndex) => (
         <AnimatedText key={lineIndex} style={textStyle}>
           {line.length === 0
             ? '\u200b'

@@ -1,4 +1,4 @@
-import { TexSvgPlugin } from '@fluxdown/react-lynx-plugins/plugins/tex-svg';
+import { TexMathJaxPlugin } from '@fluxdown/react-lynx-plugins/plugins/tex-mathjax';
 import { FluxdownLite } from '@fluxdown/react-lynx/lite';
 import { root, useEffect, useState } from '@lynx-js/react';
 
@@ -59,7 +59,7 @@ function MathPreview() {
             text={formulas}
             theme={dark ? 'dark' : 'light'}
             build={{ tex: true }}
-            plugins={TexSvgPlugin}
+            plugins={TexMathJaxPlugin}
           />
         </view>
         <view style={{ padding: '16px', backgroundColor: '#171a21', borderRadius: '12px' }}>
@@ -67,7 +67,7 @@ function MathPreview() {
             text={streamed.slice(0, length)}
             theme="dark"
             build={{ tex: true }}
-            plugins={TexSvgPlugin}
+            plugins={TexMathJaxPlugin}
             streaming={length < streamed.length ? { smooth: false, effect: false } : false}
           />
         </view>
@@ -79,7 +79,7 @@ Invalid: $\notACommand{x}$
 
 Unicode: $\text{中文}+x$`}
             build={{ tex: true }}
-            plugins={TexSvgPlugin}
+            plugins={TexMathJaxPlugin}
           />
         </view>
         <text style={{ color: '#172234', fontSize: '14px' }}>

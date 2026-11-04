@@ -9,6 +9,7 @@ import {
   useTextStyle,
   useTheme,
 } from '../../../../../base';
+import './style.scss';
 
 export const CodeHighlighterRenderer = ({
   Raw: _Raw,
@@ -29,6 +30,8 @@ export const CodeHighlighterRenderer = ({
     lineHeight: tokens.code.lineHeight,
   });
 
+  const isWeb = typeof SystemInfo !== 'undefined' && String(SystemInfo.platform) === 'web';
+
   const lines = children ?? code.replace(/\t/g, '  ').split('\n');
 
   return (
@@ -36,7 +39,11 @@ export const CodeHighlighterRenderer = ({
       <scroll-view
         {...elementProps}
         scroll-x
-        className={joinClassNames('fluxdown-code-highlighter', className)}
+        className={joinClassNames(
+          'fluxdown-code-highlighter',
+          isWeb && 'fluxdown-code-highlighter-web',
+          className,
+        )}
         style={{ width: '100%', ...style }}
       >
         <view

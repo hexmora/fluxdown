@@ -1,5 +1,5 @@
-export * from '../components';
-export * from '../context';
+export * from './components';
+export * from './context';
 export * from './consts';
 export * from './hooks';
 export * from './plugins';

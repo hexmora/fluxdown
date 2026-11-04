@@ -41,7 +41,9 @@ describe('Fluxdown patches', () => {
     );
 
     expect(screen.getByTestId('point')).toHaveTextContent('|');
+
     expect(screen.getByTestId('replacement')).toHaveTextContent('world');
+
     expect(container.firstElementChild).toHaveTextContent('Hello| world');
   });
 
@@ -65,6 +67,7 @@ describe('Fluxdown patches', () => {
         remarks: [CompileCounterRemarkPlugin as unknown as RemarkPluggable],
       },
     ];
+
     const { rerender } = render(
       <Fluxdown text="Hello world" patches={createPatches('first')} plugins={plugins} />,
     );
@@ -112,6 +115,7 @@ describe('Fluxdown patches', () => {
     );
 
     expect(screen.queryByTestId('out-of-range-patch')).not.toBeInTheDocument();
+
     expect(screen.getByText('visible')).toBeInTheDocument();
   });
 });

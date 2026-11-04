@@ -6,7 +6,7 @@ import { isEqual } from 'lodash-es';
 
 import type { Theme, ThemeConfig } from './type';
 
-import { useTextAnimation } from '../../context';
+import { useTextAnimation } from '../context';
 import { useMemoValue } from '../hooks';
 import { LIGHT_THEME } from './presets/light';
 import { resolveTheme } from './utils';

@@ -28,11 +28,17 @@ afterEach(() => {
 describe('smooth configuration', () => {
   test('defaults enabled streaming to scale and retains explicit effect overrides', () => {
     expect(toStreamingConfig()).toEqual({ repairEnding: false, smooth: false, effect: false });
+
     expect(toStreamingConfig(false)).toEqual(toStreamingConfig());
+
     expect(toStreamingConfig(true)).toEqual({ repairEnding: true, smooth: true, effect: 'scale' });
+
     expect(toStreamingConfig({})).toEqual(toStreamingConfig(true));
+
     expect(toStreamingConfig({ smooth: false }).effect).toBe('scale');
+
     expect(toStreamingConfig({ effect: false }).effect).toBe(false);
+
     expect(toStreamingConfig({ effect: 'shad' }).effect).toBe('shad');
   });
 

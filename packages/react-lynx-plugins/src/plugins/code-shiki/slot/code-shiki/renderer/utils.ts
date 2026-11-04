@@ -1,7 +1,8 @@
-import type { ThemeRegistration } from 'shiki/core';
+import type { HighlighterCore, ThemeRegistration } from 'shiki/core';
 
-import { createHighlighterCoreSync } from 'shiki/core';
-import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+import 'core-js/modules/web.atob.js';
+import { createHighlighterCore } from 'shiki/core';
+import { createOnigurumaEngine } from 'shiki/engine/oniguruma';
 import bash from 'shiki/langs/bash.mjs';
 import css from 'shiki/langs/css.mjs';
 import html from 'shiki/langs/html.mjs';
@@ -9,17 +10,30 @@ import javascript from 'shiki/langs/javascript.mjs';
 import json from 'shiki/langs/json.mjs';
 import python from 'shiki/langs/python.mjs';
 import typescript from 'shiki/langs/typescript.mjs';
+import { wasmBinary } from 'shiki/wasm';
 
 import type { ThemeTokens } from '../../../../../base/theme';
 
-export const createCodeHighlighter = () =>
-  createHighlighterCoreSync({
+let highlighterPromise: Promise<HighlighterCore> | undefined;
+
+export const createCodeHighlighter = () => {
+  highlighterPromise ??= createHighlighterCore({
     langs: [bash, css, html, javascript, json, python, typescript],
 
     themes: [],
 
-    engine: createJavaScriptRegexEngine({ target: 'ES2018', forgiving: true }),
+    engine: createOnigurumaEngine({
+      instantiator: async (imports) =>
+        new WebAssembly.Instance(new WebAssembly.Module(wasmBinary), imports),
+    }),
+  }).catch((error: unknown) => {
+    highlighterPromise = undefined;
+
+    throw error;
   });
+
+  return highlighterPromise;
+};
 
 export const createCodeTheme = ({ colors, syntax }: ThemeTokens): ThemeRegistration => ({
   name: 'fluxdown',

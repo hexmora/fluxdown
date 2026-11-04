@@ -19,8 +19,11 @@ const APPEAR_STEPS = [
 
 export const getAppearKeyframes = (blur: number, fontSize: string | number = '16px') => {
   const size = String(fontSize);
+
   const pixels = /^\d+(?:\.\d+)?(?:px)?$/.test(size);
+
   const radius = pixels ? blur * parseFloat(size) : blur;
+
   const unit = pixels ? 'px' : 'em';
 
   return APPEAR_STEPS.map(([opacity, factor], index) => ({
@@ -46,6 +49,7 @@ export const useScaleAnimation = (
       'main thread';
 
       animation.current?.cancel();
+
       animation.current = null;
 
       if (!element || arrival < 0 || duration <= 0) return;
