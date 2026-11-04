@@ -1,5 +1,12 @@
 # @fluxdown/website
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies [cedcaa2]
+  - @fluxdown/vue@0.3.0
+
 ## 0.0.15
 
 ### Patch Changes

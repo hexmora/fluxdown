@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/vue-lynx",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Streaming Markdown renderer for Vue Lynx AI chat, with native elements, syntax repair, and smooth output.",
   "keywords": [
     "ai-chat",
