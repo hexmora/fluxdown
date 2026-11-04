@@ -44,7 +44,7 @@ const props = defineProps<MessageProps>();
 
 `plugins` 接受一个综合插件或数组。每个对象可以组合 `slots`、`renders`、`remarks`、`rehypes`、`repairs` 和 `mappers`，再用 `config` 配置当前对象列出的插件。
 
-> `IPluginItem` 从 `@fluxdown/vue-plugins/typings` 导入。
+> `IPluginItem` 从 `@fluxdown/vue-base-plugins/typings` 导入。
 
 Full 和 Lite 保留默认预设，再应用传入的插件；Raw 完全使用传入的列表。相同优先级下，后面的 render 先匹配，后面的 slot 通过 `Raw` 包裹前面的组件。
 

@@ -7,12 +7,10 @@ An aggregate plugin uses `IPluginItem` to group the slot, render and Core plugin
 Every list is optional. For example, combine the blockquote renderer and slot:
 
 ```ts
-import type { IPluginItem } from '@fluxdown/vue-plugins/typings';
+import type { IPluginItem } from '@fluxdown/vue-base-plugins/typings';
 
-import {
-  BlockquoteRenderPlugin,
-  BlockquoteSlotPlugin,
-} from '@fluxdown/vue-plugins/plugins/blockquote';
+import { BlockquoteRenderPlugin } from '@fluxdown/vue-base-plugins/plugins/blockquote';
+import { BlockquoteSlotPlugin } from '@fluxdown/vue-plugins/plugins/blockquote';
 
 export const QuotePlugin: IPluginItem = {
   renders: [BlockquoteRenderPlugin],
@@ -20,7 +18,7 @@ export const QuotePlugin: IPluginItem = {
 };
 ```
 
-> Import `IPluginItem` from `@fluxdown/vue-plugins/typings`. Import built-in render and slot plugins from the corresponding plugin subpath.
+> Import `IPluginItem` from `@fluxdown/vue-base-plugins/typings`. Import built-in render and slot plugins from the corresponding plugin subpath.
 
 Then pass it to the component:
 
@@ -49,7 +47,7 @@ You can also include `remarks`, `rehypes`, `repairs` and `mappers`. Extend `Base
 `pluginExtends` accepts two or more aggregate plugins. Pass the base first, then add the behavior to override. For example, derive a code plugin with its toolbar hidden:
 
 ```ts
-import { pluginExtends } from '@fluxdown/vue-plugins/base';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
 import {
   CodeHeaderSlotPlugin,
   CodePlugin,
@@ -63,7 +61,7 @@ export const CompactCodePlugin = /*#__PURE__*/ pluginExtends(CodePlugin, {
 });
 ```
 
-> Import `pluginExtends` from `@fluxdown/vue-plugins/base`.
+> Import `pluginExtends` from `@fluxdown/vue-base-plugins/base`.
 
 Pass `CompactCodePlugin` to `FluxdownLite` through `plugins`. `config` applies only to plugins listed in the same object, matches their `key`, and overrides matching options from `[Plugin, options]`. This example explicitly lists `CodeHeaderSlotPlugin` to disable the inherited toolbar while keeping the code container and source display.
 

@@ -6,6 +6,7 @@ export const CODE_FRAMEWORKS = [
   'Angular',
   'React Native',
   'React Lynx',
+  'Vue Lynx',
   'Solid',
   'Taro',
   'uni-app',

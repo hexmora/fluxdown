@@ -56,3 +56,7 @@ Themes accept a preset name, partial overrides, or `[preset, overrides]`. Use st
 | `radius`, `spacing`               | Shared border radii and spacing.                        |
 
 Every group accepts partial overrides; you do not need to copy a complete theme. Use [slot plugins](./plugins/slot.md) to replace navigation, code toolbars or image components.
+
+## Native text styles
+
+Text styles propagate explicitly to native text elements without CSS inheritance. Fonts and glyph metrics come from the host. `inlineCode.whiteSpace` supports `normal` and `nowrap`; other values use `normal`. The built-in native slots do not apply `typography.fontSmoothing` or `colors.accentHover`; custom host slots can use these tokens.

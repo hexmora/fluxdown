@@ -15,6 +15,8 @@ React Lynx 版将 Markdown 渲染成 `text`、`view` 等 Lynx 元素。它基于
 pnpm add @fluxdown/react-lynx
 ```
 
+Android 的 Full 代码高亮需要 Lynx 3.8 或更新版本的后台线程 WebAssembly 支持。异步初始化与内联 WASM 的行为见[代码高亮](./plugins/matrix.mdx#code-highlighting)。
+
 包内保留 JSX，由项目中的 `@lynx-js/react-rsbuild-plugin` 编译。组件导入时会一并引入所需样式，无需额外加载样式文件。
 
 ## 显示第一段内容
@@ -50,4 +52,4 @@ export default function App() {
 - [流式内容](./streaming.md)：控制平滑输出与末尾效果。
 - [样式指南](./customization.md)：调整颜色、字体和间距。
 - [插件矩阵](./plugins/matrix.mdx)：选择 Full、Lite 或自己组装。
-- [横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、Svelte、Angular、React Native、React Lynx、Solid、Taro 和 Uni App 的静态与流式表现。
+- [横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、Svelte、Angular、React Native、React Lynx、Vue Lynx、Solid、Taro 和 Uni App 的静态与流式表现。

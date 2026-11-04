@@ -93,6 +93,24 @@ export class Message {
       code: getComponentExample('@fluxdown/react-lynx', comment),
     },
     {
+      framework: 'Vue Lynx',
+      renderer: 'vue-lynx',
+      lang: 'vue',
+      code: `<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+${comment}
+defineProps<{
+  text: string;
+  isStreaming: boolean;
+}>();
+</script>
+
+<template>
+  <Fluxdown :text="text" :streaming="isStreaming" />
+</template>`,
+    },
+    {
       framework: 'Solid',
       renderer: 'solid',
       lang: 'tsx',

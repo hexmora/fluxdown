@@ -46,14 +46,16 @@ export const RendererPreview = ({
 
   const props = { text, streaming, build, theme };
 
-  if (renderer === 'react-lynx') {
+  if (renderer === 'react-lynx' || renderer === 'vue-lynx') {
     return (
       <LynxPreview
+        key={renderer}
         data={data}
+        renderer={renderer}
         errorLabel={
           lang === 'zh'
-            ? 'React Lynx 预览加载失败，请刷新页面重试。'
-            : 'The React Lynx preview could not load. Refresh the page to try again.'
+            ? `${renderer === 'react-lynx' ? 'React Lynx' : 'Vue Lynx'} 预览加载失败，请刷新页面重试。`
+            : `The ${renderer === 'react-lynx' ? 'React Lynx' : 'Vue Lynx'} preview could not load. Refresh the page to try again.`
         }
       />
     );

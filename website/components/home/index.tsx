@@ -120,6 +120,10 @@ export const Home = () => {
               <strong>React Lynx</strong>
               <span>{copy.react}</span>
             </Link>
+            <Link className={styles.frameworkCard} href={href('/guide/vue-lynx/quick-start')}>
+              <strong>Vue Lynx</strong>
+              <span>{copy.react}</span>
+            </Link>
             <Link className={styles.frameworkCard} href={href('/guide/solid/quick-start')}>
               <strong>Solid</strong>
               <span>{copy.react}</span>

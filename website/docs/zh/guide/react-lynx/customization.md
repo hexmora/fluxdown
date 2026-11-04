@@ -56,3 +56,7 @@ import { Fluxdown } from '@fluxdown/react-lynx';
 | `radius`、`spacing`               | 共用圆角和间距。                           |
 
 各组都支持局部覆盖，无需复制完整主题。要替换链接导航、代码工具栏或图片组件，使用 [Slot 插件](./plugins/slot.md)。
+
+## 原生文字样式
+
+文字样式显式传递给原生文字元素，不依赖 CSS 继承；字体与字形度量由宿主提供。`inlineCode.whiteSpace` 支持 `normal` 和 `nowrap`，其他值按 `normal` 处理。内置原生插槽不使用 `typography.fontSmoothing` 和 `colors.accentHover`，自定义宿主插槽可以读取这些 token。

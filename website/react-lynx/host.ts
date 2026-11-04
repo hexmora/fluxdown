@@ -9,17 +9,27 @@ import { createBottomScroll } from '../components/bottom-scroll/utils';
 import './host.scss';
 
 let view: LynxViewElement | undefined;
+
 let reducedMotion: boolean | undefined;
+
 let scrollMode: BottomScrollMode = 'static';
+
 let stopFollowing: (() => void) | undefined;
 
 const viewport = document.createElement('main');
+
 viewport.className = 'viewport';
+
 viewport.tabIndex = 0;
+
 viewport.setAttribute('aria-label', 'React Lynx');
+
 const content = document.createElement('div');
+
 content.className = 'content';
+
 viewport.append(content);
+
 document.body.append(viewport);
 
 window.addEventListener('message', (event: MessageEvent) => {
@@ -29,6 +39,7 @@ window.addEventListener('message', (event: MessageEvent) => {
 
   if (event.data?.type === 'lynx-demo:connect') {
     window.parent.postMessage({ type: 'lynx-demo:ready' }, window.location.origin);
+
     return;
   }
 
@@ -44,7 +55,9 @@ window.addEventListener('message', (event: MessageEvent) => {
 
   if (reducedMotion !== data.reducedMotion) {
     stopFollowing?.();
+
     reducedMotion = data.reducedMotion;
+
     stopFollowing = createBottomScroll(viewport, content, reducedMotion, () => scrollMode);
   }
 

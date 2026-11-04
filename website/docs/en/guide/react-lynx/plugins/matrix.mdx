@@ -4,26 +4,31 @@ import { PluginTag, PresetCheck } from '../../../../../components';
 
 ## Component variants
 
-| Component      | Entry                                     | Included features                                            |
-| -------------- | ----------------------------------------- | ------------------------------------------------------------ |
-| `Fluxdown`     | `@fluxdown/react-lynx` or `@fluxdown/react-lynx/full` | Adds Shiki highlighting, CJK and Emoji to the base features. |
-| `FluxdownLite` | `@fluxdown/react-lynx/lite`                     | Basic Markdown, tables, images and streaming effects.        |
-| `FluxdownRaw`  | `@fluxdown/react-lynx/raw`                      | Requires your complete `plugins` list.                       |
+| Component      | Entry                                                 | Included features                                     |
+| -------------- | ----------------------------------------------------- | ----------------------------------------------------- |
+| `Fluxdown`     | `@fluxdown/react-lynx` or `@fluxdown/react-lynx/full` | Shiki highlighting, SVG math, CJK and Emoji.          |
+| `FluxdownLite` | `@fluxdown/react-lynx/lite`                           | Basic Markdown, tables, images and streaming effects. |
+| `FluxdownRaw`  | `@fluxdown/react-lynx/raw`                            | Requires your complete `plugins` list.                |
 
 Full highlights Bash, CSS, HTML, JavaScript, JSON, Python and TypeScript. Unrecognized languages remain plain text. Lite displays code as source text.
 
-Both presets provide a `Tex` slot. `build.tex` defaults to `false`; enabling it displays formula source. Add `TexSvgPlugin` and integrate SVG XElement in the host to typeset math.
+`build.tex` defaults to `false`. When enabled, Full typesets math with MathJax SVG and requires SVG XElement in the host. Lite displays formula source; add `TexMathJaxPlugin` for typesetting.
+
+## Code highlighting {#code-highlighting}
+
+Full uses Shiki highlighting and displays source text while initializing or after an error. Android requires Lynx 3.8 or later with [background-thread WebAssembly support](https://lynxjs.org/4.1/guide/scripting-runtime/webassembly.html). Use `CodePrismPlugin` for highlighting without WebAssembly.
 
 ## All plugins
 
 Composition includes inherited plugin types. A check means the preset directly includes that plugin. Full's `CodeShikiPlugin` inherits the base features of `CodePlugin`.
 
-| Plugin               | Composition                                           | Package                           |      Lite       |      Full       |
-| -------------------- | ----------------------------------------------------- | --------------------------------- | :-------------: | :-------------: |
+| Plugin               | Composition                                           | Package                                 |      Lite       |      Full       |
+| -------------------- | ----------------------------------------------------- | --------------------------------------- | :-------------: | :-------------: |
 | `BlockquotePlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `BreakLinePlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `CjkPlugin`          | <PluginTag type="remark" />                           | <PluginTag type="react-lynx-plugins" /> |                 | <PresetCheck /> |
 | `CodePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> |                 |
+| `CodePrismPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> |                 |                 |
 | `CodeShikiPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> |                 | <PresetCheck /> |
 | `EffectChunkPlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `EffectScalePlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
@@ -40,13 +45,13 @@ Composition includes inherited plugin types. A check means the preset directly i
 | `PatchPlugin`        | <PluginTag type="render" />                           | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `StrongPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `TablePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `TexSvgPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> |                 |                 |
+| `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> |                 |
+| `TexMathJaxPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> |                 | <PresetCheck /> |
 
 ## Package and imports
 
-<PluginTag type="react-lynx-plugins" /> is `@fluxdown/react-lynx-plugins`, which provides
-React Lynx composite plugins, render plugins and slots.
+<PluginTag type="react-lynx-plugins" /> is `@fluxdown/react-lynx-plugins`, which
+provides React Lynx composite plugins, render plugins and slots.
 
 > Import from `@fluxdown/react-lynx-plugins/plugins/<plugin-directory>`. Remove the `Plugin` suffix from the export name and convert it to lowercase hyphenated words: `CodeShikiPlugin` becomes `code-shiki`.
 
