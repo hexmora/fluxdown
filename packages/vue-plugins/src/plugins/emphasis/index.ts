@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { EmphasisPlugin as _EmphasisPlugin } from '@fluxdown/vue-base-plugins/plugins/emphasis';
 
-import { EmphasisRenderPlugin } from './render';
 import { EmphasisSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const EmphasisPlugin: IPluginItem = {
+export const EmphasisPlugin = /*#__PURE__*/ pluginExtends(_EmphasisPlugin, {
   slots: [EmphasisSlotPlugin],
-  renders: [EmphasisRenderPlugin],
-};
+});

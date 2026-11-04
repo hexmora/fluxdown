@@ -1,4 +1,4 @@
-import type { IPluginItem } from '../../typings';
+import type { IPluginItem } from '@fluxdown/vue-base-plugins/typings';
 
 import { EffectScaleRenderPlugin } from './render';
 import { EffectScaleSlotPlugin, EffectScaleWordSlotPlugin } from './slot';

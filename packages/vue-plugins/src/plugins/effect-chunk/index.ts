@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { EffectChunkPlugin as _EffectChunkPlugin } from '@fluxdown/vue-base-plugins/plugins/effect-chunk';
 
-import { EffectChunkRenderPlugin } from './render';
 import { EffectChunkSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const EffectChunkPlugin: IPluginItem = {
+export const EffectChunkPlugin = /*#__PURE__*/ pluginExtends(_EffectChunkPlugin, {
   slots: [EffectChunkSlotPlugin],
-  renders: [EffectChunkRenderPlugin],
-};
+});

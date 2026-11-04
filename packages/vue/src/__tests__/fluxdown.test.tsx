@@ -1,13 +1,10 @@
+import type { IPluginItem } from '@fluxdown/vue-base-plugins/typings';
 import type { ParagraphProps } from '@fluxdown/vue-plugins/base';
-import type { IPluginItem } from '@fluxdown/vue-plugins/typings';
 
 import { SyntaxSoftEndlineRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-soft-endline';
+import { ParagraphRenderPlugin } from '@fluxdown/vue-base-plugins/plugins/paragraph';
 import { BaseSlotPlugin, PREFIX } from '@fluxdown/vue-plugins/base';
-import {
-  ParagraphPlugin,
-  ParagraphRenderPlugin,
-  ParagraphSlotPlugin,
-} from '@fluxdown/vue-plugins/plugins/paragraph';
+import { ParagraphPlugin, ParagraphSlotPlugin } from '@fluxdown/vue-plugins/plugins/paragraph';
 import { mount } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
 

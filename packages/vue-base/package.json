@@ -1,0 +1,91 @@
+{
+  "name": "@fluxdown/vue-base",
+  "version": "0.1.0",
+  "description": "Platform-independent Vue renderer for Fluxdown.",
+  "keywords": [
+    "hast",
+    "llm",
+    "markdown",
+    "renderer",
+    "streaming",
+    "vue"
+  ],
+  "homepage": "https://fluxdown.dev/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/vue-base"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/packs/index.tsx",
+  "module": "./src/packs/index.tsx",
+  "types": "./src/packs/index.tsx",
+  "exports": {
+    ".": "./src/packs/index.tsx"
+  },
+  "publishConfig": {
+    "main": "./dist/cjs/index.cjs",
+    "module": "./dist/esm/index.js",
+    "types": "./dist/esm/packs/index.d.ts",
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/esm/packs/index.d.ts",
+          "default": "./dist/esm/index.js"
+        },
+        "require": {
+          "types": "./dist/cjs/packs/index.d.cts",
+          "default": "./dist/cjs/index.cjs"
+        }
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build",
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@fluxdown/vue-base-plugins": "workspace:^",
+    "@types/hast": "catalog:",
+    "lodash-es": "catalog:",
+    "shallow-equal": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue-jsx": "catalog:",
+    "@vue/server-renderer": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "vue": "catalog:vue-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

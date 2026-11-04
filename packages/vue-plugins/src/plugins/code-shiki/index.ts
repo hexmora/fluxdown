@@ -1,4 +1,5 @@
-import { pluginExtends } from '../../base';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+
 import { CodePlugin } from '../code';
 import { CodeShikiSlotPlugin } from './slot';
 

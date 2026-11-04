@@ -1,0 +1,103 @@
+{
+  "name": "@fluxdown/vue-base-plugins",
+  "version": "0.1.0",
+  "description": "Platform-independent Vue render plugins and slot infrastructure for Fluxdown.",
+  "keywords": [
+    "hast",
+    "markdown",
+    "plugins",
+    "renderer",
+    "streaming",
+    "vue"
+  ],
+  "homepage": "https://fluxdown.dev/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/vue-base-plugins"
+  },
+  "files": [
+    "dist/esm",
+    "dist/cjs",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    "./typings": "./src/typings/index.ts",
+    "./base": "./src/base/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      "./typings": {
+        "import": {
+          "types": "./dist/esm/typings/index.d.ts"
+        },
+        "require": {
+          "types": "./dist/cjs/typings/index.d.cts"
+        }
+      },
+      "./base": {
+        "import": {
+          "types": "./dist/esm/base/index.d.ts",
+          "default": "./dist/esm/base.js"
+        },
+        "require": {
+          "types": "./dist/cjs/base/index.d.cts",
+          "default": "./dist/cjs/base.cjs"
+        }
+      },
+      "./plugins/*": {
+        "import": {
+          "types": "./dist/esm/plugins/*/index.d.ts",
+          "default": "./dist/esm/plugins/*.js"
+        },
+        "require": {
+          "types": "./dist/cjs/plugins/*/index.d.cts",
+          "default": "./dist/cjs/plugins/*.cjs"
+        }
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build",
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@types/hast": "catalog:",
+    "lodash-es": "catalog:",
+    "stative": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue-jsx": "catalog:",
+    "@vue/server-renderer": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "vue": "catalog:vue-peer"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

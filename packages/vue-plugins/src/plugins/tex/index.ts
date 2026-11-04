@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { TexPlugin as _TexPlugin } from '@fluxdown/vue-base-plugins/plugins/tex';
 
-import { TexRenderPlugin } from './render';
 import { TexSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const TexPlugin: IPluginItem = {
+export const TexPlugin = /*#__PURE__*/ pluginExtends(_TexPlugin, {
   slots: [TexSlotPlugin],
-  renders: [TexRenderPlugin],
-};
+});

@@ -1,8 +1,7 @@
+import type { CodeHeaderAction } from '@fluxdown/vue-base-plugins/base';
 import type { Component, VNodeChild } from 'vue';
 
 import { Fragment, h, isVNode } from 'vue';
-
-import type { CodeHeaderAction } from '../../../../../base';
 
 const isComponent = (target: Component | VNodeChild): target is Component =>
   typeof target === 'function' ||

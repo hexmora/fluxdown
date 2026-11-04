@@ -1,10 +1,10 @@
+import { useMergePlugins } from '@fluxdown/vue-base';
 import { PRESET_LITE_PLUGINS } from '@fluxdown/vue-plugins/lite';
 import { defineComponent, shallowRef } from 'vue';
 
 import type { FluxdownRef } from '../raw';
 import type { FluxdownLiteProps } from './type';
 
-import { useMergePlugins } from '../../hooks';
 import { FluxdownRaw } from '../raw';
 
 export type {

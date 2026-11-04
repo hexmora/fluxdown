@@ -31,6 +31,8 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/uni-app',
   '@fluxdown/angular-plugins',
   '@fluxdown/angular',
+  '@fluxdown/vue-base-plugins',
+  '@fluxdown/vue-base',
   '@fluxdown/vue-plugins',
   '@fluxdown/vue',
   '@fluxdown/react-lynx-plugins',

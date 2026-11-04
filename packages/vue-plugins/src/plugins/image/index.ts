@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { ImagePlugin as _ImagePlugin } from '@fluxdown/vue-base-plugins/plugins/image';
 
-import { ImageRenderPlugin } from './render';
 import { ImageSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const ImagePlugin: IPluginItem = {
+export const ImagePlugin = /*#__PURE__*/ pluginExtends(_ImagePlugin, {
   slots: [ImageSlotPlugin],
-  renders: [ImageRenderPlugin],
-};
+});

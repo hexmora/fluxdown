@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { EffectSuffixPlugin as _EffectSuffixPlugin } from '@fluxdown/vue-base-plugins/plugins/effect-suffix';
 
-import { EffectSuffixRenderPlugin } from './render';
 import { EffectSuffixSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const EffectSuffixPlugin: IPluginItem = {
+export const EffectSuffixPlugin = /*#__PURE__*/ pluginExtends(_EffectSuffixPlugin, {
   slots: [EffectSuffixSlotPlugin],
-  renders: [EffectSuffixRenderPlugin],
-};
+});

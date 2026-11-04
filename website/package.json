@@ -12,7 +12,7 @@
     "check:seo": "tsx seo/check.ts",
     "lint": "oxlint .",
     "typecheck": "pnpm run build:renderers && tsc --noEmit && tsc --noEmit -p react-lynx/tsconfig.json",
-    "build:renderers": "pnpm --filter @fluxdown/vue-plugins --filter @fluxdown/vue --filter @fluxdown/solid-plugins --filter @fluxdown/solid build && pnpm --workspace-root exec moon run angular:build"
+    "build:renderers": "pnpm --filter @fluxdown/vue-base-plugins --filter @fluxdown/vue-base --filter @fluxdown/vue-plugins --filter @fluxdown/vue --filter @fluxdown/solid-plugins --filter @fluxdown/solid build && pnpm --workspace-root exec moon run angular:build"
   },
   "dependencies": {
     "@angular/common": "catalog:",

@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { BlockquotePlugin as _BlockquotePlugin } from '@fluxdown/vue-base-plugins/plugins/blockquote';
 
-import { BlockquoteRenderPlugin } from './render';
 import { BlockquoteSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const BlockquotePlugin: IPluginItem = {
+export const BlockquotePlugin = /*#__PURE__*/ pluginExtends(_BlockquotePlugin, {
   slots: [BlockquoteSlotPlugin],
-  renders: [BlockquoteRenderPlugin],
-};
+});
