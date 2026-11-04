@@ -201,10 +201,13 @@ test('inline code resolves theme references and relative box lengths for native 
   );
 
   const code = view.container.querySelector('.fluxdown-inline-code');
+
   const fragments = code?.querySelectorAll('view');
 
   expect(code?.textContent).toBe('inline code');
+
   expect(fragments).toHaveLength(2);
+
   expect(fragments?.[0].style).toMatchObject({
     fontSize: '17.5px',
     fontFamily: 'monospace',
@@ -227,6 +230,7 @@ test('Web inline code retains spaces in one inline text box without native attac
     globalThis.lynxTestingEnv.mainThread,
     globalThis.lynxTestingEnv.backgroundThread,
   ];
+
   const originalSystemInfo = runtimes.map((runtime) => runtime['SystemInfo']);
 
   for (const runtime of runtimes) {
@@ -249,7 +253,9 @@ test('Web inline code retains spaces in one inline text box without native attac
     const code = view.container.querySelector('.fluxdown-inline-code');
 
     expect(code?.textContent).toBe('inline code');
+
     expect(code?.querySelectorAll('view')).toHaveLength(0);
+
     expect((code as HTMLElement).style).toMatchObject({
       fontSize: '17.5px',
       fontFamily: 'monospace',

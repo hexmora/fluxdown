@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "@fluxdown/vue-lynx-plugins",
+    "types": ["node", "vitest/globals", "@lynx-js/types"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": ["src", "rslib.config.ts", "vitest.config.ts", "vitest.setup.ts"]
+}

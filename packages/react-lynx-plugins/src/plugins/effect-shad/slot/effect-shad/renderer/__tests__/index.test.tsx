@@ -33,10 +33,38 @@ test('keeps word wrapping opportunities instead of making the whole active tail 
 
 test('continues the same gradient across CJK wrap opportunities', () => {
   const { tokens } = getShadTokens('before ', '文字');
+
   const measurements = Object.fromEntries(tokens.map((token) => [token.key, { width: 20 }]));
 
   expect(getGradient(tokens, measurements, tokens[0]!.key)).toEqual({ start: 0, width: 40 });
+
   expect(getGradient(tokens, measurements, tokens[1]!.key)).toEqual({ start: -20, width: 40 });
+});
+
+test('retains measured glyph widths when the parent first reports its layout width', async () => {
+  const view = render(
+    <AnimatedText id="paragraph">
+      <ShadRenderer leading="" active="one two" isActive maskWidth={15} />
+    </AnimatedText>,
+  );
+
+  const words = view.container.querySelectorAll('.fluxdown-shad-active');
+
+  await act(() => {
+    fireEvent.layoutchange(words[0]!, { detail: { width: 15 } });
+
+    fireEvent.layoutchange(words[1]!, { detail: { width: 20 } });
+  });
+
+  const measured = words[0]!.getAttribute('style');
+
+  expect(measured).toContain('transparent 300%');
+
+  await act(() => {
+    fireEvent.layoutchange(view.container.querySelector('#paragraph')!, { detail: { width: 362 } });
+  });
+
+  expect(words[0]!.getAttribute('style')).toBe(measured);
 });
 
 test('keeps a partially shaded word together and preserves link color under the mask', () => {
@@ -65,15 +93,19 @@ test('keeps a partially shaded word together and preserves link color under the 
   const word = view.container.querySelector('.fluxdown-shad-active');
 
   expect(word?.querySelector('text')?.textContent).toBe('Flowdown');
+
   expect(view.container.querySelector('.fluxdown-shad-active')?.getAttribute('style')).toContain(
     'mask-image',
   );
+
   expect(view.container.querySelector('.fluxdown-link')?.getAttribute('style')).toContain(
     'rgb(9, 105, 218)',
   );
+
   expect(view.container.querySelector('.fluxdown-shad-prefix')?.textContent).toBe('Flo');
 
   fireEvent.tap(view.getByText('wdown'));
+
   expect(destinations).toEqual(['https://example.com']);
 });
 
@@ -81,10 +113,12 @@ test('uses the laid out rich prefix instead of estimating its width from the who
   const view = render(<ShadRenderer leading="Flo" active="wdown" isActive maskWidth={15} />);
 
   const word = view.container.querySelector('.fluxdown-shad-active')!;
+
   const prefix = view.container.querySelector('.fluxdown-shad-prefix')!;
 
   await act(() => {
     fireEvent.layoutchange(word, { detail: { width: 100 } });
+
     fireEvent.layoutchange(prefix, { detail: { width: 20 } });
   });
 
@@ -119,6 +153,7 @@ test('splits only a word that actually wraps so its gradient continues across in
   const fragments = view.container.querySelectorAll('.fluxdown-shad-active');
 
   expect([...fragments].map((node) => node.textContent)).toEqual(['unbre', 'akable']);
+
   expect(fragments[1]!.getAttribute('style')).toContain('transparent 100%');
 
   await act(() => {
@@ -134,6 +169,7 @@ test('splits only a word that actually wraps so its gradient continues across in
   );
 
   expect(view.container.querySelectorAll('.fluxdown-shad-active')).toHaveLength(1);
+
   expect(view.container.textContent).toBe('unbreakableword');
 });
 
@@ -149,5 +185,6 @@ test('keeps the tail marker in place after the shade finishes', () => {
   expect(mask?.getAttribute('style')).toContain('width: 6.5px');
 
   expect(view.container.textContent).toBe('completed');
+
   expect(view.container.querySelector('.fluxdown-shad-active')).toBeNull();
 });

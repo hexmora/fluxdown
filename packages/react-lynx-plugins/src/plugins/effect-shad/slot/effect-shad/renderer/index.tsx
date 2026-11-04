@@ -40,7 +40,9 @@ export const ShadRenderer = ({
     [leading, active, isActive],
   );
 
-  const font = `${textStyle.fontSize}:${textStyle.fontFamily}:${textStyle.fontWeight}:${textStyle.fontStyle}:${textStyle.letterSpacing}:${textStyle.lineHeight}:${layoutWidth}`;
+  const font = `${textStyle.fontSize}:${textStyle.fontFamily}:${textStyle.fontWeight}:${textStyle.fontStyle}:${textStyle.letterSpacing}:${textStyle.lineHeight}`;
+
+  const layout = `${font}:${layoutWidth}`;
 
   const [wrapped, setWrapped] = useState<
     Record<string, { text: string; font: string; ends: number[] }>
@@ -52,12 +54,12 @@ export const ShadRenderer = ({
       tokens: source.tokens.flatMap((token) => {
         const previous = wrapped[token.key];
 
-        return previous?.font === font && token.text === previous.text
+        return previous?.font === layout && token.text === previous.text
           ? splitShadToken(token, previous.ends)
           : [token];
       }),
     }),
-    [source, wrapped, font],
+    [source, wrapped, layout],
   );
 
   const [widths, setWidths] = useState<
@@ -157,7 +159,7 @@ export const ShadRenderer = ({
   const onWrap = useLatestFn((key: string, text: string, measuredFont: string, ends: number[]) => {
     if (
       ends.length <= 1 ||
-      measuredFont !== font ||
+      measuredFont !== layout ||
       !source.tokens.some((token) => token.key === key && token.text === text)
     )
       return;
@@ -170,7 +172,7 @@ export const ShadRenderer = ({
         previous,
         source.tokens.map((token) => token.key),
       ),
-      [key]: { text, font, ends },
+      [key]: { text, font: layout, ends },
     }));
   });
 
@@ -219,7 +221,7 @@ export const ShadRenderer = ({
                 onWrap(
                   token.key,
                   token.text,
-                  font,
+                  layout,
                   detail.lines.map((line) => line.end),
                 )
               }

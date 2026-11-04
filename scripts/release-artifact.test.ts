@@ -55,7 +55,7 @@ test('accepts Lynx-only artifacts after native, web, and declaration verificatio
     '@fluxdown/react-lynx',
     '@fluxdown/react-lynx/lite',
     '@fluxdown/react-lynx-plugins',
-    '@fluxdown/react-lynx-plugins/plugins/tex-svg',
+    '@fluxdown/react-lynx-plugins/plugins/tex-mathjax',
   ]);
 
   assert.equal(validateReleaseManifest(artifact), artifact);
@@ -65,9 +65,50 @@ test('accepts a mixed release with both Node and Lynx verification', () => {
   const artifact = manifest(['fluxdown', '@fluxdown/react-lynx']);
 
   artifact.verification.nodeEntries = 1;
+
   artifact.verification.lynx = lynxVerification();
 
   assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+test('accepts both Lynx frameworks after each package is verified', () => {
+  const artifact = manifest([
+    '@fluxdown/react-lynx',
+    '@fluxdown/react-lynx-plugins',
+    '@fluxdown/vue-lynx',
+    '@fluxdown/vue-lynx-plugins',
+  ]);
+
+  assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+test('requires Vue Lynx evidence in a mixed Lynx release', () => {
+  const artifact = manifest(['@fluxdown/react-lynx', '@fluxdown/vue-lynx']);
+
+  artifact.verification.lynx = lynxVerification();
+
+  assert.throws(() => validateReleaseManifest(artifact), /Missing Lynx package verification/);
+});
+
+test('accepts Lynx plugin packages with only subpath exports', () => {
+  const artifact = manifest(['@fluxdown/react-lynx-plugins', '@fluxdown/vue-lynx-plugins']);
+
+  artifact.verification.lynx = lynxVerification([
+    '@fluxdown/react-lynx-plugins/base',
+    '@fluxdown/react-lynx-plugins/full',
+    '@fluxdown/vue-lynx-plugins/base',
+    '@fluxdown/vue-lynx-plugins/full',
+  ]);
+
+  assert.equal(validateReleaseManifest(artifact), artifact);
+});
+
+test('requires separate evidence for renderer and plugin packages', () => {
+  const artifact = manifest(['@fluxdown/react-lynx', '@fluxdown/react-lynx-plugins']);
+
+  artifact.verification.lynx = lynxVerification(['@fluxdown/react-lynx/lite']);
+
+  assert.throws(() => validateReleaseManifest(artifact), /Missing Lynx package verification/);
 });
 
 test('rejects zero consumer entries without Lynx verification', () => {
@@ -171,6 +212,7 @@ test('validates supplied Lynx evidence even when Node checks passed', () => {
   const artifact = manifest();
 
   artifact.verification.nodeEntries = 1;
+
   artifact.verification.lynx = { ...lynxVerification(), webAssets: [] };
 
   assert.throws(() => validateReleaseManifest(artifact), /Missing Lynx webAssets/);

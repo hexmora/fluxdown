@@ -77,8 +77,11 @@ test('maps presentation attributes with the built-in renderer', async () => {
   const paragraph = view.container.querySelector('#message');
 
   expect(paragraph).toHaveClass('note', 'active');
+
   expect(paragraph).toHaveAttribute('data-tracking', 'message-body');
+
   expect(paragraph).not.toHaveAttribute('onclick');
+
   expect(paragraph?.getAttribute('style')).not.toContain('position: fixed');
 });
 
@@ -95,15 +98,22 @@ test('keeps node property mapping available to custom render plugins', async () 
   const paragraph = view.container.querySelector('#message');
 
   expect(paragraph?.tagName).toBe('TEXT');
+
   expect(paragraph).toHaveClass('note', 'active');
+
   expect(paragraph).toHaveAttribute('data-tracking', 'message-body');
+
   expect(paragraph).toHaveAttribute('data-child', 'emphasis');
+
   expect(paragraph).not.toHaveAttribute('onclick');
+
   expect(paragraph).not.toHaveAttribute('style');
 });
 
 test('keeps the property mapper out of component props', () => {
   expectTypeOf<ComponentProps<typeof Fluxdown>>().not.toHaveProperty('getProps');
+
   expectTypeOf<ComponentProps<typeof FluxdownLite>>().not.toHaveProperty('getProps');
+
   expectTypeOf<ComponentProps<typeof FluxdownRaw>>().not.toHaveProperty('getProps');
 });

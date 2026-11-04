@@ -19,7 +19,7 @@ import { ParagraphPlugin } from '../../plugins/paragraph';
 import { PatchPlugin } from '../../plugins/patch';
 import { StrongPlugin } from '../../plugins/strong';
 import { TablePlugin } from '../../plugins/table';
-import { TexPlugin } from '../../plugins/tex';
+import { TexMathJaxPlugin } from '../../plugins/tex-mathjax';
 
 export const PRESET_FULL_PLUGINS: IPluginItem[] = __BACKGROUND__
   ? [
@@ -38,7 +38,7 @@ export const PRESET_FULL_PLUGINS: IPluginItem[] = __BACKGROUND__
       ParagraphPlugin,
       StrongPlugin,
       TablePlugin,
-      TexPlugin,
+      TexMathJaxPlugin,
       HeadingPlugin,
       BreakLinePlugin,
       BlockquotePlugin,

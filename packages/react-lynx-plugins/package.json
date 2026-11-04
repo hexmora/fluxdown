@@ -19,47 +19,34 @@
   "type": "module",
   "sideEffects": [
     "**/*.css",
-    "**/*.scss"
+    "**/*.scss",
+    "./src/plugins/code-prism/slot/code-prism/renderer/languages.ts",
+    "./src/plugins/code-prism/slot/code-prism/renderer/runtime.ts",
+    "./dist/esm/plugins/code-prism/slot/code-prism/renderer/languages.jsx",
+    "./dist/esm/plugins/code-prism/slot/code-prism/renderer/runtime.jsx"
   ],
-  "main": "./src/presets/full/index.ts",
-  "module": "./src/presets/full/index.ts",
-  "types": "./src/presets/full/index.ts",
   "exports": {
-    ".": "./src/presets/full/index.ts",
-    "./full": "./src/presets/full/index.ts",
-    "./lite": "./src/presets/lite/index.ts",
-    "./base": "./src/base/index.ts",
     "./typings": "./src/typings/index.ts",
-    "./plugins/*": "./src/plugins/*/index.ts"
+    "./base": "./src/base/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts",
+    "./*": "./src/presets/*/index.ts"
   },
   "publishConfig": {
-    "main": "./dist/esm/presets/full/index.jsx",
-    "module": "./dist/esm/presets/full/index.jsx",
-    "types": "./dist/esm/presets/full/index.d.ts",
     "exports": {
-      ".": {
-        "types": "./dist/esm/presets/full/index.d.ts",
-        "default": "./dist/esm/presets/full/index.jsx"
-      },
-      "./full": {
-        "types": "./dist/esm/presets/full/index.d.ts",
-        "default": "./dist/esm/presets/full/index.jsx"
-      },
-      "./lite": {
-        "types": "./dist/esm/presets/lite/index.d.ts",
-        "default": "./dist/esm/presets/lite/index.jsx"
+      "./typings": {
+        "types": "./dist/esm/typings/index.d.ts"
       },
       "./base": {
         "types": "./dist/esm/base/index.d.ts",
         "default": "./dist/esm/base/index.jsx"
       },
-      "./typings": {
-        "types": "./dist/esm/typings/index.d.ts",
-        "default": "./dist/esm/typings/index.jsx"
-      },
       "./plugins/*": {
         "types": "./dist/esm/plugins/*/index.d.ts",
         "default": "./dist/esm/plugins/*/index.jsx"
+      },
+      "./*": {
+        "types": "./dist/esm/presets/*/index.d.ts",
+        "default": "./dist/esm/presets/*/index.jsx"
       }
     },
     "access": "public"
@@ -78,10 +65,12 @@
     "@fluxdown/types": "workspace:^",
     "@fluxdown/utils": "workspace:^",
     "@types/hast": "catalog:",
+    "core-js": "catalog:",
     "lodash-es": "catalog:",
     "mathjax-full": "catalog:",
+    "prismjs": "catalog:",
     "shallow-equal": "catalog:",
-    "shiki": "catalog:",
+    "shiki": "catalog:lynx-shiki",
     "stative": "workspace:^"
   },
   "devDependencies": {
@@ -98,6 +87,7 @@
     "@testing-library/jest-dom": "catalog:",
     "@types/lodash-es": "catalog:",
     "@types/node": "catalog:",
+    "@types/prismjs": "catalog:",
     "@types/react": "catalog:",
     "expect-type": "catalog:",
     "jsdom": "catalog:",

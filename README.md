@@ -6,7 +6,7 @@
 
 [Website](https://fluxdown.dev/) · [Playground](https://fluxdown.dev/playground.html) · [Documentation](https://fluxdown.dev/guide/index.html) · [简体中文](./docs/README.zh-CN.md)
 
-Fluxdown renders streaming Markdown for AI chat and live writing in React, Vue 3, Svelte 5, Angular, React Native, React Lynx, SolidJS, Taro, and Uni App. Its shared core keeps content readable from unfinished syntax to the final response.
+Fluxdown renders streaming Markdown for AI chat and live writing in React, Vue 3, Svelte 5, Angular, React Native, React Lynx, Vue Lynx, SolidJS, Taro, and Uni App. Its shared core keeps content readable from unfinished syntax to the final response.
 
 - **Smooth streaming.** Reveal incoming text gradually and handle unfinished links, emphasis, and code.
 - **Less repeated work.** Block-level caching reuses stable content as the message grows.
@@ -43,7 +43,7 @@ If your bundler does not load the styles automatically, add this to your app's g
 import "fluxdown/styles.css";
 ```
 
-See the quick starts for [React](https://fluxdown.dev/guide/react/quick-start.html), [Vue 3](https://fluxdown.dev/guide/vue/quick-start.html), [Svelte 5](https://fluxdown.dev/guide/svelte/quick-start.html), [Angular](https://fluxdown.dev/guide/angular/quick-start.html), [React Native](https://fluxdown.dev/guide/react-native/quick-start.html), [React Lynx](https://fluxdown.dev/guide/react-lynx/quick-start.html), [SolidJS](https://fluxdown.dev/guide/solid/quick-start.html), [Taro React](https://fluxdown.dev/guide/taro/quick-start.html), and [Uni App](https://fluxdown.dev/guide/uni-app/quick-start.html) for more examples.
+See the quick starts for [React](https://fluxdown.dev/guide/react/quick-start.html), [Vue 3](https://fluxdown.dev/guide/vue/quick-start.html), [Svelte 5](https://fluxdown.dev/guide/svelte/quick-start.html), [Angular](https://fluxdown.dev/guide/angular/quick-start.html), [React Native](https://fluxdown.dev/guide/react-native/quick-start.html), [React Lynx](https://fluxdown.dev/guide/react-lynx/quick-start.html), [Vue Lynx](https://fluxdown.dev/guide/vue-lynx/quick-start.html), [SolidJS](https://fluxdown.dev/guide/solid/quick-start.html), [Taro React](https://fluxdown.dev/guide/taro/quick-start.html), and [Uni App](https://fluxdown.dev/guide/uni-app/quick-start.html) for more examples.
 
 ## Packages
 
@@ -54,7 +54,8 @@ See the quick starts for [React](https://fluxdown.dev/guide/react/quick-start.ht
 | [`@fluxdown/svelte`](./packages/svelte)             | Ready-to-use Markdown rendering in Svelte 5.                        |
 | [`@fluxdown/angular`](./packages/angular)           | Ready-to-use Markdown rendering in Angular.                         |
 | [`@fluxdown/react-native`](./packages/react-native) | Ready-to-use Markdown rendering in React Native.                    |
-| [`@fluxdown/react-lynx`](./packages/react-lynx)                 | Ready-to-use Markdown rendering in React Lynx.                       |
+| [`@fluxdown/react-lynx`](./packages/react-lynx)     | Ready-to-use Markdown rendering in React Lynx.                      |
+| [`@fluxdown/vue-lynx`](./packages/vue-lynx)         | Ready-to-use Markdown rendering in Vue Lynx.                        |
 | [`@fluxdown/solid`](./packages/solid)               | Ready-to-use Markdown rendering in SolidJS.                         |
 | [`@fluxdown/taro`](./packages/taro)                 | Ready-to-use Markdown rendering in Taro React.                      |
 | [`@fluxdown/uni-app`](./packages/uni-app)           | Ready-to-use Markdown rendering in Uni App x Vapor.                 |
