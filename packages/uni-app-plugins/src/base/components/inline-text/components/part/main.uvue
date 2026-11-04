@@ -1,0 +1,44 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import type { InlinePartProps } from './type';
+
+import { EASE_OUT } from '../../../../animation/easing';
+import { useAppear } from '../../../../animation/hooks';
+import { ScaleText } from '../../../scale-text';
+
+const props = defineProps<InlinePartProps>();
+
+const scale = computed(() =>
+  props.node.effect?.type === 'scale'
+    ? props.node.effect
+    : { start: -1, duration: 0, from: 1, blur: 0 },
+);
+
+const progress = useAppear(() => {
+  const effect = props.node.effect;
+
+  return effect?.type === 'chunk' || effect?.type === 'shad' ? effect : { start: -1, duration: 0 };
+});
+
+// Shad fades linearly so the tail reads as an even gradient at a steady pace.
+const opacity = computed(() =>
+  props.node.effect?.type === 'shad' ? progress.value : EASE_OUT(progress.value),
+);
+
+const style = computed(() => ({
+  ...props.textStyle,
+  opacity: opacity.value * Number(props.textStyle.opacity ?? 1),
+}));
+</script>
+
+<template>
+  <ScaleText
+    :text="props.node.text"
+    :text-style="style"
+    :start="scale.start"
+    :duration="scale.duration"
+    :from="scale.from"
+    :blur="scale.blur"
+  />
+</template>

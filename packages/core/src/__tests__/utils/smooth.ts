@@ -78,6 +78,10 @@ export class FakeSmoothDriver extends BaseSmoothDriver {
     return this.active;
   }
 
+  override now() {
+    return this.timestamp;
+  }
+
   start() {
     if (this.active) {
       throw new Error('Cannot start a running driver');

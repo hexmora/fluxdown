@@ -1,5 +1,24 @@
 # fluxdown
 
+## 0.14.3
+
+### Patch Changes
+
+- a6380c3: Move documentation links and package homepages to https://fluxdown.dev/.
+- 65f128e: Require a current-clock reader for custom smooth tickers and provide the shared implementation on BaseSmoothTicker. Keep deterministic ticker fixtures on the same arrival and frame clock.
+- Updated dependencies [a6380c3]
+  - @fluxdown/react-base@0.14.2
+  - @fluxdown/react-base-plugins@0.11.2
+  - @fluxdown/react-plugins@0.12.2
+  - @fluxdown/utils@0.7.3
+
+## 0.14.2
+
+### Patch Changes
+
+- 0889ca7: Clarify streaming Markdown package descriptions and keywords, and link each package to its framework's documentation.
+- 0889ca7: Include React DOM plugin configuration types from the public type entry so isolated consumers can configure plugins such as `slot-code-header` without importing an unrelated plugin entry.
+
 ## 0.14.1
 
 ### Patch Changes

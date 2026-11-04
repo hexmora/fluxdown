@@ -1,5 +1,14 @@
 # @fluxdown/react-hooks
 
+## 0.2.1
+
+### Patch Changes
+
+- a6380c3: Move documentation links and package homepages to https://fluxdown.dev/.
+- Updated dependencies [a6380c3]
+  - @fluxdown/utils@0.7.3
+  - stative@2.1.1
+
 ## 0.2.0
 
 ### Minor Changes

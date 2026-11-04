@@ -8,6 +8,8 @@ export const createManualDriver = () => {
   class ManualDriver extends BaseSmoothDriver {
     private active = false;
 
+    private timestamp = 0;
+
     destroyCalls = 0;
 
     constructor() {
@@ -20,10 +22,14 @@ export const createManualDriver = () => {
       return this.active;
     }
 
+    override now() {
+      return this.timestamp;
+    }
+
     start() {
       this.active = true;
 
-      return 0;
+      return this.now();
     }
 
     stop() {
@@ -31,6 +37,8 @@ export const createManualDriver = () => {
     }
 
     tick(timestamp: number) {
+      this.timestamp = timestamp;
+
       this.subject.next(timestamp);
     }
 

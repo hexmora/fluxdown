@@ -1,4 +1,9 @@
-# Streaming content
+---
+title: Streaming Markdown in Lynx
+description: Render streaming Markdown in ReactLynx with Fluxdown. Pass accumulated text, configure smoothing and Lynx effects, and finish or cancel the response.
+---
+
+# Streaming Markdown in Lynx {#streaming-content}
 
 Pass accumulated text to `text` and control `streaming` with your request state:
 
@@ -47,4 +52,4 @@ Parsing and streaming scheduling run on the background thread; Lynx elements pre
 
 Set `streaming` to `false` when the request completes, is cancelled or fails. The component displays all text received so far and clears trailing effects.
 
-[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, and Taro together.
+[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, Taro, and Uni App together.

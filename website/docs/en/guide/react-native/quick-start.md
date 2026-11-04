@@ -1,4 +1,9 @@
-# Quick start
+---
+title: React Native Markdown Renderer
+description: Render Markdown with native Text and View components using Fluxdown for React Native. Get started in an Expo or React Native app for iOS, Android, and web.
+---
+
+# React Native Markdown renderer quick start {#quick-start}
 
 Fluxdown for React Native renders Markdown with native `Text` and `View` components. It shares parsing, streaming repairs, and the plugin system with React. The same component code runs on iOS, Android, and React Native Web.
 
@@ -46,4 +51,4 @@ Pass the full text received so far. Set `streaming` to `false` when the request 
 - [Streaming content](./streaming.md): control smoothing and end-of-stream effects.
 - [Styling guide](./customization.md): change native colors, fonts, and layout.
 - [Plugin matrix](./plugins/matrix.mdx): choose Full, Lite, or your own set.
-- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, and Taro together.
+- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, Taro, and Uni App together.

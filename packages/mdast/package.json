@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/mdast",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Markdown AST traversal helpers for Fluxdown packages.",
   "keywords": [
     "llm",
@@ -8,7 +8,7 @@
     "mdast",
     "streaming"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

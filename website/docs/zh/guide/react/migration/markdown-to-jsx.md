@@ -15,8 +15,8 @@
 
 # 参考
 
-- Fluxdown：https://hexmora.github.io/fluxdown/zh/guide/react/quick-start.html
-- 配置与扩展：https://hexmora.github.io/fluxdown/zh/guide/react/configuration.html
+- Fluxdown：https://fluxdown.dev/zh/guide/react/quick-start.html
+- 配置与扩展：https://fluxdown.dev/zh/guide/react/configuration.html
 - markdown-to-jsx：https://github.com/quantizor/markdown-to-jsx
 
 # 执行

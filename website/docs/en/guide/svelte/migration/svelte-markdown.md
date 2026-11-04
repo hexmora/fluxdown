@@ -14,7 +14,7 @@ Migrate the project from svelte-markdown to @fluxdown/svelte. Implement the chan
 # References
 
 - Source: https://github.com/pablo-abc/svelte-markdown
-- Target: https://hexmora.github.io/fluxdown/guide/svelte/quick-start.html
+- Target: https://fluxdown.dev/guide/svelte/quick-start.html
 
 # Steps
 

@@ -1,4 +1,9 @@
-# Streaming content
+---
+title: Streaming Markdown in Vue 3
+description: Stream Markdown in Vue 3 with reactive text and Fluxdown. Connect an async iterator, configure syntax repair and effects, and keep message state separate.
+---
+
+# Streaming Markdown in Vue 3 {#streaming-content}
 
 Append incoming chunks to a reactive string and pass it to `text`. `streaming` controls unfinished syntax repair, smooth output and trailing effects.
 

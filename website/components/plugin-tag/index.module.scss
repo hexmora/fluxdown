@@ -93,6 +93,11 @@
     --tag-dark-color: #ffb59b;
   }
 
+  &[data-type="uni-app-plugins"] {
+    --tag-color: #4b9b58;
+    --tag-dark-color: #a6dab0;
+  }
+
   :global(.dark) & {
     --tag-color: var(--tag-dark-color);
   }

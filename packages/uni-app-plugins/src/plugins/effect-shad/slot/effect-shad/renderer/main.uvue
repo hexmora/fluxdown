@@ -1,0 +1,15 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import { useAppear } from '../../../../../base/animation/hooks';
+import { InheritedText } from '../../../../../base/components/inherited-text';
+
+const props = defineProps<RendererProps>();
+
+// Linear opacity over time reads as an even gradient across the tail at a steady pace.
+const opacity = useAppear(() => ({ start: props.start, duration: props.duration }));
+</script>
+
+<template>
+  <InheritedText :style="{ opacity }"><slot /></InheritedText>
+</template>

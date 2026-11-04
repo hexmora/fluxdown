@@ -62,7 +62,7 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
 
         const resumed = !frame.driver.running && index < total;
 
-        const timestamp = resumed ? frame.driver.start() : frame.timestamp;
+        const timestamp = resumed ? frame.driver.start() : frame.driver.now();
 
         if (
           interpolator !== previousInterpolator ||
@@ -78,11 +78,11 @@ export const CursorPosition = /*#__PURE__*/ once(function CursorPosition({
           }
 
           if (total < previousTotal) {
-            interpolator.reset(index);
+            interpolator.start(timestamp, index);
 
             interpolator.push(total - index);
           } else if (total > previousTotal) {
-            interpolator.push(total - previousTotal);
+            interpolator.push(total - previousTotal, timestamp);
           }
 
           if (!resumed && frame !== previousFrame) {

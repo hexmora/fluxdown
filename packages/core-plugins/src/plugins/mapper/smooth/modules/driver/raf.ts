@@ -1,7 +1,6 @@
 import { assert } from '@fluxdown/utils';
 
 import { BaseSmoothDriver } from './base';
-import { getNow } from './utils';
 
 export class RafSmoothDriver extends BaseSmoothDriver {
   private frame: number | null = null;
@@ -21,16 +20,17 @@ export class RafSmoothDriver extends BaseSmoothDriver {
 
     assert(!this.running, 'Cannot start a running driver');
 
-    const timestamp = getNow();
+    const timestamp = this.now();
 
     const generation = ++this.generation;
 
-    const next = (time: number) => {
+    const next = () => {
       if (!this.running || generation !== this.generation) {
         return;
       }
 
-      this.subject.next(time);
+      // Native RAF callbacks may use a different clock origin from start().
+      this.subject.next(this.now());
 
       if (this.running && generation === this.generation) {
         this.frame = requestAnimationFrame(next);

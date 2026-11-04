@@ -1,5 +1,23 @@
 # @fluxdown/taro
 
+## 0.1.3
+
+### Patch Changes
+
+- a6380c3: Move documentation links and package homepages to https://fluxdown.dev/.
+- 65f128e: Require a current-clock reader for custom smooth tickers and provide the shared implementation on BaseSmoothTicker. Keep deterministic ticker fixtures on the same arrival and frame clock.
+- Updated dependencies [a6380c3]
+  - @fluxdown/react-base@0.14.2
+  - @fluxdown/react-base-plugins@0.11.2
+  - @fluxdown/taro-plugins@0.1.2
+  - @fluxdown/utils@0.7.3
+
+## 0.1.2
+
+### Patch Changes
+
+- 0889ca7: Clarify streaming Markdown package descriptions and keywords, and link each package to its framework's documentation.
+
 ## 0.1.1
 
 ### Patch Changes

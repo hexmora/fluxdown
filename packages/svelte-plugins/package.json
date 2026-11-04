@@ -1,8 +1,8 @@
 {
   "name": "@fluxdown/svelte-plugins",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Svelte render slots and plugin presets for Fluxdown.",
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

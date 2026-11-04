@@ -16,8 +16,8 @@ Migrate Markdown display from Towxml to @fluxdown/taro in this Taro React projec
 # References
 
 - Towxml: https://github.com/sbfkcel/towxml/wiki
-- Fluxdown: https://hexmora.github.io/fluxdown/guide/taro/quick-start.html
-- Custom components: https://hexmora.github.io/fluxdown/guide/taro/plugins/slot.html
+- Fluxdown: https://fluxdown.dev/guide/taro/quick-start.html
+- Custom components: https://fluxdown.dev/guide/taro/plugins/slot.html
 
 # Approach
 

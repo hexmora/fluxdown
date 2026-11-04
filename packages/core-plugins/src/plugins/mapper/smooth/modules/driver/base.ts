@@ -3,6 +3,8 @@ import { Destructible } from 'stative';
 
 import type { IDriver } from './type';
 
+import { getNow } from './utils';
+
 export abstract class BaseSmoothDriver extends Destructible implements IDriver {
   protected readonly subject = new Subject<number>();
 
@@ -13,6 +15,10 @@ export abstract class BaseSmoothDriver extends Destructible implements IDriver {
   abstract start(): number;
 
   abstract stop(): void;
+
+  now() {
+    return getNow();
+  }
 
   override destroy() {
     if (this.destroyed) {

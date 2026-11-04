@@ -1,4 +1,9 @@
-# 流式内容
+---
+title: SolidJS 流式 Markdown 渲染
+description: 在 SolidJS 中用 signal 累积文本并传给 Fluxdown，渲染流式 Markdown。配置语法修复、平滑输出与效果，并为不同消息管理独立状态。
+---
+
+# 在 SolidJS 中渲染流式 Markdown {#流式内容}
 
 把收到的片段追加到 signal 中，传给 `text`。`streaming` 控制未完成语法的修复、平滑输出和末尾效果。
 

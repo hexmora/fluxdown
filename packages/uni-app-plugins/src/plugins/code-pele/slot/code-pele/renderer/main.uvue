@@ -1,0 +1,66 @@
+<script setup lang="ts">
+import { uniqueId } from 'lodash-es';
+import { computed } from 'vue';
+
+import type { RendererProps } from './type';
+
+import { SvgImage } from '../../../../../base/components';
+import { RenderNodes } from '../../../../../base/slot/components';
+import { getBlockStyle, useTheme } from '../../../../../base/theme';
+import { CodeBlockRenderer } from '../../../../code/slot/code-block/renderer';
+import { useDiagram } from './hooks';
+import { toDiagramImage } from './utils';
+
+const props = defineProps<RendererProps>();
+
+const theme = useTheme();
+
+const diagram = useDiagram(() => props, uniqueId('fluxdown-pele-'));
+
+const image = computed(() =>
+  diagram.value ? toDiagramImage(diagram.value, theme.value.tokens) : null,
+);
+
+const header = computed(() => [
+  {
+    type: 'CodeHeader' as const,
+    props: { code: props.code, language: props.language, meta: props.meta },
+  },
+]);
+
+const fallback = computed(() => [
+  {
+    type: 'CodeHighlighter' as const,
+    props: { code: props.code, language: props.language, meta: props.meta },
+  },
+]);
+</script>
+
+<template>
+  <view
+    v-if="diagram"
+    class="fluxdown-code-pele"
+    :style="{
+      ...getBlockStyle('pre', theme.tokens),
+      borderRadius: `${theme.tokens.radius.lg}px`,
+      overflow: 'hidden',
+      backgroundColor: theme.tokens.colors.surfaceSubtle,
+      borderWidth: '1px',
+      borderStyle: 'solid',
+      borderColor: theme.tokens.colors.border,
+    }"
+  >
+    <RenderNodes :nodes="header" />
+    <scroll-view
+      direction="horizontal"
+      style="height: auto"
+      :style="{ padding: `${theme.tokens.spacing.lg}px`, backgroundColor: theme.tokens.colors.bg }"
+    >
+      <SvgImage :source="image">
+        <RenderNodes :nodes="fallback" />
+      </SvgImage>
+    </scroll-view>
+    <RenderNodes v-if="props.suffix" :nodes="[props.suffix]" />
+  </view>
+  <CodeBlockRenderer v-else v-bind="props" />
+</template>

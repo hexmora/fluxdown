@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/vue-plugins",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Vue 3 render slots and plugin presets for Fluxdown.",
   "keywords": [
     "hast",
@@ -10,7 +10,7 @@
     "streaming",
     "vue"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

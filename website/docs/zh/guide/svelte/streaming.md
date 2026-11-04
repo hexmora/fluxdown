@@ -1,4 +1,9 @@
-# 流式内容
+---
+title: Svelte 流式 Markdown 渲染
+description: 在 Svelte 中通过属性向 Fluxdown 传入累积文本，渲染流式 Markdown。配置平滑输出与动画效果，并在响应完成或取消时更新状态。
+---
+
+# 在 Svelte 中渲染流式 Markdown {#流式内容}
 
 把累积文本传给 `text`，用请求状态控制 `streaming`。Svelte 会随属性变化更新内容，无需手动刷新组件。
 
@@ -52,4 +57,4 @@
 
 请求完成、取消或出错后，将 `streaming` 设为 `false`。组件会显示已经收到的完整内容，并清理末尾效果。组件卸载时会自动清理自身订阅与动画。
 
-[横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、Svelte、Angular、React Native、Lynx、Solid 和 Taro 的静态与流式表现。
+[横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、Svelte、Angular、React Native、Lynx、Solid、Taro 和 Uni App 的静态与流式表现。

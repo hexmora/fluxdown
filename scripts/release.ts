@@ -28,12 +28,14 @@ import {
   isLynxPackage,
   isSveltePackage,
   isTaroPackage,
+  isUniAppPackage,
   publicEntries,
   readManifest,
 } from './check-package.ts';
 import { checkReactNativePacks, REACT_NATIVE_PACKAGES } from './check-react-native-packs.ts';
 import { checkReactPacks } from './check-react-packs.ts';
 import { checkSvelteConsumer } from './check-svelte-consumer.ts';
+import { checkUniAppConsumer } from './check-uni-app-consumer.ts';
 import {
   assertPublishEnvironment,
   assertSourceSha,
@@ -60,6 +62,7 @@ export function parseReleaseOptions(args = process.argv.slice(2)) {
     options: {
       channel: { type: 'string' },
       package: { type: 'string', default: 'all' },
+      'check-packages': { type: 'string', multiple: true },
       'dry-run': { type: 'boolean', default: false },
       publish: { type: 'boolean', default: false },
       prepare: { type: 'boolean', default: false },
@@ -74,6 +77,32 @@ export function parseReleaseOptions(args = process.argv.slice(2)) {
     values.channel === undefined || values.channel === 'stable' || values.channel === 'beta',
     'Channel must be stable or beta',
   );
+
+  const checkPackages = values['check-packages'];
+
+  if (checkPackages) {
+    assert(
+      values['dry-run'] && !values.prepare && !values.publish && values.channel !== 'beta',
+      '--check-packages is only allowed with an explicit stable --dry-run',
+    );
+    assert(
+      checkPackages.every((name) => name.trim().length > 0),
+      '--check-packages requires a nonempty package name',
+    );
+
+    for (const name of checkPackages) {
+      assert(
+        (PUBLIC_PACKAGES as readonly string[]).includes(name),
+        `Unknown --check-packages package: ${name}`,
+      );
+    }
+
+    assert(
+      new Set(checkPackages).size === checkPackages.length,
+      '--check-packages must not contain duplicate packages',
+    );
+  }
+
   assert(!(values.publish && values['dry-run']), 'Cannot combine --dry-run and --publish');
   assert(
     !values.publish || values['from-artifact'],
@@ -115,6 +144,7 @@ export function parseReleaseOptions(args = process.argv.slice(2)) {
     output: values.output,
     candidate: values.candidate,
     artifact: values['from-artifact'],
+    checkPackages,
   };
 }
 
@@ -372,7 +402,8 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
         ({ manifest }) =>
           !isLynxPackage(manifest.name) &&
           !isSveltePackage(manifest.name) &&
-          !isTaroPackage(manifest.name),
+          !isTaroPackage(manifest.name) &&
+          !isUniAppPackage(manifest.name),
       )
       .flatMap(({ manifest, files }) =>
         publicEntries(manifest, files).map(
@@ -389,6 +420,7 @@ async function verifyConsumer(artifacts: PackageArtifact[]) {
       .join('\n');
 
     let typeSmoke = '';
+    let reactTypes = '';
 
     if (specifiers.includes('@fluxdown/core-plugins/presets/remark')) {
       const presetSmoke = `
@@ -454,15 +486,20 @@ ${baseRenderSmoke}`;
     }
 
     if (specifiers.includes('fluxdown')) {
-      typeSmoke += `\nimport { createElement } from 'react';\nimport { Fluxdown } from 'fluxdown';\ncreateElement(Fluxdown, { text: 'consumer', streaming: true });\n`;
-      typeSmoke += `
+      reactTypes = `
+import { createElement } from 'react';
+import { Fluxdown, type IPluginItem, type PluginConfigs } from 'fluxdown';
 import { FluxdownLite } from 'fluxdown/lite';
 import { FluxdownRaw } from 'fluxdown/raw';
 import { PRESET_LITE_PLUGINS } from '@fluxdown/react-plugins/lite';
 import { CodePrismPlugin } from '@fluxdown/react-plugins/plugins/code-prism';
 import { TexKatexPlugin } from '@fluxdown/react-plugins/plugins/tex-katex';
-import type { IPluginItem, PluginConfigs } from '@fluxdown/react-base-plugins/typings';
-const config: PluginConfigs = { 'slot-code-header': { disabled: true } };
+import type { PluginConfigs as BasePluginConfigs } from '@fluxdown/react-base-plugins/typings';
+
+createElement(Fluxdown, { text: 'consumer', streaming: true });
+const config: PluginConfigs = {
+  'slot-code-header': { disabled: true },
+} satisfies BasePluginConfigs;
 const plugin: IPluginItem = { ...CodePrismPlugin, config };
 createElement(FluxdownLite, { text: 'consumer', plugins: [plugin, TexKatexPlugin] });
 
@@ -559,6 +596,22 @@ ${renderSmoke}`;
     );
 
     run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')]);
+
+    if (reactTypes) {
+      // Keep wrapper checks separate: importing every plugin can mask missing augmentations.
+      for (const extension of ['mts', 'cts']) {
+        await writeFile(path.join(consumer, '__tests__', `react-types.${extension}`), reactTypes);
+      }
+
+      await writeFile(
+        path.join(consumer, 'tsconfig.react.json'),
+        JSON.stringify({
+          extends: './tsconfig.json',
+          files: ['__tests__/react-types.mts', '__tests__/react-types.cts'],
+        }),
+      );
+      run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.react.json')]);
+    }
 
     const taroSpecifiers = nodeArtifacts
       .filter(({ manifest }) => isTaroPackage(manifest.name))
@@ -717,6 +770,8 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
 
     const angular = await checkAngularConsumer(consumer, artifacts);
 
+    const uniApp = await checkUniAppConsumer(consumer, artifacts);
+
     if (specifiers.includes('fluxdown') || nativeArtifacts.length) {
       if (taroSpecifiers.length) {
         // Taro 4 requires React 18 types; keep the React 19 dependency tree separate.
@@ -769,6 +824,9 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
       run('node', ['__tests__/smoke.cjs'], { cwd: consumer });
       run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.json')]);
 
+      if (reactTypes)
+        run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.react.json')]);
+
       if (specifiers.includes('@fluxdown/react-base'))
         run('pnpm', ['exec', 'tsc', '-p', path.join(consumer, 'tsconfig.react-base.json')]);
       console.log(
@@ -819,6 +877,7 @@ createElement(FluxdownBase, { ...props, theme: 'light' });
       ...(lynx ? { lynx } : {}),
       ...(svelte ? { svelte } : {}),
       ...(angular ? { angular } : {}),
+      ...(uniApp ? { uniApp } : {}),
       ...(nativeArtifacts.length
         ? { native: { packages: nativeArtifacts.map(({ manifest }) => manifest.name) } }
         : {}),
@@ -1067,7 +1126,9 @@ async function prepareRelease(options: ReturnType<typeof parseReleaseOptions>) {
   }
 
   const selectedNames = new Set(
-    candidate ? candidate.packages.map((pkg) => pkg.name) : PUBLIC_PACKAGES,
+    candidate
+      ? candidate.packages.map((pkg) => pkg.name)
+      : (options.checkPackages ?? PUBLIC_PACKAGES),
   );
 
   if (candidate) {

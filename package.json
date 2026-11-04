@@ -11,7 +11,7 @@
     "react",
     "streaming"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },
@@ -63,6 +63,7 @@
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
     "@vitejs/plugin-vue-jsx": "catalog:",
     "babel-jest": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",

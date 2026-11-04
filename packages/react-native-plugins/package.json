@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/react-native-plugins",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "React Native render slots and plugin presets for Fluxdown.",
   "keywords": [
     "hast",
@@ -11,7 +11,7 @@
     "renderer",
     "streaming"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

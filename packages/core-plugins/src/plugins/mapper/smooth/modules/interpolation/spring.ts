@@ -67,10 +67,10 @@ export class SpringSmoothInterpolator extends BaseSmoothInterpolator {
     return this.cursor >= this.fullIndex;
   }
 
-  override push(length: number) {
-    // Pin the motion toward the previous target before the target moves.
-    if (!isUndefined(this.timestamp)) {
-      this.rebase(this.timestamp);
+  override push(length: number, timestamp = this.timestamp) {
+    // Pin the motion toward the previous target at the arrival, before the target moves.
+    if (!isUndefined(timestamp)) {
+      this.rebase(Math.max(timestamp, this.origin.time));
     }
 
     super.push(length);
@@ -149,7 +149,8 @@ export class SpringSmoothInterpolator extends BaseSmoothInterpolator {
     const motion = getSpringMotion(
       this.spring,
       { displacement: position - this.fullIndex, velocity },
-      (time - start) / 1000,
+      // Arrivals can pin the origin slightly after the latest frame; nothing moves before it.
+      (Math.max(time, start) - start) / 1000,
     );
 
     return { position: this.fullIndex + motion.displacement, velocity: motion.velocity };

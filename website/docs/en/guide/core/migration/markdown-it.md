@@ -16,8 +16,8 @@ Migrate the project's markdown-it processing to @fluxdown/core. Implement the ch
 # References
 
 - markdown-it: https://markdown-it.github.io/markdown-it/
-- Fluxdown Core: https://hexmora.github.io/fluxdown/guide/core/quick-start.html
-- Core plugins: https://hexmora.github.io/fluxdown/guide/core/plugins.html
+- Fluxdown Core: https://fluxdown.dev/guide/core/quick-start.html
+- Core plugins: https://fluxdown.dev/guide/core/plugins.html
 
 # Work
 

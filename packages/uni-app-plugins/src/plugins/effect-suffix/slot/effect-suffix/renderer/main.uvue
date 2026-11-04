@@ -1,0 +1,19 @@
+<script setup lang="ts">
+import type { RendererProps } from './type';
+
+import { useBreathe } from '../../../../../base/animation/hooks';
+import { InheritedText } from '../../../../../base/components/inherited-text';
+import { getMarkerStyle, getRootStyle } from './utils';
+
+const props = defineProps<RendererProps>();
+
+const opacity = useBreathe();
+</script>
+
+<template>
+  <InheritedText v-slot="{ textStyle }">
+    <view class="fluxdown-suffix" :style="getRootStyle(textStyle)">
+      <view :style="getMarkerStyle(textStyle, props.type, opacity)" />
+    </view>
+  </InheritedText>
+</template>

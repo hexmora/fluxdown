@@ -1,5 +1,11 @@
 # stative
 
+## 2.1.1
+
+### Patch Changes
+
+- a6380c3: Move documentation links and package homepages to https://fluxdown.dev/.
+
 ## 2.1.0
 
 ### Minor Changes

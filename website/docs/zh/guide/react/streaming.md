@@ -1,4 +1,9 @@
-# 流式内容
+---
+title: React 流式 Markdown 渲染
+description: 在 React 中用 Fluxdown 渲染流式 Markdown，接入累积文本、修复未完成语法，并配置平滑输出、末尾渐隐与字符动画。
+---
+
+# 在 React 中渲染流式 Markdown {#流式内容}
 
 流式接入只需要两个信息：当前已经收到的完整文本，以及内容是否仍在生成。Fluxdown 接管呈现节奏，你可以继续使用熟悉的数据请求方式。
 

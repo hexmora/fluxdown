@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/angular-plugins",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Angular render slots and plugin presets for Fluxdown.",
   "keywords": [
     "angular",
@@ -10,7 +10,7 @@
     "renderer",
     "streaming"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

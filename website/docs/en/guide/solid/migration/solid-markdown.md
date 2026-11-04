@@ -14,7 +14,7 @@ Migrate the project from solid-markdown to @fluxdown/solid. Implement the change
 # References
 
 - Source: https://github.com/andi23rosca/solid-markdown
-- Target: https://hexmora.github.io/fluxdown/guide/solid/quick-start.html
+- Target: https://fluxdown.dev/guide/solid/quick-start.html
 
 # Steps
 

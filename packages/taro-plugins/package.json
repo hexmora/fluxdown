@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/taro-plugins",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Taro render slots and plugin presets for Fluxdown.",
   "keywords": [
     "hast",
@@ -11,7 +11,7 @@
     "streaming",
     "taro"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

@@ -1,4 +1,9 @@
-# Quick start
+---
+title: Angular Markdown Renderer
+description: Add Fluxdown standalone components to an Angular app. Render Markdown, connect streaming text, and customize presentation with themes and plugins.
+---
+
+# Angular Markdown renderer quick start {#quick-start}
 
 Fluxdown provides standalone Angular components for Markdown. They share the same Core, with static rendering, streaming repair, smooth output, and entrance effects. Themes and plugins let you adjust the presentation.
 

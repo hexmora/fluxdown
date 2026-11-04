@@ -12,7 +12,7 @@ import {
   toClosure,
 } from 'stative';
 
-import type { SmoothInterpolatorClass } from '../../..';
+import type { SmoothDriverClass, SmoothInterpolatorClass } from '../../..';
 import type { SmoothPosition } from '../states';
 
 import { SmoothCursor } from '..';
@@ -20,6 +20,7 @@ import { ArrayBlock, createArrayBlock } from '../../../__tests__/block';
 import { latest, PrimarySmoothDriver, resetSmoothTests } from '../../../__tests__/utils';
 import { SpringSmoothInterpolator } from '../../../modules';
 import {
+  LinearSmoothInterpolator,
   StepSmoothInterpolator,
   TargetInterpolator,
 } from '../../../modules/interpolation/__tests__/utils';
@@ -28,6 +29,7 @@ const setupCursor = (
   initial: IBlockState<number[]>[] = [],
   active = true,
   Interpolator: SmoothInterpolatorClass = StepSmoothInterpolator,
+  Driver: SmoothDriverClass = PrimarySmoothDriver,
 ) => {
   const source = MutableState.of(initial);
 
@@ -39,7 +41,7 @@ const setupCursor = (
       {
         source: toClosure(source),
         enabled: toClosure(enabled),
-        driver: toClosure(ReactiveState.of(PrimarySmoothDriver)),
+        driver: toClosure(ReactiveState.of(Driver)),
         interpolation: toClosure(ReactiveState.of(Interpolator)),
       },
     ]),
@@ -51,6 +53,151 @@ const setupCursor = (
 beforeEach(resetSmoothTests);
 
 describe('SmoothCursor', () => {
+  test('seeds newly started content at its arrival instead of decaying an empty old frame', () => {
+    class Driver extends PrimarySmoothDriver {
+      override now() {
+        return 100;
+      }
+    }
+
+    const block = createArrayBlock<number>([]);
+
+    const { cursor } = setupCursor([block.block], true, LinearSmoothInterpolator, Driver);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    block.source.next(Array<number>(10).fill(0));
+
+    const driver = latest(PrimarySmoothDriver.instances);
+
+    driver.tick(101);
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    cursor.destroy();
+  });
+
+  test.each([
+    { name: 'shortened content', values: [0, 1, 2], prefixLength: 3, expected: 3 },
+    { name: 'a rewritten prefix', values: [10, 11, 12], prefixLength: 0, expected: 1 },
+  ])('resets timing at the arrival of $name', ({ values, prefixLength, expected }) => {
+    let timestamp = 0;
+
+    class Driver extends PrimarySmoothDriver {
+      override now() {
+        return timestamp;
+      }
+    }
+
+    const block = createArrayBlock<number>([]);
+
+    const state: IBlockState<number[]> = block.block;
+
+    const prefix = MutableState.of(Infinity);
+
+    state.prevPrefixLength = prefix;
+
+    const { cursor } = setupCursor([state], true, LinearSmoothInterpolator, Driver);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    batch(() => {
+      block.source.next(Array.from({ length: 10 }, (_, index) => index));
+
+      prefix.next(10);
+    });
+
+    const driver = latest(PrimarySmoothDriver.instances);
+
+    timestamp = 2;
+
+    driver.tick(2);
+
+    expect(cursor.value.value.charIndex).toBe(2);
+
+    timestamp = 100;
+
+    batch(() => {
+      block.source.next(values);
+
+      prefix.next(prefixLength);
+    });
+
+    timestamp = 101;
+
+    driver.tick(101);
+
+    expect(cursor.value.value.charIndex).toBe(expected);
+
+    cursor.destroy();
+  });
+
+  test('uses the custom driver clock for arrivals without emitting between frames', () => {
+    let timestamp = 0;
+
+    class Driver extends PrimarySmoothDriver {
+      override now() {
+        return timestamp;
+      }
+    }
+
+    const block = createArrayBlock<number>([]);
+
+    const { cursor } = setupCursor([block.block], true, LinearSmoothInterpolator, Driver);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    block.source.next([1, 2]);
+
+    const driver = latest(PrimarySmoothDriver.instances);
+
+    timestamp = 10;
+
+    block.source.next(Array<number>(10).fill(0));
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    driver.tick(10);
+
+    expect(cursor.value.value.charIndex).toBe(2);
+
+    timestamp = 15;
+
+    driver.tick(15);
+
+    expect(cursor.value.value.charIndex).toBe(7);
+
+    cursor.destroy();
+  });
+
+  test('keeps one-argument interpolators compatible with driver arrival timestamps', () => {
+    const block = createArrayBlock<number>([]);
+
+    const { cursor } = setupCursor([block.block]);
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    block.source.next([1]);
+
+    const interpolator = latest(StepSmoothInterpolator.instances);
+
+    const push = jest.spyOn(interpolator, 'push');
+
+    const driver = latest(PrimarySmoothDriver.instances);
+
+    block.source.next([1, 2]);
+
+    expect(push).toHaveBeenCalledWith(1, driver.now());
+
+    expect(cursor.value.value.charIndex).toBe(0);
+
+    driver.tick(16);
+
+    expect(cursor.value.value.charIndex).toBe(1);
+
+    cursor.destroy();
+  });
+
   test.each([
     { values: [], end: { blockIndex: -1, charIndex: 0 } },
     { values: [[], []], end: { blockIndex: 1, charIndex: 0 } },

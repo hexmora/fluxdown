@@ -16,8 +16,8 @@ Migrate Markdown display from react-native-enriched-markdown to @fluxdown/react-
 # References
 
 - Source: https://github.com/software-mansion/enriched-markdown
-- Fluxdown: https://hexmora.github.io/fluxdown/guide/react-native/quick-start.html
-- Themes and interactions: https://hexmora.github.io/fluxdown/guide/react-native/customization.html
+- Fluxdown: https://fluxdown.dev/guide/react-native/quick-start.html
+- Themes and interactions: https://fluxdown.dev/guide/react-native/customization.html
 
 # Approach
 

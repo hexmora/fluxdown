@@ -1,4 +1,9 @@
-# 快速开始
+---
+title: React Native Markdown 渲染器
+description: 在 Expo 或 React Native 项目中接入 Fluxdown，以原生 Text、View 组件渲染 Markdown，同一份组件代码可用于 iOS、Android 与 Web。
+---
+
+# React Native Markdown 渲染器快速开始 {#快速开始}
 
 React Native 版把 Markdown 渲染成 `Text`、`View` 等原生组件，沿用 React 版的解析、流式修复和插件机制。iOS、Android 与 React Native Web 使用同一份组件代码。
 
@@ -46,4 +51,4 @@ export default function App() {
 - [流式内容](./streaming.md)：控制平滑输出与末尾效果。
 - [样式指南](./customization.md)：调整原生颜色、字体和布局。
 - [插件矩阵](./plugins/matrix.mdx)：选择 Full、Lite 或自己组装。
-- [横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、Svelte、Angular、React Native、Lynx、Solid 和 Taro 的静态与流式表现。
+- [横向演示](../common/features/renderers.mdx)：同时查看 React、Vue、Svelte、Angular、React Native、Lynx、Solid、Taro 和 Uni App 的静态与流式表现。

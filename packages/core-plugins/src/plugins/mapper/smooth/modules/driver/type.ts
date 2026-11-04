@@ -13,6 +13,11 @@ export interface IDriver extends IDestructible {
   readonly value: Observable<number>;
 
   /**
+   * Read the current time using the same clock as start() and timestamp events.
+   */
+  now(): number;
+
+  /**
    * Start ticking and return the initial timestamp.
    */
   start(): number;

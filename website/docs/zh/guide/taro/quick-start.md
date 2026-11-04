@@ -1,4 +1,9 @@
-# 快速开始
+---
+title: Taro Markdown 渲染器
+description: 在 Taro React 项目中使用 Fluxdown 渲染 Markdown。了解组件与样式安装、流式文本接入，以及 H5 和小程序构建的配置方式。
+---
+
+# Taro Markdown 渲染器快速开始 {#快速开始}
 
 在 Taro React 项目中，用 Taro 组件展示 Markdown。解析、流式输出与插件配置沿用 React 版的接口。
 

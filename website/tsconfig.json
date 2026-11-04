@@ -15,5 +15,5 @@
     },
     "customConditions": ["svelte"]
   },
-  "include": ["docs", "components", "theme", "rspress.config.ts", "env.d.ts"]
+  "include": ["docs", "components", "theme", "seo", "rspress.config.ts", "env.d.ts"]
 }

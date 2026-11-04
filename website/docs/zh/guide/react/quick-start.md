@@ -1,4 +1,9 @@
-# 快速开始
+---
+title: React Markdown 渲染器
+description: 在 React 中安装 Fluxdown，渲染 Markdown 与流式内容。通过组件示例接入代码高亮、复制按钮和基础样式，再按需调整主题与插件。
+---
+
+# React Markdown 渲染器快速开始 {#快速开始}
 
 在 React 应用中使用 Fluxdown，传入 Markdown 就可以开始渲染。常用语法、代码高亮、复制按钮和基础样式已经准备好。
 

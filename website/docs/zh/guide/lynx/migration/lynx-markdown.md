@@ -17,8 +17,8 @@
 
 - 原元件：https://github.com/lynx-family/lynx-website/blob/main/docs/zh/api/elements/built-in/markdown.mdx
 - 官方示例：https://github.com/lynx-family/lynx-examples/tree/main/examples/markdown
-- Fluxdown：https://hexmora.github.io/fluxdown/zh/guide/lynx/quick-start.html
-- 样式与交互：https://hexmora.github.io/fluxdown/zh/guide/lynx/customization.html
+- Fluxdown：https://fluxdown.dev/zh/guide/lynx/quick-start.html
+- 样式与交互：https://fluxdown.dev/zh/guide/lynx/customization.html
 
 # 执行方式
 

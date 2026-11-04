@@ -1,6 +1,6 @@
 export const THEME_MARKDOWN = `# A little room for good ideas
 
-Fluxdown gives Markdown a considered home: **clear emphasis**, *a quieter voice*, ~~an earlier thought~~, and an [open door to the documentation](https://hexmora.github.io/fluxdown/). Inline code like \`theme.tokens.heading\` stays easy to scan.
+Fluxdown gives Markdown a considered home: **clear emphasis**, *a quieter voice*, ~~an earlier thought~~, and an [open door to the documentation](https://fluxdown.dev/). Inline code like \`theme.tokens.heading\` stays easy to scan.
 
 ## Make space for the details
 

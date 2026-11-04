@@ -16,8 +16,8 @@
 # 参考文档
 
 - 原库：https://github.com/software-mansion/enriched-markdown
-- Fluxdown：https://hexmora.github.io/fluxdown/zh/guide/react-native/quick-start.html
-- 主题与交互：https://hexmora.github.io/fluxdown/zh/guide/react-native/customization.html
+- Fluxdown：https://fluxdown.dev/zh/guide/react-native/quick-start.html
+- 主题与交互：https://fluxdown.dev/zh/guide/react-native/customization.html
 
 # 执行方式
 

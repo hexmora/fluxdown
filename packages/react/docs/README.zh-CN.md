@@ -4,7 +4,7 @@
 
 `fluxdown` 内置基础样式、代码高亮和复制按钮，支持 GFM 表格、任务列表、删除线和自动链接。在内容生成过程中，可以平滑展示新文本、修复尚未完成的语法，并让尾部文字逐渐淡入。
 
-[文档](../../../website/docs/zh/guide/react/quick-start.md) · [在线体验](https://hexmora.github.io/fluxdown/zh/playground.html) · [English](../README.md)
+[文档](../../../website/docs/zh/guide/react/quick-start.md) · [在线体验](https://fluxdown.dev/zh/playground.html) · [English](../README.md)
 
 ## 安装
 

@@ -1,0 +1,13 @@
+<script setup lang="ts">
+import type { RootReconcilerProps } from './type';
+
+import { RenderNodes, useStateValue } from '@fluxdown/uni-app-plugins/base';
+
+const props = defineProps<RootReconcilerProps>();
+
+const nodes = useStateValue(() => props.value);
+</script>
+
+<template>
+  <RenderNodes :nodes="nodes" />
+</template>

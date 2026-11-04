@@ -12,6 +12,7 @@ import { LynxPreview } from './components/lynx-preview';
 import { SolidPreview } from './components/solid-preview';
 import { SveltePreview } from './components/svelte-preview';
 import { TaroPreview } from './components/taro-preview';
+import { UniAppPreview } from './components/uni-app-preview';
 import { VuePreview } from './components/vue-preview';
 
 export const RendererPreview = ({
@@ -80,6 +81,19 @@ export const RendererPreview = ({
 
   if (renderer === 'react-native') {
     return <FluxdownNative key={cycle} {...props} />;
+  }
+
+  if (renderer === 'uni-app') {
+    return (
+      <UniAppPreview
+        data={data}
+        errorLabel={
+          lang === 'zh'
+            ? 'Uni App 预览加载失败，请刷新页面重试。'
+            : 'The Uni App preview could not load. Refresh the page to try again.'
+        }
+      />
+    );
   }
 
   return <Fluxdown key={cycle} {...props} />;

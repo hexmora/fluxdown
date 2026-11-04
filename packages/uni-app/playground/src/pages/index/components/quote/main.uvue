@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import { useTheme } from '@fluxdown/uni-app-plugins/base';
+
+const theme = useTheme();
+
+defineOptions({ inheritAttrs: false });
+</script>
+
+<template>
+  <view
+    class="quote"
+    :style="{
+      borderLeftColor: theme.tokens.colors.accent,
+      backgroundColor: theme.tokens.colors.surfaceSubtle,
+    }"
+  >
+    <slot />
+  </view>
+</template>
+
+<style>
+.quote {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-left-width: 4px;
+  border-left-style: solid;
+  border-radius: 8px;
+}
+</style>

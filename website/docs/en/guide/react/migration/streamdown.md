@@ -15,8 +15,8 @@ Migrate this React project's Streamdown usage to fluxdown, preserving content, s
 
 # References
 
-- Fluxdown: https://hexmora.github.io/fluxdown/guide/react/quick-start.html
-- Configuration and extensions: https://hexmora.github.io/fluxdown/guide/react/configuration.html
+- Fluxdown: https://fluxdown.dev/guide/react/quick-start.html
+- Configuration and extensions: https://fluxdown.dev/guide/react/configuration.html
 - Streamdown: https://streamdown.ai/docs/configuration
 
 # Steps

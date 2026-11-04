@@ -77,7 +77,7 @@ export const FrameworkCodeTabs = ({
             tabIndex={active === index ? 0 : -1}
             type="button"
           >
-            {framework}
+            {framework === 'uni-app' ? 'Uni App' : framework}
           </button>
         ))}
       </div>

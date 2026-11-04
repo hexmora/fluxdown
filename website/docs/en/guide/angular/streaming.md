@@ -1,4 +1,9 @@
-# Streaming
+---
+title: Streaming Markdown in Angular
+description: Render streaming Markdown in Angular using signals and Fluxdown. Connect an async text iterator, configure output effects, and track messages by ID.
+---
+
+# Streaming Markdown in Angular {#streaming}
 
 Append incoming chunks to a signal and pass it to `text`. The `streaming` input controls unfinished syntax repair, smooth output, and entrance effects.
 

@@ -9,16 +9,18 @@ import { fileURLToPath } from 'node:url';
 import { reactNativeWebPlugin } from '../scripts/build/react-native-web';
 import { taroWebAliases, taroWebDefines } from '../scripts/build/taro-web';
 import { lynxDemo } from './lynx/plugin';
+import { seo } from './seo/plugin';
 import { sessionAppearance } from './theme/appearance/plugin';
 import { sessionLocale } from './theme/locale/plugin';
+import { uniAppDemo } from './uni-app/plugin';
 
 export default defineConfig({
   root: 'docs',
-  base: '/fluxdown/',
-  siteOrigin: 'https://hexmora.github.io',
+  base: '/',
+  siteOrigin: 'https://fluxdown.dev',
   title: 'Fluxdown',
   description:
-    'Markdown that keeps up. Smooth streaming, resilient syntax, and a framework-free core.',
+    'Streaming Markdown for AI apps across web, native apps, and mini programs, with smooth output, syntax repair, and a shared reactive core.',
   lang: 'en',
   locales: [
     {
@@ -26,13 +28,14 @@ export default defineConfig({
       label: 'English',
       title: 'Fluxdown',
       description:
-        'Markdown that keeps up. Smooth streaming, resilient syntax, and a framework-free core.',
+        'Streaming Markdown for AI apps across web, native apps, and mini programs, with smooth output, syntax repair, and a shared reactive core.',
     },
     {
       lang: 'zh',
       label: '简体中文',
       title: 'Fluxdown',
-      description: '让 Markdown 自然流动。平滑输出，补全语法，以框架无关的核心适应你的产品。',
+      description:
+        '面向 AI 应用的流式 Markdown 渲染库，覆盖 Web、原生应用和小程序。通过共享的响应式 Core，实现平滑输出、语法修复和自定义渲染。',
     },
   ],
   icon: '/logo.svg',
@@ -40,7 +43,9 @@ export default defineConfig({
   // Publish real HTML URLs so direct visits work without server rewrites.
   route: { cleanUrls: false, localeRedirect: 'never' },
   plugins: [
+    seo(),
     lynxDemo(),
+    uniAppDemo(),
     {
       name: 'static-search-links',
       modifySearchIndexData(pages) {
@@ -106,7 +111,7 @@ export default defineConfig({
       pluginSvgr(),
       pluginSvelte({ preprocessOptions: { typescript: false } }),
       sessionAppearance(),
-      sessionLocale('/fluxdown/'),
+      sessionLocale('/'),
       reactNativeWebPlugin(fileURLToPath(new URL('.', import.meta.url))),
     ],
     resolve: {

@@ -1,6 +1,6 @@
 {
   "name": "stative",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Headless reactive primitives for Fluxdown streaming state.",
   "keywords": [
     "headless",
@@ -10,7 +10,7 @@
     "rxjs",
     "streaming"
   ],
-  "homepage": "https://hexmora.github.io/fluxdown/",
+  "homepage": "https://fluxdown.dev/",
   "bugs": {
     "url": "https://github.com/hexmora/fluxdown/issues"
   },

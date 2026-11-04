@@ -1,4 +1,9 @@
-# Streaming content
+---
+title: Streaming Markdown in React Native
+description: Render streaming Markdown in React Native with Fluxdown. Connect message text, configure native animation effects, and finish or cancel a response.
+---
+
+# Streaming Markdown in React Native {#streaming-content}
 
 React Native shares the same streaming pipeline as React. Pass accumulated text and use the request state to control `streaming`:
 
@@ -45,4 +50,4 @@ Native slots support `scale`, `shad`, `chunk`, and `suffix`. Smoothing uses the 
 
 Set `streaming` to `false` when the request finishes, is cancelled, or fails. Fluxdown displays all received content and clears the trailing effects. Your app can also pause its data source or visual effects when it enters the background.
 
-[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, and Taro together.
+[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, Taro, and Uni App together.

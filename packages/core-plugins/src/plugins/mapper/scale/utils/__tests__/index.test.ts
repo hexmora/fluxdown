@@ -3,6 +3,7 @@ import type { Element, Root as HastRoot } from 'hast';
 import { sizeOfHast } from '@fluxdown/hast';
 
 import { createScaleRoot, SCALE_DATA_ATTR } from '..';
+import { restoreGlobals, stubGlobal } from '../../../../../../../../scripts/testing/globals';
 
 const config = { initial: false, start: 1000, duration: 200, from: 0, blur: 2 };
 
@@ -245,7 +246,7 @@ test('keeps punctuation attached to words and normalizes invalid animation value
         )
         .join(''),
     ),
-  ).toEqual(['hello,', 'world!', '中文，', '测试。']);
+  ).toEqual(['hello,', 'world!', '中', '文，', '测', '试。']);
 
   expect(readCharacters(result.root)[0]?.properties).toMatchObject({
     dataScaleDuration: 200,
@@ -264,33 +265,39 @@ test('keeps zero-duration entrances as plain text', () => {
   expect(readCharacters(result.root)).toEqual([]);
 });
 
-test('checks word segmentation support when new text arrives', () => {
-  const intl = Intl as unknown as { Segmenter?: typeof Intl.Segmenter };
+test.each([
+  ['Intl.Segmenter', {}],
+  ['Intl', undefined],
+] as const)('preserves CJK word boundaries and entrance keys without %s', async (_name, intl) => {
+  const root = paragraph('Hello, 中文，world! 「测试」 한국어。 かなカナ');
 
-  const original = intl.Segmenter;
+  const segmented = createScaleRoot(root, [], config);
 
-  const root = paragraph('Hello, 中文，world!');
+  const appendedRoot = paragraph('Hello, 中文，world! 「测试」 한국어。 かなカナ 每个文字');
+
+  const appended = createScaleRoot(appendedRoot, segmented.characters, {
+    ...config,
+    start: 1200,
+  });
 
   try {
-    intl.Segmenter = undefined;
+    stubGlobal('Intl', intl);
 
-    const fallback = createScaleRoot(root, [], config);
+    jest.resetModules();
 
-    expect(readCharacters(fallback.root).map((node) => node.children)).toEqual(
-      Array.from('Hello,中文，world!', (value) => [{ type: 'text', value }]),
-    );
+    const { createScaleRoot: createWithoutSegmenter } = await import('..');
 
-    expect((fallback.root.children[0] as Element).children).toHaveLength(5);
+    const fallback = createWithoutSegmenter(root, [], config);
 
-    intl.Segmenter = original;
+    expect(fallback).toEqual(segmented);
 
-    const segmented = createScaleRoot(root, [], config);
-
-    expect(readCharacters(segmented.root)).toEqual(readCharacters(fallback.root));
-
-    expect((segmented.root.children[0] as Element).children).toHaveLength(4);
+    expect(
+      createWithoutSegmenter(appendedRoot, fallback.characters, { ...config, start: 1200 }),
+    ).toEqual(appended);
   } finally {
-    intl.Segmenter = original;
+    restoreGlobals();
+
+    jest.resetModules();
   }
 });
 

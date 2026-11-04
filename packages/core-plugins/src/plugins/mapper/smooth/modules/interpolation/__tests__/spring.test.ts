@@ -1,4 +1,5 @@
 import { getSpringMotion, SpringSmoothInterpolator } from '..';
+import { getArrivalCompletion } from './utils';
 
 const DEFAULT_SPRING = { frequency: 5, dampingRatio: 1 };
 
@@ -223,6 +224,39 @@ describe('SpringSmoothInterpolator', () => {
     }
 
     expect(tickAll(paused, frames(20, 16, 720))).toEqual(tickAll(continuous, frames(20, 16, 720)));
+  });
+
+  test('follows the previous target until content arrives', () => {
+    const arrived = new SpringSmoothInterpolator();
+
+    const ticked = new SpringSmoothInterpolator();
+
+    for (const interpolator of [arrived, ticked]) {
+      interpolator.start(0);
+
+      interpolator.push(20);
+    }
+
+    arrived.push(80, 120);
+
+    // Ticking at the arrival time pins the same trajectory without reporting progress early.
+    const [beforeArrival = 0] = tickAll(ticked, [120]);
+
+    ticked.push(80);
+
+    expect(tickAll(arrived, [200, 300])).toEqual([
+      beforeArrival + sum(tickAll(ticked, [200])),
+      ...tickAll(ticked, [300]),
+    ]);
+  });
+
+  test('keeps source and frame phase differences from amplifying into a long tail', () => {
+    // Rounded timings from two real runs with different arrival and frame phases.
+    const first = getArrivalCompletion(21.1, 24.3, 27.8);
+
+    const second = getArrivalCompletion(11.3, 14.4, 30.6);
+
+    expect(Math.abs(first - second)).toBeLessThan(100);
   });
 
   test('keeps momentum when resetting progress', () => {

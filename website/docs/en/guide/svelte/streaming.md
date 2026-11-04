@@ -1,4 +1,9 @@
-# Streaming
+---
+title: Streaming Markdown in Svelte
+description: Render streaming Markdown in Svelte with Fluxdown. Pass accumulated text through props, configure smoothing and effects, and handle the end of a response.
+---
+
+# Streaming Markdown in Svelte {#streaming}
 
 Pass accumulated text through `text` and use the request state for `streaming`. Svelte updates the content as props change; no manual refresh is needed.
 
@@ -52,4 +57,4 @@ Set `effect: false` to keep smoothing without a visual effect. See [Configuratio
 
 Set `streaming` to `false` when the request finishes, is cancelled or fails. The component displays all received content and removes trailing effects. Unmounting also cleans up its subscriptions and animations.
 
-[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, and Taro together.
+[Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, Taro, and Uni App together.

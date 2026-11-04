@@ -18,13 +18,17 @@ dependsOn:
   - taro-plugins
   - vue
   - vue-plugins
+  - uni-app
+  - uni-app-plugins
 
 fileGroups:
   sources:
     - docs/**/*
     - components/**/*
     - theme/**/*
+    - seo/**/*
     - lynx/**/*
+    - uni-app/**/*
     - /scripts/prepare-angular.ts
     - /scripts/build/lynx-workspace.ts
     - /scripts/build/vue.ts
@@ -44,6 +48,11 @@ fileGroups:
     - /packages/*/tsconfig*.json
     - /packages/vue*/vite.config.ts
     - /packages/solid*/vite.config.ts
+    - /packages/uni-app/playground/src/**/*
+    - /packages/uni-app/playground/index.html
+    - /packages/uni-app/playground/package.json
+    - /packages/uni-app/playground/tsconfig.json
+    - /packages/uni-app/playground/vite.config.js
     - /packages/*/src/**/*
 
 tasks:
@@ -70,4 +79,8 @@ tasks:
     command: pnpm run lint
     inputs: ["@group(sources)", .oxlintrc.json, /.oxlintrc.json, /packages/react/.oxlintrc.json]
   check:
-    deps: [typecheck, lint, build]
+    deps: [typecheck, lint, test]
+  test:
+    command: pnpm run check:seo
+    deps: [build]
+    inputs: ["@group(sources)"]

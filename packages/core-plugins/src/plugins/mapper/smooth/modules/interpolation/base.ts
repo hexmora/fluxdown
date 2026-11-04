@@ -21,7 +21,7 @@ export abstract class BaseSmoothInterpolator implements IInterpolator {
     return false;
   }
 
-  push(length: number) {
+  push(length: number, _timestamp?: number) {
     this.fullIndex += length;
   }
 

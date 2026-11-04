@@ -1,4 +1,9 @@
-# Quick start
+---
+title: Vue 3 Markdown Renderer
+description: Add Fluxdown to a Vue 3 app. Render Markdown in a single-file component, connect streaming text, and customize the output with themes and plugins.
+---
+
+# Vue 3 Markdown renderer quick start {#quick-start}
 
 Fluxdown provides a Markdown component for Vue 3. It uses the same Core for static content, streaming repair, smooth output and trailing effects. Themes and plugins let you adapt its presentation.
 
