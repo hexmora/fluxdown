@@ -16,33 +16,33 @@ All three entries share the same component API. Choose the default capabilities 
 
 Composition includes inherited plugin types. A check means the component includes that plugin by default; an empty cell means it can be added manually.
 
-| Plugin                  | Composition                                           | Package                          |      Lite       |      Full       |
-| ----------------------- | ----------------------------------------------------- | -------------------------------- | :-------------: | :-------------: |
-| `BlockquotePlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `BreakLinePlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `CjkPlugin`             | <PluginTag type="remark" />                           | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
-| `CodePlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> |                 |
-| `CodePelePlugin`        | <PluginTag type="slot" />                             | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
-| `CodePrismPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> |                 |                 |
-| `CodeShikiPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
-| `EffectChunkPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `EffectScalePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `EffectShadPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `EffectSuffixPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `EmojiPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
-| `EmphasisPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `FallbackPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `HeadingPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `ImagePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `LinkPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `ListPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `ParagraphPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `PatchPlugin`           | <PluginTag type="render" />                           | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `StrongPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `TablePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `TexPlugin`             | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> | <PresetCheck /> |                 |
-| `TexKatexPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> |                 |                 |
-| `TexMathjaxKatexPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" /> |                 | <PresetCheck /> |
+| Plugin                  | Composition                                           | Package                               |      Lite       |      Full       |
+| ----------------------- | ----------------------------------------------------- | ------------------------------------- | :-------------: | :-------------: |
+| `BlockquotePlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `BreakLinePlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `CjkPlugin`             | <PluginTag type="remark" />                           | <PluginTag type="vue-base-plugins" /> |                 | <PresetCheck /> |
+| `CodePlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> |                 |
+| `CodePelePlugin`        | <PluginTag type="slot" />                             | <PluginTag type="vue-plugins" />      |                 | <PresetCheck /> |
+| `CodePrismPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      |                 |                 |
+| `CodeShikiPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      |                 | <PresetCheck /> |
+| `EffectChunkPlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `EffectScalePlugin`     | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `EffectShadPlugin`      | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `EffectSuffixPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `EmojiPlugin`           | <PluginTag type="remark" />                           | <PluginTag type="vue-base-plugins" /> |                 | <PresetCheck /> |
+| `EmphasisPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `FallbackPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `HeadingPlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `ImagePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `LinkPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `ListPlugin`            | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `ParagraphPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `PatchPlugin`           | <PluginTag type="render" />                           | <PluginTag type="vue-base-plugins" /> | <PresetCheck /> | <PresetCheck /> |
+| `StrongPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `TablePlugin`           | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> | <PresetCheck /> |
+| `TexPlugin`             | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      | <PresetCheck /> |                 |
+| `TexKatexPlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      |                 |                 |
+| `TexMathjaxKatexPlugin` | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="vue-plugins" />      |                 | <PresetCheck /> |
 
 ### Package
 
@@ -61,3 +61,13 @@ import { TexMathjaxKatexPlugin } from '@fluxdown/vue-plugins/plugins/tex-mathjax
 > Import `PRESET_FULL_PLUGINS` from `@fluxdown/vue-plugins/full` and `PRESET_LITE_PLUGINS` from `@fluxdown/vue-plugins/lite`.
 
 Pass plugins through the component's `plugins` prop. See [aggregate plugins](./aggregate.md) for declaration, composition and configuration.
+
+## Shared Vue infrastructure
+
+<PluginTag type="vue-base-plugins" /> refers to `@fluxdown/vue-base-plugins`,
+which provides shared render plugins, CJK, Emoji and Patch. Import from the
+package listed in the table:
+
+```ts
+import { CjkPlugin } from '@fluxdown/vue-base-plugins/plugins/cjk';
+```

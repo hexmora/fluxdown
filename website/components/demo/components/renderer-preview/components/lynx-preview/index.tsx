@@ -6,7 +6,7 @@ import type { LynxPreviewProps } from './type';
 
 import styles from './index.module.scss';
 
-export const LynxPreview = ({ data, errorLabel }: LynxPreviewProps) => {
+export const LynxPreview = ({ data, errorLabel, renderer }: LynxPreviewProps) => {
   const frameRef = useRef<HTMLIFrameElement>(null);
 
   const [ready, setReady] = useState(false);
@@ -58,8 +58,9 @@ export const LynxPreview = ({ data, errorLabel }: LynxPreviewProps) => {
         className={styles.frame}
         onLoad={() => setReady(true)}
         ref={frameRef}
-        src={withBase('/react-lynx-demo/index.html')}
-        title="React Lynx"
+        key={renderer}
+        src={withBase(`/${renderer}-demo/index.html`)}
+        title={renderer === 'react-lynx' ? 'React Lynx' : 'Vue Lynx'}
       />
       {failed && <output>{errorLabel}</output>}
     </>

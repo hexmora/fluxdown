@@ -1,0 +1,22 @@
+[
+  {
+    "type": "file",
+    "name": "slot",
+    "label": "Slot plugins"
+  },
+  {
+    "type": "file",
+    "name": "render",
+    "label": "Render plugins"
+  },
+  {
+    "type": "file",
+    "name": "aggregate",
+    "label": "Composite plugins"
+  },
+  {
+    "type": "file",
+    "name": "matrix",
+    "label": "Plugin matrix"
+  }
+]

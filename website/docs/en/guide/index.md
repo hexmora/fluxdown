@@ -14,6 +14,7 @@ Use it for AI conversations, live writing, streaming reports, or any interface w
 | Render Markdown and streaming content in an Angular app    | [Angular quick start](./angular/quick-start.md) · `@fluxdown/angular`                |
 | Render on iOS, Android, or React Native Web                | [React Native quick start](./react-native/quick-start.md) · `@fluxdown/react-native` |
 | Display Markdown and streaming content in a React Lynx app | [React Lynx quick start](./react-lynx/quick-start.md) · `@fluxdown/react-lynx`       |
+| Display Markdown and streaming content in a Vue Lynx app   | [Vue Lynx quick start](./vue-lynx/quick-start.md) · `@fluxdown/vue-lynx`             |
 | Display Markdown and streaming content in a Solid app      | [Solid quick start](./solid/quick-start.md) · `@fluxdown/solid`                      |
 | Display Markdown and streaming content in a Taro app       | [Taro quick start](./taro/quick-start.md) · `@fluxdown/taro`                         |
 | Display Markdown and streaming content in a Uni App x app  | [Uni App quick start](./uni-app/quick-start.md) · `@fluxdown/uni-app`                |
@@ -31,6 +32,8 @@ Framework components provide a ready-to-use presentation layer. Core handles Mar
 
 ## One core, different interfaces
 
-Fluxdown is built on [stative](../stative/index.md), which connects text, configuration, and output in a single reactive data flow. React, Vue, Svelte, Angular, React Native, React Lynx, Solid, Taro, and Uni App have ready-to-use integrations.
+Fluxdown is built on [stative](../stative/index.md), which connects text, configuration, and output in a single reactive data flow. React, Vue, Svelte, Angular, React Native, React Lynx, Vue Lynx, Solid, Taro, and Uni App have ready-to-use integrations.
 
-Start with the quick start for [React](./react/quick-start.md), [Vue 3](./vue/quick-start.md), [Svelte](./svelte/quick-start.md), [Angular](./angular/quick-start.md), [React Native](./react-native/quick-start.md), [React Lynx](./react-lynx/quick-start.md), [Solid](./solid/quick-start.md), [Taro](./taro/quick-start.md), or [Uni App](./uni-app/quick-start.md). Explore Core when you need to handle the output yourself.
+Start with the quick start for [React](./react/quick-start.md), [Vue 3](./vue/quick-start.md), [Svelte](./svelte/quick-start.md), [Angular](./angular/quick-start.md), [React Native](./react-native/quick-start.md), [React Lynx](./react-lynx/quick-start.md), [Vue Lynx](./vue-lynx/quick-start.md), [Solid](./solid/quick-start.md), [Taro](./taro/quick-start.md), or [Uni App](./uni-app/quick-start.md). Explore Core when you need to handle the output yourself.
+
+Vue and Vue Lynx share `@fluxdown/vue-base` for Core lifecycle, streaming configuration, and reactive VNode updates. `@fluxdown/vue-base-plugins` provides their shared render contracts, slot composition, and Vue composables. The platform packages supply host elements, styles, events, themes, and animation effects; Vue Lynx also handles native runtime setup and worklets.

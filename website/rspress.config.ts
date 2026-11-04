@@ -13,6 +13,7 @@ import { seo } from './seo/plugin';
 import { sessionAppearance } from './theme/appearance/plugin';
 import { sessionLocale } from './theme/locale/plugin';
 import { uniAppDemo } from './uni-app/plugin';
+import { vueLynxDemo } from './vue-lynx/plugin';
 
 export default defineConfig({
   root: 'docs',
@@ -45,6 +46,7 @@ export default defineConfig({
   plugins: [
     seo(),
     reactLynxDemo(),
+    vueLynxDemo(),
     uniAppDemo(),
     {
       name: 'static-search-links',

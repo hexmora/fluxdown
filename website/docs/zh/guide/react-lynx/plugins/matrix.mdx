@@ -4,26 +4,31 @@ import { PluginTag, PresetCheck } from '../../../../../components';
 
 ## 组件分化
 
-| 组件           | 入口                                      | 默认能力                                        |
-| -------------- | ----------------------------------------- | ----------------------------------------------- |
-| `Fluxdown`     | `@fluxdown/react-lynx` 或 `@fluxdown/react-lynx/full` | 在基础能力上加入 Shiki 代码高亮、CJK 与 Emoji。 |
-| `FluxdownLite` | `@fluxdown/react-lynx/lite`                     | 基础 Markdown、表格、图片与流式效果。           |
-| `FluxdownRaw`  | `@fluxdown/react-lynx/raw`                      | 自行传入完整的 `plugins`。                      |
+| 组件           | 入口                                                  | 默认能力                                 |
+| -------------- | ----------------------------------------------------- | ---------------------------------------- |
+| `Fluxdown`     | `@fluxdown/react-lynx` 或 `@fluxdown/react-lynx/full` | Shiki 代码高亮、SVG 公式、CJK 与 Emoji。 |
+| `FluxdownLite` | `@fluxdown/react-lynx/lite`                           | 基础 Markdown、表格、图片与流式效果。    |
+| `FluxdownRaw`  | `@fluxdown/react-lynx/raw`                            | 自行传入完整的 `plugins`。               |
 
 Full 的高亮支持 Bash、CSS、HTML、JavaScript、JSON、Python 和 TypeScript；未识别的语言保留纯文本。Lite 的代码块显示源码。
 
-两个预设都提供 `Tex` 插槽。`build.tex` 默认为 `false`，开启后显示公式源码；需要公式排版时，添加 `TexSvgPlugin`，并在宿主接入 SVG XElement。
+`build.tex` 默认为 `false`。开启后，Full 使用 MathJax SVG 排版，宿主需接入 SVG XElement；Lite 显示公式源码，也可按需添加 `TexMathJaxPlugin`。
+
+## 代码高亮 {#code-highlighting}
+
+Full 使用 Shiki 高亮，初始化完成前或失败时显示源码。Android 需要 Lynx 3.8 或更新版本的[后台线程 WebAssembly 支持](https://lynxjs.org/4.1/guide/scripting-runtime/webassembly.html)。也可通过 `CodePrismPlugin` 使用不依赖 WebAssembly 的高亮。
 
 ## 全部插件
 
 「组成」包含继承的插件类型；勾选表示预设直接包含。Full 的 `CodeShikiPlugin` 继承 `CodePlugin` 的基础能力。
 
-| 插件                 | 组成                                                  | 所在包                            |      Lite       |      Full       |
-| -------------------- | ----------------------------------------------------- | --------------------------------- | :-------------: | :-------------: |
+| 插件                 | 组成                                                  | 所在包                                  |      Lite       |      Full       |
+| -------------------- | ----------------------------------------------------- | --------------------------------------- | :-------------: | :-------------: |
 | `BlockquotePlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `BreakLinePlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `CjkPlugin`          | <PluginTag type="remark" />                           | <PluginTag type="react-lynx-plugins" /> |                 | <PresetCheck /> |
 | `CodePlugin`         | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> |                 |
+| `CodePrismPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> |                 |                 |
 | `CodeShikiPlugin`    | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> |                 | <PresetCheck /> |
 | `EffectChunkPlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `EffectScalePlugin`  | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
@@ -40,13 +45,13 @@ Full 的高亮支持 Bash、CSS、HTML、JavaScript、JSON、Python 和 TypeScri
 | `PatchPlugin`        | <PluginTag type="render" />                           | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `StrongPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
 | `TablePlugin`        | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> | <PresetCheck /> |
-| `TexSvgPlugin`       | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> |                 |                 |
+| `TexPlugin`          | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> | <PresetCheck /> |                 |
+| `TexMathJaxPlugin`   | <PluginTag type="render" /> <PluginTag type="slot" /> | <PluginTag type="react-lynx-plugins" /> |                 | <PresetCheck /> |
 
 ## 所在包与导入
 
-<PluginTag type="react-lynx-plugins" /> 对应 `@fluxdown/react-lynx-plugins`，包含 React Lynx
-的综合插件、render 和 slot。
+<PluginTag type="react-lynx-plugins" /> 对应
+`@fluxdown/react-lynx-plugins`，包含 React Lynx 的综合插件、render 和 slot。
 
 > 使用 `@fluxdown/react-lynx-plugins/plugins/<插件目录>` 导入。目录名取导出名称，去掉 `Plugin` 后转成小写中划线形式，例如 `CodeShikiPlugin` 对应 `code-shiki`。
 

@@ -15,6 +15,8 @@ Add the package to an existing React Lynx project:
 pnpm add @fluxdown/react-lynx
 ```
 
+Full code highlighting on Android requires Lynx 3.8 or later with background-thread WebAssembly support. See [code highlighting](./plugins/matrix.mdx#code-highlighting) for its asynchronous initialization and bundled WASM behavior.
+
 The package preserves JSX for your project's `@lynx-js/react-rsbuild-plugin` to compile. Component imports include the required styles, so there is no separate stylesheet to load.
 
 ## Render your first message
@@ -50,4 +52,4 @@ Always pass the complete text received so far as `text`. Set `streaming` to `fal
 - [Streaming content](./streaming.md): control smoothing and trailing effects.
 - [Styling](./customization.md): adjust colors, fonts and spacing.
 - [Plugin matrix](./plugins/matrix.mdx): choose Full, Lite or your own set.
-- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, React Lynx, Solid, Taro, and Uni App together.
+- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, React Lynx, Vue Lynx, Solid, Taro, and Uni App together.

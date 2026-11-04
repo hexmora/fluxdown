@@ -11,7 +11,7 @@ import { AnimationDemo } from '../../../../../../components';
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -104,6 +104,18 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown :streaming="{ effect: 'shad' }" :text="text" />
+</template>
+```
+
 ```tsx
 import { Fluxdown } from '@fluxdown/solid';
 
@@ -148,7 +160,7 @@ defineProps<MessageProps>();
 
 Smoothing is enabled by default. Adjust the tail length and mask width to match your typography:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -262,6 +274,21 @@ export function Message({ text }: MessageProps) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['shad', { length: 3, maskWidth: 18 }] }"
+    :text="text"
+  />
+</template>
 ```
 
 ```tsx

@@ -44,7 +44,7 @@ const props = defineProps<MessageProps>();
 
 `plugins` accepts one aggregate plugin or an array. Each object can combine `slots`, `renders`, `remarks`, `rehypes`, `repairs` and `mappers`. Its `config` configures the plugins listed in that object.
 
-> Import `IPluginItem` from `@fluxdown/vue-plugins/typings`.
+> Import `IPluginItem` from `@fluxdown/vue-base-plugins/typings`.
 
 Full and Lite keep their presets, then apply your plugins. Raw uses only the supplied list. At the same priority, later render plugins match first, and later slot plugins wrap the earlier component through `Raw`.
 

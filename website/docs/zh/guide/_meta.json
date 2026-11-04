@@ -48,6 +48,12 @@
   },
   {
     "type": "dir",
+    "name": "vue-lynx",
+    "label": "Vue Lynx",
+    "collapsed": true
+  },
+  {
+    "type": "dir",
     "name": "solid",
     "label": "Solid",
     "collapsed": true

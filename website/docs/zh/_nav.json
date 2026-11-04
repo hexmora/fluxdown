@@ -36,6 +36,11 @@
         "activeMatch": "/guide/react-lynx/"
       },
       {
+        "text": "Vue Lynx",
+        "link": "/guide/vue-lynx/quick-start",
+        "activeMatch": "/guide/vue-lynx/"
+      },
+      {
         "text": "Solid",
         "link": "/guide/solid/quick-start",
         "activeMatch": "/guide/solid/"

@@ -11,7 +11,7 @@ import { ChunkDemo } from '../../../../../../components';
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -106,6 +106,18 @@ export function Message({ text }: MessageProps) {
 }
 ```
 
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown :streaming="{ smooth: false, effect: 'chunk' }" :text="text" />
+</template>
+```
+
 ```tsx
 import { Fluxdown } from '@fluxdown/solid';
 
@@ -157,7 +169,7 @@ defineProps<MessageProps>();
 
 Always pass the complete Markdown received so far. Each group fades from transparent to opaque with an `ease-out` curve. An existing group's animation continues when another group arrives.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -268,6 +280,21 @@ export function Message({ text }: MessageProps) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ smooth: false, effect: ['chunk', { duration: 300 }] }"
+    :text="text"
+  />
+</template>
 ```
 
 ```tsx

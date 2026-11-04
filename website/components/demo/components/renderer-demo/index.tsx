@@ -24,7 +24,7 @@ const RendererPanel = ({ label, ...props }: RendererPanelProps) => {
   return (
     <section aria-label={label} className={styles.panel} data-renderer={props.renderer}>
       <h2 className={styles.label}>{label}</h2>
-      {props.renderer === 'react-lynx' ? (
+      {props.renderer === 'react-lynx' || props.renderer === 'vue-lynx' ? (
         <div className={styles.lynx}>
           <RendererPreview {...props} />
         </div>

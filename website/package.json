@@ -11,7 +11,7 @@
     "check": "pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run check:seo",
     "check:seo": "tsx seo/check.ts",
     "lint": "oxlint .",
-    "typecheck": "pnpm run build:renderers && tsc --noEmit && tsc --noEmit -p react-lynx/tsconfig.json",
+    "typecheck": "pnpm run build:renderers && tsc --noEmit && tsc --noEmit -p react-lynx/tsconfig.json && tsc --noEmit -p vue-lynx/tsconfig.json",
     "build:renderers": "pnpm --filter @fluxdown/vue-base-plugins --filter @fluxdown/vue-base --filter @fluxdown/vue-plugins --filter @fluxdown/vue --filter @fluxdown/solid-plugins --filter @fluxdown/solid build && pnpm --workspace-root exec moon run angular:build"
   },
   "dependencies": {
@@ -46,15 +46,19 @@
     "@angular/compiler-cli": "catalog:",
     "@babel/core": "catalog:",
     "@fluxdown/react-lynx": "workspace:^",
+    "@fluxdown/vue-lynx": "workspace:^",
     "@lynx-js/react": "catalog:",
     "@lynx-js/react-rsbuild-plugin": "catalog:",
+    "@lynx-js/rspeedy": "catalog:",
     "@lynx-js/types": "catalog:",
     "@lynx-js/web-core": "catalog:",
     "@rsbuild/core": "catalog:",
+    "@rsbuild/plugin-babel": "catalog:",
     "@rsbuild/plugin-less": "catalog:",
     "@rsbuild/plugin-sass": "catalog:",
     "@rsbuild/plugin-svelte": "catalog:",
     "@rsbuild/plugin-svgr": "catalog:",
+    "@rsbuild/plugin-vue-jsx": "catalog:",
     "@rspress/core": "catalog:",
     "@tarojs/components-react": "catalog:",
     "@tarojs/taro-h5": "catalog:",
@@ -65,6 +69,7 @@
     "less": "catalog:",
     "oxlint": "catalog:",
     "sass": "catalog:",
-    "typescript": "catalog:angular"
+    "typescript": "catalog:angular",
+    "vue-lynx": "catalog:"
   }
 }

@@ -5,6 +5,7 @@ export const RENDERERS = [
   { value: 'angular', label: 'Angular' },
   { value: 'react-native', label: 'React Native' },
   { value: 'react-lynx', label: 'React Lynx' },
+  { value: 'vue-lynx', label: 'Vue Lynx' },
   { value: 'solid', label: 'Solid' },
   { value: 'taro', label: 'Taro' },
   { value: 'uni-app', label: 'Uni App' },
