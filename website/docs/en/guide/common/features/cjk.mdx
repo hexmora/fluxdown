@@ -2,7 +2,7 @@ import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs
 
 # CJK support
 
-`CjkPlugin` improves Markdown parsing for Chinese, Japanese, and Korean text. It recognizes emphasis, strong emphasis, and strikethrough next to CJK punctuation, and keeps that punctuation out of bare URLs. The Full components for React, Vue, Svelte, Angular, React Native, Lynx, Solid, Taro, and Uni App include it by default; Lite components can add it as needed.
+`CjkPlugin` improves Markdown parsing for Chinese, Japanese, and Korean text. It recognizes emphasis, strong emphasis, and strikethrough next to CJK punctuation, and keeps that punctuation out of bare URLs. The Full components for React, Vue, Svelte, Angular, React Native, React Lynx, Solid, Taro, and Uni App include it by default; Lite components can add it as needed.
 
 <FrameworkCodeTabs>
 
@@ -53,7 +53,7 @@ export function Message() {
 ```
 
 ```tsx
-import { Fluxdown } from '@fluxdown/lynx';
+import { Fluxdown } from '@fluxdown/react-lynx';
 
 export function Message() {
   return <Fluxdown text="这是**加粗。**文字。" />;
@@ -108,7 +108,7 @@ Explicit Markdown links and code preserve their content. The URL in `[link](http
 
 All Full components include `CjkPlugin` without manual registration. For Core or a Lite component, install the matching plugin package:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```sh
 pnpm add @fluxdown/core-plugins
@@ -135,7 +135,7 @@ pnpm add @fluxdown/react-base-plugins
 ```
 
 ```sh
-pnpm add @fluxdown/lynx-plugins
+pnpm add @fluxdown/react-lynx-plugins
 ```
 
 ```sh
@@ -154,7 +154,7 @@ pnpm add @fluxdown/uni-app-plugins
 
 For Core, add `CjkRemarkPlugin` to the `remarks` input in the [quick start](../../core/quick-start.md). Components extend their presets through `plugins`:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import { CjkRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/cjk';
@@ -234,8 +234,8 @@ export function Message({ text }: MessageProps) {
 ```
 
 ```tsx
-import { CjkPlugin } from '@fluxdown/lynx-plugins/plugins/cjk';
-import { FluxdownLite } from '@fluxdown/lynx/lite';
+import { CjkPlugin } from '@fluxdown/react-lynx-plugins/plugins/cjk';
+import { FluxdownLite } from '@fluxdown/react-lynx/lite';
 
 type MessageProps = {
   text: string;
@@ -295,7 +295,7 @@ defineProps<MessageProps>();
 
 Include `CjkPlugin` and `config` in the same plugin pack to disable this behavior. Core uses a remark plugin entry with `disabled` set:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
@@ -398,8 +398,8 @@ export function Message({ text }: MessageProps) {
 ```
 
 ```tsx
-import { CjkPlugin } from '@fluxdown/lynx-plugins/plugins/cjk';
-import { Fluxdown } from '@fluxdown/lynx';
+import { CjkPlugin } from '@fluxdown/react-lynx-plugins/plugins/cjk';
+import { Fluxdown } from '@fluxdown/react-lynx';
 
 type MessageProps = {
   text: string;

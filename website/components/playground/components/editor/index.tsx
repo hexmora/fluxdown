@@ -144,7 +144,7 @@ export const Editor = ({ lang }: EditorProps) => {
             <section
               aria-label={copy.preview}
               className={styles.output}
-              data-lynx={renderer === 'lynx'}
+              data-lynx={renderer === 'react-lynx'}
               ref={preview.viewportRef}
               tabIndex={0}
             >

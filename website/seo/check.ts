@@ -5,14 +5,14 @@ import { fileURLToPath } from 'node:url';
 
 const output = fileURLToPath(new URL('../doc_build/', import.meta.url));
 const site = new URL('https://fluxdown.dev/');
-const demoDirectories = ['lynx-demo', 'uni-app-demo'];
+const demoDirectories = ['react-lynx-demo', 'uni-app-demo'];
 const frameworks = [
   'react',
   'vue',
   'svelte',
   'angular',
   'react-native',
-  'lynx',
+  'react-lynx',
   'solid',
   'taro',
   'uni-app',

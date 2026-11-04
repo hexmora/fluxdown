@@ -6,7 +6,7 @@ dependsOn:
   - angular-plugins
   - core
   - core-plugins
-  - lynx
+  - react-lynx
   - react
   - react-plugins
   - solid
@@ -27,7 +27,7 @@ fileGroups:
     - components/**/*
     - theme/**/*
     - seo/**/*
-    - lynx/**/*
+    - react-lynx/**/*
     - uni-app/**/*
     - /scripts/prepare-angular.ts
     - /scripts/build/lynx-workspace.ts
@@ -70,10 +70,10 @@ tasks:
     preset: server
   typecheck:
     command: pnpm exec tsc --noEmit
-    deps: ["angular:build", "vue:build", "solid:build", typecheck-lynx]
+    deps: ["angular:build", "vue:build", "solid:build", typecheck-react-lynx]
     inputs: ["@group(sources)"]
-  typecheck-lynx:
-    command: pnpm exec tsc --noEmit -p lynx/tsconfig.json
+  typecheck-react-lynx:
+    command: pnpm exec tsc --noEmit -p react-lynx/tsconfig.json
     inputs: ["@group(sources)"]
   lint:
     command: pnpm run lint

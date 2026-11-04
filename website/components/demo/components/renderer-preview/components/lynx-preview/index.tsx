@@ -58,8 +58,8 @@ export const LynxPreview = ({ data, errorLabel }: LynxPreviewProps) => {
         className={styles.frame}
         onLoad={() => setReady(true)}
         ref={frameRef}
-        src={withBase('/lynx-demo/index.html')}
-        title="Lynx"
+        src={withBase('/react-lynx-demo/index.html')}
+        title="React Lynx"
       />
       {failed && <output>{errorLabel}</output>}
     </>

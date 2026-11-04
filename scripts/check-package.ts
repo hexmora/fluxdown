@@ -110,7 +110,7 @@ export function isAngularPackage(name: string): boolean {
 }
 
 export function isLynxPackage(name: string): boolean {
-  return name === '@fluxdown/lynx' || name === '@fluxdown/lynx-plugins';
+  return name === '@fluxdown/react-lynx' || name === '@fluxdown/react-lynx-plugins';
 }
 
 export function isTaroPackage(name: string): boolean {

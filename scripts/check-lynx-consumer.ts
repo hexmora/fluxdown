@@ -1,4 +1,4 @@
-/* eslint-disable no-console -- Report packed Lynx consumer verification in release logs. */
+/* eslint-disable no-console -- Report packed React Lynx consumer verification in release logs. */
 import { pluginReactLynx } from '@lynx-js/react-rsbuild-plugin';
 import { createRsbuild } from '@rsbuild/core';
 import assert from 'node:assert/strict';
@@ -31,21 +31,21 @@ export async function checkLynxConsumer(
     .map((specifier, index) => `import * as Entry${index} from ${JSON.stringify(specifier)};`)
     .join('\n');
   const entries = specifiers.map((_, index) => `Entry${index}`).join(', ');
-  const hasRenderer = specifiers.includes('@fluxdown/lynx');
-  const hasMath = specifiers.includes('@fluxdown/lynx-plugins/plugins/tex-svg');
+  const hasRenderer = specifiers.includes('@fluxdown/react-lynx');
+  const hasMath = specifiers.includes('@fluxdown/react-lynx-plugins/plugins/tex-svg');
   const file = path.join(consumer, 'lynx-consumer.tsx');
 
   await writeFile(
     file,
     `${imports}
 import { root } from '@lynx-js/react';
-${hasRenderer ? "import { Fluxdown } from '@fluxdown/lynx';" : ''}
-${hasRenderer && hasMath ? "import { TexSvgPlugin } from '@fluxdown/lynx-plugins/plugins/tex-svg';" : ''}
+${hasRenderer ? "import { Fluxdown } from '@fluxdown/react-lynx';" : ''}
+${hasRenderer && hasMath ? "import { TexSvgPlugin } from '@fluxdown/react-lynx-plugins/plugins/tex-svg';" : ''}
 
 // Retain every public runtime entry, including optional renderers and lazy imports.
 if (__BACKGROUND__) Object.assign(globalThis, { fluxdownConsumerEntries: [${entries}] });
 
-root.render(${hasRenderer ? `<Fluxdown text={'Lynx consumer\\n\\n$x^2$'} ${hasMath ? 'build={{ tex: true }} plugins={[TexSvgPlugin]}' : ''} />` : '<view><text>Lynx consumer</text></view>'});
+root.render(${hasRenderer ? `<Fluxdown text={'React Lynx consumer\\n\\n$x^2$'} ${hasMath ? 'build={{ tex: true }} plugins={[TexSvgPlugin]}' : ''} />` : '<view><text>React Lynx consumer</text></view>'});
 `,
   );
 
@@ -54,9 +54,9 @@ root.render(${hasRenderer ? `<Fluxdown text={'Lynx consumer\\n\\n$x^2$'} ${hasMa
   await writeFile(
     typeFile,
     hasRenderer
-      ? `import { Fluxdown, type FluxdownProps } from '@fluxdown/lynx';
-import { FluxdownLite } from '@fluxdown/lynx/lite';
-import { FluxdownRaw } from '@fluxdown/lynx/raw';
+      ? `import { Fluxdown, type FluxdownProps } from '@fluxdown/react-lynx';
+import { FluxdownLite } from '@fluxdown/react-lynx/lite';
+import { FluxdownRaw } from '@fluxdown/react-lynx/raw';
 
 const props: FluxdownProps = { text: 'consumer', style: { padding: '16px' }, theme: 'dark' };
 <Fluxdown {...props} />;
@@ -100,7 +100,7 @@ const props: FluxdownProps = { text: 'consumer', style: { padding: '16px' }, the
 
   assert.equal(types.status, 0, types.stderr || types.stdout || types.error?.message);
 
-  const output = path.join(consumer, 'lynx-dist');
+  const output = path.join(consumer, 'react-lynx-dist');
   const rsbuild = await createRsbuild({
     cwd: consumer,
     config: {
@@ -128,17 +128,20 @@ const props: FluxdownProps = { text: 'consumer', style: { padding: '16px' }, the
     const nativeAssets = files.filter((name) => name.endsWith('.lynx.bundle'));
     const webAssets = files.filter((name) => name.endsWith('.web.bundle'));
 
-    assert(nativeAssets.length, 'Lynx consumer did not emit a native bundle');
-    assert(webAssets.length, 'Lynx consumer did not emit a Web bundle');
+    assert(nativeAssets.length, 'React Lynx consumer did not emit a native bundle');
+    assert(webAssets.length, 'React Lynx consumer did not emit a Web bundle');
 
     await Promise.all(
       [...nativeAssets, ...webAssets].map(async (name) => {
-        assert((await readFile(path.join(output, name))).length, `Empty Lynx bundle: ${name}`);
+        assert(
+          (await readFile(path.join(output, name))).length,
+          `Empty React Lynx bundle: ${name}`,
+        );
       }),
     );
 
     console.log(
-      `Lynx consumer OK: ${specifiers.length} public entries, strict consumer types, and native/Web bundles`,
+      `React Lynx consumer OK: ${specifiers.length} public entries, strict consumer types, and native/Web bundles`,
     );
 
     return { specifiers, typeEntries: specifiers.length, nativeAssets, webAssets };

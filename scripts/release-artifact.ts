@@ -33,8 +33,8 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/angular',
   '@fluxdown/vue-plugins',
   '@fluxdown/vue',
-  '@fluxdown/lynx-plugins',
-  '@fluxdown/lynx',
+  '@fluxdown/react-lynx-plugins',
+  '@fluxdown/react-lynx',
   '@fluxdown/svelte-plugins',
   '@fluxdown/svelte',
   '@fluxdown/react-hooks',
@@ -417,7 +417,7 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
   }
 
   const lynxPackages = [...names].filter(
-    (name) => name === '@fluxdown/lynx' || name === '@fluxdown/lynx-plugins',
+    (name) => name === '@fluxdown/react-lynx' || name === '@fluxdown/react-lynx-plugins',
   );
 
   if (verification.lynx !== undefined) validateLynxVerification(verification.lynx, lynxPackages);

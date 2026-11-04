@@ -116,8 +116,8 @@ export const Home = () => {
               <strong>React Native</strong>
               <span>{copy.react}</span>
             </Link>
-            <Link className={styles.frameworkCard} href={href('/guide/lynx/quick-start')}>
-              <strong>Lynx</strong>
+            <Link className={styles.frameworkCard} href={href('/guide/react-lynx/quick-start')}>
+              <strong>React Lynx</strong>
               <span>{copy.react}</span>
             </Link>
             <Link className={styles.frameworkCard} href={href('/guide/solid/quick-start')}>

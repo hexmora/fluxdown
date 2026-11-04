@@ -42,8 +42,8 @@
   },
   {
     "type": "dir",
-    "name": "lynx",
-    "label": "Lynx",
+    "name": "react-lynx",
+    "label": "React Lynx",
     "collapsed": true
   },
   {
