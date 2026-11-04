@@ -3,6 +3,8 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { redirects } from './redirects';
+
 const output = fileURLToPath(new URL('../doc_build/', import.meta.url));
 const site = new URL('https://fluxdown.dev/');
 const demoDirectories = ['react-lynx-demo', 'vue-lynx-demo', 'uni-app-demo'];
@@ -87,6 +89,10 @@ for (const directory of demoDirectories) {
   assert.ok(files.includes(`${directory}/index.html`), `Missing iframe entry: ${directory}`);
 }
 
+for (const file of redirects.keys()) {
+  assert.ok(files.includes(file), `Missing legacy redirect: ${file}`);
+}
+
 const pages = new Map(
   (
     await Promise.all(
@@ -98,6 +104,26 @@ const pages = new Map(
 
         const links = [...head.matchAll(/<link\b[^>]*>/gi)].map((match) => attributes(match[0]));
         const meta = [...head.matchAll(/<meta\b[^>]*>/gi)].map((match) => attributes(match[0]));
+        const canonical = links.filter((link) => link.rel === 'canonical');
+        const destination = redirects.get(file);
+
+        if (destination) {
+          const target = new URL(destination, site);
+          const refresh = meta.filter((item) => item['http-equiv']?.toLowerCase() === 'refresh');
+
+          assert.ok(!sitemapUrls.has(url), `${url}: legacy redirect must not be in the sitemap`);
+          assert.ok(sitemapUrls.has(target.href), `${url}: redirect target must be indexed`);
+          assert.equal(canonical.length, 1, `${url}: expected exactly one canonical link`);
+          assert.equal(canonical[0].href, target.href, `${url}: incorrect redirect canonical`);
+          assert.equal(refresh.length, 1, `${url}: expected exactly one refresh redirect`);
+          assert.equal(
+            refresh[0].content,
+            `0; url=${target.pathname}`,
+            `${url}: incorrect redirect`,
+          );
+          return null;
+        }
+
         const noindex = meta.some(
           (item) =>
             ['robots', 'googlebot'].includes(item.name?.toLowerCase()) &&
@@ -111,7 +137,6 @@ const pages = new Map(
           return null;
         }
 
-        const canonical = links.filter((link) => link.rel === 'canonical');
         const social = meta.filter((item) => item.property === 'og:url');
         assert.equal(canonical.length, 1, `${url}: expected exactly one canonical link`);
         assert.equal(canonical[0].href, url, `${url}: canonical differs from the built page URL`);
@@ -182,5 +207,5 @@ for (const route of routes) {
 }
 
 process.stdout.write(
-  `Verified ${pages.size} canonical sitemap pages, SEO metadata for ${titles.size} priority pages, and noindex for iframe demos.\n`,
+  `Verified ${pages.size} canonical sitemap pages, SEO metadata for ${titles.size} priority pages, ${redirects.size} legacy redirects, and noindex for iframe demos.\n`,
 );

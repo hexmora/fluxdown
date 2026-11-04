@@ -1,8 +1,10 @@
 import type { RspressPlugin } from '@rspress/core';
 
 import { normalizeHref } from '@rspress/core';
-import { writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+
+import { redirects } from './redirects';
 
 export function seo(): RspressPlugin {
   let siteUrl: URL;
@@ -38,6 +40,7 @@ export function seo(): RspressPlugin {
     async afterBuild(config, isProd) {
       if (!isProd) return;
 
+      const output = config.outDir ?? 'doc_build';
       const sortedUrls = [...urls];
 
       sortedUrls.sort();
@@ -47,7 +50,7 @@ export function seo(): RspressPlugin {
       );
 
       await writeFile(
-        join(config.outDir ?? 'doc_build', 'sitemap.xml'),
+        join(output, 'sitemap.xml'),
         [
           '<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
@@ -55,6 +58,32 @@ export function seo(): RspressPlugin {
           '</urlset>',
           '',
         ].join('\n'),
+      );
+
+      // GitHub Pages serves static files, so preserve old links with instant HTML redirects.
+      await Promise.all(
+        [...redirects].map(async ([source, destination]) => {
+          const target = new URL(destination, siteUrl);
+          const file = join(output, source);
+          const lang = source.startsWith('zh/') ? 'zh' : 'en';
+
+          await mkdir(dirname(file), { recursive: true });
+          await writeFile(
+            file,
+            `<!doctype html>
+<html lang="${lang}">
+  <head>
+    <meta charset="utf-8" />
+    <title>React Lynx Markdown - Fluxdown</title>
+    <link rel="canonical" href="${target.href}" />
+    <meta http-equiv="refresh" content="0; url=${target.pathname}" />
+    <script>location.replace(${JSON.stringify(target.pathname)} + location.search + location.hash);</script>
+  </head>
+  <body><a href="${target.pathname}">React Lynx Markdown - Fluxdown</a></body>
+</html>
+`,
+          );
+        }),
       );
     },
   };
