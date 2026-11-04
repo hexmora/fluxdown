@@ -1,14 +1,7 @@
 import type { SlotBaseProps } from '../../../../../base/slot/type';
-import type { UniRenderNode } from '../../../../../typings/render';
 
 export interface RendererProps extends SlotBaseProps {
-  leading: UniRenderNode;
+  start: number;
 
-  active: UniRenderNode;
-
-  isActive: boolean;
-
-  maskWidth: number;
-
-  offset?: number;
+  duration: number;
 }

@@ -81,10 +81,7 @@ export async function checkReactPacks(consumer: string, native = false): Promise
         specifier: '@fluxdown/react-native-plugins/plugins/effect-scale',
         allowed: ['react-native-svg'],
       },
-      {
-        specifier: '@fluxdown/react-native-plugins/plugins/effect-shad',
-        allowed: ['react-native-svg'],
-      },
+      { specifier: '@fluxdown/react-native-plugins/plugins/effect-shad', allowed: [] },
       {
         specifier: '@fluxdown/react-native-plugins/plugins/effect-suffix',
         allowed: [],

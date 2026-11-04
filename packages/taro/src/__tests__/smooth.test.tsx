@@ -6,7 +6,7 @@ import type { FluxdownRef } from '../packs/full';
 import { restoreGlobals } from '../../../../scripts/testing/globals';
 import { Fluxdown } from '../packs/full';
 import { createRafClock } from './utils/raf';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 
 afterEach(async () => {
   cleanup();
@@ -19,13 +19,13 @@ afterEach(async () => {
 });
 
 describe('Fluxdown smooth streaming', () => {
-  test('waits for new content before constructing a ticker, including StrictMode replay', async () => {
-    const ticker = createManualTicker();
+  test('waits for new content before constructing a driver, including StrictMode replay', async () => {
+    const driver = createManualDriver();
 
     const smooth = {
       enabled: true,
-      ticker: ticker.Ticker,
-      scheduler: createStepScheduler(1),
+      driver: driver.Driver,
+      interpolation: createStepInterpolator(1),
     };
 
     const view = render(
@@ -36,7 +36,7 @@ describe('Fluxdown smooth streaming', () => {
 
     expect(view.container.textContent).toBe('abc');
 
-    expect(ticker.instances).toHaveLength(0);
+    expect(driver.instances).toHaveLength(0);
 
     view.rerender(
       <StrictMode>
@@ -46,9 +46,9 @@ describe('Fluxdown smooth streaming', () => {
 
     expect(view.container.textContent).toBe('abc');
 
-    expect(ticker.instances).toHaveLength(1);
+    expect(driver.instances).toHaveLength(1);
 
-    await act(async () => ticker.current().tick(16));
+    await act(async () => driver.current().tick(16));
 
     expect(view.container.textContent).toBe('abcd');
 
@@ -56,9 +56,9 @@ describe('Fluxdown smooth streaming', () => {
 
     await act(async () => {});
 
-    expect(ticker.current().running).toBe(false);
+    expect(driver.current().running).toBe(false);
 
-    expect(ticker.current().destroyCalls).toBe(1);
+    expect(driver.current().destroyCalls).toBe(1);
   });
 
   test('renders immediately by default and when an options object omits enabled', async () => {
@@ -72,7 +72,7 @@ describe('Fluxdown smooth streaming', () => {
 
     view.rerender(
       <Fluxdown
-        streaming={{ smooth: { scheduler: 'spring', ticker: 'raf' }, effect: false }}
+        streaming={{ smooth: { interpolation: 'spring', driver: 'raf' }, effect: false }}
         text="object stream"
       />,
     );
@@ -284,25 +284,25 @@ describe('Fluxdown smooth streaming', () => {
     expect(view.container.textContent).toBe('$x$');
   });
 
-  test('switches custom tickers without losing visible progress and releases the old ticker', async () => {
-    const first = createManualTicker();
+  test('switches custom drivers without losing visible progress and releases the old driver', async () => {
+    const first = createManualDriver();
 
-    const second = createManualTicker();
+    const second = createManualDriver();
 
-    const Scheduler = createStepScheduler(1);
+    const Interpolator = createStepInterpolator(1);
 
-    const options = (ticker: typeof first.Ticker) => ({
+    const options = (driver: typeof first.Driver) => ({
       enabled: true,
-      ticker,
-      scheduler: Scheduler,
+      driver,
+      interpolation: Interpolator,
     });
 
     const view = render(
-      <Fluxdown streaming={{ smooth: options(first.Ticker), effect: false }} text="abc" />,
+      <Fluxdown streaming={{ smooth: options(first.Driver), effect: false }} text="abc" />,
     );
 
     view.rerender(
-      <Fluxdown streaming={{ smooth: options(first.Ticker), effect: false }} text="abcdef" />,
+      <Fluxdown streaming={{ smooth: options(first.Driver), effect: false }} text="abcdef" />,
     );
 
     await act(async () => first.current().tick(16));
@@ -310,7 +310,7 @@ describe('Fluxdown smooth streaming', () => {
     expect(view.container.textContent).toBe('abcd');
 
     view.rerender(
-      <Fluxdown streaming={{ smooth: options(second.Ticker), effect: false }} text="abcdef" />,
+      <Fluxdown streaming={{ smooth: options(second.Driver), effect: false }} text="abcdef" />,
     );
 
     expect(view.container.textContent).toBe('abcd');
@@ -336,42 +336,42 @@ describe('Fluxdown smooth streaming', () => {
     expect(second.current().destroyCalls).toBe(1);
   });
 
-  test('applies a changed custom scheduler to the remaining suffix', async () => {
-    const ticker = createManualTicker();
+  test('applies a changed custom interpolation to the remaining suffix', async () => {
+    const driver = createManualDriver();
 
-    const SlowScheduler = createStepScheduler(1);
+    const SlowInterpolator = createStepInterpolator(1);
 
-    const FastScheduler = createStepScheduler(2);
+    const FastInterpolator = createStepInterpolator(2);
 
-    const options = (scheduler: typeof SlowScheduler) => ({
+    const options = (interpolation: typeof SlowInterpolator) => ({
       enabled: true,
-      ticker: ticker.Ticker,
-      scheduler,
+      driver: driver.Driver,
+      interpolation,
     });
 
     const view = render(
-      <Fluxdown streaming={{ smooth: options(SlowScheduler), effect: false }} text="abc" />,
+      <Fluxdown streaming={{ smooth: options(SlowInterpolator), effect: false }} text="abc" />,
     );
 
     view.rerender(
-      <Fluxdown streaming={{ smooth: options(SlowScheduler), effect: false }} text="abcdefgh" />,
+      <Fluxdown streaming={{ smooth: options(SlowInterpolator), effect: false }} text="abcdefgh" />,
     );
 
-    await act(async () => ticker.current().tick(16));
+    await act(async () => driver.current().tick(16));
 
     expect(view.container.textContent).toBe('abcd');
 
     view.rerender(
-      <Fluxdown streaming={{ smooth: options(FastScheduler), effect: false }} text="abcdefgh" />,
+      <Fluxdown streaming={{ smooth: options(FastInterpolator), effect: false }} text="abcdefgh" />,
     );
 
     expect(view.container.textContent).toBe('abcd');
 
-    await act(async () => ticker.current().tick(32));
+    await act(async () => driver.current().tick(32));
 
     expect(view.container.textContent).toBe('abcdef');
 
-    await act(async () => ticker.current().tick(48));
+    await act(async () => driver.current().tick(48));
 
     expect(view.container.textContent).toBe('abcdefgh');
   });

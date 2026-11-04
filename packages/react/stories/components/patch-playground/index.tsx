@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { Playground } from '../playground';
+import { Button } from '../ui';
 import { PATCH_MARKDOWN } from './consts';
 import { createPatches } from './utils';
 
@@ -19,9 +20,7 @@ export const PatchPlayground = () => {
   const patches = useMemo(() => createPatches(renderReplacement), [renderReplacement]);
 
   const actions = (
-    <button onClick={() => setAlternate((current) => !current)} type="button">
-      Replace render callback
-    </button>
+    <Button onClick={() => setAlternate((current) => !current)}>Replace render callback</Button>
   );
 
   return <Playground actions={actions} initialText={PATCH_MARKDOWN} patches={patches} />;

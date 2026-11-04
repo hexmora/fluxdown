@@ -4,7 +4,13 @@ import type { PlaygroundProps, PlaygroundSetting } from '../type';
 
 import { DEFAULT_MARKDOWN, DEFAULT_PLAYGROUND_SETTINGS } from '../consts';
 
-export const usePlayground = ({ autoPlay = false, initialText }: PlaygroundProps) => {
+/**
+ * Editor and playback state. `animationSpeed` stretches playback ticks with the lab clock.
+ */
+export const usePlayground = (
+  { autoPlay = false, initialText }: PlaygroundProps,
+  animationSpeed = 1,
+) => {
   const resetValue = initialText ?? DEFAULT_MARKDOWN;
 
   const [text, setText] = useState(resetValue);
@@ -36,12 +42,15 @@ export const usePlayground = ({ autoPlay = false, initialText }: PlaygroundProps
       return;
     }
 
-    const timer = window.setInterval(() => {
-      setCursor((current) => Math.min(current + chunkSize, playbackText.length));
-    }, 1000 / speed);
+    const timer = window.setInterval(
+      () => {
+        setCursor((current) => Math.min(current + chunkSize, playbackText.length));
+      },
+      1000 / speed / animationSpeed,
+    );
 
     return () => window.clearInterval(timer);
-  }, [chunkSize, complete, paused, playbackMode, playbackText.length, speed]);
+  }, [animationSpeed, chunkSize, complete, paused, playbackMode, playbackText.length, speed]);
 
   const handlePlay = () => {
     if (text.length === 0) {

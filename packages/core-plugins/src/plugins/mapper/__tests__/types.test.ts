@@ -5,7 +5,12 @@ import { expectTypeOf } from 'expect-type';
 
 import type { ScaleConfig, ScaleInputs, ScalePluginConfig } from '../scale';
 import type { ShadConfig, ShadInputs, ShadPluginConfig } from '../shad';
-import type { SmoothConfig, SmoothInputs, SmoothPluginConfig } from '../smooth';
+import type {
+  DeprecatedSmoothConfig,
+  SmoothConfig,
+  SmoothInputs,
+  SmoothPluginConfig,
+} from '../smooth';
 
 interface ExampleConfig {
   count: number;
@@ -26,7 +31,10 @@ test('mapper configuration derives required and optional closure inputs', () => 
 });
 
 test('mappers export config, inputs and public plugin config from individual plugin entries', () => {
-  expectTypeOf<SmoothPluginConfig>().toEqualTypeOf<MapperPluginConfig<SmoothConfig>>();
+  // Smooth also accepts its pre-rename option names for one release.
+  expectTypeOf<SmoothPluginConfig>().toEqualTypeOf<
+    MapperPluginConfig<SmoothConfig & DeprecatedSmoothConfig>
+  >();
 
   expectTypeOf<ShadPluginConfig>().toEqualTypeOf<MapperPluginConfig<ShadConfig>>();
 

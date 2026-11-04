@@ -10,7 +10,7 @@ import { D, type IReadableClosure, once, useDefaults, useSwitchMap } from 'stati
 import type { SmoothInputs, SmoothPluginConfig } from './type';
 
 import { withKey } from '../../../utils';
-import { IntervalSmoothTicker, RafSmoothTicker, SpringSmoothScheduler } from './modules';
+import { IntervalSmoothDriver, RafSmoothDriver, SpringSmoothInterpolator } from './modules';
 import { CutoffBlocks, SmoothCursor } from './states';
 
 export * from './modules';
@@ -28,17 +28,20 @@ export const Smooth = /*#__PURE__*/ withKey(
     function Smooth<T>({
       source,
       enabled: _enabled,
+      driver: _driver,
+      interpolation: _interpolation,
       ticker: _ticker,
       scheduler: _scheduler,
     }: SmoothInputs<T>): IReadableClosure<IBlockState<T>[]> {
       const enabled = useDefaults(_enabled, false);
 
-      const ticker = useDefaults(
-        _ticker,
-        D(isEnableRAF() ? RafSmoothTicker : IntervalSmoothTicker),
+      // The deprecated names only apply when the new ones are absent.
+      const driver = useDefaults(
+        _driver ?? _ticker,
+        D(isEnableRAF() ? RafSmoothDriver : IntervalSmoothDriver),
       );
 
-      const scheduler = useDefaults(_scheduler, D(SpringSmoothScheduler));
+      const interpolation = useDefaults(_interpolation ?? _scheduler, D(SpringSmoothInterpolator));
 
       return useSwitchMap(enabled, (active) =>
         active ? (
@@ -48,8 +51,8 @@ export const Smooth = /*#__PURE__*/ withKey(
               <SmoothCursor<T>
                 source={source}
                 enabled={enabled}
-                ticker={ticker}
-                scheduler={scheduler}
+                driver={driver}
+                interpolation={interpolation}
               />
             }
           />

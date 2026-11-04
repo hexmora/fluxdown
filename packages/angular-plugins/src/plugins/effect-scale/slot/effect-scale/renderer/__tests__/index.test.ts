@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { AngularDomRenderer, RenderContext } from '@fluxdown/angular-plugins/base';
 
 import { ScaleRenderer } from '..';
 import { ChunkRenderer } from '../../../../../effect-chunk/slot/effect-chunk/renderer';
@@ -63,30 +62,36 @@ describe('streaming effect renderers', () => {
     );
   });
 
-  test('uses pixel widths for the shad mask without changing text flow', () => {
-    TestBed.configureTestingModule({ providers: [RenderContext, AngularDomRenderer] });
+  test('resumes a shad fade from its own start and settles once it has finished', () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1100);
 
-    const fixture = TestBed.createComponent(ShadRenderer);
+    const running = TestBed.createComponent(ShadRenderer);
 
-    const props = { Raw: null, leading: 'stable ', active: 'tail', isActive: true, maskWidth: 64 };
+    running.componentRef.setInput('props', { Raw: null, start: 1000, duration: 400 });
 
-    fixture.componentRef.setInput('props', props);
+    running.detectChanges();
 
-    fixture.detectChanges();
+    const root = running.nativeElement as HTMLElement;
 
-    const mask = fixture.nativeElement.querySelector('[aria-hidden="true"]') as HTMLElement;
+    expect(root.getAttribute('data-fluxdown-shad')).toBe('fade');
 
-    expect(mask.style.width).toBe('64px');
+    expect(root.classList.contains('fluxdown-angular-effect-shad-active')).toBe(true);
 
-    expect(mask.style.marginLeft).toBe('-64px');
+    expect(root.style.animationDelay).toBe('-100ms');
 
-    expect(fixture.nativeElement.textContent).toBe('stable tail');
+    expect(root.style.getPropertyValue('--fluxdown-angular-shad-duration')).toBe('400ms');
 
-    fixture.componentRef.setInput('props', { ...props, isActive: false });
+    now.mockReturnValue(1500);
 
-    fixture.detectChanges();
+    const settled = TestBed.createComponent(ShadRenderer);
 
-    expect(mask.classList.contains('fluxdown-angular-effect-shad-maskHidden')).toBe(true);
+    settled.componentRef.setInput('props', { Raw: null, start: 1000, duration: 400 });
+
+    settled.detectChanges();
+
+    expect(settled.nativeElement.classList.contains('fluxdown-angular-effect-shad-active')).toBe(
+      false,
+    );
   });
 
   test.each(['cursor', 'dot', 'custom'] as const)('marks %s suffix as decorative', (type) => {

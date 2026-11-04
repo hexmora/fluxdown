@@ -7,7 +7,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import type { FluxdownLiteProps } from '../packs/lite/type';
 
 import { FluxdownLite } from '../packs/lite';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 
 const mount = async (text: string, props: Partial<FluxdownLiteProps> = {}) => {
   const fixture = TestBed.createComponent(FluxdownLite);
@@ -157,22 +157,28 @@ describe('streaming effects', () => {
     expect(root.textContent).toBe('Start xb');
   });
 
-  test('shad masks only the active tail without duplicating source text', async () => {
+  test('shad fades appended characters on their own clock without duplicating source text', async () => {
+    vi.spyOn(performance, 'now').mockReturnValue(1000);
+
     const fixture = await mount('first', { streaming: { smooth: false, effect: 'shad' } });
 
     const root = fixture.nativeElement as HTMLElement;
+
+    expect(root.querySelector('[data-fluxdown-shad]')).toBeNull();
 
     await update(fixture, { text: 'first appended' });
 
     expect(root.textContent).toBe('first appended');
 
-    const masks = Array.from(root.querySelectorAll<HTMLElement>('[aria-hidden="true"]')).filter(
-      (item) => item.style.width !== '',
-    );
+    const fades = Array.from(root.querySelectorAll<HTMLElement>('[data-fluxdown-shad="fade"]'));
 
-    expect(masks.length).toBeGreaterThan(0);
+    expect(fades.map((item) => item.textContent).join('')).toBe(' appended');
 
-    expect(masks.every((item) => item.style.width.endsWith('px'))).toBe(true);
+    expect(
+      fades.every((item) =>
+        item.style.getPropertyValue(`--${PREFIX}-shad-duration`).endsWith('ms'),
+      ),
+    ).toBe(true);
   });
 
   test.each([
@@ -223,11 +229,15 @@ describe('streaming effects', () => {
   });
 
   test.each(['scale', 'shad', 'suffix', 'chunk'] as const)(
-    'reveals smooth content with %s and destroys its ticker',
+    'reveals smooth content with %s and destroys its driver',
     async (effect) => {
-      const ticker = createManualTicker();
+      const driver = createManualDriver();
 
-      const smooth = { enabled: true, ticker: ticker.Ticker, scheduler: createStepScheduler(2) };
+      const smooth = {
+        enabled: true,
+        driver: driver.Driver,
+        interpolation: createStepInterpolator(2),
+      };
 
       const fixture = await mount('first', { streaming: { smooth, effect } });
 
@@ -235,25 +245,25 @@ describe('streaming effects', () => {
 
       await update(fixture, { text: 'first\n\n**second**' });
 
-      ticker.current().tick(16);
+      driver.current().tick(16);
 
       fixture.detectChanges();
 
       expect(root.textContent).toBe('firstse');
 
-      ticker.current().tick(32);
+      driver.current().tick(32);
 
       fixture.detectChanges();
 
       expect(root.textContent).toBe('firstseco');
 
-      ticker.current().tick(48);
+      driver.current().tick(48);
 
       fixture.detectChanges();
 
       expect(root.querySelector('strong')?.textContent).toBe('second');
 
-      const instance = ticker.current();
+      const instance = driver.current();
 
       fixture.destroy();
 

@@ -5,7 +5,7 @@ import { createSignal } from 'solid-js';
 import type { StreamingConfig } from '../packs/raw';
 
 import { FluxdownLite } from '../packs/lite';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 
 describe('streaming effects', () => {
   test.each(['scale', 'chunk'] as const)(
@@ -13,7 +13,7 @@ describe('streaming effects', () => {
     (effect) => {
       const now = vi.spyOn(performance, 'now').mockReturnValue(1000);
 
-      const ticker = createManualTicker();
+      const driver = createManualDriver();
 
       const [text, setText] = createSignal('');
 
@@ -27,7 +27,7 @@ describe('streaming effects', () => {
             smooth:
               effect === 'chunk'
                 ? false
-                : { enabled: true, ticker: ticker.Ticker, scheduler: 'spring' },
+                : { enabled: true, driver: driver.Driver, interpolation: 'spring' },
             effect,
           }}
         />
@@ -53,7 +53,7 @@ describe('streaming effects', () => {
         }
 
         if (effect !== 'chunk') {
-          ticker.current().tick(((frame + 1) * 1000) / 60);
+          driver.current().tick(((frame + 1) * 1000) / 60);
         }
 
         for (const record of observer.takeRecords()) {
@@ -167,24 +167,30 @@ describe('streaming effects', () => {
     expect(animated.map((span) => span.textContent).join('')).toContain('👨‍👩‍👧‍👦');
   });
 
-  test('shad masks only the active tail without duplicating text', () => {
+  test('shad fades appended characters on their own clock without duplicating source text', () => {
+    vi.spyOn(performance, 'now').mockReturnValue(1000);
+
     const [text, setText] = createSignal('first');
 
     const { container } = render(() => (
       <FluxdownLite text={text()} streaming={{ smooth: false, effect: 'shad' }} />
     ));
 
+    expect(container.querySelector('[data-fluxdown-shad]')).toBeNull();
+
     setText('first appended');
 
     expect(container.textContent).toBe('first appended');
 
-    const masks = [...container.querySelectorAll<HTMLElement>('[aria-hidden="true"]')].filter(
-      (item) => item.style.width !== '',
-    );
+    const fades = [...container.querySelectorAll<HTMLElement>('[data-fluxdown-shad="fade"]')];
 
-    expect(masks.length).toBeGreaterThan(0);
+    expect(fades.map((item) => item.textContent).join('')).toBe(' appended');
 
-    expect(masks.every((item) => item.style.width.endsWith('px'))).toBe(true);
+    expect(
+      fades.every((item) =>
+        item.style.getPropertyValue(`--${PREFIX}-shad-duration`).endsWith('ms'),
+      ),
+    ).toBe(true);
   });
 
   test.each([
@@ -239,11 +245,15 @@ describe('streaming effects', () => {
   });
 
   test.each(['scale', 'shad', 'suffix', 'chunk'] as const)(
-    'reveals smooth content with %s and destroys its ticker',
+    'reveals smooth content with %s and destroys its driver',
     (effect) => {
-      const ticker = createManualTicker();
+      const driver = createManualDriver();
 
-      const smooth = { enabled: true, ticker: ticker.Ticker, scheduler: createStepScheduler(2) };
+      const smooth = {
+        enabled: true,
+        driver: driver.Driver,
+        interpolation: createStepInterpolator(2),
+      };
 
       const [text, setText] = createSignal('first');
 
@@ -253,19 +263,19 @@ describe('streaming effects', () => {
 
       setText('first\n\n**second**');
 
-      ticker.current().tick(16);
+      driver.current().tick(16);
 
       expect(container.textContent).toBe('firstse');
 
-      ticker.current().tick(32);
+      driver.current().tick(32);
 
       expect(container.textContent).toBe('firstseco');
 
-      ticker.current().tick(48);
+      driver.current().tick(48);
 
       expect(container.querySelector('strong')?.textContent).toBe('second');
 
-      const instance = ticker.current();
+      const instance = driver.current();
 
       unmount();
 

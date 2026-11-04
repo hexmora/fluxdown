@@ -6,7 +6,7 @@ import type { FluxdownProps } from '../packs/full';
 
 import { Fluxdown } from '../packs/full';
 import { FluxdownLite } from '../packs/lite';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 
 afterEach(() => {
   cleanup();
@@ -55,12 +55,12 @@ test('updates ending repair for existing text without replacing the core', async
 });
 
 test('settles growth that enables streaming and animates only subsequent appends', async () => {
-  const ticker = createManualTicker();
+  const driver = createManualDriver();
 
   const smooth = {
     enabled: true,
-    ticker: ticker.Ticker,
-    scheduler: createStepScheduler(2),
+    driver: driver.Driver,
+    interpolation: createStepInterpolator(2),
   };
 
   const view = render(FluxdownLite, { text: 'a', streaming: false });
@@ -71,13 +71,13 @@ test('settles growth that enables streaming and animates only subsequent appends
 
   expect(view.container.querySelector('.active .glyph')).toBeNull();
 
-  expect(ticker.instances).toHaveLength(0);
+  expect(driver.instances).toHaveLength(0);
 
   await view.rerender({ text: 'abcdef' });
 
   expect(view.container.textContent).toBe('abc');
 
-  flushSync(() => ticker.current().tick(16));
+  flushSync(() => driver.current().tick(16));
 
   expect(view.container.textContent).toBe('abcde');
 
@@ -195,33 +195,26 @@ test('resumes chunk entrances after reparsing without depending on wall-clock ch
   expect(view.container.querySelector('[data-fluxdown-chunk]')?.textContent).toBe(' next');
 });
 
-test('leaves initial shad content unfaded and hides the mask after the appended tail settles', async () => {
-  vi.useFakeTimers({ toNotFake: ['queueMicrotask'] });
+test('leaves initial shad content plain and fades appended characters on their own clock', async () => {
+  vi.spyOn(performance, 'now').mockReturnValue(1000);
 
   const view = render(Fluxdown, { text: 'abc', streaming: { smooth: false, effect: 'shad' } });
 
-  const selector = '.fluxdown-svelte-effect-shad';
+  expect(view.container.querySelector('[data-fluxdown-shad]')).toBeNull();
 
-  expect(view.container.querySelector(`${selector} .active`)?.textContent).toBe('');
+  await view.rerender({ text: 'abc defg' });
 
-  expect(view.container.querySelector(`${selector} .mask`)).toBeNull();
+  expect(view.container.textContent).toBe('abc defg');
 
-  await view.rerender({ text: 'abcdefghijklmnop' });
+  const fades = [...view.container.querySelectorAll<HTMLElement>('[data-fluxdown-shad="fade"]')];
 
-  expect(view.container.querySelector(`${selector} .active`)?.textContent).toBe('ghijklmnop');
+  expect(fades.map((item) => item.textContent).join('')).toBe(' defg');
 
-  expect(view.container.querySelector(`${selector} .mask`)).toHaveStyle({
-    width: '15px',
-    marginLeft: '-15px',
-  });
+  expect(fades.every((item) => item.classList.contains('active'))).toBe(true);
 
-  flushSync(() => vi.advanceTimersByTime(200));
-
-  expect(view.container.textContent).toBe('abcdefghijklmnop');
-
-  expect(view.container.querySelector(`${selector} .active`)?.textContent).toBe('');
-
-  expect(view.container.querySelector(`${selector} .mask`)).toBeNull();
+  expect(
+    fades.every((item) => item.style.getPropertyValue('--fluxdown-shad-duration').endsWith('ms')),
+  ).toBe(true);
 });
 
 test.each([
@@ -248,14 +241,14 @@ test.each([
 });
 
 test.each(['scale', 'shad', 'suffix'] as const)(
-  'reveals smooth %s content incrementally and releases the ticker',
+  'reveals smooth %s content incrementally and releases the driver',
   async (effect) => {
-    const ticker = createManualTicker();
+    const driver = createManualDriver();
 
     const smooth = {
       enabled: true,
-      ticker: ticker.Ticker,
-      scheduler: createStepScheduler(2),
+      driver: driver.Driver,
+      interpolation: createStepInterpolator(2),
     };
 
     const view = render(FluxdownLite, { text: 'first', streaming: { smooth, effect } });
@@ -266,7 +259,7 @@ test.each(['scale', 'shad', 'suffix'] as const)(
 
     expect(view.container.textContent).toBe('first');
 
-    flushSync(() => ticker.current().tick(16));
+    flushSync(() => driver.current().tick(16));
 
     expect(view.container.textContent).toBe('firstse');
 
@@ -274,11 +267,11 @@ test.each(['scale', 'shad', 'suffix'] as const)(
 
     expect(view.container.querySelector('p')).toBe(first);
 
-    flushSync(() => ticker.current().tick(32));
+    flushSync(() => driver.current().tick(32));
 
     expect(view.container.textContent).toBe('firstseco');
 
-    const instance = ticker.current();
+    const instance = driver.current();
 
     await view.rerender({ streaming: false });
 

@@ -1,7 +1,7 @@
 import {
-  IntervalSmoothTicker,
-  RafSmoothTicker,
-  SpringSmoothScheduler,
+  IntervalSmoothDriver,
+  RafSmoothDriver,
+  SpringSmoothInterpolator,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { afterEach, expect, test, vi } from 'vitest';
 
@@ -32,8 +32,8 @@ test('selects RAF when available and falls back to interval outside the browser'
 
   expect(toSmoothConfig(true)).toEqual({
     enabled: true,
-    ticker: RafSmoothTicker,
-    scheduler: SpringSmoothScheduler,
+    driver: RafSmoothDriver,
+    interpolation: SpringSmoothInterpolator,
   });
 
   vi.stubGlobal('requestAnimationFrame', undefined);
@@ -42,26 +42,40 @@ test('selects RAF when available and falls back to interval outside the browser'
 
   expect(toSmoothConfig(true)).toEqual({
     enabled: true,
-    ticker: IntervalSmoothTicker,
-    scheduler: SpringSmoothScheduler,
+    driver: IntervalSmoothDriver,
+    interpolation: SpringSmoothInterpolator,
   });
 });
 
-test('accepts explicit ticker and scheduler classes and rejects unknown names', () => {
+test('accepts explicit driver and interpolation classes and rejects unknown names', () => {
   expect(
     toSmoothConfig({
-      ticker: IntervalSmoothTicker,
-      scheduler: SpringSmoothScheduler,
+      driver: IntervalSmoothDriver,
+      interpolation: SpringSmoothInterpolator,
     }),
-  ).toEqual({ enabled: false, ticker: IntervalSmoothTicker, scheduler: SpringSmoothScheduler });
+  ).toEqual({
+    enabled: false,
+    driver: IntervalSmoothDriver,
+    interpolation: SpringSmoothInterpolator,
+  });
 
-  expect(() => toSmoothConfig({ ticker: 'missing' as 'raf', scheduler: 'spring' })).toThrow(
-    'Unknown ticker type',
+  expect(() => toSmoothConfig({ driver: 'missing' as 'raf', interpolation: 'spring' })).toThrow(
+    'Unknown driver type',
   );
 
-  expect(() => toSmoothConfig({ ticker: 'raf', scheduler: 'missing' as 'spring' })).toThrow(
-    'Unknown scheduler type',
+  expect(() => toSmoothConfig({ driver: 'raf', interpolation: 'missing' as 'spring' })).toThrow(
+    'Unknown interpolation type',
   );
+});
+
+test('accepts the deprecated ticker and scheduler names when the new ones are absent', () => {
+  expect(toSmoothConfig({ ticker: 'interval', scheduler: 'spring' })).toEqual({
+    enabled: false,
+    driver: IntervalSmoothDriver,
+    interpolation: SpringSmoothInterpolator,
+  });
+
+  expect(toSmoothConfig({ driver: 'raf', ticker: 'interval' }).driver).toBe(RafSmoothDriver);
 });
 
 test('applies ending repair independently and leaves caller build options unchanged', () => {

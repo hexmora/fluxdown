@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
 import type { RendererProps } from './type';
 
-import { RenderNodes } from '../../../../../base/slot/components';
-import { shadeNodes } from './utils';
+import { useAppear } from '../../../../../base/animation/hooks';
+import { InheritedText } from '../../../../../base/components/inherited-text';
 
 const props = defineProps<RendererProps>();
 
-const nodes = computed(() => shadeNodes(props.leading, props.active, props.offset, props.isActive));
+// Linear opacity over time reads as an even gradient across the tail at a steady pace.
+const opacity = useAppear(() => ({ start: props.start, duration: props.duration }));
 </script>
 
 <template>
-  <RenderNodes :nodes="nodes" />
+  <InheritedText :style="{ opacity }"><slot /></InheritedText>
 </template>

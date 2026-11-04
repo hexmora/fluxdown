@@ -143,145 +143,56 @@ test('keeps distinct cursor keys across appends while preserving explicit suffix
   }
 });
 
-test('retains shad positions when mature words move before the host', () => {
-  const slots = createSlots();
-
-  const before = normalizeInlineNodes(
-    [Shad({ leading: ['one '], active: ['two three'], isActive: true, maskWidth: 15 })],
-    slots,
+test('carries each shad batch clock into its own words', () => {
+  const result = normalizeInlineNodes(
+    ['old ', Shad({ start: 20, duration: 400 }, ['tail ', Strong({}, ['bold'])])],
+    createSlots(),
   );
 
-  const after = normalizeInlineNodes(
-    [
-      'one ',
-      Shad({ leading: [], active: ['two three'], isActive: true, maskWidth: 15, offset: 4 }),
-    ],
-    slots,
-  );
+  const shad = { type: 'shad', start: 20, duration: 400 };
 
-  expect(after.map((node) => node.key)).toEqual(before.map((node) => node.key));
-
-  expect(wordsOf(after)[1]).toEqual([
-    {
-      text: 'two\u00a0',
-      effect: {
-        type: 'shad',
-        maskText: 'two three',
-        trailingText: 'three',
-      },
-    },
+  expect(wordsOf(result.slice(0, 2))).toEqual([
+    [{ text: 'old\u00a0' }],
+    [{ text: 'tail\u00a0', effect: shad }],
   ]);
 
-  expect(wordsOf(after)[2][0].effect).toMatchObject({ trailingText: '' });
+  expect((result[2] as UniSlotNode).children).toEqual([{ text: 'bold', effect: shad }]);
 });
 
-test('keeps mature shad words unmasked when an auto-hidden tail starts again', async () => {
-  const leading = ['old '];
-
-  const active = ['tail'];
-
-  const props = { leading, active, isActive: true, maskWidth: 15 };
-
-  expect(new EffectShadSlotPlugin().renderInline(props)![0]).toBe(leading);
-
-  const wrapper = mount(Harness, { props: { nodes: [Shad(props)] } });
-
-  await flushPromises();
-
-  const old = wrapper.findAllComponents(InlineText)[0];
-
-  const tail = wrapper.findAllComponents(InlineText)[1];
-
-  const oldInstance = old.vm.$;
-
-  const tailInstance = tail.vm.$;
-
-  const placeholder = tail.find('text').element;
-
-  expect(old.props('parts')).toEqual([{ text: 'old\u00a0' }]);
-
-  expect(tail.props('parts')[0].effect).toMatchObject({ type: 'shad', maskText: 'tail' });
-
-  await wrapper.setProps({
-    nodes: [Shad({ leading: ['old tail'], active: [], isActive: false, maskWidth: 15 })],
-  });
-
-  expect(wrapper.findAllComponents(InlineText)[1].props('parts')).toEqual([{ text: 'tail' }]);
-
-  expect(tail.get<HTMLElement>('.fluxdown-inline-text__effect').element.style.opacity).toBe('');
-
-  await wrapper.setProps({
-    nodes: [Shad({ leading: ['old tail '], active: ['new'], isActive: true, maskWidth: 15 })],
-  });
-
-  const words = wrapper.findAllComponents(InlineText);
-
-  expect(words[0].vm.$).toBe(oldInstance);
-
-  expect(words[1].vm.$).toBe(tailInstance);
-
-  expect(words[1].find('text').element).toBe(placeholder);
-
-  expect(words[0].props('parts')).toEqual([{ text: 'old\u00a0' }]);
-
-  expect(words[1].props('parts')).toEqual([{ text: 'tail\u00a0' }]);
-
-  expect(words[0].find('.fluxdown-inline-text__effect').exists()).toBe(false);
-
-  expect(words[1].find('.fluxdown-inline-text__effect').exists()).toBe(true);
-
-  expect(words[2].props('parts')[0].effect).toMatchObject({ type: 'shad', maskText: 'new' });
-});
-
-test('marks only the appendable final word for an uncompressed mask grid', () => {
-  const slots = createSlots();
-
-  const tails = (nodes: UniRenderNode[]) =>
-    normalizeInlineNodes(nodes, slots)
-      .filter((node) => 'component' in node && node.component === InlineText)
-      .map((node) => node.props.tail);
-
-  expect(tails(['one two'])).toEqual([false, true]);
-
-  expect(tails(['one two '])).toEqual([false, false]);
-
-  expect(tails(['one', Strong({}, ['styled']), 'last'])).toEqual([false, true]);
-
-  expect(tails(['中文'])).toEqual([false, true]);
-});
-
-test('closes an earlier Chinese character without replacing its drawing host', async () => {
+test('keeps settled shad words on their hosts when a new batch starts', async () => {
   const wrapper = mount(Harness, {
-    props: { nodes: [Shad({ leading: [], active: ['中'], isActive: true, maskWidth: 15 })] },
+    props: { nodes: ['old ', Shad({ start: 20, duration: 400 }, ['tail'])] },
   });
 
   await flushPromises();
 
-  const first = wrapper.getComponent(InlineText);
+  const [old, tail] = wrapper.findAllComponents(InlineText);
 
-  const instance = first.vm.$;
+  const instances = [old!.vm.$, tail!.vm.$];
 
-  const text = first.find('text').element;
-
-  expect(first.props('tail')).toBe(true);
+  const placeholder = tail!.find('text').element;
 
   await wrapper.setProps({
-    nodes: [Shad({ leading: ['中'], active: ['文'], isActive: true, maskWidth: 15 })],
+    nodes: [
+      'old ',
+      Shad({ start: 20, duration: 400 }, ['tail ']),
+      Shad({ start: 50, duration: 300 }, ['new']),
+    ],
   });
 
   const words = wrapper.findAllComponents(InlineText);
 
-  expect(words[0].vm.$).toBe(instance);
+  expect(words.slice(0, 2).map((word) => word.vm.$)).toEqual(instances);
 
-  expect(words[0].find('text').element).toBe(text);
+  expect(words[1]!.find('text').element).toBe(placeholder);
 
-  expect(words[0].props('tail')).toBe(false);
+  expect(words[0]!.find('.fluxdown-inline-text__effect').exists()).toBe(false);
 
-  expect(words[0].find('.fluxdown-inline-text__effect').exists()).toBe(true);
+  expect(words[1]!.find('.fluxdown-inline-text__effect').exists()).toBe(true);
 
-  expect(words[1].props('tail')).toBe(true);
-
-  expect(words[1].find('.fluxdown-inline-text__effect').exists()).toBe(true);
+  expect(words[2]!.props('parts')).toEqual([
+    { text: 'new', effect: { type: 'shad', start: 50, duration: 300 } },
+  ]);
 });
 
 test('keeps styled boundaries while carrying chunk timing into their children', () => {

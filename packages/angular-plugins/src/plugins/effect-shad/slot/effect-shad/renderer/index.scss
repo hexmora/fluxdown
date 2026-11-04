@@ -1,26 +1,25 @@
 @use "../../../../../styles/prefix" as *;
 
 .fluxdown-angular-effect-shad-root {
+  // Fading runs wrap naturally across lines, including their whitespace.
   display: inline;
 
-  .fluxdown-angular-effect-shad-leading {
-    display: inline;
-  }
+  &.fluxdown-angular-effect-shad-active {
+    // Linear opacity over time reads as an even gradient across the tail at a steady pace.
+    animation: fluxdown-angular-effect-shad-appear var(--#{$prefix}-shad-duration) linear both;
 
-  .fluxdown-angular-effect-shad-active {
-    display: inline;
-    mask-image: linear-gradient(to right, #000, transparent);
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   }
+}
 
-  .fluxdown-angular-effect-shad-mask,
-  .fluxdown-angular-effect-shad-maskHidden {
-    position: relative;
-    display: inline-block;
-    background-image: linear-gradient(to right, transparent, var(--#{$prefix}-colors-bg));
-    pointer-events: none;
-  }
-
-  .fluxdown-angular-effect-shad-maskHidden {
+@keyframes fluxdown-angular-effect-shad-appear {
+  from {
     opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }

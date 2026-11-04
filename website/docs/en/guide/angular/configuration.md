@@ -39,13 +39,13 @@ Repairs unfinished syntax at the end of the stream. `false` only disables ending
 
 **Type:** `boolean | SmoothConfig` · **Default:** `true`
 
-Reveals new content gradually. `true` uses the built-in spring scheduler; `false` displays received content immediately. Use an object to choose a ticker and scheduler:
+Reveals new content gradually. `true` uses the built-in spring interpolation and selects an available driver automatically; `false` displays received content immediately. Use an object to choose a driver and interpolation:
 
 ```html
 <fluxdown
   [text]="text()"
   [streaming]="{
-    smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+    smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
   }"
 />
 ```
@@ -56,19 +56,19 @@ Reveals new content gradually. `true` uses the built-in spring scheduler; `false
 
 When using a `smooth` object, explicitly set this to `true` to enable smoothing.
 
-### smooth.ticker {#smoothticker}
+### smooth.driver {#smoothdriver}
 
-**Type:** `'raf' | 'interval' | SmoothTickerClass` · **Required for object configuration**
+**Type:** `'raf' | 'interval' | SmoothDriverClass` · **Default:** `'raf'` when animation frames are available, otherwise `'interval'`
 
-`raf` follows animation frames; `interval` uses a timer. A custom ticker class is also accepted.
+Chooses the clock that drives output: `raf` follows animation frames and `interval` uses a timer. A custom driver class is also accepted.
 
-### smooth.scheduler {#smoothscheduler}
+### smooth.interpolation {#smoothinterpolation}
 
-**Type:** `'spring' | SmoothSchedulerClass` · **Required for object configuration**
+**Type:** `'spring' | SmoothInterpolatorClass` · **Default:** `'spring'`
 
-Controls how much content each update reveals. `spring` uses the built-in spring scheduler; custom scheduler classes are also supported.
+Turns elapsed time into visible progress. `spring` uses the built-in closed-form spring; custom interpolator classes are also supported.
 
-> Import `SmoothTickerClass` and `SmoothSchedulerClass` from `@fluxdown/core-plugins/plugins/mapper/smooth`. In most cases, `smooth: true` is sufficient.
+> Import `SmoothDriverClass` and `SmoothInterpolatorClass` from `@fluxdown/core-plugins/plugins/mapper/smooth`. In most cases, `smooth: true` is sufficient. The previous names `ticker` and `scheduler` still work for one release and are deprecated.
 
 ### streaming.effect {#streamingeffect}
 

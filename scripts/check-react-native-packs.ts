@@ -58,7 +58,7 @@ createElement(ChunkRenderer, { Raw: null, start: 0, duration: 400 }, 'chunk');
 
 createElement(ScaleRenderer, { Raw: null, start: 0, duration: 400, from: 0, blur: 0.08 }, 'scale');
 
-createElement(ShadRenderer, { Raw: null, leading: 'ready', active: 'incoming', isActive: true, maskWidth: 4 });
+createElement(ShadRenderer, { Raw: null, start: 0, duration: 400 }, 'shad');
 
 createElement(SuffixRenderer, { Raw: null, type: 'cursor' });
 
@@ -149,6 +149,7 @@ const start = performance.now() + 1000;
 
 for (const [Component, props, label] of [
   [ChunkRenderer, { Raw: null, start, duration: 400 }, 'chunk'],
+  [ShadRenderer, { Raw: null, start, duration: 400 }, 'shad'],
   [ScaleRenderer, { Raw: null, start, duration: 400, from: 0, blur: 0.08 }, 'scale'],
 ]) {
   const html = renderToStaticMarkup(createElement(Component, props, label));
@@ -159,12 +160,6 @@ for (const [Component, props, label] of [
     throw new Error('Native ' + label + ' did not preserve its initial animation state');
   }
 }
-
-const shad = renderToStaticMarkup(createElement(ShadRenderer, {
-  Raw: null, leading: 'ready', active: 'incoming', isActive: true, maskWidth: 4,
-}));
-
-if (!shad.includes('ready') || !shad.includes('incoming')) throw new Error('Native shad slot did not render');
 
 for (const type of ['cursor', 'dot']) {
   const html = renderToStaticMarkup(createElement(SuffixRenderer, { Raw: null, type }));
