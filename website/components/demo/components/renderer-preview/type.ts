@@ -9,7 +9,7 @@ export type Renderer =
   | 'vue'
   | 'svelte'
   | 'react-native'
-  | 'lynx'
+  | 'react-lynx'
   | 'solid'
   | 'taro'
   | 'angular'

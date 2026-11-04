@@ -6,7 +6,7 @@ import type { AngularCheckResult, LynxCheckResult, SvelteCheckResult } from './t
 
 import { validateReleaseManifest } from './release-artifact.ts';
 
-function lynxVerification(names = ['@fluxdown/lynx']): LynxCheckResult {
+function lynxVerification(names = ['@fluxdown/react-lynx']): LynxCheckResult {
   return {
     specifiers: names,
     typeEntries: names.length,
@@ -15,7 +15,7 @@ function lynxVerification(names = ['@fluxdown/lynx']): LynxCheckResult {
   };
 }
 
-function manifest(names = ['@fluxdown/lynx']): ReleaseArtifactManifest {
+function manifest(names = ['@fluxdown/react-lynx']): ReleaseArtifactManifest {
   return {
     schemaVersion: 1,
     repository: 'hexmora/fluxdown',
@@ -41,7 +41,7 @@ function manifest(names = ['@fluxdown/lynx']): ReleaseArtifactManifest {
 }
 
 test('accepts existing artifacts without Lynx evidence for recovery', () => {
-  const artifact = manifest(['fluxdown', '@fluxdown/lynx']);
+  const artifact = manifest(['fluxdown', '@fluxdown/react-lynx']);
 
   artifact.verification = { nodeEntries: 4, browser: [] };
 
@@ -49,20 +49,20 @@ test('accepts existing artifacts without Lynx evidence for recovery', () => {
 });
 
 test('accepts Lynx-only artifacts after native, web, and declaration verification', () => {
-  const artifact = manifest(['@fluxdown/lynx', '@fluxdown/lynx-plugins']);
+  const artifact = manifest(['@fluxdown/react-lynx', '@fluxdown/react-lynx-plugins']);
 
   artifact.verification.lynx = lynxVerification([
-    '@fluxdown/lynx',
-    '@fluxdown/lynx/lite',
-    '@fluxdown/lynx-plugins',
-    '@fluxdown/lynx-plugins/plugins/tex-svg',
+    '@fluxdown/react-lynx',
+    '@fluxdown/react-lynx/lite',
+    '@fluxdown/react-lynx-plugins',
+    '@fluxdown/react-lynx-plugins/plugins/tex-svg',
   ]);
 
   assert.equal(validateReleaseManifest(artifact), artifact);
 });
 
 test('accepts a mixed release with both Node and Lynx verification', () => {
-  const artifact = manifest(['fluxdown', '@fluxdown/lynx']);
+  const artifact = manifest(['fluxdown', '@fluxdown/react-lynx']);
 
   artifact.verification.nodeEntries = 1;
   artifact.verification.lynx = lynxVerification();
@@ -80,7 +80,7 @@ test('rejects zero consumer entries without Lynx verification', () => {
 
 for (const name of ['fluxdown', '@fluxdown/react-native']) {
   test(`Lynx verification cannot replace Node verification for ${name}`, () => {
-    const artifact = manifest(['@fluxdown/lynx', name]);
+    const artifact = manifest(['@fluxdown/react-lynx', name]);
 
     artifact.verification.lynx = lynxVerification();
 
@@ -130,13 +130,13 @@ for (const [label, lynx] of incompleteEvidence) {
 }
 
 for (const specifiers of [
-  ['@fluxdown/lynx', '@fluxdown/lynx'],
-  ['@fluxdown/lynx/lite'],
-  ['@fluxdown/lynx', '@fluxdown/lynx-plugins'],
-  ['@fluxdown/lynx', '@fluxdown/core'],
-  ['@fluxdown/lynx', '@fluxdown/lynx-other'],
-  ['@fluxdown/lynx', '@fluxdown/lynx/../core'],
-  ['@fluxdown/lynx', '@fluxdown/lynx/'],
+  ['@fluxdown/react-lynx', '@fluxdown/react-lynx'],
+  ['@fluxdown/react-lynx/lite'],
+  ['@fluxdown/react-lynx', '@fluxdown/react-lynx-plugins'],
+  ['@fluxdown/react-lynx', '@fluxdown/core'],
+  ['@fluxdown/react-lynx', '@fluxdown/react-lynx-other'],
+  ['@fluxdown/react-lynx', '@fluxdown/react-lynx/../core'],
+  ['@fluxdown/react-lynx', '@fluxdown/react-lynx/'],
 ]) {
   test(`rejects entries outside the verified artifact: ${specifiers.join(', ')}`, () => {
     const artifact = manifest();
@@ -148,7 +148,7 @@ for (const specifiers of [
 }
 
 test('requires evidence for every Lynx package in the artifact', () => {
-  const artifact = manifest(['@fluxdown/lynx', '@fluxdown/lynx-plugins']);
+  const artifact = manifest(['@fluxdown/react-lynx', '@fluxdown/react-lynx-plugins']);
 
   artifact.verification.lynx = lynxVerification();
 
@@ -473,7 +473,7 @@ test('requires compiler evidence for uni-app even when Node verification passes'
 });
 
 test('accepts a release containing both target-compiled renderers without Node entries', () => {
-  const artifact = manifest(['@fluxdown/lynx', '@fluxdown/uni-app']);
+  const artifact = manifest(['@fluxdown/react-lynx', '@fluxdown/uni-app']);
 
   artifact.verification = {
     nodeEntries: 0,

@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 import { reactNativeWebPlugin } from '../scripts/build/react-native-web';
 import { taroWebAliases, taroWebDefines } from '../scripts/build/taro-web';
-import { lynxDemo } from './lynx/plugin';
+import { reactLynxDemo } from './react-lynx/plugin';
 import { seo } from './seo/plugin';
 import { sessionAppearance } from './theme/appearance/plugin';
 import { sessionLocale } from './theme/locale/plugin';
@@ -44,7 +44,7 @@ export default defineConfig({
   route: { cleanUrls: false, localeRedirect: 'never' },
   plugins: [
     seo(),
-    lynxDemo(),
+    reactLynxDemo(),
     uniAppDemo(),
     {
       name: 'static-search-links',

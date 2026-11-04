@@ -5,7 +5,7 @@ export const CODE_FRAMEWORKS = [
   'Svelte',
   'Angular',
   'React Native',
-  'Lynx',
+  'React Lynx',
   'Solid',
   'Taro',
   'uni-app',

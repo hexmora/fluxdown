@@ -120,6 +120,26 @@
         "name": "@fluxdown/core-plugins",
         "directory": "packages/core-plugins"
       }
+    },
+    {
+      "from": {
+        "name": "@fluxdown/lynx",
+        "directory": "packages/lynx"
+      },
+      "to": {
+        "name": "@fluxdown/react-lynx",
+        "directory": "packages/react-lynx"
+      }
+    },
+    {
+      "from": {
+        "name": "@fluxdown/lynx-plugins",
+        "directory": "packages/lynx-plugins"
+      },
+      "to": {
+        "name": "@fluxdown/react-lynx-plugins",
+        "directory": "packages/react-lynx-plugins"
+      }
     }
   ]
 }

@@ -87,10 +87,10 @@ export class Message {
       code: getComponentExample('@fluxdown/react-native', comment),
     },
     {
-      framework: 'Lynx',
-      renderer: 'lynx',
+      framework: 'React Lynx',
+      renderer: 'react-lynx',
       lang: 'tsx',
-      code: getComponentExample('@fluxdown/lynx', comment),
+      code: getComponentExample('@fluxdown/react-lynx', comment),
     },
     {
       framework: 'Solid',
