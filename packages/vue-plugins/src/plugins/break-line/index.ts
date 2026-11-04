@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { BreakLinePlugin as _BreakLinePlugin } from '@fluxdown/vue-base-plugins/plugins/break-line';
 
-import { BreakLineRenderPlugin } from './render';
 import { BreakLineSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const BreakLinePlugin: IPluginItem = {
+export const BreakLinePlugin = /*#__PURE__*/ pluginExtends(_BreakLinePlugin, {
   slots: [BreakLineSlotPlugin],
-  renders: [BreakLineRenderPlugin],
-};
+});

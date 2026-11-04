@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "@fluxdown/vue-lynx-plugins",
+    "types": ["vue-lynx/types", "@lynx-js/types", "node"]
+  },
+  "include": ["*.ts", "*.tsx"]
+}

@@ -1,4 +1,6 @@
-import type { IPluginItem } from '../../typings';
+import type { IPluginItem } from '@fluxdown/vue-base-plugins/typings';
+
+import { PatchPlugin } from '@fluxdown/vue-base-plugins/plugins/patch';
 
 import { BlockquotePlugin } from '../../plugins/blockquote';
 import { BreakLinePlugin } from '../../plugins/break-line';
@@ -14,7 +16,6 @@ import { ImagePlugin } from '../../plugins/image';
 import { LinkPlugin } from '../../plugins/link';
 import { ListPlugin } from '../../plugins/list';
 import { ParagraphPlugin } from '../../plugins/paragraph';
-import { PatchPlugin } from '../../plugins/patch';
 import { StrongPlugin } from '../../plugins/strong';
 import { TablePlugin } from '../../plugins/table';
 import { TexPlugin } from '../../plugins/tex';

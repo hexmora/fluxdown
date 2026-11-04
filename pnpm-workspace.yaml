@@ -71,6 +71,11 @@ catalog:
   "@testing-library/dom": 10.4.2
   jsdom: 29.0.0
   storybook-lynx-rsbuild: 0.1.0
+  vue-lynx: 0.5.1
+  "@lynx-js/rspeedy": 0.18.4
+  "@rsbuild/plugin-vue": 2.0.1
+  "@rsbuild/plugin-vue-jsx": 2.0.1
+  "@rsbuild/plugin-babel": 2.1.0
   tslib: ^2.8.1
   "@rspress/core": ^2.0.23
   ahooks: ^3.9.7
@@ -212,9 +217,14 @@ catalogs:
   react-native-peer:
     react: ^19.0.0
     react-native: ">=0.83.0 <1"
+  lynx-shiki:
+    # Shiki 4.6 decodes WASM through browser-only compression APIs.
+    shiki: 4.4.3
   lynx-peer:
     "@lynx-js/react": ^0.129.0
     "@lynx-js/types": ^4.3.0
+  vue-lynx-peer:
+    vue-lynx: ^0.5.1
   react-peer:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0

@@ -31,9 +31,14 @@
         "activeMatch": "/guide/react-native/"
       },
       {
-        "text": "Lynx",
-        "link": "/guide/lynx/quick-start",
-        "activeMatch": "/guide/lynx/"
+        "text": "React Lynx",
+        "link": "/guide/react-lynx/quick-start",
+        "activeMatch": "/guide/react-lynx/"
+      },
+      {
+        "text": "Vue Lynx",
+        "link": "/guide/vue-lynx/quick-start",
+        "activeMatch": "/guide/vue-lynx/"
       },
       {
         "text": "Solid",

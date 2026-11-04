@@ -1,4 +1,4 @@
-import type { IPluginItem } from '../../typings';
+import type { IPluginItem } from '@fluxdown/vue-base-plugins/typings';
 
 import { CodeRenderPlugin } from './render';
 import { CodeBlockSlotPlugin, CodeHeaderSlotPlugin, CodeHighlighterSlotPlugin } from './slot';

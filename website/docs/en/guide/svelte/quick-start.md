@@ -59,4 +59,4 @@ Always pass the complete text received so far. Set `streaming` to `false` when t
 - [Streaming](./streaming.md): control smoothing and trailing effects.
 - [Styling](./customization.md): adjust colors, typography and spacing.
 - [Plugin matrix](./plugins/matrix.mdx): choose a preset or assemble your own.
-- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, Lynx, Solid, Taro, and Uni App together.
+- [Side-by-side demo](../common/features/renderers.mdx): explore static and streaming output in React, Vue, Svelte, Angular, React Native, React Lynx, Vue Lynx, Solid, Taro, and Uni App together.

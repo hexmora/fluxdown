@@ -8,11 +8,12 @@ import { fileURLToPath } from 'node:url';
 
 import { reactNativeWebPlugin } from '../scripts/build/react-native-web';
 import { taroWebAliases, taroWebDefines } from '../scripts/build/taro-web';
-import { lynxDemo } from './lynx/plugin';
+import { reactLynxDemo } from './react-lynx/plugin';
 import { seo } from './seo/plugin';
 import { sessionAppearance } from './theme/appearance/plugin';
 import { sessionLocale } from './theme/locale/plugin';
 import { uniAppDemo } from './uni-app/plugin';
+import { vueLynxDemo } from './vue-lynx/plugin';
 
 export default defineConfig({
   root: 'docs',
@@ -44,7 +45,8 @@ export default defineConfig({
   route: { cleanUrls: false, localeRedirect: 'never' },
   plugins: [
     seo(),
-    lynxDemo(),
+    reactLynxDemo(),
+    vueLynxDemo(),
     uniAppDemo(),
     {
       name: 'static-search-links',
@@ -149,6 +151,15 @@ export default defineConfig({
           new URL('../packages/solid-plugins/dist/esm/presets/lite.browser.js', import.meta.url),
         ),
         // Vue JSX is compiled by its package build before Rspress handles the demo.
+        '@fluxdown/vue-base$': fileURLToPath(
+          new URL('../packages/vue-base/dist/esm/index.js', import.meta.url),
+        ),
+        '@fluxdown/vue-base-plugins/base$': fileURLToPath(
+          new URL('../packages/vue-base-plugins/dist/esm/base.js', import.meta.url),
+        ),
+        '@fluxdown/vue-base-plugins/plugins': fileURLToPath(
+          new URL('../packages/vue-base-plugins/dist/esm/plugins', import.meta.url),
+        ),
         '@fluxdown/vue$': fileURLToPath(
           new URL('../packages/vue/dist/esm/full.browser.js', import.meta.url),
         ),

@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { HeadingPlugin as _HeadingPlugin } from '@fluxdown/vue-base-plugins/plugins/heading';
 
-import { HeadingRenderPlugin } from './render';
 import { HeadingSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const HeadingPlugin: IPluginItem = {
+export const HeadingPlugin = /*#__PURE__*/ pluginExtends(_HeadingPlugin, {
   slots: [HeadingSlotPlugin],
-  renders: [HeadingRenderPlugin],
-};
+});

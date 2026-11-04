@@ -9,7 +9,7 @@ import { browserStyles, packageDeclarations } from './vite.ts';
 export const vuePackageConfig = (
   root: string,
   entries: Record<string, string>,
-  stylesheets: readonly string[] = [],
+  stylesheets?: readonly string[],
 ): UserConfig => {
   const manifest = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
 
@@ -17,8 +17,11 @@ export const vuePackageConfig = (
 
   return {
     plugins: [
-      vueJsx({ tsTransform: 'built-in', include: /packages\/vue(?:-plugins)?\/.*\.[jt]sx$/ }),
-      browserStyles(stylesheets),
+      vueJsx({
+        tsTransform: 'built-in',
+        include: /packages\/vue(?:-base)?(?:-plugins)?\/.*\.[jt]sx$/,
+      }),
+      ...(stylesheets ? [browserStyles(stylesheets)] : []),
       packageDeclarations(root),
     ],
     resolve: { alias: { '@prefix': path.resolve(root, '../vue-plugins/src/styles/_prefix.scss') } },

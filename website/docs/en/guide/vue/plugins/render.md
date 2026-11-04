@@ -10,13 +10,13 @@ This example sends paragraphs starting with “Note:” to the blockquote slot, 
 import type {
   VueRenderMatchParams,
   VueRenderParams,
-} from '@fluxdown/vue-plugins/base';
+} from '@fluxdown/vue-base-plugins/base';
 
 import {
   BaseVueRenderPlugin,
-  createTypeOfSlot,
   isElementWithTag,
-} from '@fluxdown/vue-plugins/base';
+} from '@fluxdown/vue-base-plugins/base';
+import { createTypeOfSlot } from '@fluxdown/vue-plugins/base';
 import { h } from 'vue';
 
 const Blockquote = /*#__PURE__*/ createTypeOfSlot('Blockquote');
@@ -64,7 +64,7 @@ const plugins = { renders: [NoteRenderPlugin] };
 </template>
 ```
 
-> Import the base class, parameter types and `createTypeOfSlot` from `@fluxdown/vue-plugins/base`. Install `@fluxdown/vue-plugins` first.
+> Install `@fluxdown/vue-base-plugins` and `@fluxdown/vue-plugins` for the shared render contracts and Vue slots.
 
 `match` selects nodes, and `renderChildren` renders their children. `current`, `parents` and `render` preserve the slot's context. This example uses Vue's `h`; a project configured for Vue JSX can return JSX instead.
 

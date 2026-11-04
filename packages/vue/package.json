@@ -93,16 +93,15 @@
     "build:storybook": "storybook build"
   },
   "dependencies": {
-    "@fluxdown/core": "workspace:^",
-    "@fluxdown/core-plugins": "workspace:^",
-    "@fluxdown/types": "workspace:^",
     "@fluxdown/utils": "workspace:^",
+    "@fluxdown/vue-base": "workspace:^",
+    "@fluxdown/vue-base-plugins": "workspace:^",
     "@fluxdown/vue-plugins": "workspace:^",
-    "lodash-es": "catalog:",
-    "shallow-equal": "catalog:",
-    "stative": "workspace:^"
+    "lodash-es": "catalog:"
   },
   "devDependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@fluxdown/core-plugins": "workspace:^",
     "@storybook/addon-docs": "catalog:",
     "@storybook/vue3-vite": "catalog:",
     "@types/hast": "catalog:",

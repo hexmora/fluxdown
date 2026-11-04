@@ -1,4 +1,5 @@
-import { pluginExtends, toPluginList } from '../../base';
+import { pluginExtends, toPluginList } from '@fluxdown/vue-base-plugins/base';
+
 import { CodePlugin } from '../../plugins/code';
 import { CodePelePlugin } from '../../plugins/code-pele';
 import { CodeShikiPlugin } from '../../plugins/code-shiki';

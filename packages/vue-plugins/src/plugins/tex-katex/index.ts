@@ -1,4 +1,5 @@
-import { pluginExtends } from '../../base';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+
 import { TexPlugin } from '../tex';
 import { TexKatexSlotPlugin } from './slot';
 

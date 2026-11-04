@@ -31,10 +31,14 @@ export const PUBLIC_PACKAGES = [
   '@fluxdown/uni-app',
   '@fluxdown/angular-plugins',
   '@fluxdown/angular',
+  '@fluxdown/vue-base-plugins',
+  '@fluxdown/vue-base',
   '@fluxdown/vue-plugins',
   '@fluxdown/vue',
-  '@fluxdown/lynx-plugins',
-  '@fluxdown/lynx',
+  '@fluxdown/react-lynx-plugins',
+  '@fluxdown/react-lynx',
+  '@fluxdown/vue-lynx-plugins',
+  '@fluxdown/vue-lynx',
   '@fluxdown/svelte-plugins',
   '@fluxdown/svelte',
   '@fluxdown/react-hooks',
@@ -196,7 +200,12 @@ function validateLynxVerification(value: unknown, packages: string[]): void {
   }
 
   for (const name of packages)
-    assert(specifiers.includes(name), `Missing Lynx package verification: ${name}`);
+    assert(
+      specifiers.includes(name) ||
+        (name.endsWith('-plugins') &&
+          specifiers.some((specifier) => specifier.startsWith(`${name}/`))),
+      `Missing Lynx package verification: ${name}`,
+    );
 
   assert.equal(typeEntries, specifiers.length, 'Incomplete Lynx declaration verification');
 
@@ -417,7 +426,11 @@ export function validateReleaseManifest(value: unknown): ReleaseArtifactManifest
   }
 
   const lynxPackages = [...names].filter(
-    (name) => name === '@fluxdown/lynx' || name === '@fluxdown/lynx-plugins',
+    (name) =>
+      name === '@fluxdown/react-lynx' ||
+      name === '@fluxdown/react-lynx-plugins' ||
+      name === '@fluxdown/vue-lynx' ||
+      name === '@fluxdown/vue-lynx-plugins',
   );
 
   if (verification.lynx !== undefined) validateLynxVerification(verification.lynx, lynxPackages);

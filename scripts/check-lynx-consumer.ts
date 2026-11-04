@@ -8,14 +8,15 @@ import path from 'node:path';
 
 import type { LynxCheckResult, PackageArtifact } from './types.ts';
 
-import { filesUnder, isLynxPackage, publicEntries } from './check-package.ts';
+import { filesUnder, isReactLynxPackage, publicEntries } from './check-package.ts';
+import { checkVueLynxConsumer } from './check-vue-lynx-consumer.ts';
 
-export async function checkLynxConsumer(
+async function checkReactLynxConsumer(
   consumer: string,
   artifacts: PackageArtifact[],
 ): Promise<LynxCheckResult | undefined> {
   const specifiers = artifacts
-    .filter(({ manifest }) => isLynxPackage(manifest.name))
+    .filter(({ manifest }) => isReactLynxPackage(manifest.name))
     .flatMap(({ manifest, files }) =>
       publicEntries(manifest, files).map(
         ([entry]) => manifest.name + (entry === '.' ? '' : entry.slice(1)),
@@ -30,22 +31,27 @@ export async function checkLynxConsumer(
   const imports = specifiers
     .map((specifier, index) => `import * as Entry${index} from ${JSON.stringify(specifier)};`)
     .join('\n');
+
   const entries = specifiers.map((_, index) => `Entry${index}`).join(', ');
-  const hasRenderer = specifiers.includes('@fluxdown/lynx');
-  const hasMath = specifiers.includes('@fluxdown/lynx-plugins/plugins/tex-svg');
+
+  const hasRenderer = specifiers.includes('@fluxdown/react-lynx');
+
+  const hasMath = specifiers.includes('@fluxdown/react-lynx-plugins/plugins/tex-mathjax');
+
+  const markdown = 'React Lynx consumer\n\n$x^2$\n\n```javascript\nconst value = 42;\n```';
+
   const file = path.join(consumer, 'lynx-consumer.tsx');
 
   await writeFile(
     file,
     `${imports}
 import { root } from '@lynx-js/react';
-${hasRenderer ? "import { Fluxdown } from '@fluxdown/lynx';" : ''}
-${hasRenderer && hasMath ? "import { TexSvgPlugin } from '@fluxdown/lynx-plugins/plugins/tex-svg';" : ''}
+${hasRenderer ? "import { Fluxdown } from '@fluxdown/react-lynx';" : ''}
 
 // Retain every public runtime entry, including optional renderers and lazy imports.
 if (__BACKGROUND__) Object.assign(globalThis, { fluxdownConsumerEntries: [${entries}] });
 
-root.render(${hasRenderer ? `<Fluxdown text={'Lynx consumer\\n\\n$x^2$'} ${hasMath ? 'build={{ tex: true }} plugins={[TexSvgPlugin]}' : ''} />` : '<view><text>Lynx consumer</text></view>'});
+root.render(${hasRenderer ? `<Fluxdown text={${JSON.stringify(markdown)}} ${hasMath ? 'build={{ tex: true }}' : ''} />` : '<view><text>React Lynx consumer</text></view>'});
 `,
   );
 
@@ -54,9 +60,9 @@ root.render(${hasRenderer ? `<Fluxdown text={'Lynx consumer\\n\\n$x^2$'} ${hasMa
   await writeFile(
     typeFile,
     hasRenderer
-      ? `import { Fluxdown, type FluxdownProps } from '@fluxdown/lynx';
-import { FluxdownLite } from '@fluxdown/lynx/lite';
-import { FluxdownRaw } from '@fluxdown/lynx/raw';
+      ? `import { Fluxdown, type FluxdownProps } from '@fluxdown/react-lynx';
+import { FluxdownLite } from '@fluxdown/react-lynx/lite';
+import { FluxdownRaw } from '@fluxdown/react-lynx/raw';
 
 const props: FluxdownProps = { text: 'consumer', style: { padding: '16px' }, theme: 'dark' };
 <Fluxdown {...props} />;
@@ -100,7 +106,8 @@ const props: FluxdownProps = { text: 'consumer', style: { padding: '16px' }, the
 
   assert.equal(types.status, 0, types.stderr || types.stdout || types.error?.message);
 
-  const output = path.join(consumer, 'lynx-dist');
+  const output = path.join(consumer, 'react-lynx-dist');
+
   const rsbuild = await createRsbuild({
     cwd: consumer,
     config: {
@@ -115,6 +122,7 @@ const props: FluxdownProps = { text: 'consumer', style: { padding: '16px' }, the
       tools: {
         rspack(config) {
           config.resolve ??= {};
+
           config.resolve.conditionNames = ['worker', ...(config.resolve.conditionNames ?? ['...'])];
         },
       },
@@ -125,24 +133,54 @@ const props: FluxdownProps = { text: 'consumer', style: { padding: '16px' }, the
 
   try {
     const files = await filesUnder(output);
+
     const nativeAssets = files.filter((name) => name.endsWith('.lynx.bundle'));
+
     const webAssets = files.filter((name) => name.endsWith('.web.bundle'));
 
-    assert(nativeAssets.length, 'Lynx consumer did not emit a native bundle');
-    assert(webAssets.length, 'Lynx consumer did not emit a Web bundle');
+    assert(nativeAssets.length, 'React Lynx consumer did not emit a native bundle');
+
+    assert(webAssets.length, 'React Lynx consumer did not emit a Web bundle');
 
     await Promise.all(
       [...nativeAssets, ...webAssets].map(async (name) => {
-        assert((await readFile(path.join(output, name))).length, `Empty Lynx bundle: ${name}`);
+        assert(
+          (await readFile(path.join(output, name))).length,
+          `Empty React Lynx bundle: ${name}`,
+        );
       }),
     );
 
     console.log(
-      `Lynx consumer OK: ${specifiers.length} public entries, strict consumer types, and native/Web bundles`,
+      `React Lynx consumer OK: ${specifiers.length} public entries, strict consumer types, and native/Web bundles`,
     );
 
     return { specifiers, typeEntries: specifiers.length, nativeAssets, webAssets };
   } finally {
     await build.close();
   }
+}
+
+export async function checkLynxConsumer(
+  consumer: string,
+  artifacts: PackageArtifact[],
+): Promise<LynxCheckResult | undefined> {
+  const react = await checkReactLynxConsumer(consumer, artifacts);
+
+  const vue = await checkVueLynxConsumer(consumer, artifacts);
+
+  const checks = [react, vue].filter((result): result is LynxCheckResult => Boolean(result));
+
+  if (!checks.length) return;
+
+  return {
+    specifiers: checks.flatMap((result) => result.specifiers),
+    typeEntries: checks.reduce((total, result) => total + result.typeEntries, 0),
+    nativeAssets: checks.flatMap((result, index) =>
+      result.nativeAssets.map((file) => `${index}/${file}`),
+    ),
+    webAssets: checks.flatMap((result, index) =>
+      result.webAssets.map((file) => `${index}/${file}`),
+    ),
+  };
 }

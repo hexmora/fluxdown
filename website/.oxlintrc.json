@@ -1,5 +1,13 @@
 {
   "$schema": "../node_modules/oxlint/configuration_schema.json",
   "extends": ["../packages/react/.oxlintrc.json"],
-  "ignorePatterns": ["doc_build", ".rspress"]
+  "ignorePatterns": ["doc_build", ".rspress"],
+  "overrides": [
+    {
+      "files": ["vue-lynx/**/*"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off"
+      }
+    }
+  ]
 }

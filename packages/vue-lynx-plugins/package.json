@@ -1,0 +1,99 @@
+{
+  "name": "@fluxdown/vue-lynx-plugins",
+  "version": "0.1.0",
+  "description": "Vue Lynx elements and render plugins for Fluxdown.",
+  "homepage": "https://fluxdown.dev/",
+  "bugs": {
+    "url": "https://github.com/hexmora/fluxdown/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexmora/fluxdown.git",
+    "directory": "packages/vue-lynx-plugins"
+  },
+  "files": [
+    "dist/esm",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": true,
+  "exports": {
+    "./typings": "./src/typings/index.ts",
+    "./base": "./src/base/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts",
+    "./*": "./src/presets/*/index.ts",
+    "./jsx-runtime": "./src/jsx-runtime.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      "./typings": {
+        "types": "./dist/esm/typings/index.d.ts"
+      },
+      "./base": {
+        "types": "./dist/esm/base/index.d.ts",
+        "default": "./dist/esm/base/index.js"
+      },
+      "./plugins/*": {
+        "types": "./dist/esm/plugins/*/index.d.ts",
+        "default": "./dist/esm/plugins/*/index.js"
+      },
+      "./*": {
+        "types": "./dist/esm/presets/*/index.d.ts",
+        "default": "./dist/esm/presets/*/index.js"
+      },
+      "./jsx-runtime": {
+        "types": "./dist/esm/jsx-runtime.d.ts",
+        "default": "./dist/esm/jsx-runtime.js"
+      }
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rslib build",
+    "lint": "oxlint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "tsx ../../scripts/check-package.ts --source"
+  },
+  "dependencies": {
+    "@fluxdown/core-plugins": "workspace:^",
+    "@fluxdown/hast": "workspace:^",
+    "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@fluxdown/vue-base-plugins": "workspace:^",
+    "@types/hast": "catalog:",
+    "core-js": "catalog:",
+    "lodash-es": "catalog:",
+    "mathjax-full": "catalog:",
+    "prismjs": "catalog:",
+    "shiki": "catalog:lynx-shiki"
+  },
+  "devDependencies": {
+    "@fluxdown/core": "workspace:^",
+    "@lynx-js/types": "catalog:",
+    "@rsbuild/core": "catalog:",
+    "@rsbuild/plugin-sass": "catalog:",
+    "@rslib/core": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "@types/prismjs": "catalog:",
+    "@vitejs/plugin-vue-jsx": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "expect-type": "catalog:",
+    "jsdom": "catalog:",
+    "oxlint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-lynx": "catalog:"
+  },
+  "peerDependencies": {
+    "@lynx-js/types": "catalog:lynx-peer",
+    "vue": "catalog:vue-peer",
+    "vue-lynx": "^0.5.1"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

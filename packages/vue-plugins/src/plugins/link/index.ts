@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { LinkPlugin as _LinkPlugin } from '@fluxdown/vue-base-plugins/plugins/link';
 
-import { LinkRenderPlugin } from './render';
 import { LinkSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const LinkPlugin: IPluginItem = {
+export const LinkPlugin = /*#__PURE__*/ pluginExtends(_LinkPlugin, {
   slots: [LinkSlotPlugin],
-  renders: [LinkRenderPlugin],
-};
+});

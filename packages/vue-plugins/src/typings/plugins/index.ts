@@ -1,2 +1,1 @@
-export * from './packs';
-export type * from './plugins.js';
+import './plugins.js';

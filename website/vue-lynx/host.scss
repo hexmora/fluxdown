@@ -1,0 +1,22 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: transparent;
+}
+
+.viewport {
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.content {
+  padding: 20px;
+}
+
+lynx-view {
+  display: block;
+  width: 100%;
+}

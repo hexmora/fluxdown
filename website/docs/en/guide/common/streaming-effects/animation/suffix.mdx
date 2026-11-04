@@ -13,7 +13,7 @@ Switch the content type to inspect different endings. Pause or replay the stream
 
 Choose your framework above each example. Pass the Core example’s `mappers` to the [Core inputs](../../../core/quick-start.md) to enable the mappers explicitly. Components enable the same effects through `streaming.effect` and include their visual renderers.
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -113,7 +113,7 @@ export function Message({ text }: MessageProps) {
 ```
 
 ```tsx
-import { Fluxdown } from '@fluxdown/lynx';
+import { Fluxdown } from '@fluxdown/react-lynx';
 
 type MessageProps = {
   text: string;
@@ -127,6 +127,21 @@ export function Message({ text }: MessageProps) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['suffix', { type: 'cursor' }] }"
+    :text="text"
+  />
+</template>
 ```
 
 ```tsx
@@ -188,7 +203,7 @@ Use `type: 'dot'` for a circular marker. `effect: 'suffix'` uses the block curso
 
 The marker remains visible while the effect is enabled. Set `streaming` to `false` when the response finishes, or set the suffix's `enabled` option to `false` to keep other streaming behavior active:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -312,7 +327,7 @@ export function Message({ text, isStreaming }: MessageProps) {
 ```
 
 ```tsx
-import { Fluxdown } from '@fluxdown/lynx';
+import { Fluxdown } from '@fluxdown/react-lynx';
 
 type MessageProps = {
   text: string;
@@ -330,6 +345,24 @@ export function Message({ text, isStreaming }: MessageProps) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+defineProps<{ text: string; isStreaming: boolean }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{
+      smooth: true,
+      effect: ['suffix', { type: 'dot', enabled: isStreaming }],
+    }"
+    :text="text"
+  />
+</template>
 ```
 
 ```tsx
@@ -401,7 +434,7 @@ defineProps<MessageProps>();
 
 Combine the marker with an entrance effect:
 
-<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'Lynx', 'Solid', 'Taro', 'uni-app']}>
+<FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
@@ -503,7 +536,7 @@ export function Message({ text }: MessageProps) {
 ```
 
 ```tsx
-import { Fluxdown } from '@fluxdown/lynx';
+import { Fluxdown } from '@fluxdown/react-lynx';
 
 type MessageProps = {
   text: string;
@@ -517,6 +550,21 @@ export function Message({ text }: MessageProps) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :streaming="{ effect: ['scale', ['suffix', { type: 'dot' }]] }"
+    :text="text"
+  />
+</template>
 ```
 
 ```tsx
@@ -578,7 +626,7 @@ defineProps<MessageProps>();
 
 The `type` option is `'cursor' | 'dot' | (string & {})`. Every value uses the same HAST node: a `span` whose `dataFluxdownSuffix` property contains that type. The built-in renderer recognizes only `cursor` and `dot`; it returns `null` for every other value. An unknown type is metadata for your renderer, not text to display.
 
-Use a render plugin for your framework to display a smile. `SuffixRenderer` shares the built-in marker layout and breathing animation. Vue uses `h`, Svelte uses `createElement`, and Lynx keeps its JSX rendering function outside the plugin class; Uni App returns a text marker:
+Use a render plugin for your framework to display a smile. `SuffixRenderer` shares the built-in marker layout and breathing animation. Vue uses `h`, Svelte uses `createElement`, and React Lynx keeps its JSX rendering function outside the plugin class; Uni App returns a text marker:
 
 <FrameworkCodeTabs>
 
@@ -632,13 +680,13 @@ export function Message({ text }: MessageProps) {
 import type {
   VueRenderMatchParams,
   VueRenderParams,
-} from '@fluxdown/vue-plugins/base';
+} from '@fluxdown/vue-base-plugins/base';
 
 import {
   isSuffixNode,
   SUFFIX_DATA_ATTR,
 } from '@fluxdown/core-plugins/plugins/mapper/suffix';
-import { BaseVueRenderPlugin } from '@fluxdown/vue-plugins/base';
+import { BaseVueRenderPlugin } from '@fluxdown/vue-base-plugins/base';
 import { SuffixRenderer } from '@fluxdown/vue-plugins/plugins/effect-suffix';
 import { Fluxdown } from '@fluxdown/vue';
 import { h } from 'vue';
@@ -660,6 +708,7 @@ class SmileRenderPlugin extends BaseVueRenderPlugin {
 }
 
 const plugins = { renders: [SmileRenderPlugin] };
+
 defineProps<{ text: string }>();
 </script>
 
@@ -829,19 +878,19 @@ export function Message({ text }: MessageProps) {
 
 ```tsx
 import type {
-  LynxRenderMatchParams,
-  LynxRenderParams,
-} from '@fluxdown/lynx-plugins/base';
+  ReactLynxRenderMatchParams,
+  ReactLynxRenderParams,
+} from '@fluxdown/react-lynx-plugins/base';
 
 import {
   isSuffixNode,
   SUFFIX_DATA_ATTR,
 } from '@fluxdown/core-plugins/plugins/mapper/suffix';
-import { BaseLynxRenderPlugin } from '@fluxdown/lynx-plugins/base';
-import { SuffixRenderer } from '@fluxdown/lynx-plugins/plugins/effect-suffix';
-import { Fluxdown } from '@fluxdown/lynx';
+import { BaseReactLynxRenderPlugin } from '@fluxdown/react-lynx-plugins/base';
+import { SuffixRenderer } from '@fluxdown/react-lynx-plugins/plugins/effect-suffix';
+import { Fluxdown } from '@fluxdown/react-lynx';
 
-function renderSmile({ node }: LynxRenderParams) {
+function renderSmile({ node }: ReactLynxRenderParams) {
   if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
     return null;
   }
@@ -849,10 +898,10 @@ function renderSmile({ node }: LynxRenderParams) {
   return <SuffixRenderer type="smile">🙂</SuffixRenderer>;
 }
 
-class SmileRenderPlugin extends BaseLynxRenderPlugin {
+class SmileRenderPlugin extends BaseReactLynxRenderPlugin {
   static readonly key = 'render-smile';
 
-  match({ node }: LynxRenderMatchParams) {
+  match({ node }: ReactLynxRenderMatchParams) {
     return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
   }
 
@@ -872,6 +921,52 @@ export function Message({ text }: MessageProps) {
     />
   );
 }
+```
+
+```vue
+<script setup lang="ts">
+import type {
+  VueRenderMatchParams,
+  VueRenderParams,
+} from '@fluxdown/vue-base-plugins/base';
+
+import {
+  isSuffixNode,
+  SUFFIX_DATA_ATTR,
+} from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { BaseVueRenderPlugin } from '@fluxdown/vue-base-plugins/base';
+import { SuffixRenderer } from '@fluxdown/vue-lynx-plugins/plugins/effect-suffix';
+import { Fluxdown } from '@fluxdown/vue-lynx';
+import { h } from 'vue';
+
+class SmileRenderPlugin extends BaseVueRenderPlugin {
+  static readonly key = 'render-smile';
+
+  match({ node }: VueRenderMatchParams) {
+    return isSuffixNode(node) && node.properties[SUFFIX_DATA_ATTR] === 'smile';
+  }
+
+  render({ node }: VueRenderParams) {
+    if (!isSuffixNode(node) || node.properties[SUFFIX_DATA_ATTR] !== 'smile') {
+      return null;
+    }
+
+    return h(SuffixRenderer, { type: 'smile', children: '🙂' });
+  }
+}
+
+const plugins = { renders: [SmileRenderPlugin] };
+
+defineProps<{ text: string }>();
+</script>
+
+<template>
+  <Fluxdown
+    :plugins="plugins"
+    :streaming="{ effect: ['suffix', { type: 'smile' }] }"
+    :text="text"
+  />
+</template>
 ```
 
 ```tsx

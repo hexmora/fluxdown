@@ -1,11 +1,10 @@
-import type { ISlotPlugin, SlotPositionType, SlotProps, SlotType } from './type';
+import type { SlotType } from '@fluxdown/vue-base-plugins/base';
 
-export abstract class BaseSlotPlugin<T extends SlotType> implements ISlotPlugin<T> {
-  readonly config = {};
+import { BaseSlotPlugin as SharedBaseSlotPlugin } from '@fluxdown/vue-base-plugins/base';
 
-  abstract readonly Component: SlotPositionType<SlotProps[T]>;
+import type { SlotProps } from './type';
 
-  abstract readonly type: T;
-
-  destroy() {}
-}
+export abstract class BaseSlotPlugin<T extends SlotType> extends SharedBaseSlotPlugin<
+  T,
+  SlotProps[T]
+> {}

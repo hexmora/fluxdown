@@ -5,9 +5,8 @@ import {
   SHAD_FADE_VALUE,
   SHAD_TAG_NAME,
 } from '@fluxdown/core-plugins/plugins/mapper/shad';
+import { isElementWithTag } from '@fluxdown/vue-base-plugins/base';
 import { toNumber } from 'lodash-es';
-
-import { isElementWithTag } from '../../../../base';
 
 export const isShadNode = (node: ElementContent): node is Element =>
   isElementWithTag(node, SHAD_TAG_NAME) && node.properties[SHAD_DATA_ATTR] === SHAD_FADE_VALUE;

@@ -13,7 +13,8 @@ Fluxdown 让 Markdown 在生成的过程中也保持好读。它把断续到达�
 | 在 Svelte 或 SvelteKit 应用里展示流式 Markdown | [Svelte 快速开始](./svelte/quick-start.md) · `@fluxdown/svelte`                   |
 | 在 Angular 应用里展示 Markdown 与流式内容      | [Angular 快速开始](./angular/quick-start.md) · `@fluxdown/angular`                |
 | 在 iOS、Android 或 React Native Web 中展示内容 | [React Native 快速开始](./react-native/quick-start.md) · `@fluxdown/react-native` |
-| 在 ReactLynx 应用里展示 Markdown 与流式内容    | [Lynx 快速开始](./lynx/quick-start.md) · `@fluxdown/lynx`                         |
+| 在 React Lynx 应用里展示 Markdown 与流式内容   | [React Lynx 快速开始](./react-lynx/quick-start.md) · `@fluxdown/react-lynx`       |
+| 在 Vue Lynx 应用里展示 Markdown 与流式内容     | [Vue Lynx 快速开始](./vue-lynx/quick-start.md) · `@fluxdown/vue-lynx`             |
 | 在 Solid 应用里展示 Markdown 与流式内容        | [Solid 快速开始](./solid/quick-start.md) · `@fluxdown/solid`                      |
 | 在 Taro 应用里展示 Markdown 与流式内容         | [Taro 快速开始](./taro/quick-start.md) · `@fluxdown/taro`                         |
 | 在 Uni App x 应用里展示 Markdown 与流式内容    | [Uni App 快速开始](./uni-app/quick-start.md) · `@fluxdown/uni-app`                |
@@ -31,6 +32,8 @@ Fluxdown 让 Markdown 在生成的过程中也保持好读。它把断续到达�
 
 ## 一套核心，多种界面
 
-Fluxdown 的核心基于 [stative](../stative/index.md) 构建，用同一条响应式数据流连接文本、配置与输出。React、Vue、Svelte、Angular、React Native、Lynx、Solid、Taro 与 Uni App 已提供开箱即用的组件。
+Fluxdown 的核心基于 [stative](../stative/index.md) 构建，用同一条响应式数据流连接文本、配置与输出。React、Vue、Svelte、Angular、React Native、React Lynx、Vue Lynx、Solid、Taro 与 Uni App 已提供开箱即用的组件。
 
-第一次接入时，从 [React](./react/quick-start.md)、[Vue 3](./vue/quick-start.md)、[Svelte](./svelte/quick-start.md)、[Angular](./angular/quick-start.md)、[React Native](./react-native/quick-start.md)、[Lynx](./lynx/quick-start.md)、[Solid](./solid/quick-start.md)、[Taro](./taro/quick-start.md) 或 [Uni App](./uni-app/quick-start.md) 的快速开始文档入手。需要自行处理输出时，再阅读 Core 部分。
+第一次接入时，从 [React](./react/quick-start.md)、[Vue 3](./vue/quick-start.md)、[Svelte](./svelte/quick-start.md)、[Angular](./angular/quick-start.md)、[React Native](./react-native/quick-start.md)、[React Lynx](./react-lynx/quick-start.md)、[Vue Lynx](./vue-lynx/quick-start.md)、[Solid](./solid/quick-start.md)、[Taro](./taro/quick-start.md) 或 [Uni App](./uni-app/quick-start.md) 的快速开始文档入手。需要自行处理输出时，再阅读 Core 部分。
+
+Vue 与 Vue Lynx 通过 `@fluxdown/vue-base` 共享 Core 生命周期、流式配置和响应式 VNode 更新；`@fluxdown/vue-base-plugins` 提供共用的渲染契约、插槽组合与 Vue composables。平台包分别提供宿主元素、样式、事件、主题和动画效果，Vue Lynx 还负责原生运行时初始化与 worklet。

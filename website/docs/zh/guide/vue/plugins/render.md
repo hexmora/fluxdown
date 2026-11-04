@@ -10,13 +10,13 @@ Render 插件将 HAST 节点渲染成插槽，决定哪些内容交给哪个组�
 import type {
   VueRenderMatchParams,
   VueRenderParams,
-} from '@fluxdown/vue-plugins/base';
+} from '@fluxdown/vue-base-plugins/base';
 
 import {
   BaseVueRenderPlugin,
-  createTypeOfSlot,
   isElementWithTag,
-} from '@fluxdown/vue-plugins/base';
+} from '@fluxdown/vue-base-plugins/base';
+import { createTypeOfSlot } from '@fluxdown/vue-plugins/base';
 import { h } from 'vue';
 
 const Blockquote = /*#__PURE__*/ createTypeOfSlot('Blockquote');
@@ -64,7 +64,7 @@ const plugins = { renders: [NoteRenderPlugin] };
 </template>
 ```
 
-> 基类、参数类型和 `createTypeOfSlot` 从 `@fluxdown/vue-plugins/base` 导入。使用前安装 `@fluxdown/vue-plugins`。
+> 安装 `@fluxdown/vue-base-plugins` 和 `@fluxdown/vue-plugins`，分别提供共享渲染契约和 Vue 插槽。
 
 `match` 选择节点，`renderChildren` 渲染其子节点。`current`、`parents` 和 `render` 保留插槽需要的上下文。这里使用 Vue 的 `h`；项目已配置 Vue JSX 时也可以返回 JSX。
 

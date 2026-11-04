@@ -42,8 +42,14 @@
   },
   {
     "type": "dir",
-    "name": "lynx",
-    "label": "Lynx",
+    "name": "react-lynx",
+    "label": "React Lynx",
+    "collapsed": true
+  },
+  {
+    "type": "dir",
+    "name": "vue-lynx",
+    "label": "Vue Lynx",
     "collapsed": true
   },
   {

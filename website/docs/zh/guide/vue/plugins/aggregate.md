@@ -7,12 +7,10 @@
 各列表都可省略，例如组合引用块的渲染与插槽：
 
 ```ts
-import type { IPluginItem } from '@fluxdown/vue-plugins/typings';
+import type { IPluginItem } from '@fluxdown/vue-base-plugins/typings';
 
-import {
-  BlockquoteRenderPlugin,
-  BlockquoteSlotPlugin,
-} from '@fluxdown/vue-plugins/plugins/blockquote';
+import { BlockquoteRenderPlugin } from '@fluxdown/vue-base-plugins/plugins/blockquote';
+import { BlockquoteSlotPlugin } from '@fluxdown/vue-plugins/plugins/blockquote';
 
 export const QuotePlugin: IPluginItem = {
   renders: [BlockquoteRenderPlugin],
@@ -20,7 +18,7 @@ export const QuotePlugin: IPluginItem = {
 };
 ```
 
-> `IPluginItem` 从 `@fluxdown/vue-plugins/typings` 导入。内置 render 和 slot 从对应插件的子路径导入。
+> `IPluginItem` 从 `@fluxdown/vue-base-plugins/typings` 导入。内置 render 和 slot 从对应插件的子路径导入。
 
 然后传给组件：
 
@@ -49,7 +47,7 @@ const props = defineProps<MessageProps>();
 `pluginExtends` 接收两个或更多综合插件。先传基础插件，再追加需要覆盖的能力。例如，派生一个隐藏代码工具栏的插件：
 
 ```ts
-import { pluginExtends } from '@fluxdown/vue-plugins/base';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
 import {
   CodeHeaderSlotPlugin,
   CodePlugin,
@@ -63,7 +61,7 @@ export const CompactCodePlugin = /*#__PURE__*/ pluginExtends(CodePlugin, {
 });
 ```
 
-> `pluginExtends` 从 `@fluxdown/vue-plugins/base` 导入。
+> `pluginExtends` 从 `@fluxdown/vue-base-plugins/base` 导入。
 
 把 `CompactCodePlugin` 传入 `FluxdownLite` 的 `plugins` 即可。`config` 只配置当前对象列表中的插件，按插件 `key` 匹配，并覆盖 `[Plugin, options]` 中的同名选项。上例显式列出 `CodeHeaderSlotPlugin`，关闭继承的工具栏，保留代码容器和源码显示。
 

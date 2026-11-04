@@ -1,0 +1,11 @@
+.fluxdown-table {
+  width: 100%;
+
+  > .fluxdown-table-grid {
+    display: grid;
+    width: max-content;
+    min-width: 100%;
+
+    justify-content: stretch;
+  }
+}

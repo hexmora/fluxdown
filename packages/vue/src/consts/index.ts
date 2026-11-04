@@ -1,4 +1,1 @@
-export * from './config';
-export * from './defaults';
-export * from './smooth';
 export * from './styles';

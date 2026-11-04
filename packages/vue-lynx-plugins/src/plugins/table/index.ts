@@ -1,0 +1,13 @@
+import type { IPluginItem } from '@fluxdown/vue-base-plugins/typings';
+
+import { TableCellRenderPlugin, TableRenderPlugin } from './render';
+import { TableCellSlotPlugin, TableSlotPlugin } from './slot';
+
+export * from './render';
+export * from './slot';
+
+export const TablePlugin: IPluginItem = {
+  renders: [TableRenderPlugin, TableCellRenderPlugin],
+
+  slots: [TableSlotPlugin, TableCellSlotPlugin],
+};

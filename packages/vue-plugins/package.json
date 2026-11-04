@@ -104,10 +104,10 @@
     "prepack": "tsx ../../scripts/check-package.ts --source"
   },
   "dependencies": {
-    "@fluxdown/core": "workspace:^",
     "@fluxdown/core-plugins": "workspace:^",
     "@fluxdown/types": "workspace:^",
     "@fluxdown/utils": "workspace:^",
+    "@fluxdown/vue-base-plugins": "workspace:^",
     "@mathjax/mathjax-tex-font": "catalog:",
     "@mathjax/src": "catalog:",
     "@types/hast": "catalog:",
@@ -116,8 +116,7 @@
     "lodash-es": "catalog:",
     "pele": "catalog:",
     "prismjs": "catalog:",
-    "shiki": "catalog:",
-    "stative": "workspace:^"
+    "shiki": "catalog:"
   },
   "devDependencies": {
     "@types/lodash-es": "catalog:",
