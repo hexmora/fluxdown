@@ -1,6 +1,6 @@
 {
   "name": "@fluxdown/react-lynx-plugins",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "React Lynx elements and render plugins for Fluxdown.",
   "homepage": "https://fluxdown.dev/",
   "bugs": {
