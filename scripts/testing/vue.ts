@@ -5,7 +5,10 @@ import { defineConfig } from 'vitest/config';
 export const vueTestConfig = (root: string) =>
   defineConfig({
     plugins: [
-      vueJsx({ tsTransform: 'built-in', include: /packages\/vue(?:-plugins)?\/.*\.[jt]sx$/ }),
+      vueJsx({
+        tsTransform: 'built-in',
+        include: /packages\/vue(?:-base)?(?:-plugins)?\/.*\.[jt]sx$/,
+      }),
     ],
     oxc: { jsx: { development: false } },
     resolve: {

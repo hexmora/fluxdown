@@ -1,9 +1,12 @@
 import type { Element } from 'hast';
 
 import { isSuffixNode } from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import {
+  getStringProperty,
+  getTextContent,
+  isElementWithTag,
+} from '@fluxdown/vue-base-plugins/base';
 import { isString } from 'lodash-es';
-
-import { getStringProperty, getTextContent, isElementWithTag } from '../../../../base';
 
 export const getCodeElement = (node: Element) =>
   node.children.find((child): child is Element => isElementWithTag(child, 'code'));

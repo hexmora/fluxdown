@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { StrongPlugin as _StrongPlugin } from '@fluxdown/vue-base-plugins/plugins/strong';
 
-import { StrongRenderPlugin } from './render';
 import { StrongSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const StrongPlugin: IPluginItem = {
+export const StrongPlugin = /*#__PURE__*/ pluginExtends(_StrongPlugin, {
   slots: [StrongSlotPlugin],
-  renders: [StrongRenderPlugin],
-};
+});

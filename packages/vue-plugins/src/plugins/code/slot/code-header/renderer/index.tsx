@@ -1,12 +1,11 @@
+import type { CodeHeaderAction } from '@fluxdown/vue-base-plugins/base';
+
+import { CodeHeaderInnerActionKey } from '@fluxdown/vue-base-plugins/base';
 import cn from 'classnames';
 import { isFunction } from 'lodash-es';
 import { defineComponent } from 'vue';
 
-import {
-  type CodeHeaderAction,
-  CodeHeaderInnerActionKey,
-  type CodeHeaderProps,
-} from '../../../../../base';
+import { type CodeHeaderProps } from '../../../../../base';
 import { CheckIcon } from './assets/check';
 import { CopyIcon } from './assets/copy';
 import { useCopy } from './hooks';

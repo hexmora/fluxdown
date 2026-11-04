@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { ListPlugin as _ListPlugin } from '@fluxdown/vue-base-plugins/plugins/list';
 
-import { ListRenderPlugin } from './render';
 import { ListSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const ListPlugin: IPluginItem = {
+export const ListPlugin = /*#__PURE__*/ pluginExtends(_ListPlugin, {
   slots: [ListSlotPlugin],
-  renders: [ListRenderPlugin],
-};
+});

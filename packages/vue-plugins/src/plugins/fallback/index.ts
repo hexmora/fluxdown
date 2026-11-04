@@ -1,4 +1,4 @@
-import type { IPluginItem } from '../../typings';
+import type { IPluginItem } from '@fluxdown/vue-base-plugins/typings';
 
 import { FallbackRenderPlugin } from './render';
 import { ElementSlotPlugin } from './slot';

@@ -5,6 +5,14 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node", "svelte"],
     "paths": {
+      "@fluxdown/vue-base": ["../packages/vue-base/dist/esm/packs/index.d.ts"],
+      "@fluxdown/vue-base-plugins/base": ["../packages/vue-base-plugins/dist/esm/base/index.d.ts"],
+      "@fluxdown/vue-base-plugins/typings": [
+        "../packages/vue-base-plugins/dist/esm/typings/index.d.ts"
+      ],
+      "@fluxdown/vue-base-plugins/plugins/*": [
+        "../packages/vue-base-plugins/dist/esm/plugins/*/index.d.ts"
+      ],
       "@fluxdown/vue": ["../packages/vue/dist/esm/packs/full/index.d.ts"],
       "@fluxdown/vue-plugins/typings": ["../packages/vue-plugins/dist/esm/typings/index.d.ts"],
       "@fluxdown/solid": ["../packages/solid/dist/esm/packs/full/index.d.ts"],

@@ -6,9 +6,8 @@ import {
   SCALE_TAG_NAME,
   SCALE_WORD_VALUE,
 } from '@fluxdown/core-plugins/plugins/mapper/scale';
+import { isElementWithTag } from '@fluxdown/vue-base-plugins/base';
 import { toNumber } from 'lodash-es';
-
-import { isElementWithTag } from '../../../../base';
 
 export const isScaleNode = (node: ElementContent): node is Element => {
   return (

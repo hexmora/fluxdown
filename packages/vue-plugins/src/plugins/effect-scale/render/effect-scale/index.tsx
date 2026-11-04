@@ -1,11 +1,11 @@
 import type { IPluggableConfig } from '@fluxdown/types';
+import type { VueRenderMatchParams, VueRenderParams } from '@fluxdown/vue-base-plugins/base';
 
 import { SCALE_DATA_ATTR, SCALE_WORD_VALUE } from '@fluxdown/core-plugins/plugins/mapper/scale';
 import { assert } from '@fluxdown/utils';
+import { BaseVueRenderPlugin } from '@fluxdown/vue-base-plugins/base';
 
-import type { VueRenderMatchParams, VueRenderParams } from '../../../../base';
-
-import { BaseVueRenderPlugin, createTypeOfSlot } from '../../../../base';
+import { createTypeOfSlot } from '../../../../base';
 import { getScaleConfig, isScaleNode } from './utils';
 
 const Scale = /*#__PURE__*/ createTypeOfSlot('Scale');

@@ -149,6 +149,15 @@ export default defineConfig({
           new URL('../packages/solid-plugins/dist/esm/presets/lite.browser.js', import.meta.url),
         ),
         // Vue JSX is compiled by its package build before Rspress handles the demo.
+        '@fluxdown/vue-base$': fileURLToPath(
+          new URL('../packages/vue-base/dist/esm/index.js', import.meta.url),
+        ),
+        '@fluxdown/vue-base-plugins/base$': fileURLToPath(
+          new URL('../packages/vue-base-plugins/dist/esm/base.js', import.meta.url),
+        ),
+        '@fluxdown/vue-base-plugins/plugins': fileURLToPath(
+          new URL('../packages/vue-base-plugins/dist/esm/plugins', import.meta.url),
+        ),
         '@fluxdown/vue$': fileURLToPath(
           new URL('../packages/vue/dist/esm/full.browser.js', import.meta.url),
         ),

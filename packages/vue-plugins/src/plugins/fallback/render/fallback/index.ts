@@ -1,10 +1,10 @@
 import type { IPluggableConfig } from '@fluxdown/types';
+import type { VueRenderMatchParams, VueRenderParams } from '@fluxdown/vue-base-plugins/base';
 
+import { BaseVueRenderPlugin } from '@fluxdown/vue-base-plugins/base';
 import { h } from 'vue';
 
-import type { VueRenderMatchParams, VueRenderParams } from '../../../../base';
-
-import { BaseVueRenderPlugin, createTypeOfSlot } from '../../../../base';
+import { createTypeOfSlot } from '../../../../base';
 
 const Element = /*#__PURE__*/ createTypeOfSlot('Element');
 

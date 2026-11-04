@@ -1,12 +1,10 @@
-import type { IPluginItem } from '../../typings';
+import { pluginExtends } from '@fluxdown/vue-base-plugins/base';
+import { ParagraphPlugin as _ParagraphPlugin } from '@fluxdown/vue-base-plugins/plugins/paragraph';
 
-import { ParagraphRenderPlugin } from './render';
 import { ParagraphSlotPlugin } from './slot';
 
-export * from './render';
 export * from './slot';
 
-export const ParagraphPlugin: IPluginItem = {
+export const ParagraphPlugin = /*#__PURE__*/ pluginExtends(_ParagraphPlugin, {
   slots: [ParagraphSlotPlugin],
-  renders: [ParagraphRenderPlugin],
-};
+});

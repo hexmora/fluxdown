@@ -1,11 +1,11 @@
 import type { IPluggableConfig } from '@fluxdown/types';
+import type { VueRenderMatchParams, VueRenderParams } from '@fluxdown/vue-base-plugins/base';
 
 import { assert } from '@fluxdown/utils';
+import { BaseVueRenderPlugin, isElementWithTag } from '@fluxdown/vue-base-plugins/base';
 import { isString } from 'lodash-es';
 
-import type { VueRenderMatchParams, VueRenderParams } from '../../../../base';
-
-import { BaseVueRenderPlugin, createTypeOfSlot, isElementWithTag } from '../../../../base';
+import { createTypeOfSlot } from '../../../../base';
 
 const TableCell = /*#__PURE__*/ createTypeOfSlot('TableCell');
 
