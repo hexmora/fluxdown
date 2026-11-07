@@ -1,9 +1,9 @@
 ---
-title: Vue Lynx Markdown Renderer
+title: Quick start - Fluxdown Vue Lynx
 description: Add Fluxdown to a Vue Lynx project, render Markdown with native Lynx elements, and connect streaming text.
 ---
 
-# Vue Lynx Markdown renderer quick start {#quick-start}
+# Quick start - Fluxdown Vue Lynx {#quick-start}
 
 Fluxdown for Vue Lynx renders Markdown as Lynx `text`, `view` and other elements. It uses the same Core pipeline and native styles as React Lynx, with Vue components, reactive props and replaceable slots.
 

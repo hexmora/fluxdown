@@ -1,4 +1,4 @@
-# 自定义配置
+# 自定义配置 - Fluxdown Taro {#自定义配置}
 
 基本用法与 [React](../react/configuration.md) 相同。表中链接指向各参数的完整说明，下方补充 Taro 的 `style` 用法。
 

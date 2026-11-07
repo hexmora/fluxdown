@@ -1,4 +1,4 @@
-# Using and writing plugins
+# Using and writing plugins - Fluxdown Vue Lynx {#using-and-writing-plugins}
 
 Plugins follow the content pipeline. Start with slot plugins to change components and interactions; use render plugins to choose a slot for a node. Core plugins handle parsing, repair and streaming transforms.
 

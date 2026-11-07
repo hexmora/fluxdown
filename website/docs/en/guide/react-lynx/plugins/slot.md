@@ -1,4 +1,4 @@
-# Slot plugins
+# Slot plugins - Fluxdown React Lynx {#slot-plugins}
 
 Slot plugins render slots. The code blocks, links, headings and other content are already prepared; you choose their components and interactions.
 

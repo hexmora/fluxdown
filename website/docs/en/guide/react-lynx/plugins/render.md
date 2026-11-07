@@ -1,4 +1,4 @@
-# Render plugins
+# Render plugins - Fluxdown React Lynx {#render-plugins}
 
 Render plugins turn HAST nodes into slots, deciding which component receives each piece of content. Slot plugins provide the styling and interactions.
 

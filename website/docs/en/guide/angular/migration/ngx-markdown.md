@@ -1,4 +1,4 @@
-# ngx-markdown
+# ngx-markdown migration guide - Fluxdown Angular {#ngx-markdown}
 
 For a basic view, replace `<markdown [data]="text">` with `<fluxdown [text]="text" />`. Fluxdown currently requires Angular 22; resolve framework compatibility first in older projects.
 

@@ -1,4 +1,4 @@
-# Configuration
+# Configuration - Fluxdown React Native {#configuration}
 
 Basic usage follows [React](../react/configuration.md). The table links to the full reference for each prop; platform-specific `style` usage is covered below.
 

@@ -1,13 +1,13 @@
 [
   {
     "type": "file",
-    "name": "shad",
-    "label": "Trailing fade"
+    "name": "scale",
+    "label": "Character entrance"
   },
   {
     "type": "file",
-    "name": "scale",
-    "label": "Character entrance"
+    "name": "shad",
+    "label": "Trailing fade"
   },
   {
     "type": "file",

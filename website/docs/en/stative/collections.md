@@ -1,4 +1,4 @@
-# Switching and lists
+# Switching and lists - Stative {#switching-and-lists}
 
 Dependencies can change: users switch between views, and lists grow, shrink, or reorder. Stative can adjust child computations and release the ones no longer needed.
 

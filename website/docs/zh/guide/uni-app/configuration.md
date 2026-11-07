@@ -1,4 +1,4 @@
-# 自定义配置
+# 自定义配置 - Fluxdown Uni App {#自定义配置}
 
 本页列出 Uni App `Fluxdown` 的全部参数。顶层只有 `text` 必传；`FluxdownRaw` 还必须传入 `plugins`。Full、Lite 和 Raw 的其余字段相同。
 

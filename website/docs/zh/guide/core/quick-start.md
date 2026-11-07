@@ -1,4 +1,4 @@
-# 快速开始
+# 快速开始 - Fluxdown Core {#快速开始}
 
 `@fluxdown/core` 把持续变化的 Markdown 转成可订阅的内容块。它与框架无关，也不依赖浏览器；你决定每个内容块最终成为组件、数据，还是其他形式的输出。
 
@@ -79,7 +79,7 @@ text.destroy();
 - `BlocksRenderer` 决定输出形式。示例保留内容块，实际应用可以返回目标框架的组件。
 - `core` 连接输入与输出。`core.value.value` 是当前输出列表，`block.value.value` 是该块的当前 HAST。
 
-`S` 和 `render` 用来创建这条响应式数据流；`D` 把渲染器类作为普通值传入。它们来自 [stative](../../stative/index.md)。
+`S` 和 `render` 用来创建这条响应式数据流；`D` 把渲染器类作为普通值传入。它们来自 [Stative](../../stative/index.md)。
 
 ## 内置什么
 

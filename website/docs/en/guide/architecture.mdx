@@ -1,0 +1,94 @@
+import { ArchitectureDemo } from '../../../components/demo/components/architecture-demo';
+import {
+  ChunkingDiagram,
+  BuildingDiagram,
+  MappingDiagram,
+  RenderingDiagram,
+  StateClosureDiagram,
+  RendererBridgeDiagram,
+} from '../../../components/demo/components/architecture-diagrams';
+
+# Architecture - Fluxdown {#architecture}
+
+Core processes Markdown in four stages: chunking, building, mapping, and rendering. Each has its own inputs, outputs, and state. Connected together, they keep growing text readable without depending on a particular UI framework.
+
+## Building the processing pipeline
+
+<ArchitectureDemo />
+
+> Follow the same content from left to right. Edit the source or append a chunk; highlights mark the latest changes in each column. Smoothing runs at one third of its normal speed here to make the changes easier to follow.
+
+### Chunking
+
+Divide the full Markdown text into blocks that can be processed separately.
+
+<ChunkingDiagram />
+
+> Matching colors identify the same block. Blocks follow Markdown structure rather than individual lines: lists and code fences can span several lines.
+
+### Building
+
+Turn each block into a syntax tree and handle unfinished syntax at the end of a stream.
+
+<BuildingDiagram />
+
+> HAST is an HTML syntax tree. Here, a paragraph contains plain and bold text. A readable result can be built before the closing `**` arrives. Unchanged blocks can reuse their existing results.
+
+### Mapping
+
+Control reveal progress and apply streaming effects to the existing syntax tree.
+
+<MappingDiagram />
+
+> The whole sentence has arrived on the left; only part is visible on the right. Smoothing advances through the existing build result, without parsing Markdown again for every character. Faded cells represent content that has not appeared yet.
+
+### Rendering
+
+Pass the processed tree to platform components or a custom output.
+
+<RenderingDiagram />
+
+> Core supplies the content structure. The renderer chooses the elements, styles, and interactions. The same bold node can become a web element or a native text component.
+
+## How state closures form layers
+
+A [**state closure**](../stative/composition.md) is an object that can produce state changes on its own, or derive them from its inputs. State closures are usually lazy: their side effects begin when their state is accessed. We use this abstraction to build the pipeline above.
+
+State closures organize each stage. A closure groups related computations and owns the child state it creates. The build stage, for example, keeps separate state for each block.
+
+<StateClosureDiagram />
+
+> Adding a block and changing text within a block are distinct updates that can be subscribed to separately. Destroying Core releases its child state and subscriptions. The caller still owns the external text state.
+
+## Connecting a rendering library
+
+An adapter connects application inputs to Core, subscribes to its output, and releases resources when the view unmounts.
+
+<RendererBridgeDiagram />
+
+> In React, for example, props update persistent input state. Changes to the block list and to individual blocks notify the corresponding components. Re-renders retain the same Core instance; unmounting releases it. Other rendering libraries can use the same division of work.
+
+## Organizing everything with Stative
+
+Stative JSX describes connections between state modules. Its build runtime turns those descriptions into state flows you can read and subscribe to. Later input changes propagate through the established connections.
+
+```tsx
+/** @jsxImportSource stative */
+import { MutableState, render } from 'stative';
+
+const TextLength = ({ text }: { text: string }) => text.length;
+
+const text = MutableState.of('Hello');
+const length = render(<TextLength text={text} />);
+
+console.log(length.value.value); // 5
+text.next('Hello, Fluxdown');
+console.log(length.value.value); // 15
+
+length.destroy();
+text.destroy();
+```
+
+> JSX describes the connection from text to a length calculation; `render` turns a pipeline description such as JSX into a state closure, allowing its reactive data to be read. Core connects chunking, building, and mapping in the same way, with richer outputs. A group of connected modules can itself become a reusable state module.
+
+Read [Stative JSX](../stative/jsx.md) to learn about composition, or start with the [Core quick start](./core/quick-start.md) to use Core directly.

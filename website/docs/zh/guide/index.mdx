@@ -1,0 +1,65 @@
+import {
+  RepairTourDemo,
+  SmoothTourDemo,
+  SlotTourDemo,
+} from '../../../components/demo/components/tour-demo';
+
+# 认识 Fluxdown {#认识-fluxdown}
+
+AI 的回答还没写完，读者就已经开始看了。此时的 Markdown 往往停在半个链接、一段未闭合的加粗中间；网络送来的文字也时多时少，页面容易一顿一顿地往外跳。
+
+Fluxdown 就是为这样的阅读过程设计的。它在内容生成时修复未完成的语法，把成批到达的文字平滑地显示出来，也让你用自己的组件定制内容的呈现。适合 AI 对话、实时写作和持续更新的报告；完整的静态 Markdown 也可以直接渲染。
+
+## 语法还没写完，排版先跟上
+
+当输入停在 `**今天的重点` 时，读者看到的应该已经是重点，而不是等下一批星号到来才突然变成加粗。Fluxdown 会处理流式末尾常见的未完成语法，后续内容到达后继续更新。
+
+拖动下面的进度条，试着停在语法还没写完的位置。加粗、行内代码和链接分别占一行，可以同时对照原文与两种渲染结果。
+
+<RepairTourDemo />
+
+修复作用于展示过程，应用持有的原始文本不会被改写。链接地址还没完整到达时，也会先让文字保持可读。更细的开关见[流式渲染](./react/streaming.md)。
+
+## 收得快一点，显示稳一点
+
+服务端可能一次发来半句话，又停顿片刻。Fluxdown 把“收到多少”和“显示多少”分开处理，让文字以更连贯的节奏展开；缓冲积累时，默认的弹簧追踪器会加快追赶。
+
+下面两边使用同一份输入。点击左栏，可以让下一批文字提前到达；也可以重播，或换一种入场效果。
+
+<SmoothTourDemo />
+
+平滑化控制文字何时出现，动画控制出现时的样子。两者可以分别开关：保留平滑输出而不加动画，或让新内容带一点渐变、缩放，都可以。继续看[平滑化](./common/streaming-effects/smoothing.mdx)和[动画效果](./common/streaming-effects/animation/index.mdx)。
+
+## 用自己的组件呈现内容
+
+主题负责字体和颜色，插槽则让你换上自己的组件。代码块可以加上业务操作，链接可以打开站内预览，引用也可以换成产品里的提示卡片。
+
+切换下面的按钮，原文没有变化，替换的只是引用块的插槽组件。里面的加粗和段落仍然由 Fluxdown 处理。
+
+<SlotTourDemo />
+
+你可以替换整个插槽，也可以包一层默认组件，只调整其中一部分。比如保留代码高亮与复制，只改工具栏的外观。React 的写法见 [Slot 插件](./react/plugins/slot.md)；如果需要在正文的某个位置加入引用来源、人物标记等内容，见[位置插入](./common/patches.mdx)。
+
+## 一套核心，多种界面
+
+解析、语法修复和平滑化都在框架无关的 Core 中完成，界面层把处理结果交给各自的组件。换到 Vue、React Native 或其他支持的平台时，可以沿用同一套内容处理思路，再按平台定制外观和交互。
+
+Core 基于 [Stative](../stative/index.md) 组织响应式状态流。文本和配置变化后，相关计算与界面随之更新。想知道这些步骤怎样串起来、各渲染库怎样接上 Core，可以继续读[架构介绍](./architecture.mdx)。
+
+## 从哪里开始
+
+先选择你使用的框架，传入文本就能开始。各平台的快速开始会说明安装、样式和运行环境；需要自行处理输出时，再从 Core 入手。
+
+| 你的需求                                       | 选择                                                                              |
+| ---------------------------------------------- | --------------------------------------------------------------------------------- |
+| 在 React 应用里展示 Markdown，快速接入流式输出 | [React 快速开始](./react/quick-start.md) · `fluxdown`                             |
+| 在 Vue 3 应用里展示 Markdown 与流式内容        | [Vue 快速开始](./vue/quick-start.md) · `@fluxdown/vue`                            |
+| 在 Svelte 或 SvelteKit 应用里展示流式 Markdown | [Svelte 快速开始](./svelte/quick-start.md) · `@fluxdown/svelte`                   |
+| 在 Angular 应用里展示 Markdown 与流式内容      | [Angular 快速开始](./angular/quick-start.md) · `@fluxdown/angular`                |
+| 在 iOS、Android 或 React Native Web 中展示内容 | [React Native 快速开始](./react-native/quick-start.md) · `@fluxdown/react-native` |
+| 在 React Lynx 应用里展示 Markdown 与流式内容   | [React Lynx 快速开始](./react-lynx/quick-start.md) · `@fluxdown/react-lynx`       |
+| 在 Vue Lynx 应用里展示 Markdown 与流式内容     | [Vue Lynx 快速开始](./vue-lynx/quick-start.md) · `@fluxdown/vue-lynx`             |
+| 在 Solid 应用里展示 Markdown 与流式内容        | [Solid 快速开始](./solid/quick-start.md) · `@fluxdown/solid`                      |
+| 在 Taro 应用里展示 Markdown 与流式内容         | [Taro 快速开始](./taro/quick-start.md) · `@fluxdown/taro`                         |
+| 在 Uni App x 应用里展示 Markdown 与流式内容    | [Uni App 快速开始](./uni-app/quick-start.md) · `@fluxdown/uni-app`                |
+| 接入其他框架，或自己决定内容如何呈现           | [Core 快速开始](./core/quick-start.md) · `@fluxdown/core`                         |

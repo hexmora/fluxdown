@@ -1,4 +1,4 @@
-# vue-markdown-render
+# vue-markdown-render 迁移指南 - Fluxdown Vue {#vue-markdown-render}
 
 最简单的迁移是把 `source` 改为 `text`。已有的 Vue 响应式数据可以继续使用，`markdown-it` 的选项与插件则需要单独调整。
 

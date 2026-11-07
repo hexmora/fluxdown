@@ -1,4 +1,4 @@
-# 组合计算
+# 组合计算 - Stative {#组合计算}
 
 状态闭包（state closure）把输入、计算和子计算的生命周期放在一起。Stative 提供三种声明方式；它们都通过 `render(S([Declaration, inputs]))` 创建，也都能使用 JSX。
 

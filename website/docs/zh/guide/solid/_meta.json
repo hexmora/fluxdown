@@ -7,7 +7,7 @@
   {
     "type": "file",
     "name": "streaming",
-    "label": "流式内容"
+    "label": "流式渲染"
   },
   {
     "type": "file",

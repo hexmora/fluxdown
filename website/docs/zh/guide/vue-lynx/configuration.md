@@ -1,4 +1,4 @@
-# 自定义配置
+# 自定义配置 - Fluxdown Vue Lynx {#自定义配置}
 
 Vue Lynx 的 `text`、`build`、`streaming`、`plugins`、`patches` 和模板 ref 沿用 [Vue 自定义配置](../vue/configuration.md)。本页仅说明 Lynx 平台的差异。
 

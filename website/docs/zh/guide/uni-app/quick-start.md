@@ -1,9 +1,9 @@
 ---
-title: Uni App Markdown 渲染器
+title: 快速开始 - Fluxdown Uni App
 description: 在 Uni App x Vapor 项目中接入 Fluxdown，使用 .uvue 组件展示 Markdown 与流式内容。了解安装、累积文本接入，以及主题和插件的使用入口。
 ---
 
-# Uni App Markdown 渲染器快速开始 {#快速开始}
+# 快速开始 - Fluxdown Uni App {#快速开始}
 
 `@fluxdown/uni-app` 为 Uni App x 的 Vapor 项目提供 Markdown 组件。解析、语法修复和平滑输出基于 Fluxdown Core，界面使用 `.uvue` 组件。
 

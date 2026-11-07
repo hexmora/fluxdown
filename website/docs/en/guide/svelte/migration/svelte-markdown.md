@@ -1,4 +1,4 @@
-# svelte-markdown
+# svelte-markdown migration guide - Fluxdown Svelte {#svelte-markdown}
 
 Start by passing `SvelteMarkdown`'s string `source` to Fluxdown's `text`. Fluxdown requires Svelte 5, so check the framework version before migrating an older project.
 

@@ -1,4 +1,4 @@
-# Render plugins
+# Render plugins - Fluxdown React {#render-plugins}
 
 Render plugins turn HAST nodes into slots. They choose which nodes use each slot and what content to pass along; slot plugins still provide the components.
 

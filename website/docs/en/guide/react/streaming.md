@@ -1,9 +1,9 @@
 ---
-title: Streaming Markdown in React
+title: Streaming rendering - Fluxdown React
 description: Render streaming Markdown in React with Fluxdown. Connect accumulated text, repair unfinished syntax, and configure smooth output and animation.
 ---
 
-# Streaming Markdown in React {#streaming-content}
+# Streaming rendering - Fluxdown React {#streaming-content}
 
 A streaming integration needs two things: the complete text received so far and whether generation is still in progress. Fluxdown manages the presentation, while you keep using your preferred request library.
 

@@ -1,4 +1,4 @@
-# Quick start
+# Quick start - Fluxdown Core {#quick-start}
 
 `@fluxdown/core` turns changing Markdown into content blocks you can subscribe to. It is framework independent and works without a browser. You decide whether each block becomes a component, data, or another kind of output.
 
@@ -79,7 +79,7 @@ There are three parts to this example:
 - `BlocksRenderer` decides the output format. Here it preserves content blocks; an app could return components for its target framework.
 - `core` connects input and output. `core.value.value` is the current output list, and `block.value.value` is a block's current HAST.
 
-`S` and `render` create this reactive data flow. `D` passes the renderer class as a plain value. All three come from [stative](../../stative/index.md).
+`S` and `render` create this reactive data flow. `D` passes the renderer class as a plain value. All three come from [Stative](../../stative/index.md).
 
 ## What is included
 

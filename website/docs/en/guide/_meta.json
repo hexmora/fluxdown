@@ -1,8 +1,15 @@
 [
   {
-    "type": "file",
-    "name": "index",
-    "label": "Meet Fluxdown"
+    "type": "custom-link",
+    "label": "Meet Fluxdown",
+    "link": "/guide/index.html",
+    "collapsed": true,
+    "items": [
+      {
+        "label": "Architecture",
+        "link": "/guide/architecture.html"
+      }
+    ]
   },
   {
     "type": "dir",

@@ -1,4 +1,4 @@
-# Lynx Markdown
+# Lynx Markdown migration guide - Fluxdown React Lynx {#lynx-markdown}
 
 This guide covers Lynx's official [`<markdown>` native element](https://github.com/lynx-family/lynx-website/blob/main/docs/en/api/elements/built-in/markdown.mdx). For basic rendering, replace `content` with `text`. Styles, events, and native selection features need separate adapters.
 

@@ -1,4 +1,4 @@
-# svelte-markdown
+# svelte-markdown 迁移指南 - Fluxdown Svelte {#svelte-markdown}
 
 将 `SvelteMarkdown` 的字符串 `source` 交给 Fluxdown 的 `text` 即可开始迁移。Fluxdown 使用 Svelte 5；旧项目需要先确认框架版本。
 

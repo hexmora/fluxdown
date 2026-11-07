@@ -1,4 +1,4 @@
-# Render plugins
+# Render plugins - Fluxdown Angular {#render-plugins}
 
 Render plugins convert HAST nodes into Angular rendering descriptions and choose which slot handles each node. Slot plugins provide the styling and interactions.
 

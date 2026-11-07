@@ -1,9 +1,9 @@
 ---
-title: Angular Markdown 渲染器
+title: 快速开始 - Fluxdown Angular
 description: 在 Angular 项目中接入 Fluxdown 独立组件，渲染 Markdown 与流式文本。了解安装、模板输入，以及主题和插件的使用方式。
 ---
 
-# Angular Markdown 渲染器快速开始 {#快速开始}
+# 快速开始 - Fluxdown Angular {#快速开始}
 
 Fluxdown 为 Angular 提供独立组件。它基于同一个 Core，支持静态内容、流式修复、平滑输出和末尾效果，用主题与插件调整呈现方式。
 

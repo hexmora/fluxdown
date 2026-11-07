@@ -1,4 +1,4 @@
-# Styling guide
+# Styling guide - Fluxdown Taro {#styling-guide}
 
 Use a theme to match your app's colors, typography, and spacing, then use container styles for layout. For components and interactions, use [slot plugins](./plugins/slot.md).
 

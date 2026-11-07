@@ -1,4 +1,4 @@
-# Styling
+# Styling - Fluxdown Vue Lynx {#styling}
 
 Use Vue `class` and `style` bindings for the outer Lynx `view`, and `theme` for content colors and typography.
 

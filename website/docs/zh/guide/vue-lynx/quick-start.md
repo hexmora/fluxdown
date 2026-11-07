@@ -1,9 +1,9 @@
 ---
-title: Vue Lynx Markdown 渲染器
+title: 快速开始 - Fluxdown Vue Lynx
 description: 在 Vue Lynx 项目中使用 Fluxdown，以 Lynx 原生元素渲染 Markdown，并接入流式内容。
 ---
 
-# Vue Lynx 快速开始 {#quick-start}
+# 快速开始 - Fluxdown Vue Lynx {#quick-start}
 
 Vue Lynx 版 Fluxdown 将 Markdown 渲染为 Lynx 的 `text`、`view` 等元素。它使用与 React Lynx 相同的 Core 流程和原生样式，并提供 Vue 组件、响应式 props 和可替换插槽。
 

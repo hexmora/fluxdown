@@ -1,4 +1,4 @@
-# State and derived values
+# State and derived values - Stative {#state-and-derived-values}
 
 Keep the data you actively change in state, and derive the values you can calculate. That gives every value a clear source.
 

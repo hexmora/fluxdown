@@ -1,4 +1,4 @@
-# react-native-enriched-markdown
+# react-native-enriched-markdown 迁移指南 - Fluxdown React Native {#react-native-enriched-markdown}
 
 这篇指南迁移 `EnrichedMarkdownText` 的 Markdown 展示部分。Fluxdown 负责渲染，不替代富文本输入框；项目中的 `EnrichedMarkdownTextInput` 可以继续保留。
 

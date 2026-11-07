@@ -1,4 +1,4 @@
-# Render 插件
+# Render 插件 - Fluxdown Svelte {#render-插件}
 
 Render 插件将 HAST 节点转换为 Svelte 渲染描述，决定哪些内容交给哪个插槽。插槽本身的样式和交互由 slot 插件负责。
 

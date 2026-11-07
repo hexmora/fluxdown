@@ -1,4 +1,4 @@
-# markdown-it
+# markdown-it 迁移指南 - Fluxdown Core {#markdown-it}
 
 markdown-it 通常把 Markdown 转成 HTML 字符串；Core 则保留可订阅的内容块，方便持续更新。迁移时，先确定下游仍需要 HTML，还是准备接入自己的渲染器。
 

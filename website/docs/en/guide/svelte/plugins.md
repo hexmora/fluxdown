@@ -1,4 +1,4 @@
-# Plugins
+# Plugins - Fluxdown Svelte {#plugins}
 
 Plugins divide the content pipeline into stages. Start with slots to change components and interactions. Use render plugins to change which slots a node uses. Core plugins handle parsing, repair and streaming transforms.
 

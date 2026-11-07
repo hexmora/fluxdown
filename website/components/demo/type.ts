@@ -23,6 +23,8 @@ export type DemoControls = {
 export type DemoTiming = {
   duration?: number;
 
+  steps?: number;
+
   chunks: readonly number[];
 
   delays: readonly number[];

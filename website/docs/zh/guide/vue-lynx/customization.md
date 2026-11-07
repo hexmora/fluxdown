@@ -1,4 +1,4 @@
-# 样式指南
+# 样式指南 - Fluxdown Vue Lynx {#样式指南}
 
 使用 Vue `class`、`style` 绑定设置外层 Lynx `view`，通过 `theme` 调整内容颜色和字体。
 

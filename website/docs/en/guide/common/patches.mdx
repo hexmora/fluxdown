@@ -1,0 +1,74 @@
+import {
+  StaticPatchesDemo,
+  StreamingPatchesDemo,
+} from '../../../../components/demo/components/patches-demo';
+
+# Positional inserts - Fluxdown {#positional-inserts}
+
+An answer may need a source reference. A shared document may need a person's name to open their profile. That information belongs to your application and may not be part of the Markdown.
+
+Use `patches` to insert content at a source position or replace a short range with your own component. The Markdown stays unchanged, and your application controls the buttons, links, and labels it adds.
+
+## Turn a range into a component
+
+This example replaces `@Ada` with a button that opens a profile. Turn off “Profile card” to see the original text.
+
+<StaticPatchesDemo />
+
+Give the replacement a start and end position, then return the content from `render`. For example, in React:
+
+```tsx
+<Fluxdown
+  text="Hello, @Ada."
+  patches={[
+    {
+      key: 'person-ada',
+      range: [7, 11],
+      render: (text) => <button onClick={openProfile}>{text}</button>,
+    },
+  ]}
+/>
+```
+
+`[7, 11]` selects `@Ada`: the start is included and the end is excluded. `render` receives the replaced text; your application supplies `openProfile`. `render` can also return an existing profile component, status label, or link.
+
+To add a source marker beside the text, pass a single position instead:
+
+```tsx
+const text = 'Start with the project handbook.';
+
+<Fluxdown
+  text={text}
+  patches={[
+    { key: 'source-1', range: text.length, render: () => <sup>[1]</sup> },
+  ]}
+/>;
+```
+
+This inserts `[1]` at the end of the sentence without removing its final period.
+
+## Appear with the streaming text
+
+Sources often arrive separately from the answer. Once you know a reference's position, you can pass its patch before the text reaches it. The marker appears when that position becomes available.
+
+<StreamingPatchesDemo />
+
+Pause or replay the answer, or click `[1]` to read its source. This demo disables smoothing and entrance effects to make the timing easy to see. Patches also work with [smoothing](./streaming-effects/smoothing.mdx).
+
+The insertion point stays fixed as more text arrives. A replacement range needs its end position to have arrived too; a patch outside the current source is ignored until then. Sources can arrive late as well: updating `patches` adds them to text already on screen.
+
+## Find the position
+
+Positions start at `0` in the complete Markdown string passed to Fluxdown. Spaces, newlines, and syntax such as `**` count too, following JavaScript string indexing. Use `indexOf` to find a target and its `length` to calculate the end. This also avoids counting emoji by their visible length.
+
+While streaming, `text` still contains **all the text received so far**. Appending leaves earlier indexes unchanged. Editing text before a reference means its position needs to be recalculated. If the target is missing, leave that patch out for now.
+
+Keep replacement ranges within a single run of ordinary text. Avoid crossing paragraphs or the boundaries of bold text and links, and keep replacement ranges from overlapping. Use the relevant rendering plugin to customize code blocks rather than replacing text inside code.
+
+## When to use patches
+
+Patches suit content with a known position, such as reference ranges returned by a server or text selected by a reader. Give each patch a stable `key` so it can be updated or removed later.
+
+For changes such as styling every link or adding a copy button to every code block, use [slots](../react/plugins/slot.md). Slots apply by element type and don't require individual source positions.
+
+The `range` rules are shared across frameworks; `render` returns content for the chosen framework. See the complete fields in the [React](../react/configuration.md#patches), [Vue](../vue/configuration.md#patches), or [Core](../core/configuration.md#patches) configuration reference.

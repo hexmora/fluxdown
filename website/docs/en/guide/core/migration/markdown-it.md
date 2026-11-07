@@ -1,4 +1,4 @@
-# markdown-it
+# markdown-it migration guide - Fluxdown Core {#markdown-it}
 
 markdown-it usually turns Markdown into an HTML string. Core keeps subscribable content blocks so they can update over time. Start by deciding whether consumers still need HTML or will use your own renderer.
 

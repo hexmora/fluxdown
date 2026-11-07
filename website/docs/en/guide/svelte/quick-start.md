@@ -1,9 +1,9 @@
 ---
-title: Svelte Markdown Renderer
+title: Quick start - Fluxdown Svelte
 description: Use Fluxdown in Svelte 5 or SvelteKit to render Markdown and streaming text. Install the component and choose Full, Lite, or Raw to fit your app.
 ---
 
-# Svelte Markdown renderer quick start {#quick-start}
+# Quick start - Fluxdown Svelte {#quick-start}
 
 The Svelte component builds on Core with syntax repair, smooth streaming and replaceable rendering slots. It uses Svelte 5 and works in existing Svelte and SvelteKit projects.
 
