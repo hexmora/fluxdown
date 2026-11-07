@@ -1,4 +1,4 @@
-# Configuration
+# Configuration - Fluxdown Core {#configuration}
 
 `CoreInputs<R, C>` describes Core's public inputs. `R` is the output produced by your renderer; `C` is any additional context it gives render plugins. All fields are collected on this page so you can jump to them from the table of contents.
 

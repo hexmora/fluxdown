@@ -1,4 +1,4 @@
-# Marked
+# Marked 迁移指南 - Fluxdown Core {#marked}
 
 把 Marked 接入 Core，主要变化是从一次返回 HTML，改为持有一组可更新的内容块。如果只是要在应用里显示 Markdown，可以直接选择[对应框架的渲染器](../../common/features/renderers.mdx)。本页适合需要自己处理输出的项目。
 

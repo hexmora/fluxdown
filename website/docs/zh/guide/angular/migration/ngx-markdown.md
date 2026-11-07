@@ -1,4 +1,4 @@
-# ngx-markdown
+# ngx-markdown 迁移指南 - Fluxdown Angular {#ngx-markdown}
 
 将 `<markdown [data]="text">` 换成 `<fluxdown [text]="text" />`，即可迁移普通展示。Fluxdown 当前需要 Angular 22；较旧的项目应先处理框架版本兼容。
 

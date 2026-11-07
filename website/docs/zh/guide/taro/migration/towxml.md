@@ -1,4 +1,4 @@
-# Towxml
+# Towxml 迁移指南 - Fluxdown Taro {#towxml}
 
 在 Taro React 项目中，将 Towxml 的“解析成节点，再交给小程序组件”改为直接传入 Markdown。本文迁移 Markdown 展示；如果同一页面还用 Towxml 展示 HTML，需要单独保留或适配那部分。
 

@@ -1,4 +1,4 @@
-# Styling
+# Styling - Fluxdown Angular {#styling}
 
 Themes control Markdown colors, fonts, and spacing. An outer container controls page layout. Use [slot plugins](./plugins/slot.md) to change components or interactions.
 

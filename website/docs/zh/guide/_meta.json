@@ -1,8 +1,15 @@
 [
   {
-    "type": "file",
-    "name": "index",
-    "label": "认识 Fluxdown"
+    "type": "custom-link",
+    "label": "认识 Fluxdown",
+    "link": "/zh/guide/index.html",
+    "collapsed": true,
+    "items": [
+      {
+        "label": "架构介绍",
+        "link": "/guide/architecture.html"
+      }
+    ]
   },
   {
     "type": "dir",

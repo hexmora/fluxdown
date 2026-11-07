@@ -1,4 +1,4 @@
-# Slot plugins
+# Slot plugins - Fluxdown Vue {#slot-plugins}
 
 Slot plugins render components. Content such as code, links and headings is already prepared; you choose its presentation and interactions.
 

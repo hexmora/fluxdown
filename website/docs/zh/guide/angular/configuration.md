@@ -1,4 +1,4 @@
-# 自定义配置
+# 自定义配置 - Fluxdown Angular {#自定义配置}
 
 本页列出 Angular 组件的公开 inputs。除 `text` 外，顶层属性均可省略；`FluxdownRaw` 还需要显式传入 `plugins`。Full、Lite 和 Raw 的其他字段一致。
 

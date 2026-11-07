@@ -1,4 +1,4 @@
-# Slot 插件
+# Slot 插件 - Fluxdown Uni App {#slot-插件}
 
 Slot 插件决定内容的具体外观与交互。保留内置 Markdown 解析与 render，只替换对应的 `.uvue` 组件，适合调整引用块、链接或代码工具栏。
 

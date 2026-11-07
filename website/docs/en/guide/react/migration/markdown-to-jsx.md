@@ -1,4 +1,4 @@
-# markdown-to-jsx
+# markdown-to-jsx migration guide - Fluxdown React {#markdown-to-jsx}
 
 Ordinary Markdown can go straight to Fluxdown when migrating from [markdown-to-jsx](https://github.com/quantizor/markdown-to-jsx). If your content embeds custom React tags, first decide how those components will be rendered.
 

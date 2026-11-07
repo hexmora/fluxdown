@@ -1,4 +1,4 @@
-# Configuration
+# Configuration - Fluxdown React {#configuration}
 
 This page lists the public `Fluxdown` props. Only `text` is required at the top level.
 

@@ -1,4 +1,4 @@
-# Using and writing plugins
+# Using and writing plugins - Fluxdown React Native {#using-and-writing-plugins}
 
 Plugins work at different stages of content processing. Start with slots to change components and interactions, or use render plugins to choose which slots nodes use. Core plugins handle parsing, repairs, and streaming transformations.
 

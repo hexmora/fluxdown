@@ -1,0 +1,43 @@
+.accelerator {
+  position: relative;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--site-accent);
+    outline-offset: -2px;
+  }
+
+  .hint {
+    position: absolute;
+    z-index: 1;
+    bottom: 12px;
+    left: 50%;
+    padding: 4px 10px;
+    border: 1px solid var(--site-line);
+    border-radius: 20px;
+    background: var(--site-surface);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+    color: var(--site-muted);
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 5px);
+    transition:
+      opacity 160ms ease,
+      transform 160ms ease;
+  }
+
+  &:is(:hover, :focus-visible) .hint {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hint {
+      transition: none;
+      transform: translate(-50%, 0);
+    }
+  }
+}

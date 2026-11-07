@@ -1,4 +1,4 @@
-# Lifecycle
+# Lifecycle - Stative {#lifecycle}
 
 A state flow should live as long as the feature using it. Stative cleans up the children managed by a closure, and external resources can share that lifecycle.
 

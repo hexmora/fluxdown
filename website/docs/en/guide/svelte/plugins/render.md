@@ -1,4 +1,4 @@
-# Render plugins
+# Render plugins - Fluxdown Svelte {#render-plugins}
 
 Render plugins turn HAST nodes into Svelte render descriptions and select the slots used for each node. Slot plugins provide their appearance and interactions.
 

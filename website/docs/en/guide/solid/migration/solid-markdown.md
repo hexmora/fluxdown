@@ -1,4 +1,4 @@
-# solid-markdown
+# solid-markdown migration guide - Fluxdown Solid {#solid-markdown}
 
 Move `SolidMarkdown`'s `children` to Fluxdown's `text` and keep existing signals and request logic. The target component requires Solid 1.9 or a later 1.x release.
 

@@ -1,4 +1,4 @@
-# Plugin packs
+# Plugin packs - Fluxdown Svelte {#plugin-packs}
 
 An `IPluginItem` groups the slot, render and Core plugins needed for a feature. Your application can enable them together by passing one object.
 

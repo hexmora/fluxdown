@@ -1,4 +1,4 @@
-# Getting started
+# Quick start - Stative {#getting-started}
 
 Build an order total that follows changes in quantity to learn Stative's most common operations.
 

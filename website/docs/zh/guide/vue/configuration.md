@@ -1,4 +1,4 @@
-# 自定义配置
+# 自定义配置 - Fluxdown Vue {#自定义配置}
 
 本页列出 Vue 组件 `Fluxdown` 的公开属性与透传 attributes。除 `text` 外，顶层属性均可省略；`FluxdownRaw` 还需要显式传入 `plugins`。Full、Lite 和 Raw 的其他字段一致。
 

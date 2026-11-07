@@ -1,0 +1,148 @@
+.equation {
+  margin: 18px 0;
+  text-align: center;
+}
+
+.demo {
+  margin: 24px 0;
+  border: 1px solid var(--site-line);
+  border-radius: 10px;
+  overflow: hidden;
+  color: var(--site-ink);
+  background: var(--site-surface);
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--site-line);
+    font-size: 12px;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+
+    > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+
+      &::before {
+        content: "";
+        width: 18px;
+        border-top: 2px solid currentColor;
+      }
+    }
+  }
+
+  .received {
+    color: var(--site-muted);
+  }
+
+  .legend > .received::before {
+    border-top-style: dashed;
+  }
+
+  .visible {
+    color: var(--site-accent);
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    padding: 5px 10px;
+    border: 1px solid var(--site-line);
+    border-radius: 6px;
+    color: inherit;
+    background: var(--site-surface);
+    font: inherit;
+    cursor: pointer;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      background: var(--site-inset);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--site-accent);
+      outline-offset: 3px;
+    }
+  }
+
+  > svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 16px 12px 10px;
+  }
+
+  .grid {
+    line {
+      stroke: var(--site-line);
+      stroke-width: 1;
+    }
+
+    text {
+      fill: var(--site-muted);
+      font-size: 11px;
+    }
+  }
+
+  .axis {
+    fill: var(--site-muted);
+    font-size: 11px;
+  }
+
+  .targetLine,
+  .visibleLine {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .targetLine {
+    stroke: var(--site-muted);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 4;
+  }
+
+  .visibleLine {
+    stroke: var(--site-accent);
+    stroke-width: 2;
+  }
+
+  .targetDot {
+    fill: var(--site-muted);
+  }
+
+  .visibleDot {
+    fill: var(--site-accent);
+  }
+
+  @media (max-width: 480px) {
+    .toolbar {
+      padding-inline: 14px;
+    }
+
+    > svg {
+      padding-inline: 2px;
+    }
+
+    .axis,
+    .grid text {
+      font-size: 20px;
+    }
+  }
+}

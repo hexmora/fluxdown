@@ -1,4 +1,4 @@
-# Slot plugins
+# Slot plugins - Fluxdown React Native {#slot-plugins}
 
 Slot plugins render slots. Content such as code, links, and headings is already prepared; you decide which components and interactions readers see. Start here for most interface changes.
 

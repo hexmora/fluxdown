@@ -20,6 +20,19 @@ const frameworks = [
   'taro',
   'uni-app',
 ];
+const scopes: Record<string, string> = {
+  react: 'Fluxdown React',
+  vue: 'Fluxdown Vue',
+  svelte: 'Fluxdown Svelte',
+  angular: 'Fluxdown Angular',
+  'react-native': 'Fluxdown React Native',
+  'react-lynx': 'Fluxdown React Lynx',
+  'vue-lynx': 'Fluxdown Vue Lynx',
+  solid: 'Fluxdown Solid',
+  taro: 'Fluxdown Taro',
+  'uni-app': 'Fluxdown Uni App',
+  core: 'Fluxdown Core',
+};
 
 function decode(value: string): string {
   const entities: Record<string, string> = {
@@ -154,6 +167,64 @@ assert.deepEqual(
   'The sitemap must contain every indexable built page and no other URLs',
 );
 
+const sidebarTargets = new Set<string>();
+let articles = 0;
+
+for (const [url, page] of pages) {
+  for (const match of page.html.matchAll(/<a\b[^>]*>/gi)) {
+    const link = attributes(match[0]);
+    if (!link.class?.split(/\s+/).includes('rp-sidebar-item') || !link.href) continue;
+
+    const target = new URL(link.href, url);
+    if (target.origin !== site.origin) continue;
+
+    target.search = '';
+    target.hash = '';
+    if (target.pathname.endsWith('/')) target.pathname += 'index.html';
+    assert.ok(pages.has(target.href), `${url}: sidebar link has no built page: ${link.href}`);
+    sidebarTargets.add(target.href);
+  }
+
+  const route = new URL(url).pathname.replace(/^\/(?:zh\/)?/, '');
+  if (!route.startsWith('guide/') && !route.startsWith('stative/')) continue;
+
+  const heading = page.html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+  assert.ok(heading, `${url}: article is missing its H1`);
+  const headingText = decode(
+    heading[1]
+      .replace(/<a\b[^>]*class=(["'])[^"']*\brp-header-anchor\b[^"']*\1[^>]*>[\s\S]*?<\/a>/gi, '')
+      .replace(/<[^>]+>/g, ''),
+  ).trim();
+  const scope = route.startsWith('stative/')
+    ? 'Stative'
+    : (scopes[route.split('/')[1]] ?? 'Fluxdown');
+  const suffix = ` - ${scope}`;
+  const articleName = headingText.endsWith(suffix)
+    ? headingText.slice(0, -suffix.length)
+    : headingText;
+  const brand = scope === 'Stative' ? /\bStative\b/ : /\bFluxdown\b/;
+  if (brand.test(articleName)) {
+    assert.equal(headingText, articleName, `${url}: H1 must not repeat the library name`);
+  } else {
+    assert.ok(headingText.endsWith(suffix), `${url}: H1 must end with "${suffix}"`);
+  }
+  const title = page.head.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
+  assert.equal(
+    title && decode(title[1]).trim(),
+    headingText,
+    `${url}: browser title must match the article title`,
+  );
+  if (route.includes('/migration/')) {
+    assert.ok(
+      new URL(url).pathname.startsWith('/zh/')
+        ? headingText.includes(' 迁移指南 - ')
+        : headingText.includes(' migration guide - '),
+      `${url}: migration title must name the source library and migration guide`,
+    );
+  }
+  articles += 1;
+}
+
 const routes = [
   'index.html',
   ...frameworks.flatMap((framework) => [
@@ -175,7 +246,19 @@ for (const route of routes) {
     const titleTags = [...page.head.matchAll(/<title\b[^>]*>([\s\S]*?)<\/title>/gi)];
     assert.equal(titleTags.length, 1, `${url}: expected exactly one title`);
     const title = decode(titleTags[0][1]).trim();
-    assert.ok(/markdown/i.test(title), `${url}: title must identify Markdown content`);
+    if (route === 'index.html') {
+      assert.ok(/markdown/i.test(title), `${url}: home title must identify Markdown content`);
+    } else {
+      const names = route.endsWith('/quick-start.html')
+        ? { zh: '快速开始', en: 'Quick start' }
+        : { zh: '流式渲染', en: 'Streaming rendering' };
+      const article = locale === 'zh' ? names.zh : names.en;
+      assert.equal(
+        title,
+        `${article} - ${scopes[route.split('/')[1]]}`,
+        `${url}: incorrect scoped article title`,
+      );
+    }
     assert.ok(/fluxdown/i.test(title), `${url}: title must identify Fluxdown`);
     const framework = route.split('/')[1]?.replace('-', ' ');
     assert.ok(
@@ -188,6 +271,10 @@ for (const route of routes) {
     const descriptions = page.meta.filter((item) => item.name === 'description');
     assert.equal(descriptions.length, 1, `${url}: expected exactly one description`);
     assert.ok(descriptions[0].content?.trim(), `${url}: empty description`);
+    assert.ok(
+      /markdown/i.test(descriptions[0].content),
+      `${url}: description must identify Markdown content`,
+    );
     const htmlTag = page.html.match(/<html\b[^>]*>/i)?.[0] ?? '';
     assert.equal(attributes(htmlTag).lang, locale, `${url}: incorrect HTML language`);
 
@@ -207,5 +294,5 @@ for (const route of routes) {
 }
 
 process.stdout.write(
-  `Verified ${pages.size} canonical sitemap pages, SEO metadata for ${titles.size} priority pages, ${redirects.size} legacy redirects, and noindex for iframe demos.\n`,
+  `Verified ${pages.size} canonical sitemap pages, ${articles} article titles, ${sidebarTargets.size} sidebar destinations, SEO metadata for ${titles.size} priority pages, ${redirects.size} legacy redirects, and noindex for iframe demos.\n`,
 );

@@ -9,6 +9,7 @@ export const createBottomScroll = (
   content: HTMLElement,
   reducedMotion: boolean,
   getMode: () => BottomScrollMode = () => 'active',
+  onWrite?: () => void,
 ) => {
   const bottom = () => Math.max(0, viewport.scrollHeight - viewport.clientHeight);
   const atBottom = () => bottom() - viewport.scrollTop <= BOTTOM_TOLERANCE;
@@ -67,6 +68,7 @@ export const createBottomScroll = (
     viewport.scrollTop = top;
     // Scroll events arrive later; record our write before they can look like user input.
     lastTop = viewport.scrollTop;
+    onWrite?.();
   };
 
   const tick = (time: number) => {

@@ -3,7 +3,7 @@ import type { DemoTiming } from './type';
 export const createDemoFrames = (source: string, timing: DemoTiming) => {
   const segments = new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(source);
   const ends = Array.from(segments, ({ index, segment }) => index + segment.length);
-  const count = Math.min(60, ends.length);
+  const count = Math.min(timing.steps ?? 60, ends.length);
   const weights = Array.from(
     { length: count },
     (_, index) => timing.chunks[index % timing.chunks.length],

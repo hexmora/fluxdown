@@ -1,0 +1,133 @@
+.patches {
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 54px;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--site-line);
+    color: var(--site-muted);
+    font-size: 12px;
+  }
+
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--site-ink);
+    cursor: pointer;
+
+    input {
+      accent-color: var(--site-accent);
+    }
+  }
+
+  .source {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--site-line);
+    color: var(--site-muted);
+    font-size: 12px;
+    line-height: 1.7;
+
+    code {
+      padding: 0;
+      background: transparent;
+      color: var(--site-ink);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .preview {
+    padding: 24px;
+  }
+
+  .streaming {
+    min-height: 220px;
+  }
+
+  .person,
+  .citation {
+    border: 1px solid color-mix(in srgb, var(--site-accent) 25%, transparent);
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--site-accent) 8%, transparent);
+    color: var(--site-accent);
+    font: inherit;
+    cursor: pointer;
+
+    &:hover,
+    &[aria-expanded="true"] {
+      background: color-mix(in srgb, var(--site-accent) 16%, transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--site-accent);
+      outline-offset: 3px;
+    }
+  }
+
+  .person {
+    padding: 1px 7px;
+  }
+
+  .citation {
+    margin-inline: 3px;
+    padding: 0 5px;
+    font-size: 11px;
+    line-height: 1.8;
+    vertical-align: super;
+  }
+
+  .status {
+    margin: 0;
+    padding: 0 24px 20px;
+    color: var(--site-muted);
+    font-size: 12px;
+  }
+
+  .detail {
+    margin: 0 24px 24px;
+    padding: 14px 16px;
+    border-left: 2px solid var(--site-accent);
+    border-radius: 0 5px 5px 0;
+    background: var(--site-inset);
+    font-size: 13px;
+    line-height: 1.7;
+
+    span {
+      margin-inline-start: 10px;
+      color: var(--site-muted);
+      font-size: 12px;
+    }
+
+    p {
+      margin: 4px 0 0;
+      color: var(--site-muted);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .toolbar,
+    .source,
+    .preview {
+      padding-inline: 18px;
+    }
+
+    .streaming {
+      min-height: 280px;
+    }
+
+    .status {
+      padding-inline: 18px;
+    }
+
+    .detail {
+      margin-inline: 18px;
+    }
+  }
+}

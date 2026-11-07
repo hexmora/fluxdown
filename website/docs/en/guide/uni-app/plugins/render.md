@@ -1,4 +1,4 @@
-# Render plugins
+# Render plugins - Fluxdown Uni App {#render-plugins}
 
 Render plugins convert HAST nodes into Uni App render descriptions. Each description contains a slot name, props, and children for the `.uvue` components to display. Prefer [Slot plugins](./slot.md) when only the presentation needs to change.
 

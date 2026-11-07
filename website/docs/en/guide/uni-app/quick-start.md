@@ -1,9 +1,9 @@
 ---
-title: Uni App Markdown Renderer
+title: Quick start - Fluxdown Uni App
 description: Add Fluxdown to a Uni App x Vapor project. Render Markdown in a .uvue component, connect streaming text, and customize the output with themes and plugins.
 ---
 
-# Uni App Markdown renderer quick start {#quick-start}
+# Quick start - Fluxdown Uni App {#quick-start}
 
 `@fluxdown/uni-app` provides Markdown components for Uni App x Vapor projects. Fluxdown Core handles parsing, syntax repair, and smooth output; `.uvue` components provide the interface.
 

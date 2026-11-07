@@ -1,4 +1,4 @@
-# Streamdown
+# Streamdown migration guide - Fluxdown React {#streamdown}
 
 When migrating from [Streamdown](https://streamdown.ai/docs/usage), keep your existing data stream and message state. Pass Markdown through `text`, then adapt plugins, styling, and interactions.
 

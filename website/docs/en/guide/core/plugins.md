@@ -1,4 +1,4 @@
-# Using and writing plugins
+# Using and writing plugins - Fluxdown Core {#using-and-writing-plugins}
 
 Plugins extend one stage of Core's content pipeline. Choose the stage that owns the behavior you want to change:
 

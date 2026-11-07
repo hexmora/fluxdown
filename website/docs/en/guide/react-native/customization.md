@@ -1,4 +1,4 @@
-# Styling guide
+# Styling guide - Fluxdown React Native {#styling-guide}
 
 The native component uses React Native styles. Use `style` for the outer layout and `theme` for the content's colors and typography.
 

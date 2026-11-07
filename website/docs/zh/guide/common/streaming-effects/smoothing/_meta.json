@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "ticker",
+    "label": "节奏器"
+  },
+  {
+    "type": "file",
+    "name": "scheduler",
+    "label": "追踪器"
+  }
+]

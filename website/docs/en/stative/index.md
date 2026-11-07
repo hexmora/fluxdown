@@ -1,8 +1,8 @@
-# Meet Stative
+# Meet Stative {#meet-stative}
 
-**Organize state flows into modules, just as React organizes the DOM.**
+**State is to Stative what components are to React.**
 
-Stative is a reactive state library, independent of any UI framework. Describe how your computations depend on their inputs, and the results follow those inputs as they change.
+React organizes interfaces into components. Stative organizes reactive state and state flows into modules you can compose and reuse. Describe how your computations depend on their inputs, and the results follow those inputs as they change.
 
 Use it to break connected data processing into small, reusable pieces: price calculations in a form, content analysis in an editor, or a streaming text pipeline. Fluxdown Core is built on Stative.
 
@@ -45,7 +45,7 @@ Start with a plain function for simple calculations. Use `once` or a class when 
 
 ## Learn as you go
 
-- [Getting started](./getting-started): create, observe, and update your first state flow.
+- [Quick start](./getting-started): create, observe, and update your first state flow.
 - [State and derived values](./state-and-derived): combine inputs, batch updates, and skip repeated work.
 - [Composing computations](./composition): package a state flow into a reusable closure.
 - [Lifecycle](./lifecycle): clean up subscriptions, timers, and child computations together.

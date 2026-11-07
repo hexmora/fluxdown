@@ -1,4 +1,4 @@
-# vue-markdown-render
+# vue-markdown-render migration guide - Fluxdown Vue {#vue-markdown-render}
 
 For a basic view, rename `source` to `text` and keep the existing reactive data. Review `markdown-it` options and plugins separately.
 

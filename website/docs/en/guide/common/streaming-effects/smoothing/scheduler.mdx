@@ -1,0 +1,93 @@
+import { SchedulerDemo } from '../../../../../../components/demo/components/smoothing-controls-demo';
+
+# Scheduler - Fluxdown {#scheduler}
+
+Received content is ahead; visible content follows. The scheduler decides how the visible position catches up. New content moves the target forward, and each [ticker](./ticker.mdx) event asks how far to advance.
+
+The default spring scheduler adjusts its speed to the distance. It accelerates when more content is waiting and slows near the end. That works well for most chat interfaces. Replace it when you need a different rule, such as a fixed step on every tick.
+
+## Compare two ways to catch up
+
+Both sides update every `80 ms`. The left uses a spring; the right advances by a fixed number of units. Change the step size to see how each handles a pause followed by a new burst of text.
+
+The Received bar advances as each batch arrives. Between batches, the text below can keep unfolding. Click the output area to bring the next batch forward.
+
+<SchedulerDemo />
+
+A unit means a piece of visible content: in this sample, roughly a character. Markdown markers such as `**` do not count. With a fixed step, frequency also affects speed: two units per tick at about 12.5 ticks per second gives about 25 units per second.
+
+## Write a fixed-step scheduler
+
+`BaseSmoothScheduler` already tracks the target. We only need to track our current position and return the distance to advance on each tick:
+
+```ts
+import { BaseSmoothScheduler } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+
+class StepScheduler extends BaseSmoothScheduler {
+  protected readonly defaultTuple = [2];
+  private position = 0;
+
+  override get idle() {
+    return this.position >= this.fullIndex;
+  }
+
+  override reset(index = 0) {
+    super.reset(index);
+    this.position = index;
+  }
+
+  start(_timestamp: number, index = 0) {
+    this.reset(index);
+  }
+
+  override resume(_timestamp: number) {}
+
+  tick(_timestamp: number) {
+    const [step = 2] = this.tuple;
+    const distance = Math.min(step, this.fullIndex - this.position);
+    this.position += distance;
+    return distance;
+  }
+}
+```
+
+The inherited `push()` adds arriving content to the target. `tick()` returns a distance, capped at the target, rather than an absolute position. Once caught up, `idle` tells Fluxdown it can stop the ticker. `reset()` handles content resets. This example does not use elapsed time, so `resume()` has no timing to restore.
+
+## Use it in streaming
+
+Pass the class to `scheduler`. This example also fixes the ticker interval, giving the demo's two-unit step every `80 ms`:
+
+```tsx
+import { IntervalSmoothTicker } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Fluxdown } from 'fluxdown';
+
+class SteadyTicker extends IntervalSmoothTicker {
+  constructor() {
+    super(80);
+  }
+}
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        smooth: {
+          enabled: true,
+          ticker: SteadyTicker,
+          scheduler: StepScheduler,
+        },
+        effect: false,
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+Place both classes in the same module as the component. As with a ticker, pass a class and let Fluxdown manage an instance for each piece of content. The scheduler also works with other frameworks or directly with Core's `Smooth` mapper.
+
+## When to keep the spring
+
+A fixed step is predictable, but a large backlog still takes time to reveal at that same pace. Keep the default `'spring'` when you want responses of different lengths to catch up promptly.
+
+For a more advanced custom scheduler, use the timestamp passed to `tick(timestamp)` to calculate progress from actual elapsed time. Carry fractional progress into the next tick. That keeps the speed steadier as the frame rate changes. If internal velocity still needs to settle after reaching the target, leave `idle` as `false` until those updates finish.

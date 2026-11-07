@@ -1,4 +1,4 @@
-# Composing computations
+# Composing computations - Stative {#composing-computations}
 
 A **state closure** brings together inputs, a computation, and the lifetime of its children. Stative offers three declaration forms. All three can be created with `render(S([Declaration, inputs]))` or described with JSX.
 

@@ -1,4 +1,4 @@
-# 自定义配置
+# 自定义配置 - Fluxdown Solid {#自定义配置}
 
 本页列出 Solid 组件 `Fluxdown` 的公开属性。除 `text` 外，顶层属性均可省略；`FluxdownRaw` 还需要显式传入 `plugins`。Full、Lite 和 Raw 的其他字段一致。
 

@@ -1,4 +1,4 @@
-# Render 插件
+# Render 插件 - Fluxdown Vue {#render-插件}
 
 Render 插件将 HAST 节点渲染成插槽，决定哪些内容交给哪个组件。插槽的样式与交互由 slot 插件负责。
 

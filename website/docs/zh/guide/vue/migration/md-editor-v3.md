@@ -1,4 +1,4 @@
-# md-editor-v3
+# md-editor-v3 迁移指南 - Fluxdown Vue {#md-editor-v3}
 
 把 `MdPreview` 换成 Fluxdown，就可以继续使用原来的 Markdown 数据。`MdEditor` 的编辑、上传和保存功能仍由编辑器负责；这里只迁移阅读区域。
 

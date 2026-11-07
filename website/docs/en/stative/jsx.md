@@ -1,4 +1,4 @@
-# Using JSX
+# Using JSX - Stative {#using-jsx}
 
 JSX and `S` describe the same thing: connecting existing closures into a new state flow. JSX makes the composition read like a tree, especially when inputs contain other computations or callbacks.
 

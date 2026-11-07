@@ -1,4 +1,4 @@
-# Towxml
+# Towxml migration guide - Fluxdown Taro {#towxml}
 
 In a Taro React app, replace Towxml's parse-then-render flow with a component that accepts Markdown directly. This guide covers Markdown display. Keep or adapt any separate use of Towxml for HTML.
 

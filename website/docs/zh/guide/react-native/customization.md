@@ -1,4 +1,4 @@
-# 样式指南
+# 样式指南 - Fluxdown React Native {#样式指南}
 
 外部布局交给 `style`，内容内部的颜色与排版交给 `theme`。
 

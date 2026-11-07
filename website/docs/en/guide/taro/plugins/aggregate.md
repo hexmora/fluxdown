@@ -1,4 +1,4 @@
-# Composite plugins
+# Composite plugins - Fluxdown Taro {#composite-plugins}
 
 A composite plugin uses `IPluginItem` to group the slot, render, and Core plugins needed for one feature. Pass one object to enable the whole feature.
 

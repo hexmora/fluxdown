@@ -1,4 +1,4 @@
-# Configuration
+# Configuration - Fluxdown Taro {#configuration}
 
 Basic usage follows [React](../react/configuration.md). The table links to the full reference for each prop; Taro's `style` usage is covered below.
 

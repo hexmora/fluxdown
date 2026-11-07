@@ -1,4 +1,4 @@
-# Streamdown
+# Streamdown 迁移指南 - Fluxdown React {#streamdown}
 
 从 [Streamdown](https://streamdown.ai/docs/usage) 迁移时，可以保留现有的数据流和消息状态。先把 Markdown 改为传入 `text`，再调整插件、主题和交互。
 

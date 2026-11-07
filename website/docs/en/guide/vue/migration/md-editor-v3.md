@@ -1,4 +1,4 @@
-# md-editor-v3
+# md-editor-v3 migration guide - Fluxdown Vue {#md-editor-v3}
 
 Replace `MdPreview` with Fluxdown and keep the same Markdown data. Editing, uploads, and saving still belong to `MdEditor`; this guide covers the reading view.
 

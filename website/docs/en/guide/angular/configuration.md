@@ -1,4 +1,4 @@
-# Configuration
+# Configuration - Fluxdown Angular {#configuration}
 
 This page lists the Angular components’ public inputs. Only `text` is required; `FluxdownRaw` also requires `plugins`. The remaining inputs are the same for Full, Lite, and Raw.
 

@@ -1,4 +1,4 @@
-# Styling
+# Styling - Fluxdown Svelte {#styling}
 
 Use `class` and `style` for outer layout, and `theme` for colors and typography inside the content.
 

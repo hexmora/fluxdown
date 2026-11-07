@@ -1,9 +1,9 @@
 ---
-title: Streaming Markdown in Uni App
+title: Streaming rendering - Fluxdown Uni App
 description: Stream Markdown in Uni App x with reactive text and Fluxdown. Connect an async iterator, configure syntax repair and effects, and keep message state separate.
 ---
 
-# Streaming Markdown in Uni App {#streaming-content}
+# Streaming rendering - Fluxdown Uni App {#streaming-content}
 
 Append incoming chunks to a reactive string and pass it to `text`. `streaming` controls unfinished syntax repair, smooth output and trailing effects.
 

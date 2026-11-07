@@ -1,4 +1,4 @@
-# Marked
+# Marked migration guide - Fluxdown Core {#marked}
 
 Moving from Marked to Core changes the output from a single HTML result to a set of updatable content blocks. If you only need to display Markdown in an app, use the [renderer for your framework](../../common/features/renderers.mdx). This guide is for projects that manage their own output.
 
