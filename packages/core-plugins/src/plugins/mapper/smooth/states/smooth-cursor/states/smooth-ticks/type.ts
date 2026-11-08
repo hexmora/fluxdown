@@ -1,20 +1,20 @@
 import type { IReadableClosure } from 'stative';
 
-import type { SmoothTickerClass } from '../../../../type';
+import type { SmoothDriverClass } from '../../../../type';
 import type { BlockRevision } from '../block-revisions';
 
-export interface SmoothTickerInputs {
+export interface SmoothDriverInputs {
   /**
-   * Whether newly appended content advances on ticker events.
+   * Whether newly appended content advances on driver events.
    */
   enabled: IReadableClosure<boolean>;
 
   /**
    * Constructor used to supply animation timestamps.
    */
-  ticker: IReadableClosure<SmoothTickerClass>;
+  driver: IReadableClosure<SmoothDriverClass>;
 }
 
-export interface SmoothTicksInputs extends SmoothTickerInputs {
+export interface SmoothTicksInputs extends SmoothDriverInputs {
   revisions: IReadableClosure<BlockRevision[]>;
 }

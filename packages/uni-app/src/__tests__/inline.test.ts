@@ -18,7 +18,12 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { toState } from 'stative';
 import { defineComponent, h } from 'vue';
 
-import { createShadRoot } from '../../../core-plugins/src/plugins/mapper/shad/utils';
+import type { ShadCharacter } from '../../../core-plugins/src/plugins/mapper/shad/utils';
+
+import {
+  createShadRoot,
+  FadeConcurrency,
+} from '../../../core-plugins/src/plugins/mapper/shad/utils';
 import { renderParentChildren } from '../components/block-reconciler/utils';
 import { FluxdownLite } from '../packs/lite';
 import { getText } from './utils/text';
@@ -46,27 +51,43 @@ const renderRoot = (root: Root) => {
   );
 };
 
-test('retains one emphasized word when core shad partitions and releases its source element', async () => {
-  const emphasis: Element = {
-    type: 'element',
-    tagName: 'em',
-    properties: {},
-    children: [{ type: 'text', value: 'italic' }],
-    position: {
-      start: { line: 1, column: 8, offset: 7 },
-      end: { line: 1, column: 16, offset: 15 },
-    },
+test('retains one emphasized word while core shad fades it in across batches', async () => {
+  const createSource = (italic: string): { emphasis: Element; root: Root } => {
+    const emphasis: Element = {
+      type: 'element',
+      tagName: 'em',
+      properties: {},
+      children: [{ type: 'text', value: italic }],
+      position: {
+        start: { line: 1, column: 8, offset: 7 },
+        end: { line: 1, column: 16, offset: 15 },
+      },
+    };
+
+    return {
+      emphasis,
+      root: { type: 'root', children: [{ type: 'text', value: 'before ' }, emphasis] },
+    };
   };
 
-  const source: Root = {
-    type: 'root',
-    children: [{ type: 'text', value: 'before ' }, emphasis],
+  const concurrency = new FadeConcurrency();
+
+  let characters: ShadCharacter[] = [];
+
+  const mapped = (italic: string, start: number) => {
+    const result = createShadRoot(
+      createSource(italic).root,
+      characters,
+      { initial: false, start, length: 6, duration: 400 },
+      concurrency,
+    );
+
+    characters = result.characters;
+
+    return renderRoot(result.root);
   };
 
-  const mapped = (activeLength: number) =>
-    renderRoot(createShadRoot({ root: source, length: 6, activeLength }));
-
-  const wrapper = mount(Harness, { props: { nodes: mapped(1) } });
+  const wrapper = mount(Harness, { props: { nodes: mapped('i', 0) } });
 
   await flushPromises();
 
@@ -82,7 +103,9 @@ test('retains one emphasized word when core shad partitions and releases its sou
 
   expect(styled.findAll('.fluxdown-inline-text')).toHaveLength(1);
 
-  for (const nodes of [mapped(3), mapped(6), renderRoot(source)]) {
+  const { emphasis, root } = createSource('italic');
+
+  for (const nodes of [mapped('ita', 100), mapped('italic', 200), renderRoot(root)]) {
     await wrapper.setProps({ nodes });
 
     expect(wrapper.findAllComponents(Component)).toHaveLength(1);
@@ -149,148 +172,19 @@ test('keeps the strong component and bold word while streamed closing markers ar
   }
 });
 
-test('bounds historical block masks while preserving every native word drawing', async () => {
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-
-  vi.spyOn(uni, 'getElementById').mockReturnValue({
-    getBoundingClientRectAsync: async () => ({ width: 32, height: 24 }),
-  } as unknown as UniElement);
-
-  const wrapper = mount(FluxdownLite, {
-    props: { text: 'fir', streaming: { smooth: false, effect: 'shad' } },
-  });
-
-  await flushPromises();
-
-  await wrapper.setProps({ text: 'first' });
-
-  await flushPromises();
-
-  const first = wrapper.get('.fluxdown-masked-text').element;
-
-  const prefix = wrapper.get('.fluxdown-masked-text__prefix text').element;
-
-  vi.advanceTimersByTime(201);
-
-  await flushPromises();
-
-  expect(wrapper.get('.fluxdown-masked-text').element).toBe(first);
-
-  await wrapper.setProps({ text: 'firsts' });
-
-  await flushPromises();
-
-  expect(wrapper.get('.fluxdown-masked-text').element).toBe(first);
-
-  for (const [index, text] of ['firsts\n\nsecond', 'firsts\n\nsecond\n\nthird'].entries()) {
-    await wrapper.setProps({ text });
-
-    await flushPromises();
-
-    vi.advanceTimersByTime(201);
-
-    await flushPromises();
-
-    const masks = wrapper.findAll('.fluxdown-masked-text');
-
-    expect(masks).toHaveLength(index + 2);
-
-    expect(masks[0].element).toBe(first);
-
-    expect(masks[0].get('.fluxdown-masked-text__prefix text').element).toBe(prefix);
-
-    expect(masks.every((mask) => !mask.find('.fluxdown-masked-text__active').exists())).toBe(true);
-
-    expect(
-      masks.every(
-        (mask) =>
-          mask.get<HTMLElement>('.fluxdown-masked-text__prefix').element.style.width === '32px',
-      ),
-    ).toBe(true);
-
-    expect(getText(wrapper.element)).toBe(text.replaceAll('\n', ''));
-  }
-});
-
-test('retires a closed styled window without replacing its opaque prefix', async () => {
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-
-  vi.spyOn(uni, 'getElementById').mockReturnValue({
-    getBoundingClientRectAsync: async () => ({ width: 32, height: 24 }),
-  } as unknown as UniElement);
-
-  const wrapper = mount(FluxdownLite, {
-    props: { text: '**bo', streaming: { smooth: false, effect: 'shad' } },
-  });
-
-  await flushPromises();
-
-  await wrapper.setProps({ text: '**bold**' });
-
-  await flushPromises();
-
-  const Component = new StrongSlotPlugin().Component;
-
-  const strong = wrapper.getComponent(Component);
-
-  const instance = strong.vm.$;
-
-  const prefix = strong.get('.fluxdown-masked-text__prefix text').element;
-
-  expect(strong.find('.fluxdown-masked-text').exists()).toBe(true);
-
-  vi.advanceTimersByTime(201);
-
-  await flushPromises();
-
-  expect(strong.find('.fluxdown-masked-text').exists()).toBe(true);
-
-  await wrapper.setProps({ text: '**bold** next' });
-
-  await flushPromises();
-
-  vi.advanceTimersByTime(201);
-
-  await flushPromises();
-
-  expect(wrapper.getComponent(Component).vm.$).toBe(instance);
-
-  expect(strong.find('.fluxdown-masked-text').exists()).toBe(true);
-
-  expect(strong.get('.fluxdown-masked-text__prefix text').element).toBe(prefix);
-
-  expect(strong.find('.fluxdown-masked-text__active').exists()).toBe(false);
-
-  const masks = wrapper.findAll('.fluxdown-masked-text');
-
-  expect(masks.every((mask) => !mask.find('.fluxdown-masked-text__active').exists())).toBe(true);
-
-  expect(getText(wrapper.element)).toBe('bold next');
-});
-
 test.each([
-  {
-    name: 'list',
-    selector: '.fluxdown-list',
-    before: '- fir',
-    active: '- first',
-    next: '- first\n- next',
-  },
+  { name: 'paragraph', before: 'fir', active: 'first', next: 'first\n\nnext' },
+  { name: 'list', before: '- fir', active: '- first', next: '- first\n- next' },
   {
     name: 'table',
-    selector: '.fluxdown-table',
     before: '| Name |\n| --- |\n| fir |',
     active: '| Name |\n| --- |\n| first |',
     next: '| Name |\n| --- |\n| first |\n| next |',
   },
 ])(
-  'retires a completed $name window while retaining its prefix when a new block begins',
-  async ({ selector, before, active, next }) => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-
-    vi.spyOn(uni, 'getElementById').mockReturnValue({
-      getBoundingClientRectAsync: async () => ({ width: 32, height: 24 }),
-    } as unknown as UniElement);
+  'keeps a faded $name word on its native drawing when a new block begins',
+  async ({ before, active, next }) => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1000);
 
     const wrapper = mount(FluxdownLite, {
       props: { text: before, streaming: { smooth: false, effect: 'shad' } },
@@ -298,49 +192,27 @@ test.each([
 
     await flushPromises();
 
+    now.mockReturnValue(1100);
+
     await wrapper.setProps({ text: active });
 
     await flushPromises();
 
-    expect(wrapper.find(`${selector} .fluxdown-masked-text`).exists()).toBe(true);
+    const word = wrapper
+      .findAll('.fluxdown-inline-text')
+      .find((item) => getText(item.element).startsWith('first'))!.element;
 
-    const prefix = wrapper.get(`${selector} .fluxdown-masked-text__prefix text`).element;
+    // Long after the fade has finished, the settled word keeps its host and drawing.
+    now.mockReturnValue(5000);
 
     await wrapper.setProps({ text: next });
 
     await flushPromises();
 
-    vi.advanceTimersByTime(201);
+    const words = wrapper.findAll('.fluxdown-inline-text');
 
-    await flushPromises();
+    expect(words.map((item) => item.element)).toContain(word);
 
-    const masks = wrapper.findAll(`${selector} .fluxdown-masked-text`);
-
-    expect(masks).toHaveLength(2);
-
-    expect(masks[0].get('.fluxdown-masked-text__prefix text').element).toBe(prefix);
-
-    expect(masks.every((mask) => !mask.find('.fluxdown-masked-text__active').exists())).toBe(true);
-
-    expect(masks.map((mask) => mask.get('.fluxdown-masked-text__prefix text').text())).toEqual([
-      'first\u200b',
-      'next\u200b',
-    ]);
-
-    await wrapper.setProps({ text: `${next}\n\nafter` });
-
-    await flushPromises();
-
-    vi.advanceTimersByTime(201);
-
-    await flushPromises();
-
-    expect(wrapper.findAll(`${selector} .fluxdown-masked-text`)).toHaveLength(2);
-
-    expect(wrapper.get(`${selector} .fluxdown-masked-text__prefix text`).element).toBe(prefix);
-
-    expect(wrapper.find(`${selector} .fluxdown-masked-text__active`).exists()).toBe(false);
-
-    expect(wrapper.findAll('.fluxdown-masked-text')).toHaveLength(3);
+    expect(getText(wrapper.element)).toContain('next');
   },
 );

@@ -1,178 +1,232 @@
-import { random } from 'lodash-es';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import type { SmoothStreamingProps } from './type';
+import type { ChunkPacing, SmoothStreamingProps } from './type';
 
+import { useResolvedTheme } from '../../../.storybook/theme-addon';
 import { Fluxdown } from '../../../src/packs/full';
-import { SMOOTH_MARKDOWN } from './consts';
+import { StreamingLabControls, StreamingLabInspector, useStreamingLab } from '../streaming-lab';
+import { Button, NumberField, Panel, PanelGroup } from '../ui';
+import { DEFAULT_PACING, SMOOTH_MARKDOWN } from './consts';
+import { createChunkPlan } from './utils';
 import '../playground/style.scss';
 
-export const SmoothStreaming = ({ initialText = SMOOTH_MARKDOWN }: SmoothStreamingProps) => {
-  const [cursor, setCursor] = useState(0);
+export const SmoothStreaming = ({
+  initialText = SMOOTH_MARKDOWN,
+  initialSettings,
+  title = 'Smooth streaming',
+}: SmoothStreamingProps) => {
+  const lab = useStreamingLab(initialSettings);
+
+  const theme = useResolvedTheme();
+
+  const [pacing, setPacing] = useState(DEFAULT_PACING);
+
+  const [step, setStep] = useState(0);
 
   const [playing, setPlaying] = useState(false);
 
-  const [shad, setShad] = useState(true);
+  const plan = useMemo(() => createChunkPlan(initialText.length, pacing), [initialText, pacing]);
 
-  const [shadLength, setShadLength] = useState(10);
+  const complete = step >= plan.length;
 
-  const [maskWidth, setMaskWidth] = useState(15);
+  const received = step === 0 ? 0 : (plan[step - 1]?.end ?? initialText.length);
 
-  const complete = cursor >= initialText.length;
+  const previous = step <= 1 ? 0 : (plan[step - 2]?.end ?? 0);
 
-  const text = initialText.slice(0, cursor);
+  const text = initialText.slice(0, received);
 
   const status = complete
     ? 'Input complete'
     : playing
       ? 'Streaming'
-      : cursor > 0
+      : step > 0
         ? 'Paused'
         : 'Ready';
 
+  const { speed } = lab.settings;
+
+  const delay = plan[step]?.delay;
+
   useEffect(() => {
-    if (!playing || complete) {
+    if (!playing || delay === undefined) {
       return;
     }
 
-    const timer = window.setTimeout(
-      () => {
-        setCursor((current) => Math.min(current + random(1, 24), initialText.length));
-      },
-      random(50, 350),
-    );
+    // Arrivals slow down with the animation clock, so the whole timeline plays in slow motion.
+    const timer = window.setTimeout(() => setStep((current) => current + 1), delay / speed);
 
     return () => window.clearTimeout(timer);
-  }, [complete, cursor, initialText.length, playing]);
+  }, [delay, playing, speed, step]);
+
+  const restart = (next: ChunkPacing) => {
+    lab.inspector.clear();
+
+    setPacing(next);
+
+    setStep(0);
+
+    setPlaying(false);
+  };
+
+  const updatePacing = (patch: Partial<ChunkPacing>) => restart({ ...pacing, ...patch });
 
   const handlePlay = () => {
     if (complete) {
-      setCursor(0);
+      lab.inspector.clear();
+
+      setStep(0);
     }
 
     setPlaying(true);
   };
 
-  const handlePause = () => {
+  const handleNextChunk = () => {
     setPlaying(false);
+
+    setStep((current) => Math.min(plan.length, current + 1));
   };
 
-  const handleReset = () => {
+  const handleFlush = () => {
     setPlaying(false);
 
-    setCursor(0);
+    setStep(plan.length);
   };
 
   return (
-    <main className="playground-shell">
-      <header className="playground-header">
-        <div>
-          <p className="playground-eyebrow">Fluxdown workshop</p>
+    <main className="playground">
+      <header className="playground-toolbar">
+        <h1>{title}</h1>
 
-          <h1>Smooth Streaming</h1>
-        </div>
-
-        <span aria-live="polite" className="playground-status">
+        <span
+          aria-live="polite"
+          className="playground-status"
+          data-state={playing && !complete ? 'live' : undefined}
+        >
           {status}
         </span>
-      </header>
 
-      <section aria-label="Streaming controls" className="playground-deck">
-        <fieldset className="playground-settings">
-          <legend>Randomized chunks</legend>
-
-          <span>1–24 characters arrive every 50–350 ms.</span>
-
-          <label>
-            <input
-              aria-label="Shad"
-              checked={shad}
-              onChange={(event) => setShad(event.currentTarget.checked)}
-              type="checkbox"
-            />
-            Shad
-          </label>
-        </fieldset>
+        <span className="playground-meta">
+          Chunk {step}/{plan.length}
+        </span>
 
         <div className="playground-actions">
-          <button
-            className="playground-primary"
-            disabled={(playing && !complete) || initialText.length === 0}
-            onClick={handlePlay}
-            type="button"
-          >
-            Play
-          </button>
+          <Button disabled={playing && !complete} onClick={handlePlay} primary>
+            {complete && step > 0 ? 'Replay' : 'Play'}
+          </Button>
 
-          <button disabled={!playing || complete} onClick={handlePause} type="button">
+          <Button disabled={!playing || complete} onClick={() => setPlaying(false)}>
             Pause
-          </button>
+          </Button>
 
-          <button onClick={handleReset} type="button">
-            Reset
-          </button>
+          <Button disabled={complete} onClick={handleNextChunk}>
+            Next chunk
+          </Button>
+
+          <Button disabled={complete} onClick={handleFlush}>
+            Deliver all
+          </Button>
+
+          <Button onClick={() => restart(pacing)}>Reset</Button>
         </div>
+      </header>
 
-        <div className="playground-transport">
-          <label>
-            Shad length
-            <input
-              aria-label="Shad length"
-              max={12}
-              min={0}
-              onChange={(event) => setShadLength(Number(event.currentTarget.value))}
-              type="range"
-              value={shadLength}
+      <div className="playground-body">
+        <Panel label="Streaming settings">
+          <PanelGroup
+            actions={
+              <Button
+                onClick={() => updatePacing({ seed: Math.floor(Math.random() * 100_000) })}
+                title="Draw a new random chunk plan"
+              >
+                New seed
+              </Button>
+            }
+            title="Chunks"
+          >
+            <NumberField
+              label="Min size"
+              max={pacing.maxSize}
+              min={1}
+              onChange={(minSize) => updatePacing({ minSize })}
+              unit="chars"
+              value={pacing.minSize}
             />
-            <output>{shadLength} chars</output>
-          </label>
 
-          <label>
-            Mask width
-            <input
-              aria-label="Mask width"
-              max={40}
-              min={0}
-              onChange={(event) => setMaskWidth(Number(event.currentTarget.value))}
-              type="range"
-              value={maskWidth}
+            <NumberField
+              label="Max size"
+              max={200}
+              min={pacing.minSize}
+              onChange={(maxSize) => updatePacing({ maxSize })}
+              unit="chars"
+              value={pacing.maxSize}
             />
-            <output>{maskWidth} px</output>
-          </label>
+
+            <NumberField
+              label="Min delay"
+              max={pacing.maxDelay}
+              min={0}
+              onChange={(minDelay) => updatePacing({ minDelay })}
+              step={10}
+              unit="ms"
+              value={pacing.minDelay}
+            />
+
+            <NumberField
+              label="Max delay"
+              max={5000}
+              min={pacing.minDelay}
+              onChange={(maxDelay) => updatePacing({ maxDelay })}
+              step={10}
+              unit="ms"
+              value={pacing.maxDelay}
+            />
+
+            <NumberField
+              label="Seed"
+              min={0}
+              onChange={(seed) => updatePacing({ seed })}
+              value={pacing.seed}
+            />
+          </PanelGroup>
+
+          <StreamingLabControls lab={lab} />
+
+          <StreamingLabInspector lab={lab} />
+        </Panel>
+
+        <div className="playground-workspace">
+          <section aria-label="Incoming Markdown" className="playground-pane">
+            <div className="playground-pane-heading">
+              <h2>Incoming chunks</h2>
+
+              <span className="playground-meta">
+                {received}/{initialText.length} chars received
+              </span>
+            </div>
+
+            <pre aria-label="Markdown stream" className="playground-source">
+              <span>{initialText.slice(0, previous)}</span>
+
+              <span className="playground-latest" key={step}>
+                {initialText.slice(previous, received)}
+              </span>
+
+              <span className="playground-unplayed">{initialText.slice(received)}</span>
+            </pre>
+          </section>
+
+          <section aria-label="Smooth preview" className="playground-pane">
+            <div className="playground-pane-heading">
+              <h2>Smoothed render</h2>
+
+              <span className="playground-meta">Visible units follow the spring</span>
+            </div>
+
+            <div className="playground-preview-content">
+              <Fluxdown streaming={lab.streaming} text={text} theme={theme} />
+            </div>
+          </section>
         </div>
-      </section>
-
-      <div className="playground-workspace">
-        <section aria-label="Incoming Markdown" className="playground-panel playground-editor">
-          <div className="playground-panel-heading">
-            <h2>Incoming chunks</h2>
-
-            <span>
-              {cursor}/{initialText.length} chars received
-            </span>
-          </div>
-
-          <pre aria-label="Markdown stream" className="playground-playback-source">
-            <span>{text}</span>
-
-            <span className="playground-unplayed">{initialText.slice(cursor)}</span>
-          </pre>
-        </section>
-
-        <section aria-label="Smooth preview" className="playground-panel playground-preview">
-          <div className="playground-panel-heading">
-            <h2>Smoothed render</h2>
-
-            <span>Gradual reveal</span>
-          </div>
-
-          <div className="playground-preview-content">
-            <Fluxdown
-              streaming={{ effect: ['shad', { enabled: shad, length: shadLength, maskWidth }] }}
-              text={text}
-            />
-          </div>
-        </section>
       </div>
     </main>
   );

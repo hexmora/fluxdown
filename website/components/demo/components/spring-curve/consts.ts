@@ -7,7 +7,7 @@ export const COPY = {
     seconds: '时间（秒）',
     replay: '重新播放',
     description:
-      '阶梯线在收到新片段时上升。平滑曲线显示真实弹簧追踪器的进度，并始终停在接收目标以内。',
+      '阶梯线在收到新片段时上升。平滑曲线显示真实弹簧插值的进度，并始终停在接收目标以内。',
   },
   en: {
     label: 'Received content and spring reveal progress',
@@ -17,6 +17,6 @@ export const COPY = {
     seconds: 'Time (seconds)',
     replay: 'Replay',
     description:
-      'The stepped line rises when a batch arrives. The smooth line follows the real spring scheduler and never passes the received target.',
+      'The stepped line rises when a batch arrives. The smooth line follows the real spring interpolation and never passes the received target.',
   },
 };

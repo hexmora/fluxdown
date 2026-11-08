@@ -18,12 +18,17 @@ const scale = computed(() =>
 const progress = useAppear(() => {
   const effect = props.node.effect;
 
-  return effect?.type === 'chunk' ? effect : { start: -1, duration: 0 };
+  return effect?.type === 'chunk' || effect?.type === 'shad' ? effect : { start: -1, duration: 0 };
 });
+
+// Shad fades linearly so the tail reads as an even gradient at a steady pace.
+const opacity = computed(() =>
+  props.node.effect?.type === 'shad' ? progress.value : EASE_OUT(progress.value),
+);
 
 const style = computed(() => ({
   ...props.textStyle,
-  opacity: EASE_OUT(progress.value) * Number(props.textStyle.opacity ?? 1),
+  opacity: opacity.value * Number(props.textStyle.opacity ?? 1),
 }));
 </script>
 

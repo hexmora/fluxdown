@@ -39,13 +39,13 @@
 
 **类型:** `boolean | SmoothConfig` · **默认值:** `true`
 
-让新增内容逐步显示。`true` 使用内置弹簧调度；`false` 直接显示已收到的内容。传对象可以指定时钟和调度方式：
+让新增内容逐步显示。`true` 使用内置弹簧插值，并自动选择可用的驱动；`false` 直接显示已收到的内容。传对象可以指定驱动和插值方式：
 
 ```html
 <fluxdown
   [text]="text()"
   [streaming]="{
-    smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+    smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
   }"
 />
 ```
@@ -56,19 +56,19 @@
 
 使用 `smooth` 对象时，显式设为 `true` 开启平滑输出。
 
-### smooth.ticker {#smoothticker}
+### smooth.driver {#smoothdriver}
 
-**类型:** `'raf' | 'interval' | SmoothTickerClass` · **对象形式必选**
+**类型:** `'raf' | 'interval' | SmoothDriverClass` · **默认值:** 支持动画帧时为 `'raf'`，否则为 `'interval'`
 
-`raf` 跟随动画帧，`interval` 使用定时器，也可以传自定义时钟类。
+选择驱动输出的时钟：`raf` 跟随动画帧，`interval` 使用定时器，也可以传自定义驱动类。
 
-### smooth.scheduler {#smoothscheduler}
+### smooth.interpolation {#smoothinterpolation}
 
-**类型:** `'spring' | SmoothSchedulerClass` · **对象形式必选**
+**类型:** `'spring' | SmoothInterpolatorClass` · **默认值:** `'spring'`
 
-决定每次更新显示多少内容。`spring` 使用内置弹簧调度，也可以传自定义调度类。
+把经过的时间换算成显示进度。`spring` 使用内置的弹簧精确解，也可以传自定义插值类。
 
-> `SmoothTickerClass` 和 `SmoothSchedulerClass` 从 `@fluxdown/core-plugins/plugins/mapper/smooth` 导入。通常使用 `smooth: true` 即可。
+> `SmoothDriverClass` 和 `SmoothInterpolatorClass` 从 `@fluxdown/core-plugins/plugins/mapper/smooth` 导入。通常使用 `smooth: true` 即可。旧名称 `ticker` 和 `scheduler` 在下一个版本前仍可使用，但已弃用。
 
 ### streaming.effect {#streamingeffect}
 

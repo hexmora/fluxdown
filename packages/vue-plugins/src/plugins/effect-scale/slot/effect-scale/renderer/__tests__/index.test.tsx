@@ -59,29 +59,36 @@ describe('streaming effect renderers', () => {
     wrapper.unmount();
   });
 
-  test('uses pixel widths for the shad mask without changing text flow', async () => {
-    const wrapper = mount(ShadRenderer, {
-      props: { leading: 'stable ', active: 'tail', isActive: true, maskWidth: 64 },
+  test('resumes a shad fade from its own start time and settles once it has finished', () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1100);
+
+    const running = mount(ShadRenderer, {
+      props: { start: 1000, duration: 400, children: 'tail' },
     });
 
-    const mask = wrapper.get('[aria-hidden="true"]').element as HTMLElement;
+    const element = running.element as HTMLElement;
 
-    expect(mask.style.width).toBe('64px');
+    expect(running.attributes('data-fluxdown-shad')).toBe('fade');
 
-    expect(mask.style.marginLeft).toBe('-64px');
+    expect(running.classes().some((name) => name.includes('active'))).toBe(true);
 
-    expect(wrapper.text()).toBe('stable tail');
+    expect(element.style.animationDelay).toBe('-100ms');
 
-    await wrapper.setProps({ isActive: false });
+    expect(element.style.getPropertyValue(`--${PREFIX}-shad-duration`)).toBe('400ms');
 
-    expect(
-      wrapper
-        .get('[aria-hidden="true"]')
-        .classes()
-        .some((name) => name.includes('maskHidden')),
-    ).toBe(true);
+    expect(running.text()).toBe('tail');
 
-    wrapper.unmount();
+    running.unmount();
+
+    now.mockReturnValue(1500);
+
+    const settled = mount(ShadRenderer, {
+      props: { start: 1000, duration: 400, children: 'tail' },
+    });
+
+    expect(settled.classes().some((name) => name.includes('active'))).toBe(false);
+
+    settled.unmount();
   });
 
   test.each(['cursor', 'dot', 'custom'] as const)('marks %s suffix as decorative', (type) => {

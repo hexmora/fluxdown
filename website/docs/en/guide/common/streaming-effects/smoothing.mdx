@@ -20,27 +20,27 @@ When a chunk arrives, the buffer grows first and the visible boundary follows. P
 
 ## Smoothing with spring mechanics
 
-Imagine a spring pulling the visible position toward the received content. As new content moves the target forward, the gap stretches the spring. A larger gap produces a stronger pull:
+Imagine a spring pulling the visible position toward the received content. As new content moves the target forward, the gap stretches the spring, and a damper resists the motion:
 
 <SpringEquation />
 
-Here, `r` is the target, `x` the current position, `k` the spring stiffness, and `m` the mass. Distance changes the force, which changes the velocity. The position does not jump simply because the target has moved.
+Here, `r` is the target, `x` the current position, `v` its velocity, `k` the spring stiffness, `c` the damping, and `m` the mass. Distance changes the force, which changes the velocity. The position does not jump simply because the target has moved.
 
-Fluxdown uses this idea to track reveal progress. A large batch increases the gap, so output accelerates. Each update keeps the previous velocity, connecting one burst to the next. The implementation also adjusts the pulling target using a small buffer and limits the minimum and maximum speed. Speed can fall near the end and continues to decay after catching up. The visible position only moves forward and never passes the received content.
+Fluxdown uses this idea to track reveal progress. A large batch increases the gap, so output accelerates; near the end it slows down and, critically damped by default, settles without passing the received content. When new content arrives, the spring keeps its current position and velocity and starts pulling toward the new end, so one burst flows into the next.
 
 <SpringCurve />
 
-> The stepped line shows content arriving in batches; the curve shows visible progress. The curve is sampled directly from the current `SpringSmoothScheduler`. When the steps pause, the visible position keeps catching up. Replay to watch what happens each time the gap grows.
+> The stepped line shows content arriving in batches; the curve shows visible progress. The curve is sampled directly from the current `SpringSmoothInterpolator`. When the steps pause, the visible position keeps catching up. Replay to watch what happens each time the gap grows.
 
-This suits an uneven stream: small arrivals can join the existing pace, while a large backlog encourages the output to catch up. The scheduler calculates progress from elapsed time, without a fixed delay for each character.
+The interpolator computes the position from elapsed time with the spring's exact solution, not by stepping frame by frame. The result does not depend on the frame rate, and no error builds up over a long response. Text can advance between network updates, without a fixed delay for every character.
 
 ## Two parts of smoothing
 
-Smoothing has two parts: a [ticker](./smoothing/ticker.mdx) decides when to update, and a [scheduler](./smoothing/scheduler.mdx) decides how far to advance.
+Smoothing has two parts: a [driver](./smoothing/driver.mdx) decides when to update, and an [interpolation](./smoothing/interpolation.mdx) decides how far to advance.
 
 <SmoothingPartsDiagram />
 
-> At the 160 ms tick, the target is 8. The scheduler advances the visible position by 2, from 3 to 5. The ticker decides when to update; the scheduler decides how far to move.
+> At the 160 ms tick, the target is 8. The interpolation advances the visible position by 2, from 3 to 5. The driver decides when to update; the interpolation decides how far to move.
 
 The defaults suit most streams. Replace either part when you need a fixed interval, a fixed step, or a host-specific clock. Both guides include comparisons and working examples.
 
@@ -206,16 +206,16 @@ defineProps<MessageProps>();
 
 </FrameworkCodeTabs>
 
-You can also select the scheduler explicitly and add an [animation effect](./animation/index.mdx):
+You can also select the interpolation explicitly and add an [animation effect](./animation/index.mdx):
 
 <FrameworkCodeTabs frameworks={['Core', 'React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
 
 ```ts
 import type { MapperPluggable } from '@fluxdown/core';
 import {
-  RafSmoothTicker,
+  RafSmoothDriver,
   Smooth,
-  SpringSmoothScheduler,
+  SpringSmoothInterpolator,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
 
@@ -224,8 +224,8 @@ const mappers: MapperPluggable[] = [
     Smooth,
     {
       enabled: true,
-      ticker: RafSmoothTicker,
-      scheduler: SpringSmoothScheduler,
+      driver: RafSmoothDriver,
+      interpolation: SpringSmoothInterpolator,
     },
   ],
   [Shad, { enabled: true }],
@@ -243,7 +243,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -262,7 +262,7 @@ defineProps<{ text: string }>();
 <template>
   <Fluxdown
     :streaming="{
-      smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+      smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
       effect: 'shad',
     }"
     :text="text"
@@ -283,7 +283,7 @@ defineProps<{ text: string }>();
 
 <Fluxdown
   streaming={{
-    smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+    smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
     effect: 'shad',
   }}
   {text}
@@ -305,7 +305,7 @@ export class Message {
   readonly text = input.required<string>();
 
   readonly streaming: StreamingConfig = {
-    smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+    smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
     effect: 'shad',
   };
 }
@@ -322,7 +322,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -342,7 +342,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -361,7 +361,7 @@ defineProps<{ text: string }>();
 <template>
   <Fluxdown
     :streaming="{
-      smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+      smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
       effect: 'shad',
     }"
     :text="text"
@@ -380,7 +380,7 @@ export function Message(props: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={props.text}
@@ -400,7 +400,7 @@ export function Message({ text }: MessageProps) {
   return (
     <Fluxdown
       streaming={{
-        smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+        smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
         effect: 'shad',
       }}
       text={text}
@@ -423,7 +423,7 @@ defineProps<MessageProps>();
 <template>
   <Fluxdown
     :streaming="{
-      smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' },
+      smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
       effect: 'shad',
     }"
     :text="text"

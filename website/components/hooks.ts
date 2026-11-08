@@ -15,7 +15,10 @@ export const useLocale = () => {
   };
 };
 
-export const useStream = (source: string, reducedMotion: boolean | null) => {
+/**
+ * Replay `source` in timed chunks. `rate` scales playback speed; 0.5 waits twice as long per chunk.
+ */
+export const useStream = (source: string, reducedMotion: boolean | null, rate = 1) => {
   const [stream, setStream] = useState<Stream>({
     source,
     frames: [],
@@ -55,10 +58,10 @@ export const useStream = (source: string, reducedMotion: boolean | null) => {
           playing: frame.end < source.length,
         };
       });
-    }, frame.delay);
+    }, frame.delay / rate);
 
     return () => window.clearTimeout(timer);
-  }, [playing, source.length, stream]);
+  }, [playing, rate, source.length, stream]);
 
   return {
     complete,

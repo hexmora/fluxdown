@@ -1,14 +1,14 @@
 import { batch } from 'stative';
 
 import { countStateObservers } from '../../../../../scripts/testing/state';
-import { StepSmoothScheduler } from '../utils/smooth';
+import { StepSmoothInterpolator } from '../utils/smooth';
 import {
   collectText,
   createBlock,
   firstBlock,
   latest,
   paragraph,
-  PrimarySmoothTicker,
+  PrimarySmoothDriver,
   resetSmoothTests,
   setupSmooth,
   visibleText,
@@ -17,12 +17,12 @@ import {
 beforeEach(resetSmoothTests);
 
 describe('Smooth ownership', () => {
-  test.each(['ticker start', 'scheduler constructor'] as const)(
+  test.each(['driver start', 'interpolation constructor'] as const)(
     'destroys owned resources after %s fails on the first content growth',
     (stage) => {
       const failure = new Error('Smooth initialization failed.');
 
-      class FailingTicker extends PrimarySmoothTicker {
+      class FailingDriver extends PrimarySmoothDriver {
         override start(): number {
           super.start();
 
@@ -30,7 +30,7 @@ describe('Smooth ownership', () => {
         }
       }
 
-      class FailingScheduler extends StepSmoothScheduler {
+      class FailingInterpolator extends StepSmoothInterpolator {
         constructor() {
           super();
 
@@ -42,17 +42,17 @@ describe('Smooth ownership', () => {
 
       const harness = setupSmooth([block.block]);
 
-      if (stage === 'ticker start') {
-        harness.ticker.next(FailingTicker);
+      if (stage === 'driver start') {
+        harness.driver.next(FailingDriver);
       } else {
-        harness.scheduler.next(FailingScheduler);
+        harness.interpolation.next(FailingInterpolator);
       }
 
       const error = jest.fn();
 
       harness.state.value.subscribe({ error });
 
-      if (stage === 'scheduler constructor') {
+      if (stage === 'interpolation constructor') {
         expect(() => block.source.next(paragraph('ready to stream'))).toThrow(failure);
       } else {
         block.source.next(paragraph('ready to stream'));
@@ -60,14 +60,14 @@ describe('Smooth ownership', () => {
         expect(error).toHaveBeenCalledTimes(1);
         expect(error).toHaveBeenCalledWith(failure);
 
-        expect(PrimarySmoothTicker.instances.every((ticker) => !ticker.running)).toBe(true);
+        expect(PrimarySmoothDriver.instances.every((driver) => !driver.running)).toBe(true);
       }
 
       harness.state.destroy();
 
       expect(countStateObservers(block.block.prevPrefixLength)).toBe(0);
 
-      expect(PrimarySmoothTicker.instances.every((ticker) => !ticker.running)).toBe(true);
+      expect(PrimarySmoothDriver.instances.every((driver) => !driver.running)).toBe(true);
 
       expect(block.source.closed).toBe(false);
     },
@@ -88,7 +88,7 @@ describe('Smooth ownership', () => {
 
     const fork = firstBlock(output.value);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     block.source.complete();
 
@@ -96,9 +96,9 @@ describe('Smooth ownership', () => {
 
     harness.enabled.complete();
 
-    harness.ticker.complete();
+    harness.driver.complete();
 
-    harness.scheduler.complete();
+    harness.interpolation.complete();
 
     expect(block.block.baseLength.closed).toBe(true);
 
@@ -106,19 +106,19 @@ describe('Smooth ownership', () => {
 
     expect(output.closed).toBe(false);
 
-    expect(ticker.running).toBe(true);
+    expect(driver.running).toBe(true);
 
     expect(complete).not.toHaveBeenCalled();
 
-    ticker.tick(16);
+    driver.tick(16);
 
-    ticker.tick(32);
+    driver.tick(32);
 
     expect(collectText(fork.value.value)).toBe('ab');
 
     expect(output.closed).toBe(false);
 
-    ticker.tick(48);
+    driver.tick(48);
 
     expect(collectText(fork.value.value)).toBe('abc');
 
@@ -126,7 +126,7 @@ describe('Smooth ownership', () => {
 
     expect(complete).toHaveBeenCalledTimes(1);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
     harness.state.destroy();
   });
@@ -162,12 +162,12 @@ describe('Smooth ownership', () => {
 
       harness.enabled.complete();
 
-      harness.ticker.complete();
+      harness.driver.complete();
 
-      harness.scheduler.complete();
+      harness.interpolation.complete();
     });
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     expect(visibleText(output.value)).toEqual(['a']);
 
@@ -175,15 +175,15 @@ describe('Smooth ownership', () => {
 
     expect(complete).not.toHaveBeenCalled();
 
-    expect(ticker.running).toBe(true);
+    expect(driver.running).toBe(true);
 
-    ticker.tick(16);
+    driver.tick(16);
 
     expect(visibleText(output.value)).toEqual(scenario.intermediate);
 
     expect(output.closed).toBe(false);
 
-    ticker.tick(32);
+    driver.tick(32);
 
     expect(visibleText(output.value)).toEqual(scenario.final);
 
@@ -191,13 +191,13 @@ describe('Smooth ownership', () => {
 
     expect(complete).toHaveBeenCalledTimes(1);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
-    expect(ticker.destroyCalls).toBe(1);
+    expect(driver.destroyCalls).toBe(1);
 
     harness.state.destroy();
 
-    expect(ticker.destroyCalls).toBe(1);
+    expect(driver.destroyCalls).toBe(1);
   });
 
   test.each([false, true])(
@@ -222,9 +222,9 @@ describe('Smooth ownership', () => {
 
         harness.enabled.complete();
 
-        harness.ticker.complete();
+        harness.driver.complete();
 
-        harness.scheduler.complete();
+        harness.interpolation.complete();
       });
 
       expect(visibleText(output.value)).toEqual(['ready']);
@@ -235,13 +235,13 @@ describe('Smooth ownership', () => {
 
       expect(complete).toHaveBeenCalledTimes(1);
 
-      expect(PrimarySmoothTicker.instances).toHaveLength(0);
+      expect(PrimarySmoothDriver.instances).toHaveLength(0);
 
-      expect(PrimarySmoothTicker.instances.every((ticker) => !ticker.running)).toBe(true);
+      expect(PrimarySmoothDriver.instances.every((driver) => !driver.running)).toBe(true);
 
       harness.state.destroy();
 
-      expect(PrimarySmoothTicker.instances.every((ticker) => ticker.destroyCalls === 1)).toBe(true);
+      expect(PrimarySmoothDriver.instances.every((driver) => driver.destroyCalls === 1)).toBe(true);
     },
   );
 
@@ -280,10 +280,10 @@ describe('Smooth ownership', () => {
 
     expect(visibleText(harness.state.value.value)).toEqual(['']);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     for (const time of [16, 32, 48]) {
-      ticker.tick(time);
+      driver.tick(time);
     }
 
     expect(visibleText(harness.state.value.value)).toEqual(['new']);
@@ -310,13 +310,13 @@ describe('Smooth ownership', () => {
 
     block.source.next(paragraph('value grows'));
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     const borrowed = [
       harness.source,
       harness.enabled,
-      harness.ticker,
-      harness.scheduler,
+      harness.driver,
+      harness.interpolation,
       block.block.prevPrefixLength,
     ];
 
@@ -328,9 +328,9 @@ describe('Smooth ownership', () => {
 
     expect(subscription.closed).toBe(true);
 
-    expect(ticker.destroyCalls).toBe(1);
+    expect(driver.destroyCalls).toBe(1);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
     expect(destroyFork).toHaveBeenCalledTimes(1);
 
@@ -353,16 +353,18 @@ describe('Smooth ownership', () => {
     const destroySource = jest.spyOn(block.block, 'destroy');
 
     expect(
-      [harness.source, harness.enabled, harness.ticker, harness.scheduler].map(countStateObservers),
+      [harness.source, harness.enabled, harness.driver, harness.interpolation].map(
+        countStateObservers,
+      ),
     ).toEqual([0, 0, 0, 0]);
 
     harness.state.destroy();
 
     harness.state.destroy();
 
-    expect(PrimarySmoothTicker.instances).toHaveLength(0);
+    expect(PrimarySmoothDriver.instances).toHaveLength(0);
 
-    expect(StepSmoothScheduler.instances).toHaveLength(0);
+    expect(StepSmoothInterpolator.instances).toHaveLength(0);
 
     expect(destroySource).not.toHaveBeenCalled();
 
@@ -380,7 +382,7 @@ describe('Smooth ownership', () => {
 
     block.source.next(paragraph('value grows'));
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     const failure = new Error('Source failed.');
 
@@ -393,9 +395,9 @@ describe('Smooth ownership', () => {
 
     harness.state.destroy();
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
-    expect(ticker.destroyCalls).toBe(1);
+    expect(driver.destroyCalls).toBe(1);
 
     expect(block.source.closed).toBe(false);
 

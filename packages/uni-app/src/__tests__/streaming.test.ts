@@ -3,7 +3,7 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 
 import { FluxdownLite } from '../packs/lite';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 import { getText } from './utils/text';
 
 describe('streaming lifecycle', () => {
@@ -145,6 +145,36 @@ describe('streaming lifecycle', () => {
     expect(getText(wrapper.element)).toBe('Hello world! Another chunk.');
   });
 
+  test('fades shad characters linearly on their own clock', async () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1000);
+
+    const wrapper = mount(FluxdownLite, {
+      props: { text: 'Hello', streaming: { smooth: false, effect: ['shad', { duration: 400 }] } },
+    });
+
+    await flushPromises();
+
+    await wrapper.setProps({ text: 'Hello world' });
+
+    const glyph = () =>
+      wrapper
+        .findAll('.fluxdown-inline-text')
+        .find((node) => getText(node.element).startsWith('world'))!
+        .element.querySelector<HTMLElement>(
+          '.fluxdown-inline-text__effect .fluxdown-scale-text__placeholder text',
+        )!;
+
+    expect(Number(glyph().style.opacity)).toBe(0);
+
+    now.mockReturnValue(1100);
+
+    await wrapper.setProps({ text: 'Hello world!' });
+
+    expect(Number(glyph().style.opacity)).toBeCloseTo(0.25);
+
+    expect(getText(wrapper.element)).toBe('Hello world!');
+  });
+
   test.each(['scale', 'shad', 'suffix', 'chunk'] as const)(
     'keeps Unicode content intact when %s settles',
     async (effect) => {
@@ -167,11 +197,15 @@ describe('streaming lifecycle', () => {
   );
 
   test.each(['scale', 'shad', 'suffix'] as const)(
-    'reveals smooth content with %s and destroys its ticker',
+    'reveals smooth content with %s and destroys its driver',
     async (effect) => {
-      const ticker = createManualTicker();
+      const driver = createManualDriver();
 
-      const smooth = { enabled: true, ticker: ticker.Ticker, scheduler: createStepScheduler(2) };
+      const smooth = {
+        enabled: true,
+        driver: driver.Driver,
+        interpolation: createStepInterpolator(2),
+      };
 
       const wrapper = mount(FluxdownLite, {
         props: { text: 'first', streaming: { smooth, effect } },
@@ -181,25 +215,25 @@ describe('streaming lifecycle', () => {
 
       await wrapper.setProps({ text: 'first\n\n**second**' });
 
-      ticker.current().tick(16);
+      driver.current().tick(16);
 
       await flushPromises();
 
       expect(getText(wrapper.element)).toContain('firstse');
 
-      ticker.current().tick(32);
+      driver.current().tick(32);
 
       await nextTick();
 
       expect(getText(wrapper.element)).toContain('firstseco');
 
-      ticker.current().tick(48);
+      driver.current().tick(48);
 
       await nextTick();
 
       expect(getText(wrapper.element)).toContain('firstsecond');
 
-      const instance = ticker.current();
+      const instance = driver.current();
 
       wrapper.unmount();
 

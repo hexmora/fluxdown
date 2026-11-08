@@ -1,0 +1,22 @@
+<style>
+  /*
+   * First-paint colors for the preview iframe. They apply before the bundle loads, so neither
+   * the canvas nor Storybook's preparing overlay flashes white in dark mode. The colors match
+   * the light and dark Fluxdown theme backgrounds that the stories paint.
+   *
+   * The canvas rule sits in the lowest-priority layer, so the theme addon's color-scheme rule and
+   * story styles override it once they load. The overlay rule stays unlayered to beat
+   * Storybook's own unlayered white background for `.sb-preparing-*` (checked against 10.4).
+   */
+  @layer preview-boot {
+    :root {
+      color-scheme: light dark;
+      background-color: light-dark(#ffffff, #212121);
+    }
+  }
+
+  .sb-preparing-story,
+  .sb-preparing-docs {
+    background-color: light-dark(#ffffff, #212121);
+  }
+</style>

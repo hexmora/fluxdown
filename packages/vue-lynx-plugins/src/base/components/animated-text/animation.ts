@@ -4,7 +4,12 @@ import { computed, onScopeDispose, watch } from 'vue';
 import { nextTick, runOnMainThread, useMainThreadRef } from 'vue-lynx';
 
 export const useTextAnimationRef = (
-  source: () => { arrival: number; duration: number; color: CSSProperties['color'] },
+  source: () => {
+    arrival: number;
+    duration: number;
+    easing: string;
+    color: CSSProperties['color'];
+  },
 ) => {
   const element = useMainThreadRef<MainThread.Element | null>(null);
 
@@ -34,7 +39,7 @@ export const useTextAnimationRef = (
 
   watch(
     config,
-    async ({ arrival, duration, color }, _, onCleanup) => {
+    async ({ arrival, duration, easing, color }, _, onCleanup) => {
       if (!active && (arrival < 0 || duration <= 0 || !color)) return;
 
       let stale = false;
@@ -79,7 +84,7 @@ export const useTextAnimationRef = (
         handle.current = target.animate([{ color: 'transparent' }, { color: String(color) }], {
           duration,
           delay,
-          easing: 'cubic-bezier(0, 0, 0.58, 1)',
+          easing,
           fill: 'both',
         });
       })();

@@ -2,7 +2,6 @@ import type {
   ReactRenderMatchParams,
   ReactRenderParams,
   ScaleProps,
-  ShadProps,
 } from '@fluxdown/react-native-plugins/base';
 import type { ReactNode } from 'react';
 
@@ -11,10 +10,6 @@ import {
   EffectScaleSlotPlugin,
   ScaleRenderer,
 } from '@fluxdown/react-native-plugins/plugins/effect-scale';
-import {
-  EffectShadSlotPlugin,
-  ShadRenderer,
-} from '@fluxdown/react-native-plugins/plugins/effect-shad';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react-native';
 import { Children, createRef, isValidElement, useEffect, useRef } from 'react';
 import { StyleSheet, Text } from 'react-native';
@@ -58,162 +53,6 @@ afterEach(async () => {
 });
 
 describe('React Native streaming', () => {
-  test('keeps the shade host and measured drawing when inline formatting appears', async () => {
-    // Shad inactivity must not expire while the test advances its own RAF clock.
-    jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
-
-    const clock = createRafClock();
-
-    let mounts = 0;
-
-    const TrackedShad = (props: ShadProps) => {
-      useEffect(() => {
-        mounts += 1;
-      }, []);
-
-      return <ShadRenderer {...props} />;
-    };
-
-    class TrackedSlot extends EffectShadSlotPlugin {
-      static readonly key = 'slot-shad';
-
-      readonly Component = TrackedShad;
-    }
-
-    const plugins = { slots: [TrackedSlot] };
-
-    const streaming = { effect: 'shad', smooth: true } as const;
-
-    await render(<FluxdownLite plugins={plugins} streaming={streaming} text="" />);
-
-    await screen.rerender(
-      <FluxdownLite plugins={plugins} streaming={streaming} text="prefix 清晰重点" />,
-    );
-
-    await clock.advanceUntil(() => screen.queryByText('点') !== null);
-
-    await measureText(screen.getByText('清'), { width: 16, height: 26 });
-
-    const gradient = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0];
-
-    const initialMounts = mounts;
-
-    expect(gradient).toBeDefined();
-
-    await screen.rerender(
-      <FluxdownLite plugins={plugins} streaming={streaming} text="prefix **清晰重点**A" />,
-    );
-
-    await clock.advanceUntil(() => screen.queryByText('A') !== null);
-
-    expect(mounts).toBe(initialMounts);
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')).toContain(
-      gradient,
-    );
-  });
-
-  test.each([
-    {
-      before: '文字自然展开，阅读不必',
-      after: '文字自然展开，阅读不必等',
-      token: '开，',
-      next: '开，',
-      ready: '必',
-      nextReady: '等',
-      width: 32,
-    },
-    {
-      before: '文字自然展开，阅读不必等待。Stream',
-      after: '文字自然展开，阅读不必等待。Streami',
-      token: 'Stream',
-      next: 'Streami',
-      ready: 'Stream',
-      nextReady: 'Streami',
-      width: 50,
-    },
-    {
-      before: 'same paragraph, while',
-      after: 'same paragraph, while n',
-      token: 'paragraph,',
-      next: 'paragraph,',
-      ready: 'while',
-      nextReady: 'n',
-      width: 84,
-      prefix: 'paragr',
-    },
-  ])(
-    'retains $token when the real shaded tail moves forward',
-    async ({ before, after, token, next, ready, nextReady, width, prefix }) => {
-      jest.useFakeTimers({ doNotFake: ['queueMicrotask'] });
-
-      const clock = createRafClock();
-
-      const streaming = { effect: 'shad', smooth: true } as const;
-
-      await render(<FluxdownLite streaming={streaming} text="" />);
-
-      await screen.rerender(<FluxdownLite streaming={streaming} text={before} />);
-
-      await clock.advanceUntil(() => screen.queryByText(ready) !== null);
-
-      const getDrawingText = (value: string) => {
-        let node = screen.getByText(value);
-
-        while (
-          StyleSheet.flatten(node.props.style)?.color !== 'rgba(255,255,255,0)' &&
-          node.parent
-        ) {
-          node = node.parent;
-        }
-
-        expect(node).toHaveStyle({ color: 'rgba(255,255,255,0)' });
-
-        return node;
-      };
-
-      const original = getDrawingText(token);
-
-      const measurement = getMeasurement(original);
-
-      await measureText(original, { width, height: 26 });
-
-      if (prefix) {
-        const measuredPrefix = screen.container.queryAll(
-          (node) =>
-            node.type === 'Text' &&
-            typeof node.props.onLayout === 'function' &&
-            StyleSheet.flatten(node.props.style)?.opacity === 0,
-        )[0];
-
-        expect(measuredPrefix).toBeDefined();
-
-        await fireEvent.layout(measuredPrefix!, {
-          width: 46,
-          height: 26,
-        });
-      }
-
-      const gradient = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0];
-
-      expect(gradient).toBeDefined();
-
-      await screen.rerender(<FluxdownLite streaming={streaming} text={after} />);
-
-      await clock.advanceUntil(() => screen.queryByText(nextReady) !== null);
-
-      // Word spans may change inside a sliced text fragment. The drawing's
-      // own text host, measured geometry and gradient must survive that change.
-      expect(getDrawingText(next)).toBe(original);
-
-      expect(getMeasurement(getDrawingText(next))).toBe(measurement);
-
-      expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')).toContain(
-        gradient,
-      );
-    },
-  );
-
   test('keeps scale glyph instances while settled words collapse during streaming', async () => {
     const clock = createRafClock();
 

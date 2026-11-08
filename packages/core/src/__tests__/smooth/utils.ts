@@ -1,6 +1,6 @@
 import type {
-  SmoothSchedulerClass,
-  SmoothTickerClass,
+  SmoothDriverClass,
+  SmoothInterpolatorClass,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import type { IBlockMeta, IBlockState } from '@fluxdown/types';
 import type { Element, ElementContent, RootContent, Text } from 'hast';
@@ -12,36 +12,40 @@ import { MutableState, render, S } from 'stative';
 import type { HastRoot } from '../../typings';
 
 import { BlockItem } from '../../states';
-import { DoubleStepSmoothScheduler, FakeSmoothTicker, StepSmoothScheduler } from '../utils/smooth';
+import {
+  DoubleStepSmoothInterpolator,
+  FakeSmoothDriver,
+  StepSmoothInterpolator,
+} from '../utils/smooth';
 
-export class PrimarySmoothTicker extends FakeSmoothTicker {
-  static instances: PrimarySmoothTicker[] = [];
+export class PrimarySmoothDriver extends FakeSmoothDriver {
+  static instances: PrimarySmoothDriver[] = [];
 
   constructor() {
     super();
 
-    PrimarySmoothTicker.instances.push(this);
+    PrimarySmoothDriver.instances.push(this);
   }
 }
 
-export class SecondarySmoothTicker extends FakeSmoothTicker {
-  static instances: SecondarySmoothTicker[] = [];
+export class SecondarySmoothDriver extends FakeSmoothDriver {
+  static instances: SecondarySmoothDriver[] = [];
 
   constructor() {
     super();
 
-    SecondarySmoothTicker.instances.push(this);
+    SecondarySmoothDriver.instances.push(this);
   }
 }
 
 export const resetSmoothTests = () => {
-  PrimarySmoothTicker.instances = [];
+  PrimarySmoothDriver.instances = [];
 
-  SecondarySmoothTicker.instances = [];
+  SecondarySmoothDriver.instances = [];
 
-  StepSmoothScheduler.instances = [];
+  StepSmoothInterpolator.instances = [];
 
-  DoubleStepSmoothScheduler.instances = [];
+  DoubleStepSmoothInterpolator.instances = [];
 };
 
 export const root = (children: RootContent[] = []): HastRoot => ({ type: 'root', children });
@@ -111,13 +115,13 @@ export const setupSmooth = (initialBlocks: IBlockState<HastRoot>[] = [], initial
 
   const enabled = MutableState.of(initialEnabled);
 
-  const ticker = MutableState.of<SmoothTickerClass>(PrimarySmoothTicker);
+  const driver = MutableState.of<SmoothDriverClass>(PrimarySmoothDriver);
 
-  const scheduler = MutableState.of<SmoothSchedulerClass>(StepSmoothScheduler);
+  const interpolation = MutableState.of<SmoothInterpolatorClass>(StepSmoothInterpolator);
 
-  const state = render(S([Smooth<HastRoot>, { source, enabled, ticker, scheduler }]));
+  const state = render(S([Smooth<HastRoot>, { source, enabled, driver, interpolation }]));
 
-  return { state, source, enabled, ticker, scheduler };
+  return { state, source, enabled, driver, interpolation };
 };
 
 export const visibleText = (blocks: IBlockState<HastRoot>[]) => {

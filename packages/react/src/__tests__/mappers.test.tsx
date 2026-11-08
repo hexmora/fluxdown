@@ -21,7 +21,7 @@ import type { FluxdownRef, IPluginItem } from '../packs/full';
 
 import styles from '../../../react-plugins/src/plugins/effect-shad/slot/effect-shad/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 
 declare global {
   interface MapperConfigs {
@@ -47,17 +47,17 @@ afterEach(async () => {
 
 describe('Fluxdown mapper plugins', () => {
   test('overrides Smooth tuples while retaining explicit mapper effects', () => {
-    const ticker = createManualTicker();
+    const driver = createManualDriver();
 
-    const scheduler = createStepScheduler(1);
+    const interpolation = createStepInterpolator(1);
 
     const mappers: MapperPluggable[] = [
       [
         Smooth,
         {
           enabled: toClosure(ReactiveState.of(true)),
-          ticker: toClosure(ReactiveState.of(ticker.Ticker)),
-          scheduler: toClosure(ReactiveState.of(scheduler)),
+          driver: toClosure(ReactiveState.of(driver.Driver)),
+          interpolation: toClosure(ReactiveState.of(interpolation)),
         },
       ],
       [
@@ -76,7 +76,7 @@ describe('Fluxdown mapper plugins', () => {
 
     expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('bc');
 
-    expect(ticker.instances).toHaveLength(0);
+    expect(driver.instances).toHaveLength(0);
   });
 
   test('applies keyed pack config and rebinds distinct readable config values', async () => {
@@ -226,12 +226,12 @@ describe('Fluxdown mapper plugins', () => {
     await waitFor(() => expect(destroyed).toHaveBeenCalledTimes(created.mock.calls.length));
   });
 
-  test('keeps Smooth progress and ticker when appending or removing a mapper', async () => {
-    const ticker = createManualTicker();
+  test('keeps Smooth progress and driver when appending or removing a mapper', async () => {
+    const driver = createManualDriver();
 
-    const scheduler = createStepScheduler(1);
+    const interpolation = createStepInterpolator(1);
 
-    const smooth = { enabled: true, ticker: ticker.Ticker, scheduler };
+    const smooth = { enabled: true, driver: driver.Driver, interpolation };
 
     const renderContent = (text: string, mappers: MapperPluggable[] = []) => (
       <Fluxdown streaming={{ smooth, effect: false }} text={text} plugins={[{ mappers }]} />
@@ -241,29 +241,29 @@ describe('Fluxdown mapper plugins', () => {
 
     view.rerender(renderContent('abcd'));
 
-    act(() => ticker.current().tick(16));
+    act(() => driver.current().tick(16));
 
     expect(view.container.textContent).toBe('ab');
 
-    const original = ticker.current();
+    const original = driver.current();
 
     view.rerender(renderContent('abcd', [Reverse]));
 
     await waitFor(() => expect(view.container.textContent).toBe('ab'));
 
-    act(() => ticker.current().tick(32));
+    act(() => driver.current().tick(32));
 
     expect(view.container.textContent).toBe('abc');
 
     view.rerender(renderContent('abcd'));
 
-    act(() => ticker.current().tick(48));
+    act(() => driver.current().tick(48));
 
     expect(view.container.textContent).toBe('abcd');
 
-    expect(ticker.instances).toHaveLength(1);
+    expect(driver.instances).toHaveLength(1);
 
-    expect(first(ticker.instances)).toBe(original);
+    expect(first(driver.instances)).toBe(original);
 
     view.unmount();
 

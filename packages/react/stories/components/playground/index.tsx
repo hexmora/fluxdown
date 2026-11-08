@@ -1,12 +1,16 @@
 import type { PlaygroundProps } from './type';
 
+import { StreamingLabControls, StreamingLabInspector, useStreamingLab } from '../streaming-lab';
 import { TrackedPreview } from '../tracked-preview';
+import { Button, Panel, PanelActions, PanelGroup, Slider, Switch } from '../ui';
 import { usePlayground } from './hooks/use-playground';
 import './style.scss';
 
 export type { PlaygroundProps } from './type';
 
 export const Playground = ({ actions, patches, ...props }: PlaygroundProps) => {
+  const lab = useStreamingLab();
+
   const {
     chunkSize,
     complete,
@@ -33,194 +37,169 @@ export const Playground = ({ actions, patches, ...props }: PlaygroundProps) => {
     status,
     stopped,
     text,
-  } = usePlayground(props);
+  } = usePlayground(props, lab.settings.speed);
+
+  // Each of these rewinds playback to the start, so the inspector starts a fresh record.
+  const rewind = (action: () => void) => () => {
+    lab.inspector.clear();
+
+    action();
+  };
 
   return (
-    <main className="playground-shell">
-      <header className="playground-header">
-        <div>
-          <p className="playground-eyebrow">Fluxdown workshop</p>
-          <h1>Markdown Playground</h1>
-        </div>
+    <main className="playground">
+      <header className="playground-toolbar">
+        <h1>Markdown playground</h1>
 
-        <span aria-live="polite" className="playground-status">
+        <span
+          aria-live="polite"
+          className="playground-status"
+          data-state={playbackMode && !stopped ? 'live' : undefined}
+        >
           {status}
         </span>
-      </header>
-
-      <section aria-label="Playground controls" className="playground-deck">
-        <fieldset className="playground-settings">
-          <legend>Compiler settings</legend>
-
-          <label>
-            <input
-              aria-label="Repair"
-              checked={config.repair}
-              onChange={(event) => handleSetting('repair', event.currentTarget.checked)}
-              type="checkbox"
-            />
-            Repair
-          </label>
-
-          <label>
-            <input
-              aria-label="Repair ending"
-              checked={config.repairEnding}
-              onChange={(event) => handleSetting('repairEnding', event.currentTarget.checked)}
-              type="checkbox"
-            />
-            Repair ending
-          </label>
-
-          <label>
-            <input
-              aria-label="Footnote"
-              checked={config.footnote}
-              onChange={(event) => handleSetting('footnote', event.currentTarget.checked)}
-              type="checkbox"
-            />
-            Footnote
-          </label>
-
-          <label>
-            <input
-              aria-label="TeX"
-              checked={config.tex}
-              onChange={(event) => handleSetting('tex', event.currentTarget.checked)}
-              type="checkbox"
-            />
-            TeX
-          </label>
-        </fieldset>
 
         <div className="playground-actions">
-          <button onClick={handleResetSettings} type="button">
-            Reset settings
-          </button>
+          <Button onClick={handleResetSettings}>Reset settings</Button>
 
-          <button onClick={handleResetText} type="button">
+          <Button onClick={playbackMode ? rewind(handleResetText) : handleResetText}>
             Reset text
-          </button>
+          </Button>
 
           {playbackMode ? (
-            <button className="playground-primary" onClick={handleBackToEditor} type="button">
+            <Button onClick={handleBackToEditor} primary>
               Back to editor
-            </button>
+            </Button>
           ) : (
-            <button
-              className="playground-primary"
-              disabled={text.length === 0}
-              onClick={handlePlay}
-              type="button"
-            >
+            <Button disabled={text.length === 0} onClick={rewind(handlePlay)} primary>
               Play
-            </button>
+            </Button>
           )}
         </div>
+      </header>
 
-        {playbackMode ? (
-          <div className="playground-transport">
-            <label>
-              Speed
-              <input
-                aria-label="Speed"
-                max={100}
-                min={1}
-                onChange={(event) => setSpeed(Number(event.currentTarget.value))}
-                type="range"
-                value={speed}
-              />
-              <output>{speed} ticks/s</output>
-            </label>
+      <div className="playground-body">
+        <Panel label="Playground settings">
+          <PanelGroup title="Compiler">
+            <Switch
+              checked={config.repair}
+              label="Repair"
+              onChange={(enabled) => handleSetting('repair', enabled)}
+            />
 
-            <label>
-              Chunk size
-              <input
-                aria-label="Chunk size"
-                max={20}
-                min={1}
-                onChange={(event) => setChunkSize(Number(event.currentTarget.value))}
-                type="range"
-                value={chunkSize}
-              />
-              <output>{chunkSize} chars</output>
-            </label>
+            <Switch
+              checked={config.repairEnding}
+              label="Repair end"
+              onChange={(enabled) => handleSetting('repairEnding', enabled)}
+            />
 
-            <label className="playground-progress">
-              Progress
-              <input
-                aria-label="Progress"
-                max={100}
-                min={0}
-                onChange={(event) => handleProgress(Number(event.currentTarget.value))}
-                type="range"
-                value={progress}
-              />
-              <output>{Math.round(progress)}%</output>
-            </label>
+            <Switch
+              checked={config.footnote}
+              label="Footnote"
+              onChange={(enabled) => handleSetting('footnote', enabled)}
+            />
 
-            <div className="playground-transport-actions">
-              <button disabled={cursor === 0} onClick={handleStepBackward} type="button">
-                Step backward
-              </button>
-
-              <button disabled={complete} onClick={handlePause} type="button">
-                {stopped ? 'Resume' : 'Pause'}
-              </button>
-
-              <button disabled={complete} onClick={handleStepForward} type="button">
-                Step forward
-              </button>
-
-              <button disabled={playbackText.length === 0} onClick={handleReplay} type="button">
-                Replay
-              </button>
-            </div>
-          </div>
-        ) : null}
-      </section>
-
-      <div className="playground-workspace">
-        <section aria-label="Markdown editor" className="playground-panel playground-editor">
-          <div className="playground-panel-heading">
-            <h2>Source</h2>
-            <span>
-              {playbackMode ? `${cursor}/${playbackText.length}` : `${text.length} chars`}
-            </span>
-          </div>
+            <Switch
+              checked={config.tex}
+              label="TeX"
+              onChange={(enabled) => handleSetting('tex', enabled)}
+            />
+          </PanelGroup>
 
           {playbackMode ? (
-            <pre aria-label="Markdown playback" className="playground-playback-source">
-              <span>{playbackText.slice(0, cursor)}</span>
-              <span className="playground-unplayed">{playbackText.slice(cursor)}</span>
-            </pre>
-          ) : (
-            <label className="playground-textarea-label">
-              <span>Markdown</span>
+            <>
+              <PanelGroup title="Playback">
+                <Slider
+                  format={(value) => `${value}/s`}
+                  label="Rate"
+                  max={100}
+                  min={1}
+                  onChange={setSpeed}
+                  step={1}
+                  value={speed}
+                />
+
+                <Slider
+                  format={(value) => `${value} ch`}
+                  label="Chunk size"
+                  max={20}
+                  min={1}
+                  onChange={setChunkSize}
+                  step={1}
+                  value={chunkSize}
+                />
+
+                <Slider
+                  format={(value) => `${Math.round(value)}%`}
+                  label="Progress"
+                  max={100}
+                  min={0}
+                  onChange={handleProgress}
+                  step={1}
+                  value={progress}
+                />
+
+                <PanelActions>
+                  <Button disabled={cursor === 0} onClick={handleStepBackward}>
+                    Step back
+                  </Button>
+
+                  <Button disabled={complete} onClick={handleStepForward}>
+                    Step forward
+                  </Button>
+
+                  <Button disabled={complete} onClick={handlePause}>
+                    {stopped ? 'Resume' : 'Pause'}
+                  </Button>
+
+                  <Button disabled={playbackText.length === 0} onClick={rewind(handleReplay)}>
+                    Replay
+                  </Button>
+                </PanelActions>
+              </PanelGroup>
+
+              <StreamingLabControls lab={lab} />
+
+              <StreamingLabInspector lab={lab} />
+            </>
+          ) : null}
+        </Panel>
+
+        <div className="playground-workspace">
+          <section aria-label="Markdown editor" className="playground-pane">
+            <div className="playground-pane-heading">
+              <h2>Source</h2>
+
+              <span className="playground-meta">
+                {playbackMode ? `${cursor}/${playbackText.length}` : `${text.length} chars`}
+              </span>
+            </div>
+
+            {playbackMode ? (
+              <pre aria-label="Markdown playback" className="playground-source">
+                <span>{playbackText.slice(0, cursor)}</span>
+                <span className="playground-unplayed">{playbackText.slice(cursor)}</span>
+              </pre>
+            ) : (
               <textarea
                 aria-label="Markdown"
+                className="playground-source"
                 onChange={(event) => setText(event.currentTarget.value)}
                 spellCheck={false}
                 value={text}
               />
-            </label>
-          )}
-        </section>
-
-        <section className="playground-panel playground-preview">
-          <div className="playground-panel-heading">
-            <h2>Preview</h2>
-            <span>Reactive output</span>
-          </div>
+            )}
+          </section>
 
           <TrackedPreview
             actions={actions}
             ariaLabel={playbackMode ? 'Playback preview' : 'Preview'}
             config={config}
             patches={patches}
+            streaming={playbackMode ? lab.streaming : undefined}
             text={previewText}
           />
-        </section>
+        </div>
       </div>
     </main>
   );

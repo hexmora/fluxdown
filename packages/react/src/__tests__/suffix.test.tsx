@@ -9,7 +9,7 @@ import {
 import { act, cleanup, render, waitFor } from '@testing-library/react';
 
 import { Fluxdown, type IPluginItem } from '../packs/full';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 
 afterEach(async () => {
   cleanup();
@@ -81,8 +81,12 @@ describe('Fluxdown suffix streaming', () => {
   });
 
   test('follows the visible Smooth endpoint through text and fenced code', () => {
-    const ticker = createManualTicker();
-    const smooth = { enabled: true, ticker: ticker.Ticker, scheduler: createStepScheduler(2) };
+    const driver = createManualDriver();
+    const smooth = {
+      enabled: true,
+      driver: driver.Driver,
+      interpolation: createStepInterpolator(2),
+    };
     const view = render(<Fluxdown streaming={{ smooth, effect: 'suffix' }} text="first" />);
 
     view.rerender(
@@ -93,12 +97,12 @@ describe('Fluxdown suffix streaming', () => {
     );
     expect(view.container.querySelector(selector)?.parentElement?.tagName).toBe('P');
 
-    act(() => ticker.current().tick(16));
+    act(() => driver.current().tick(16));
     expect(view.container.querySelector(selector)?.parentElement?.tagName).toBe('CODE');
     expect(view.container.querySelector('code')?.textContent).toBe('co');
     expect(view.container.querySelectorAll(selector)).toHaveLength(1);
 
-    act(() => ticker.current().tick(32));
+    act(() => driver.current().tick(32));
     expect(view.container.querySelector('code')?.textContent).toBe('cons');
     expect(view.container.querySelectorAll(selector)).toHaveLength(1);
   });
@@ -127,16 +131,16 @@ describe('Fluxdown suffix streaming', () => {
     ['chunk', 'suffix', true],
     ['suffix', 'chunk', true],
   ] as const)('composes %s → %s with Smooth=%s', (first, second, smoothing) => {
-    const ticker = createManualTicker();
+    const driver = createManualDriver();
     const smooth = smoothing
-      ? { enabled: true, ticker: ticker.Ticker, scheduler: createStepScheduler(2) }
+      ? { enabled: true, driver: driver.Driver, interpolation: createStepInterpolator(2) }
       : false;
     const effect = [first, second];
     const view = render(<Fluxdown streaming={{ smooth, effect }} text="first" />);
 
     view.rerender(<Fluxdown streaming={{ smooth, effect }} text={'first\n\n**second**'} />);
     if (smoothing) {
-      act(() => ticker.current().tick(16));
+      act(() => driver.current().tick(16));
     }
 
     expect(view.container.querySelector('[data-fluxdown-chunk]')).toHaveTextContent(

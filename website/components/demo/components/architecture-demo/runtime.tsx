@@ -18,7 +18,7 @@ import { D, type IReadableClosure, MutableState, render, renderHooks, S, useCrea
 import type { Block, HastElement, HastNode, RenderOutput, TreeSnapshot } from './type';
 
 import { diffTree } from './diff';
-import { DemoSpringScheduler } from './scheduler';
+import { DemoSpringInterpolator } from './interpolator';
 import { MarkdownTree } from './views';
 
 class DemoRenderer extends BaseRenderer<
@@ -95,7 +95,9 @@ export const createPipeline = (smooth: boolean) => {
     const mapped = MapperComposer({
       source: compiled,
       mappers: useCreate(
-        D<MapperPluggable[]>([[Smooth, { enabled: smooth, scheduler: DemoSpringScheduler }]]),
+        D<MapperPluggable[]>([
+          [Smooth, { enabled: smooth, interpolation: DemoSpringInterpolator }],
+        ]),
       ),
     });
     const rendered = useCreate(S([DemoRenderer, { source: mapped, patches: [], plugins: [] }]));

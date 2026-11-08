@@ -78,6 +78,7 @@ export const AnimatedText = /*#__PURE__*/ defineComponent(
     const element = useTextAnimationRef(() => ({
       arrival: native.value?.arrival ?? -1,
       duration: native.value?.duration ?? 0,
+      easing: native.value?.easing ?? 'cubic-bezier(0, 0, 0.58, 1)',
       color: color.value,
     }));
 

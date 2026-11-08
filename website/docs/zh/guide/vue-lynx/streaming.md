@@ -33,7 +33,7 @@ Vue Lynx 沿用 [Vue 的流式配置](../vue/configuration.md#streaming)。`stre
 四种效果均使用 Lynx 元素，原生样式与 React Lynx 相同：
 
 - `scale`：文字从较小、模糊的状态显现。
-- `shad`：以渐变逐步揭示末尾文字。
+- `shad`：每个新出现的字符按各自的时钟淡入。
 - `chunk`：收到的文本片段逐块淡入。
 - `suffix`：脉动光标或圆点跟随末尾文字。
 

@@ -33,7 +33,7 @@ Vue Lynx shares [Vue's streaming configuration](../vue/configuration.md#streamin
 All four effects use Lynx elements and the same native styles as React Lynx:
 
 - `scale`: reveal text from a smaller, blurred state.
-- `shad`: reveal trailing text with a gradient.
+- `shad`: fade each newly visible character in on its own clock.
 - `chunk`: fade in incoming text chunks.
 - `suffix`: follow the text with a pulsing cursor or dot.
 

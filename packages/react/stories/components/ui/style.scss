@@ -1,0 +1,608 @@
+@use "tokens";
+
+// Interaction model: state changes (hover, press, check) use a quick out-curve; anything that
+// travels (thumbs, popups) gets a slightly longer one. Every transition is disabled for
+// reduced motion at the end of this file.
+
+.ui-label {
+  color: var(--playground-secondary);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.ui-value {
+  min-width: 6.5em;
+  color: var(--playground-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ui-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// Buttons
+
+.ui-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--playground-radius);
+  color: var(--playground-ink);
+  background: var(--playground-raised);
+  box-shadow: var(--playground-shadow-raised);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--playground-fast) var(--playground-ease),
+    box-shadow var(--playground-fast) var(--playground-ease),
+    transform var(--playground-fast) var(--playground-ease),
+    opacity var(--playground-fast) var(--playground-ease);
+
+  &:hover:not([data-disabled]) {
+    background: var(--playground-hover);
+  }
+
+  // A slight press makes the click land before the result arrives.
+  &:active:not([data-disabled]) {
+    background: var(--playground-press);
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--playground-focus-ring);
+  }
+
+  &[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+}
+
+.ui-button-primary {
+  color: var(--playground-bg);
+  background: var(--playground-ink);
+  box-shadow: inset 0 1px 0 light-dark(rgb(255 255 255 / 12%), rgb(255 255 255 / 40%));
+
+  &:hover:not([data-disabled]) {
+    background: var(--playground-ink);
+    opacity: 0.88;
+  }
+
+  &:active:not([data-disabled]) {
+    background: var(--playground-ink);
+    opacity: 0.8;
+  }
+}
+
+// Slider
+
+.ui-slider {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ui-slider-control {
+  display: flex;
+  align-items: center;
+  width: 112px;
+  height: 16px;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.ui-slider-track {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--playground-line-strong);
+}
+
+.ui-slider-indicator {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--playground-ink);
+}
+
+.ui-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--playground-raised);
+  box-shadow:
+    0 0 0 1px var(--playground-line-strong),
+    0 1px 3px light-dark(rgb(0 0 0 / 14%), rgb(0 0 0 / 50%));
+  transition:
+    transform var(--playground-fast) var(--playground-ease),
+    box-shadow var(--playground-fast) var(--playground-ease);
+
+  &:hover {
+    transform: scale(1.15);
+  }
+
+  &:has(:focus-visible) {
+    box-shadow: var(--playground-focus-ring);
+  }
+}
+
+// While dragging, the thumb follows the pointer exactly and wears a soft halo.
+.ui-slider[data-dragging] .ui-slider-thumb {
+  transform: scale(1.15);
+  box-shadow:
+    0 0 0 1px var(--playground-ink),
+    0 0 0 5px light-dark(rgb(32 33 35 / 10%), rgb(236 236 241 / 14%));
+}
+
+// Keyboard and click jumps glide instead of teleporting; drags stay immediate.
+.ui-slider:not([data-dragging]) {
+  .ui-slider-indicator {
+    transition: width var(--playground-move) var(--playground-ease);
+  }
+
+  .ui-slider-thumb {
+    transition:
+      inset-inline-start var(--playground-move) var(--playground-ease),
+      transform var(--playground-fast) var(--playground-ease),
+      box-shadow var(--playground-fast) var(--playground-ease);
+  }
+}
+
+// Select
+
+.ui-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 6px 0 8px;
+  border: 0;
+  border-radius: var(--playground-radius);
+  color: var(--playground-ink);
+  background: var(--playground-raised);
+  box-shadow: var(--playground-shadow-raised);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--playground-fast) var(--playground-ease),
+    box-shadow var(--playground-fast) var(--playground-ease);
+
+  &:hover {
+    background: var(--playground-hover);
+  }
+
+  &[data-popup-open] {
+    background: var(--playground-press);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--playground-focus-ring);
+  }
+}
+
+.ui-select-icon {
+  display: flex;
+  color: var(--playground-muted);
+  transition: transform var(--playground-move) var(--playground-ease);
+
+  [data-popup-open] > & {
+    transform: rotate(180deg);
+  }
+}
+
+.ui-select-positioner {
+  z-index: 10;
+  outline: none;
+}
+
+.ui-select-popup {
+  @include tokens.tokens;
+
+  // The popup renders in a portal outside `.playground`, so it misses that border-box reset.
+  // Base UI sizes it with `height: 100%`, and content-box padding would add space below the
+  // last item.
+  box-sizing: border-box;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  min-width: var(--anchor-width);
+  padding: 4px;
+  border-radius: var(--playground-radius-popup);
+  color: var(--playground-ink);
+  background: var(--playground-raised);
+  box-shadow: var(--playground-shadow-popup);
+  font-family: var(--playground-sans);
+  font-size: 12px;
+  outline: none;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--playground-fast) var(--playground-ease),
+    transform var(--playground-fast) var(--playground-ease);
+
+  // The popup grows out of its trigger and shrinks back into it.
+  &[data-starting-style],
+  &[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.ui-select-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 12px;
+  align-items: center;
+  gap: 12px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: var(--playground-radius);
+  cursor: default;
+  outline: none;
+  user-select: none;
+
+  &[data-highlighted] {
+    background: var(--playground-hover);
+  }
+}
+
+.ui-select-check {
+  display: flex;
+  grid-column: 2;
+}
+
+// Switch
+
+.ui-switch-field {
+  cursor: pointer;
+  user-select: none;
+}
+
+.ui-switch {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  width: 26px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--playground-line-strong);
+  cursor: pointer;
+  transition: background-color var(--playground-move) var(--playground-ease);
+
+  &[data-checked] {
+    background: var(--playground-ink);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--playground-focus-ring);
+  }
+}
+
+.ui-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: light-dark(#fff, #fafafa);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+  transition:
+    transform var(--playground-move) var(--playground-ease),
+    width var(--playground-fast) var(--playground-ease),
+    background-color var(--playground-move) var(--playground-ease);
+
+  // The checked track is ink-colored, so the thumb takes the page color to keep contrast in
+  // both themes.
+  [data-checked] > & {
+    background: var(--playground-bg);
+    transform: translateX(10px);
+  }
+
+  // The thumb stretches toward its destination while pressed, then settles on release.
+  .ui-switch:active > & {
+    width: 14px;
+  }
+
+  .ui-switch[data-checked]:active > & {
+    transform: translateX(8px);
+  }
+}
+
+// Segmented control
+
+.ui-segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 5px;
+  background: var(--playground-surface);
+  box-shadow: inset 0 0 0 1px var(--playground-line);
+}
+
+.ui-segment {
+  height: 20px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 3px;
+  color: var(--playground-secondary);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    color var(--playground-fast) var(--playground-ease),
+    background-color var(--playground-fast) var(--playground-ease),
+    box-shadow var(--playground-fast) var(--playground-ease);
+
+  &:hover {
+    color: var(--playground-ink);
+  }
+
+  &[data-pressed] {
+    color: var(--playground-ink);
+    background: var(--playground-raised);
+    box-shadow: var(--playground-shadow-raised);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--playground-focus-ring);
+  }
+}
+
+// Number field
+
+.ui-number-scrub {
+  cursor: ew-resize;
+
+  .ui-label {
+    cursor: inherit;
+    transition: color var(--playground-fast) var(--playground-ease);
+  }
+
+  &:hover .ui-label,
+  &[data-scrubbing] .ui-label {
+    color: var(--playground-ink);
+  }
+}
+
+.ui-number-group {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  border-radius: var(--playground-radius);
+  background: var(--playground-raised);
+  box-shadow: var(--playground-shadow-raised);
+  transition: box-shadow var(--playground-fast) var(--playground-ease);
+
+  &:focus-within {
+    box-shadow: var(--playground-focus-ring);
+  }
+}
+
+.ui-number-input {
+  width: 52px;
+  height: 100%;
+  padding: 0 6px;
+  border: 0;
+  outline: none;
+  color: var(--playground-ink);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.ui-number-unit {
+  padding-right: 6px;
+  color: var(--playground-muted);
+  font-size: 11px;
+}
+
+// Properties panel
+
+.ui-panel {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 256px;
+  min-height: 0;
+  overflow-y: auto;
+  border-right: 1px solid var(--playground-line);
+  background: var(--playground-surface);
+  overscroll-behavior: contain;
+
+  @media (max-width: 48rem) {
+    width: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--playground-line);
+  }
+}
+
+.ui-group {
+  padding: 8px 10px 10px;
+
+  & + & {
+    border-top: 1px solid var(--playground-line);
+  }
+}
+
+.ui-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 20px;
+  margin-bottom: 4px;
+
+  h3 {
+    margin: 0;
+    color: var(--playground-muted);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .ui-button {
+    height: 20px;
+    padding: 0 7px;
+    font-size: 11px;
+  }
+}
+
+// Every row shares the label column; sliders add a fixed value column on the right.
+.ui-group-body {
+  --ui-label-width: 72px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+
+  > .ui-field,
+  > .ui-slider {
+    display: grid;
+    grid-template-columns: var(--ui-label-width) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 8px;
+    min-height: 24px;
+  }
+
+  > .ui-slider {
+    grid-template-columns: var(--ui-label-width) minmax(0, 1fr) 4.5em;
+  }
+
+  // Controls shrink to the row height inside the panel.
+  .ui-select-trigger,
+  .ui-number-group {
+    height: 22px;
+  }
+
+  .ui-segmented {
+    padding: 1px;
+  }
+
+  .ui-segment {
+    height: 20px;
+  }
+
+  .ui-button {
+    height: 22px;
+  }
+
+  .ui-slider-control,
+  .ui-select-trigger,
+  .ui-segmented,
+  .ui-number-group {
+    width: 100%;
+  }
+
+  .ui-select-trigger {
+    justify-content: space-between;
+  }
+
+  .ui-segment {
+    flex: 1;
+    padding: 0 4px;
+  }
+
+  .ui-number-input {
+    flex: 1;
+    width: 0;
+    text-align: left;
+  }
+
+  .ui-switch {
+    justify-self: start;
+  }
+
+  .ui-value {
+    min-width: 0;
+    color: var(--playground-secondary);
+    text-align: right;
+  }
+}
+
+.ui-group-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 4px;
+
+  .ui-button {
+    justify-content: center;
+  }
+}
+
+// Read-only key-value rows, aligned like the controls above them.
+.ui-readouts {
+  display: grid;
+  grid-template-columns: var(--ui-label-width) minmax(0, 1fr);
+  gap: 2px 8px;
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+
+  // Each dt/dd pair is wrapped for valid markup but lays out on the dl's grid.
+  > div {
+    display: contents;
+  }
+
+  dt {
+    color: var(--playground-secondary);
+  }
+
+  dd {
+    min-width: 0;
+    margin: 0;
+    color: var(--playground-ink);
+    overflow: hidden;
+    font-family: var(--playground-mono);
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-button,
+  .ui-slider-thumb,
+  .ui-slider-indicator,
+  .ui-select-trigger,
+  .ui-select-icon,
+  .ui-select-popup,
+  .ui-switch,
+  .ui-switch-thumb,
+  .ui-segment,
+  .ui-number-group,
+  .ui-number-scrub .ui-label {
+    transition: none !important;
+  }
+
+  .ui-button:active:not([data-disabled]) {
+    transform: none;
+  }
+}

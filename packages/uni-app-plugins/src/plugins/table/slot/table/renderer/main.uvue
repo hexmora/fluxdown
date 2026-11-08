@@ -38,7 +38,7 @@ const theme = useTheme();
             index > 0 && index % 2 === 0 ? theme.tokens.colors.surfaceSubtle : 'transparent',
         }"
       >
-        <RenderNodes :nodes="row" :tail="index === props.rows.length - 1" />
+        <RenderNodes :nodes="row" />
       </view>
     </view>
   </scroll-view>

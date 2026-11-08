@@ -1,2 +1,3 @@
-export * from './scheduler';
-export * from './ticker';
+export * from './deprecated';
+export * from './driver';
+export * from './interpolation';

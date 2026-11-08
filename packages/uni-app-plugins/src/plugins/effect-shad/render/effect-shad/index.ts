@@ -4,12 +4,7 @@ import { assert } from '@fluxdown/utils';
 
 import type { UniRenderMatchParams, UniRenderParams } from '../../../../base';
 
-import {
-  BaseUniRenderPlugin,
-  createTypeOfSlot,
-  getTextContent,
-  isElementWithTag,
-} from '../../../../base';
+import { BaseUniRenderPlugin, createTypeOfSlot } from '../../../../base';
 import { getShadConfig, isShadNode } from './utils';
 
 const Shad = /*#__PURE__*/ createTypeOfSlot('Shad');
@@ -30,17 +25,6 @@ export class EffectShadRenderPlugin extends BaseUniRenderPlugin {
   render({ node, renderChildren }: UniRenderParams) {
     assert(isShadNode(node));
 
-    const [leading, active] = node.children;
-
-    assert(leading && isElementWithTag(leading, 'span'));
-
-    assert(active && isElementWithTag(active, 'span'));
-
-    return Shad({
-      ...getShadConfig(node),
-      active: renderChildren(active),
-      isActive: getTextContent(active).length > 0,
-      leading: renderChildren(leading),
-    });
+    return Shad({ ...getShadConfig(node) }, renderChildren(node));
   }
 }

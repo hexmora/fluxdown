@@ -54,7 +54,7 @@ const expandNodes = (nodes: UniRenderNode[], slots: Slots): UniRenderNode[] => {
   return result;
 };
 
-export const normalizeInlineNodes = (nodes: UniRenderNode[], slots: Slots, tail = true) => {
+export const normalizeInlineNodes = (nodes: UniRenderNode[], slots: Slots) => {
   const result: (UniComponentNode | UniSlotNode)[] = [];
 
   let pending: UniTextNode[] = [];
@@ -64,7 +64,7 @@ export const normalizeInlineNodes = (nodes: UniRenderNode[], slots: Slots, tail 
   // Keep tail animations running when preceding text grows.
   let suffixIndex = 0;
 
-  const flush = (isTail = false) => {
+  const flush = () => {
     const text = pending.map((part) => part.text).join('');
 
     const words = splitInlineText(text);
@@ -73,7 +73,7 @@ export const normalizeInlineNodes = (nodes: UniRenderNode[], slots: Slots, tail 
 
     let consumed = 0;
 
-    for (const [wordIndex, word] of words.entries()) {
+    for (const word of words) {
       const parts: UniTextNode[] = [];
 
       let remaining = word.length;
@@ -87,16 +87,7 @@ export const normalizeInlineNodes = (nodes: UniRenderNode[], slots: Slots, tail 
 
         const value = word.slice(wordOffset, wordOffset + length);
 
-        let effect = part.effect;
-
-        if (effect?.type === 'shad') {
-          effect = {
-            ...effect,
-            trailingText: part.text.slice(consumed + length) + effect.trailingText,
-          };
-        }
-
-        parts.push(effect ? { text: value, effect } : { text: value });
+        parts.push(part.effect ? { text: value, effect: part.effect } : { text: value });
 
         remaining -= length;
 
@@ -114,7 +105,7 @@ export const normalizeInlineNodes = (nodes: UniRenderNode[], slots: Slots, tail 
       result.push({
         component: InlineText,
         key: `inline:${position}`,
-        props: { parts, tail: isTail && wordIndex === words.length - 1 && !/\s$/.test(word) },
+        props: { parts },
       });
 
       position += [...getTextUnits(word)].length;
@@ -154,7 +145,7 @@ export const normalizeInlineNodes = (nodes: UniRenderNode[], slots: Slots, tail 
     position += [...getTextUnits(getInlineText(node))].length || 1;
   }
 
-  flush(tail);
+  flush();
 
   return result;
 };

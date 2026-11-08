@@ -7,7 +7,7 @@ import type { EffectItem } from '../packs/full';
 
 import styles from '../../../taro-plugins/src/plugins/effect-chunk/slot/effect-chunk/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
 
 const selector = '[data-fluxdown-chunk]';
 
@@ -101,16 +101,16 @@ test('preserves completed block identity and timestamps new Unicode content as a
   );
 });
 
-test('groups newly revealed Smooth output into each tick and cleans up its ticker', async () => {
-  const ticker = createManualTicker();
+test('groups newly revealed Smooth output into each tick and cleans up its driver', async () => {
+  const driver = createManualDriver();
 
-  const smooth = { enabled: true, ticker: ticker.Ticker, scheduler: createStepScheduler(2) };
+  const smooth = { enabled: true, driver: driver.Driver, interpolation: createStepInterpolator(2) };
 
   const view = render(<Fluxdown streaming={{ smooth, effect: 'chunk' }} text="first" />);
 
   view.rerender(<Fluxdown streaming={{ smooth, effect: 'chunk' }} text={'first\n\n**second**'} />);
 
-  act(() => ticker.current().tick(16));
+  act(() => driver.current().tick(16));
 
   const chunk = view.container.querySelector(selector);
 
@@ -120,7 +120,7 @@ test('groups newly revealed Smooth output into each tick and cleans up its ticke
 
   jest.mocked(performance.now).mockReturnValue(1016);
 
-  act(() => ticker.current().tick(32));
+  act(() => driver.current().tick(32));
 
   expect(view.container.querySelector(selector)).toBe(chunk);
 
@@ -128,7 +128,7 @@ test('groups newly revealed Smooth output into each tick and cleans up its ticke
     ['se', 'co'],
   );
 
-  const instance = ticker.current();
+  const instance = driver.current();
 
   view.unmount();
 

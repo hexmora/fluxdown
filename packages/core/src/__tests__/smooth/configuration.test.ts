@@ -1,15 +1,15 @@
 import { batch } from 'stative';
 
-import { DoubleStepSmoothScheduler, StepSmoothScheduler } from '../utils/smooth';
+import { DoubleStepSmoothInterpolator, StepSmoothInterpolator } from '../utils/smooth';
 import {
   collectText,
   createBlock,
   firstBlock,
   latest,
   paragraph,
-  PrimarySmoothTicker,
+  PrimarySmoothDriver,
   resetSmoothTests,
-  SecondarySmoothTicker,
+  SecondarySmoothDriver,
   setupSmooth,
   visibleText,
 } from './utils';
@@ -50,13 +50,13 @@ describe('Smooth configuration', () => {
 
       block.source.next(paragraph('abcde'));
 
-      const ticker = latest(PrimarySmoothTicker.instances);
+      const driver = latest(PrimarySmoothDriver.instances);
 
-      ticker.tick(16);
+      driver.tick(16);
 
       expect(collectText(fork.value.value)).toBe('abcd');
 
-      ticker.tick(32);
+      driver.tick(32);
 
       expect(collectText(fork.value.value)).toBe('abcde');
 
@@ -104,9 +104,9 @@ describe('Smooth configuration', () => {
 
     expect(collectText(fork.value.value)).toBe('abc');
 
-    expect(PrimarySmoothTicker.instances).toHaveLength(0);
+    expect(PrimarySmoothDriver.instances).toHaveLength(0);
 
-    expect(StepSmoothScheduler.instances).toHaveLength(0);
+    expect(StepSmoothInterpolator.instances).toHaveLength(0);
 
     block.source.next(paragraph('abcde'));
 
@@ -118,17 +118,17 @@ describe('Smooth configuration', () => {
 
     expect(collectText(fork.value.value)).toBe('abcde');
 
-    expect(PrimarySmoothTicker.instances).toHaveLength(0);
+    expect(PrimarySmoothDriver.instances).toHaveLength(0);
 
     block.source.next(paragraph('abcdefg'));
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
-    expect(ticker.running).toBe(true);
+    expect(driver.running).toBe(true);
 
     expect(collectText(fork.value.value)).toBe('abcde');
 
-    ticker.tick(16);
+    driver.tick(16);
 
     expect(collectText(fork.value.value)).toBe('abcdef');
 
@@ -142,7 +142,7 @@ describe('Smooth configuration', () => {
 
     expect(fork.range.value).toBeNull();
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
     harness.state.destroy();
   });
@@ -157,9 +157,9 @@ describe('Smooth configuration', () => {
       createBlock('b', paragraph('def'), 1, 2).block,
     ]);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
-    ticker.tick(16);
+    driver.tick(16);
 
     expect(visibleText(harness.state.value.value)).toEqual(['a']);
 
@@ -173,27 +173,27 @@ describe('Smooth configuration', () => {
 
     expect(output.map((block) => block.meta.value.blockCount)).toEqual([2, 2]);
 
-    expect(ticker.running).toBe(false);
+    expect(driver.running).toBe(false);
 
     harness.state.destroy();
   });
 
-  test('replaces ticker and scheduler constructors while retaining visible forks', () => {
+  test('replaces driver and interpolation constructors while retaining visible forks', () => {
     const harness = setupSmooth();
 
     expect(harness.state.value.value).toEqual([]);
 
     harness.source.next([createBlock('a', paragraph('abcd')).block]);
 
-    const primary = latest(PrimarySmoothTicker.instances);
+    const primary = latest(PrimarySmoothDriver.instances);
 
     primary.tick(16);
 
     const fork = firstBlock(harness.state.value.value);
 
-    harness.ticker.next(SecondarySmoothTicker);
+    harness.driver.next(SecondarySmoothDriver);
 
-    const secondary = latest(SecondarySmoothTicker.instances);
+    const secondary = latest(SecondarySmoothDriver.instances);
 
     expect(primary.destroyCalls).toBe(1);
 
@@ -209,9 +209,9 @@ describe('Smooth configuration', () => {
 
     expect(collectText(fork.value.value)).toBe('ab');
 
-    harness.scheduler.next(DoubleStepSmoothScheduler);
+    harness.interpolation.next(DoubleStepSmoothInterpolator);
 
-    expect(DoubleStepSmoothScheduler.instances).toHaveLength(1);
+    expect(DoubleStepSmoothInterpolator.instances).toHaveLength(1);
 
     secondary.tick(32);
 
@@ -227,21 +227,21 @@ describe('Smooth configuration', () => {
 
     expect(harness.state.value.value).toEqual([]);
 
-    harness.ticker.next(SecondarySmoothTicker);
+    harness.driver.next(SecondarySmoothDriver);
 
-    harness.scheduler.next(DoubleStepSmoothScheduler);
+    harness.interpolation.next(DoubleStepSmoothInterpolator);
 
-    expect(PrimarySmoothTicker.instances).toHaveLength(0);
+    expect(PrimarySmoothDriver.instances).toHaveLength(0);
 
-    expect(SecondarySmoothTicker.instances).toHaveLength(0);
+    expect(SecondarySmoothDriver.instances).toHaveLength(0);
 
-    expect(StepSmoothScheduler.instances).toHaveLength(0);
+    expect(StepSmoothInterpolator.instances).toHaveLength(0);
 
     harness.enabled.next(true);
 
     harness.source.next([createBlock('a', paragraph('abcd')).block]);
 
-    latest(SecondarySmoothTicker.instances).tick(16);
+    latest(SecondarySmoothDriver.instances).tick(16);
 
     expect(visibleText(harness.state.value.value)).toEqual(['ab']);
 
@@ -257,15 +257,15 @@ describe('Smooth configuration', () => {
 
     block.source.next(paragraph('ab'));
 
-    const primary = latest(PrimarySmoothTicker.instances);
+    const primary = latest(PrimarySmoothDriver.instances);
 
     harness.enabled.next(false);
 
     fork = firstBlock(harness.state.value.value);
 
-    harness.ticker.next(SecondarySmoothTicker);
+    harness.driver.next(SecondarySmoothDriver);
 
-    harness.scheduler.next(DoubleStepSmoothScheduler);
+    harness.interpolation.next(DoubleStepSmoothInterpolator);
 
     block.source.next(paragraph('abc'));
 
@@ -273,7 +273,7 @@ describe('Smooth configuration', () => {
 
     expect(collectText(fork.value.value)).toBe('abc');
 
-    expect(SecondarySmoothTicker.instances).toHaveLength(0);
+    expect(SecondarySmoothDriver.instances).toHaveLength(0);
 
     harness.enabled.next(true);
 
@@ -281,7 +281,7 @@ describe('Smooth configuration', () => {
 
     block.source.next(paragraph('abcdef'));
 
-    latest(SecondarySmoothTicker.instances).tick(16);
+    latest(SecondarySmoothDriver.instances).tick(16);
 
     expect(firstBlock(harness.state.value.value)).toBe(fork);
 
