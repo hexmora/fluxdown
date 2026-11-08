@@ -1,4 +1,4 @@
-# Slot 插件
+# Slot 插件 - Fluxdown Angular {#slot-插件}
 
 Slot 插件负责渲染插槽。代码块、链接、标题等内容已经准备好，你只需要决定它们的组件和交互。
 

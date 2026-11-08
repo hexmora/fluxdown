@@ -1,4 +1,4 @@
-# Render plugins
+# Render plugins - Fluxdown Vue {#render-plugins}
 
 Render plugins turn HAST nodes into slots, choosing which component handles the content. Slot plugins provide the appearance and interactions.
 

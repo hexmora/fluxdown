@@ -1,4 +1,4 @@
-# Render 插件
+# Render 插件 - Fluxdown React {#render-插件}
 
 Render 插件将 HAST 节点渲染成插槽。它决定哪些节点交给哪个插槽，以及传递什么内容；插槽的组件仍由 slot 插件负责。
 

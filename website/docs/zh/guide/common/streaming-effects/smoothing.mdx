@@ -1,23 +1,48 @@
 import { FrameworkCodeTabs } from '../../../../../components/framework-code-tabs';
 import { SpringDemo } from '../../../../../components';
+import {
+  SpringCurve,
+  SpringEquation,
+} from '../../../../../components/demo/components/spring-curve';
+import { SmoothingPartsDiagram } from '../../../../../components/demo/components/smoothing-parts';
 
-# 平滑化
+# 平滑化 - Fluxdown {#平滑化}
 
 流式文本通常是成批到达的：有时只收到几个字，有时一次收到一整段。平滑化把接收和显示分开，让内容按更连贯的节奏出现在页面上。
 
-## 看见缓冲区
+## 进度跟踪
 
 下面的演示模拟大小不同的文本片段陆续到达。正常颜色是已经显示的内容，另一种颜色是已收到、仍在等待显示的缓冲内容。实际应用中，缓冲区里的文字暂时不可见。
 
 <SpringDemo />
 
-新片段到达时，缓冲区先增长，显示边界再逐步跟上。可以暂停观察两者的位置，或重新播放，比较每次收到内容时的变化。
+新片段到达时，缓冲区先增长，显示边界再逐步跟上。可以暂停播放，定格观察两者的位置，或重新播放，比较每次收到内容时的变化。
 
-## 弹簧如何调整节奏
+## 弹簧力学模拟的平滑化方式
 
-内置的 `spring` 插值把显示位置看作一个被拉向已收到内容末尾的阻尼弹簧。积压内容越多，拉力越大，输出越快；接近末尾时逐步减速，并在不越过末尾的情况下停稳。收到新内容时，弹簧保留当前的位置和速度，转而拉向新的末尾，让前后更新自然衔接。
+想象一根弹簧，一端牵着显示位置，另一端跟着已收到的内容向前移动。两端离得越远，向前拉的力就越大；同时还有阻尼抵消一部分运动。这个关系可以写成：
 
-插值器直接用弹簧运动的精确解，根据经过的时间计算位置，而不是逐帧累加。因此结果不受帧率影响，长回复中也不会积累误差。文字可以在两次网络更新之间继续显示，也不需要为每个字符设置固定延时。上面的演示使用与 `Smooth` mapper 相同的 `SpringSmoothInterpolator`。
+<SpringEquation />
+
+这里 `r` 是牵引目标，`x` 是当前位置，`v` 是速度，`k` 是弹性系数，`c` 是阻尼系数，`m` 是质量。距离影响拉力，拉力再改变速度；位置不会因为目标突然跳远就立刻跟着跳过去。
+
+Fluxdown 用这个思路追踪显示进度。一次收到很多内容时，距离增大，输出逐渐加快；接近末尾时逐步减速，默认的临界阻尼让它在不越过已收到内容的情况下停稳。收到新内容时，弹簧保留当前的位置和速度，转而拉向新的末尾，让一批批输入自然衔接。
+
+<SpringCurve />
+
+> 阶梯线表示分批到达的内容，曲线表示已经显示的进度。曲线直接由当前的 `SpringSmoothInterpolator` 采样得到；阶梯停下来时，显示进度仍然在追赶。可以重播，观察每次距离突然拉大后的变化。
+
+插值器直接用弹簧运动的精确解，根据经过的时间计算位置，而不是逐帧累加。因此结果不受帧率影响，长回复中也不会积累误差。文字可以在两次网络更新之间继续显示，也不需要为每个字符设置固定延时。
+
+## 平滑化两要素
+
+平滑化由两部分配合完成：[驱动](./smoothing/driver.mdx)决定什么时候更新，[插值](./smoothing/interpolation.mdx)决定每次前进多少。
+
+<SmoothingPartsDiagram />
+
+> 在 160 毫秒这一拍，目标已经到 8。插值让显示位置从 3 前进 2，到达 5。驱动决定什么时候更新，插值决定走多远。
+
+默认组合已经适合大多数流式内容。需要固定更新间隔、逐拍输出，或接入自己的时钟时，可以分别替换这两部分。两篇子页都有对照演示与可直接使用的示例。
 
 ## 在应用中使用
 
@@ -411,5 +436,3 @@ defineProps<MessageProps>();
 `text` 始终传入已经收到的完整内容。将 `streaming` 设为 `false` 后，剩余缓冲会立即显示；如果希望保留收尾过程，可以让平滑化继续开启。
 
 Core 使用同一个 `Smooth` mapper，输出经过截取的内容块，渲染层无需自己安排逐字更新。接入方式见 [Core 状态与更新](../../core/streaming.md#启用平滑输出)，完整选项见各框架的配置文档：[React](../../react/configuration.md#streamingsmooth)、[Vue](../../vue/configuration.md#streamingsmooth)、[Svelte](../../svelte/configuration.md)、[Angular](../../angular/configuration.md#streamingsmooth)、[React Native](../../react-native/configuration.md)、[React Lynx](../../react-lynx/configuration.md)、[Vue Lynx](../../vue-lynx/configuration.md)、[Solid](../../solid/configuration.md#streamingsmooth)、[Taro](../../taro/configuration.md)、[Uni App](../../uni-app/configuration.md#streamingsmooth)。
-
-Core 示例用 `MutableState` 保存接收状态；完成时调用 `isStreaming.next(false)`，销毁 Core 后再调用 `active.destroy()` 和 `isStreaming.destroy()` 清理外部状态。

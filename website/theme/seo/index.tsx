@@ -49,12 +49,19 @@ export const SeoHead = () => {
 
   const canonical = withSiteOrigin(withBase(normalizeHref(page.routePath, false)));
 
-  // Rspress 2.0 uses the site title for custom pages, ignoring their frontmatter title.
+  // Article titles already include the brand. Rspress otherwise appends it again.
   const { frontmatter } = page;
+  const articleTitle =
+    (page.pageType === 'doc' || page.pageType === 'doc-wide') && (frontmatter.title ?? page.title);
+  const brandedTitle =
+    articleTitle && /\b(?:Fluxdown|Stative)\b/.test(articleTitle) && articleTitle;
+
+  // Rspress 2.0 uses the site title for custom pages, ignoring their frontmatter title.
   const customTitle =
     (page.pageType === 'custom' || page.pageType === 'blank') && frontmatter.title;
   const suffix = frontmatter.titleSuffix ?? site.title;
-  const title = customTitle && (suffix ? `${customTitle} - ${suffix}` : customTitle);
+  const title =
+    brandedTitle || (customTitle && (suffix ? `${customTitle} - ${suffix}` : customTitle));
 
   return (
     <Head>

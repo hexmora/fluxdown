@@ -1,4 +1,4 @@
-# Configuration
+# Configuration - Fluxdown Vue Lynx {#configuration}
 
 Vue Lynx follows [Vue configuration](../vue/configuration.md) for `text`, `build`, `streaming`, `plugins`, `patches` and template refs. This page describes the differences for Lynx.
 

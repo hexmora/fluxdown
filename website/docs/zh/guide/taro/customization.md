@@ -1,4 +1,4 @@
-# 样式指南
+# 样式指南 - Fluxdown Taro {#样式指南}
 
 用主题让 Markdown 融入应用的颜色、字体和间距，再通过容器样式安排布局。要改变组件或交互，使用 [Slot 插件](./plugins/slot.md)。
 

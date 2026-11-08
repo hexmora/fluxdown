@@ -1,4 +1,4 @@
-# Slot plugins
+# Slot plugins - Fluxdown Svelte {#slot-plugins}
 
 Slot plugins provide the components that render prepared content such as code, links and headings. Use them to change appearance and interactions.
 

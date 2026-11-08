@@ -1,0 +1,65 @@
+import {
+  RepairTourDemo,
+  SmoothTourDemo,
+  SlotTourDemo,
+} from '../../../components/demo/components/tour-demo';
+
+# Meet Fluxdown {#meet-fluxdown}
+
+People start reading an AI response before it finishes. At that point, Markdown may end halfway through a link or a bold phrase. Text also arrives in uneven bursts, making the page jump forward and then pause.
+
+Fluxdown is built for that reading experience. It repairs unfinished syntax for display, reveals incoming text at a smoother pace, and lets you use your own components to present the content. Use it for AI conversations, live writing, and growing reports. It renders complete, static Markdown too.
+
+## Formatting before the final character
+
+When the input stops at `**the highlights`, readers should already see the emphasis. They should not have to wait for another pair of asterisks. Fluxdown handles common unfinished syntax at the end of a stream and updates the result as more text arrives.
+
+Drag the slider to stop before the syntax is complete. Bold text, inline code, and links each have their own row, so you can compare the source and both rendering results at once.
+
+<RepairTourDemo />
+
+Repair affects the displayed result, leaving your application's original text intact. While a link address is incomplete, the text still stays readable. See [streaming rendering](./react/streaming.md) for the available controls.
+
+## Receive in bursts, reveal at a steady pace
+
+A server might send half a sentence at once, then pause. Fluxdown separates how much text has arrived from how much is visible. The default spring interpolation speeds up as the backlog grows, helping the display catch up.
+
+Both previews below share the same input. Click the left panel to receive the next chunk early, replay the stream, or choose a different entrance effect.
+
+<SmoothTourDemo />
+
+Smoothing controls when text becomes visible. Animation controls how it appears. You can use either independently: smooth output without animation, or a fade or scale effect as new text arrives. Explore [smoothing](./common/streaming-effects/smoothing.mdx) and [animation effects](./common/streaming-effects/animation/index.mdx).
+
+## Bring your components to Markdown
+
+Themes control fonts and colors; slots let you supply your own components. A code block can include a product action, a link can open an in-app preview, and a quote can become the note card used elsewhere in your interface.
+
+Switch between the two styles below. The source stays the same; only the blockquote slot changes. Fluxdown still handles the bold text and paragraphs inside it.
+
+<SlotTourDemo />
+
+Replace an entire slot, or wrap its default component and adjust one part. For example, keep code highlighting and copying while changing the toolbar. See [Slot plugins](./react/plugins/slot.md) for React examples. To add a citation or a person tag at a specific place in the text, see [position patches](./common/patches.mdx).
+
+## One core, different interfaces
+
+Parsing, syntax repair, and smoothing live in a framework-independent Core. The presentation layer turns its output into each framework's components. Moving to Vue, React Native, or another supported platform keeps the same approach to processing content, with room for each platform's appearance and interactions.
+
+Core uses [Stative](../stative/index.md) to organize its reactive state flows. As text and configuration change, the dependent computations and interface update. Read the [architecture guide](./architecture.mdx) to see how those steps fit together and how rendering libraries connect to Core.
+
+## Where to start
+
+Choose your framework and pass in some text. Each quick start covers installation, styling, and its runtime requirements. Start with Core when you want to handle the output yourself.
+
+| What you need                                              | Start here                                                                           |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Display Markdown and streaming responses in a React app    | [React quick start](./react/quick-start.md) · `fluxdown`                             |
+| Display Markdown and streaming content in a Vue 3 app      | [Vue quick start](./vue/quick-start.md) · `@fluxdown/vue`                            |
+| Render streaming Markdown in Svelte or SvelteKit           | [Svelte quick start](./svelte/quick-start.md) · `@fluxdown/svelte`                   |
+| Render Markdown and streaming content in an Angular app    | [Angular quick start](./angular/quick-start.md) · `@fluxdown/angular`                |
+| Render on iOS, Android, or React Native Web                | [React Native quick start](./react-native/quick-start.md) · `@fluxdown/react-native` |
+| Display Markdown and streaming content in a React Lynx app | [React Lynx quick start](./react-lynx/quick-start.md) · `@fluxdown/react-lynx`       |
+| Display Markdown and streaming content in a Vue Lynx app   | [Vue Lynx quick start](./vue-lynx/quick-start.md) · `@fluxdown/vue-lynx`             |
+| Display Markdown and streaming content in a Solid app      | [Solid quick start](./solid/quick-start.md) · `@fluxdown/solid`                      |
+| Display Markdown and streaming content in a Taro app       | [Taro quick start](./taro/quick-start.md) · `@fluxdown/taro`                         |
+| Display Markdown and streaming content in a Uni App x app  | [Uni App quick start](./uni-app/quick-start.md) · `@fluxdown/uni-app`                |
+| Use another framework or control how content is presented  | [Core quick start](./core/quick-start.md) · `@fluxdown/core`                         |

@@ -1,9 +1,9 @@
 ---
-title: SolidJS Markdown Renderer
+title: Quick start - Fluxdown Solid
 description: Use Fluxdown to render Markdown and streaming messages in SolidJS. Install the component, connect reactive text, and customize themes and plugins.
 ---
 
-# SolidJS Markdown renderer quick start {#quick-start}
+# Quick start - Fluxdown Solid {#quick-start}
 
 Fluxdown renders Markdown in Solid applications. Static content and streaming messages share the same component, with themes and plugins for changing its presentation.
 

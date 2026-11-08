@@ -1,4 +1,4 @@
-# Composite plugins
+# Composite plugins - Fluxdown React Lynx {#composite-plugins}
 
 A composite plugin uses `IPluginItem` to group the slots, render plugins and Core plugins needed for a feature. Pass one object to enable them together.
 

@@ -1,0 +1,74 @@
+import {
+  StaticPatchesDemo,
+  StreamingPatchesDemo,
+} from '../../../../components/demo/components/patches-demo';
+
+# 位置插入 - Fluxdown {#位置插入}
+
+一段回答里可能需要带上引用来源，一份协作文档里可能需要点开某个人的资料。这些信息来自你的应用，未必写在 Markdown 里。
+
+`patches` 可以在原文的某个位置插入内容，也可以把一小段文字换成自己的组件。Markdown 本身保持不变，插入的按钮、链接和标签仍由你的应用控制。
+
+## 把一段文字换成组件
+
+下面把 `@Ada` 换成了可以点开的人物卡片。关掉「人物卡片」，就能看到原来的文字。
+
+<StaticPatchesDemo />
+
+替换时，给出起点和终点，再用 `render` 返回想显示的内容。以 React 为例：
+
+```tsx
+<Fluxdown
+  text="欢迎，@Ada。"
+  patches={[
+    {
+      key: 'person-ada',
+      range: [3, 7],
+      render: (text) => <button onClick={openProfile}>{text}</button>,
+    },
+  ]}
+/>
+```
+
+`[3, 7]` 选中了 `@Ada`：包含起点，不包含终点。`render` 收到被替换的文字，`openProfile` 则由应用提供。也可以返回现成的人物组件、状态标签或链接。
+
+如果只想在文字旁边加一个引用标记，将 `range` 改成单个位置即可：
+
+```tsx
+const text = '可以先读项目手册。';
+
+<Fluxdown
+  text={text}
+  patches={[
+    { key: 'source-1', range: text.length, render: () => <sup>[1]</sup> },
+  ]}
+/>;
+```
+
+这里在句末插入 `[1]`，不会删掉原来的句号。
+
+## 跟着流式正文出现
+
+来源往往和正文分开返回。拿到引用位置后，可以先把 patch 传进去，再继续追加 `text`；等正文到达这个位置，标记才会出现。
+
+<StreamingPatchesDemo />
+
+可以暂停、重播，或点击 `[1]` 查看来源。演示关闭了平滑化和入场动画，方便看清标记出现的时机。`patches` 也能与[平滑化](./streaming-effects/smoothing.mdx)一起使用。
+
+插入点保持不变，后续文字会接着往后显示。要替换一个区间，则需要等区间的终点也已收到；超出当前正文范围的 patch 暂时不会生效。来源晚一点到达也没关系，更新 `patches` 就能补到已经显示的正文中。
+
+## 位置怎么算
+
+位置始终相对于传入的完整 Markdown 字符串，从 `0` 开始。空格、换行和 `**` 这样的语法标记都算在内，与 JavaScript 的字符串索引一致。可以用 `indexOf` 找到目标，再用目标的 `length` 计算终点；遇到 emoji，也不要按屏幕上看到的字数手算。
+
+流式场景中的 `text` 仍然是**已经收到的全部正文**。追加文字不会改变前面的索引；如果编辑了引用之前的文字，就要重新计算位置。找不到目标时，先不要添加那条 patch。
+
+选取范围时，尽量落在同一段普通文字里。不要跨段落、跨加粗或链接的边界，也不要让多个替换范围重叠。代码内部不适合用这种方式替换；代码块的定制交给对应的渲染插件。
+
+## 什么时候用它
+
+有了明确的位置，例如服务端返回的引用范围、用户选中的文字，`patches` 很直接。给每一条 patch 一个稳定的 `key`，后续就可以更新它的内容，或从数组中移除它。
+
+如果需求是「所有链接都带上同一种外观」「每个代码块都有复制按钮」，则更适合[插槽定制](../react/plugins/slot.md)：它按元素类型生效，不需要逐个计算位置。
+
+各框架的 `range` 规则相同，`render` 返回各自支持的界面内容。完整字段说明见 [React 配置](../react/configuration.md#patches)、[Vue 配置](../vue/configuration.md#patches)或 [Core 配置](../core/configuration.md#patches)。

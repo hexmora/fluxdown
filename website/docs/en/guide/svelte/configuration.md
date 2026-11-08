@@ -1,4 +1,4 @@
-# Configuration
+# Configuration - Fluxdown Svelte {#configuration}
 
 This page lists the public props of the Svelte `Fluxdown` component. Only `text` is required at the top level; `FluxdownRaw` also requires explicit `plugins`. All other fields are shared by Full, Lite, and Raw.
 

@@ -1,4 +1,4 @@
-# Lynx Markdown
+# Lynx Markdown 迁移指南 - Fluxdown React Lynx {#lynx-markdown}
 
 这篇指南迁移 Lynx 官方的 [`<markdown>` 原生元件](https://github.com/lynx-family/lynx-website/blob/main/docs/zh/api/elements/built-in/markdown.mdx)。基础展示只需将 `content` 改为 `text`；原来的样式、事件和原生选择能力需要分别适配。
 

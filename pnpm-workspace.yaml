@@ -257,6 +257,7 @@ packageExtensions:
       "@storybook/react-vite": ^10.4.4
 
 overrides:
+  "@rspack/core@2.2.9": 2.3.1
   "@types/hast": "catalog:"
   "@types/react": "catalog:"
   "@types/react-dom": "catalog:"

@@ -1,4 +1,4 @@
-# Styling guide
+# Styling guide - Fluxdown Uni App {#styling-guide}
 
 Use `theme` to adjust typography, colors, and spacing. Keep layout in the outer container and content-specific interactions in Slot plugins.
 

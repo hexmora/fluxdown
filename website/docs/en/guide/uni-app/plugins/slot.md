@@ -1,4 +1,4 @@
-# Slot plugins
+# Slot plugins - Fluxdown Uni App {#slot-plugins}
 
 Slot plugins control presentation and interaction. Keep the built-in Markdown parsing and render plugins, then replace the corresponding `.uvue` component to customize blockquotes, links, or code headers.
 

@@ -1,9 +1,9 @@
 ---
-title: React Native Markdown Renderer
+title: Quick start - Fluxdown React Native
 description: Render Markdown with native Text and View components using Fluxdown for React Native. Get started in an Expo or React Native app for iOS, Android, and web.
 ---
 
-# React Native Markdown renderer quick start {#quick-start}
+# Quick start - Fluxdown React Native {#quick-start}
 
 Fluxdown for React Native renders Markdown with native `Text` and `View` components. It shares parsing, streaming repairs, and the plugin system with React. The same component code runs on iOS, Android, and React Native Web.
 

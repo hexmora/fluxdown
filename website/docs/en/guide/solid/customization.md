@@ -1,4 +1,4 @@
-# Styling guide
+# Styling guide - Fluxdown Solid {#styling-guide}
 
 Themes control Markdown colors, typography and spacing. Container styles handle layout. Use [Slot plugins](./plugins/slot.md) to change components or interactions.
 

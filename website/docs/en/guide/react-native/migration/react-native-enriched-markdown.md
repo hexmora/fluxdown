@@ -1,4 +1,4 @@
-# react-native-enriched-markdown
+# react-native-enriched-markdown migration guide - Fluxdown React Native {#react-native-enriched-markdown}
 
 This guide migrates Markdown display through `EnrichedMarkdownText`. Fluxdown renders content; it does not replace a rich text input. Keep `EnrichedMarkdownTextInput` wherever the app still needs it.
 

@@ -1,4 +1,4 @@
-# solid-markdown
+# solid-markdown 迁移指南 - Fluxdown Solid {#solid-markdown}
 
 把 `SolidMarkdown` 的 `children` 改为 Fluxdown 的 `text`，已有的 signal 和请求逻辑可以保留。目标组件需要 Solid 1.9 或更高的 1.x 版本。
 

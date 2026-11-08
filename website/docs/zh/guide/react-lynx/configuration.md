@@ -1,4 +1,4 @@
-# 自定义配置
+# 自定义配置 - Fluxdown React Lynx {#自定义配置}
 
 基本用法与 [React](../react/configuration.md) 相同。表中链接指向各参数的完整说明，下方补充 `style` 的平台用法。
 

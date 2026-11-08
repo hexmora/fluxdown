@@ -1,4 +1,4 @@
-# Styling
+# Styling - Fluxdown React Lynx {#styling}
 
 Use `className` and `style` for outer layout, and `theme` for colors and typography within the content.
 

@@ -1,4 +1,4 @@
-# react-native-markdown-display
+# react-native-markdown-display 迁移指南 - Fluxdown React Native {#react-native-markdown-display}
 
 将 `Markdown` 的子内容改为 Fluxdown 的 `text`，就能继续使用原来的 Markdown 字符串。外层的滚动容器和消息列表可以保留；样式与自定义规则需要分别迁移。
 

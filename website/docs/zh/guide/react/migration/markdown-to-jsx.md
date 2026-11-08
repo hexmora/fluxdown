@@ -1,4 +1,4 @@
-# markdown-to-jsx
+# markdown-to-jsx 迁移指南 - Fluxdown React {#markdown-to-jsx}
 
 从 [markdown-to-jsx](https://github.com/quantizor/markdown-to-jsx) 迁移时，普通 Markdown 可以直接交给 Fluxdown。若内容里嵌入了自定义 React 标签，需要先安排好这些组件的呈现方式。
 

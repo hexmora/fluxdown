@@ -1,9 +1,9 @@
 ---
-title: Streaming Markdown in Svelte
+title: Streaming rendering - Fluxdown Svelte
 description: Render streaming Markdown in Svelte with Fluxdown. Pass accumulated text through props, configure smoothing and effects, and handle the end of a response.
 ---
 
-# Streaming Markdown in Svelte {#streaming}
+# Streaming rendering - Fluxdown Svelte {#streaming}
 
 Pass accumulated text through `text` and use the request state for `streaming`. Svelte updates the content as props change; no manual refresh is needed.
 

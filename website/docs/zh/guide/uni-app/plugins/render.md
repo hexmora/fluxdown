@@ -1,4 +1,4 @@
-# Render 插件
+# Render 插件 - Fluxdown Uni App {#render-插件}
 
 Render 插件把 HAST 节点转换为 Uni App 渲染描述。描述中保存插槽名称、props 与子节点，由 `.uvue` 组件负责展示。只改变视觉样式时，优先使用 [Slot 插件](./slot.md)。
 

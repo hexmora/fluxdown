@@ -1,4 +1,4 @@
-# react-native-markdown-display
+# react-native-markdown-display migration guide - Fluxdown React Native {#react-native-markdown-display}
 
 Move the Markdown string from `Markdown` children to Fluxdown's `text` prop. Keep the surrounding scroll container and message list; migrate styles and custom rules separately.
 

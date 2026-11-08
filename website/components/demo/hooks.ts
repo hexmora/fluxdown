@@ -11,6 +11,7 @@ const DEFAULT_TIMING: DemoTiming = {
 
 export const useDemoStream = (source: string, timing: DemoTiming = DEFAULT_TIMING) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<number | null>(null);
 
   const frames = useMemo(() => createDemoFrames(source, timing), [source, timing]);
 
@@ -85,19 +86,27 @@ export const useDemoStream = (source: string, timing: DemoTiming = DEFAULT_TIMIN
   useEffect(() => {
     const frame = frames[stream.step];
 
-    if (!active || complete || stream.source !== source || !frame) {
+    if (!active || complete || stream.source !== source || !frame || timerRef.current !== null) {
       return;
     }
 
     const timer = window.setTimeout(() => {
-      setStream((current) => ({
-        ...current,
-        cursor: frame.end,
-        step: current.step + 1,
-      }));
+      timerRef.current = null;
+      setStream((current) => {
+        const next = frames[current.step];
+        if (current.source !== source || current.cycle !== stream.cycle || !next) {
+          return current;
+        }
+        return { ...current, cursor: next.end, step: current.step + 1 };
+      });
     }, frame.delay);
 
-    return () => window.clearTimeout(timer);
+    timerRef.current = timer;
+
+    return () => {
+      window.clearTimeout(timer);
+      timerRef.current = null;
+    };
   }, [active, complete, frames, source, stream]);
 
   return {
@@ -108,6 +117,21 @@ export const useDemoStream = (source: string, timing: DemoTiming = DEFAULT_TIMIN
     playing: active && !complete,
     cycle: stream.cycle,
     text: source.slice(0, cursor),
+    advance: () => {
+      // Give each manual chunk a full interval before the next automatic one.
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+
+      setStream((current) => {
+        const frame = frames[current.step];
+        if (reducedMotion || current.source !== source || !frame) {
+          return current;
+        }
+        return { ...current, cursor: frame.end, step: current.step + 1 };
+      });
+    },
     toggle: () => setStream((current) => ({ ...current, playing: !current.playing })),
     replay: () =>
       setStream((current) => ({

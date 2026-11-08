@@ -1,4 +1,4 @@
-# Using and writing plugins
+# Using and writing plugins - Fluxdown React Lynx {#using-and-writing-plugins}
 
 Plugins divide the content pipeline into stages. Start with slots to change components and interactions; use render plugins to change which slot handles a node. Core plugins handle parsing, repair and streaming transforms.
 

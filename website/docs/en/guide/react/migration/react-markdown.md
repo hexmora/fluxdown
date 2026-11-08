@@ -1,4 +1,4 @@
-# react-markdown
+# react-markdown migration guide - Fluxdown React {#react-markdown}
 
 Keep your Markdown content when migrating from [react-markdown](https://github.com/remarkjs/react-markdown). The main changes are the input prop, component overrides, and syntax plugin configuration.
 

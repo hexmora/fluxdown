@@ -1,9 +1,9 @@
 ---
-title: Streaming Markdown in Vue Lynx
+title: Streaming rendering - Fluxdown Vue Lynx
 description: Render streaming Markdown in Vue Lynx with smoothing, syntax repair and scale, shad, chunk or suffix effects.
 ---
 
-# Streaming Markdown in Vue Lynx {#streaming-content}
+# Streaming rendering - Fluxdown Vue Lynx {#streaming-content}
 
 Pass accumulated text to `text` and control `streaming` with the request state:
 

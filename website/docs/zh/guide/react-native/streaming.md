@@ -1,9 +1,9 @@
 ---
-title: React Native 流式 Markdown 渲染
+title: 流式渲染 - Fluxdown React Native
 description: 在 React Native 中用 Fluxdown 渲染流式 Markdown，接入完整消息文本、配置原生动画效果，并处理响应完成、取消或失败时的状态。
 ---
 
-# 在 React Native 中渲染流式 Markdown {#流式内容}
+# 流式渲染 - Fluxdown React Native {#流式内容}
 
 React Native 与 React 共用同一套流式处理。把累积文本传给 `text`，用请求状态控制 `streaming`：
 

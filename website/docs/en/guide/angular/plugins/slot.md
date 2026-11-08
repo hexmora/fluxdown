@@ -1,4 +1,4 @@
-# Slot plugins
+# Slot plugins - Fluxdown Angular {#slot-plugins}
 
 Slot plugins render prepared content such as code blocks, links, and headings. You choose their components and interactions.
 

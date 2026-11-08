@@ -1,4 +1,4 @@
-# 综合插件
+# 综合插件 - Fluxdown React {#综合插件}
 
 综合插件用 `IPluginItem` 把一个功能需要的 slot、render 和 Core 插件放在一起。应用只需传入一个对象，就能启用整套能力。
 

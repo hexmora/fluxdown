@@ -1,4 +1,4 @@
-# 样式指南
+# 样式指南 - Fluxdown Vue {#样式指南}
 
 主题控制 Markdown 的颜色、字体和间距，容器样式负责布局。需要改变组件或交互时，使用 [Slot 插件](./plugins/slot.md)。
 

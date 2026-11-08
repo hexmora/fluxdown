@@ -1,4 +1,4 @@
-# Configuration
+# Configuration - Fluxdown Solid {#configuration}
 
 This page covers the Solid component's props, defaults and container attributes. `Fluxdown` and `FluxdownLite` require only `text`. `FluxdownRaw` also requires `plugins`; the remaining props are shared by all three entries.
 

@@ -1,0 +1,94 @@
+import { ArchitectureDemo } from '../../../components/demo/components/architecture-demo';
+import {
+  ChunkingDiagram,
+  BuildingDiagram,
+  MappingDiagram,
+  RenderingDiagram,
+  StateClosureDiagram,
+  RendererBridgeDiagram,
+} from '../../../components/demo/components/architecture-diagrams';
+
+# 架构介绍 - Fluxdown {#架构介绍}
+
+Core 把 Markdown 的处理分成四步：分块、构建、映射和渲染。每一步都有自己的输入、输出和状态，连接起来，就能把陆续收到的文本呈现出来。这套处理流程不依赖某个界面框架。
+
+## 处理管线的构建
+
+<ArchitectureDemo />
+
+> 从左往右看同一份内容的变化。可以编辑原文，也可以逐段追加；高亮标出每一栏刚刚发生的变化。演示将平滑展开放慢了三倍，便于观察。
+
+### 分块
+
+把完整 Markdown 拆成可以分别处理的内容块。
+
+<ChunkingDiagram />
+
+> 颜色对应同一个内容块。块按 Markdown 结构划分，不是逐行切开：列表和代码围栏都可能跨越多行。
+
+### 构建
+
+把每个内容块变成语法树，并处理流式末尾尚未完成的语法。
+
+<BuildingDiagram />
+
+> HAST 是 HTML 语法树：图中的段落包含普通文字和加粗文字。即使最后的 `**` 还没收到，也可以先构建出可读的结果。没有变化的块可以复用已有结果。
+
+### 映射
+
+在已有语法树上安排显示进度，并叠加流式效果。
+
+<MappingDiagram />
+
+> 左侧已经收到整句话，右侧只显示到当前进度。后续的平滑更新使用已有的构建结果，不需要每显示一个字就重新解析 Markdown。浅色格子表示尚未显示的内容。
+
+### 渲染
+
+把处理后的语法树交给目标平台的组件或自定义输出。
+
+<RenderingDiagram />
+
+> Core 提供内容结构，渲染层决定用什么元素、样式和交互来呈现。相同的加粗节点，可以接到 Web 元素，也可以接到原生文本组件。
+
+## 状态闭包怎样分层
+
+能够自行产生状态变化，或依据输入产生派生状态变化的对象，叫做[**状态闭包**](../stative/composition.md)。状态闭包一般是 Lazy 的，即访问其状态时才开始执行任何副作用。我们使用状态闭包这种抽象方式来构建上面的管线。
+
+每个阶段都由状态闭包组织。闭包把相关计算放在一起，也管理它创建的子状态；例如构建层会为不同内容块保留各自的状态。
+
+<StateClosureDiagram />
+
+> 新增一个块和更新块内文字是两种变化，可以分别订阅。销毁 Core 时，内部子状态与订阅一起释放；外部传入的文本状态仍由调用方管理。
+
+## 对接渲染库
+
+适配层把界面的输入接到 Core，订阅输出，并在界面卸载时清理资源。
+
+<RendererBridgeDiagram />
+
+> 以 React 为例：props 更新持续存在的输入状态，块列表和块内内容分别通知对应组件。组件重复渲染时保留同一个 Core 实例，卸载时再释放。其他渲染库也可以沿用这套分工。
+
+## 使用 Stative 组织一切
+
+Stative 的 JSX 用来描述状态模块之间的连接。构建运行时把描述变成可以读取和订阅的状态流，后续输入变化沿着这些连接传递。
+
+```tsx
+/** @jsxImportSource stative */
+import { MutableState, render } from 'stative';
+
+const TextLength = ({ text }: { text: string }) => text.length;
+
+const text = MutableState.of('Hello');
+const length = render(<TextLength text={text} />);
+
+console.log(length.value.value); // 5
+text.next('Hello, Fluxdown');
+console.log(length.value.value); // 15
+
+length.destroy();
+text.destroy();
+```
+
+> JSX 描述“把文本接到长度计算”，`render` 用于将 JSX 这样的管线描述实例化成状态闭包，使得可以读取响应式数据。Core 也这样连接分块、构建和映射，只是每个模块的输出更丰富。把组合封装起来，就能像单个状态模块一样继续复用。
+
+继续阅读 [Stative 的 JSX](../stative/jsx.md)，了解如何组合状态；需要直接使用 Core 时，从[快速开始](./core/quick-start.md)入手。

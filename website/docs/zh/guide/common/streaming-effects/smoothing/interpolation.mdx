@@ -1,0 +1,93 @@
+import { InterpolationDemo } from '../../../../../../components/demo/components/smoothing-controls-demo';
+
+# 插值 - Fluxdown {#插值}
+
+已经收到的文字，不一定马上全部显示出来。插值（interpolation）决定显示进度怎样跟上接收进度：每收到新内容，目标向前移动；[驱动](./driver.mdx)每发出一拍，它就决定这次前进多少。
+
+默认的弹簧插值会根据距离调整速度。积压较多时追得快一些，接近末尾时慢下来。多数聊天界面用它就够了；希望每一拍都保持固定步幅时，可以换成自己的插值器。
+
+## 比一比两种步幅
+
+下面两边都每 `80 ms` 更新一次。左侧使用弹簧，右侧每拍前进固定的步幅。切换右侧的步幅，能看到停顿之后、整段文字到达时，两种方式如何跟上。
+
+「已收到」的进度条会随着输入分批跳动。它停下来时，下面的文字仍可以继续展开。点击输出区域，可以让下一批内容提前到达。
+
+<InterpolationDemo />
+
+步幅按可见内容单位计算，在这段文字里可以理解为字数。Markdown 的 `**` 之类的语法标记不计入其中。步幅固定时，更新频率也会影响速度：每拍两个单位、每秒约 12.5 拍，就是每秒约 25 个单位。
+
+## 写一个固定步幅的插值器
+
+`BaseSmoothInterpolator` 已经记录了目标位置。我们只需记录自己走到哪里，并在每拍返回前进量：
+
+```ts
+import { BaseSmoothInterpolator } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+
+class StepInterpolator extends BaseSmoothInterpolator {
+  protected readonly defaultTuple = [2];
+  private position = 0;
+
+  override get idle() {
+    return this.position >= this.fullIndex;
+  }
+
+  override reset(index = 0) {
+    super.reset(index);
+    this.position = index;
+  }
+
+  start(_timestamp: number, index = 0) {
+    this.reset(index);
+  }
+
+  override resume(_timestamp: number) {}
+
+  tick(_timestamp: number) {
+    const [step = 2] = this.tuple;
+    const distance = Math.min(step, this.fullIndex - this.position);
+    this.position += distance;
+    return distance;
+  }
+}
+```
+
+`push()` 由基类负责，把新到达的内容加到目标上。`tick()` 返回本次前进量，最多走到目标，不能返回当前位置。追平后，`idle` 告诉 Fluxdown 可以暂停计时；`reset()` 则用于内容重置。这个例子不使用经过的时间，所以恢复时的 `resume()` 无需处理计时。
+
+## 放进流式配置
+
+把这个类传给 `interpolation`。下面也固定了驱动的间隔，得到演示里每 `80 ms` 前进两个单位的效果：
+
+```tsx
+import { IntervalSmoothDriver } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Fluxdown } from 'fluxdown';
+
+class SteadyDriver extends IntervalSmoothDriver {
+  constructor() {
+    super(80);
+  }
+}
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        smooth: {
+          enabled: true,
+          driver: SteadyDriver,
+          interpolation: StepInterpolator,
+        },
+        effect: false,
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+将两个类与组件放在同一个模块中即可。和驱动一样，传入类，让 Fluxdown 为每份内容管理自己的实例。这个插值器也可以用于其他框架，或直接传给 Core 的 `Smooth` mapper。
+
+## 什么时候保留弹簧
+
+固定步幅容易理解，但积压一大段内容后，它也会按原速慢慢走完。如果你更在意长短不一的响应都能及时显示，默认的 `'spring'` 更合适。
+
+进一步自定义时，可以利用 `tick(timestamp)` 的时间戳按实际经过的时间计算进度；不足一个单位的余量留到下一拍。这样即使帧率改变，显示速度也比较稳定。`push(length, timestamp)` 还会收到每批内容在驱动时钟上的到达时间，到达之前的运动可以继续朝旧目标前进。若追平后仍要更新内部速度，先让 `idle` 保持 `false`，等这些变化结束后再允许暂停计时。

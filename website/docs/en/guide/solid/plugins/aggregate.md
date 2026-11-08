@@ -1,4 +1,4 @@
-# Aggregate plugins
+# Aggregate plugins - Fluxdown Solid {#aggregate-plugins}
 
 An aggregate plugin uses `IPluginItem` to group the slot, render and Core plugins needed for one feature. Pass a single object to enable the whole feature.
 

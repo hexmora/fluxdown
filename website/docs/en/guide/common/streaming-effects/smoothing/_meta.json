@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "driver",
+    "label": "Driver"
+  },
+  {
+    "type": "file",
+    "name": "interpolation",
+    "label": "Interpolation"
+  }
+]

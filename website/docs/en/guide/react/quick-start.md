@@ -1,9 +1,9 @@
 ---
-title: React Markdown Renderer
+title: Quick start - Fluxdown React
 description: Install Fluxdown in React and render Markdown with code highlighting, copy buttons, themes, and streaming support. Includes a working component example.
 ---
 
-# React Markdown renderer quick start {#quick-start}
+# Quick start - Fluxdown React {#quick-start}
 
 Add Fluxdown to a React app and pass it Markdown. Common syntax, code highlighting, copy buttons, and base styles are already included.
 

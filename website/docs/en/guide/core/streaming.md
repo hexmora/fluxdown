@@ -1,4 +1,4 @@
-# State and updates
+# State and updates - Fluxdown Core {#state-and-updates}
 
 Core's inputs and outputs are reactive. As text grows or configuration changes, the existing data flow updates. You do not need to create a new Core instance for each network chunk.
 

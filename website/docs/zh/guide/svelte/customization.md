@@ -1,4 +1,4 @@
-# 样式指南
+# 样式指南 - Fluxdown Svelte {#样式指南}
 
 外部布局交给 `class` 和 `style`，内容内部的颜色与排版交给 `theme`。
 

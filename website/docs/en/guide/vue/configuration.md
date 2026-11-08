@@ -1,4 +1,4 @@
-# Configuration
+# Configuration - Fluxdown Vue {#configuration}
 
 This page lists the public props and fallthrough attributes of the Vue `Fluxdown` component. Only `text` is required at the top level; `FluxdownRaw` also requires explicit `plugins`. All other fields are shared by Full, Lite, and Raw.
 

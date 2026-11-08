@@ -1,9 +1,9 @@
 ---
-title: Vue Lynx 流式 Markdown
-description: 在 Vue Lynx 中使用平滑输出、语法修复以及 scale、shad、chunk、suffix 四种流式效果。
+title: 流式渲染 - Fluxdown Vue Lynx
+description: 在 Vue Lynx 中渲染流式 Markdown，使用平滑输出、语法修复以及 scale、shad、chunk、suffix 四种流式效果。
 ---
 
-# Vue Lynx 流式内容 {#streaming-content}
+# 流式渲染 - Fluxdown Vue Lynx {#streaming-content}
 
 向 `text` 传入累计文本，用请求状态控制 `streaming`：
 
