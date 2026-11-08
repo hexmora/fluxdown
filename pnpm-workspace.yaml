@@ -256,6 +256,9 @@ packageExtensions:
       "@storybook/react-vite": ^10.4.4
 
 overrides:
+  # Rspack 2.2.9 reports shared native references as leaks on CLI exit.
+  # https://github.com/web-infra-dev/rspack/pull/16117
+  "@rspack/core@2.2.9": 2.3.1
   "@types/hast": "catalog:"
   "@types/react": "catalog:"
   "@types/react-dom": "catalog:"
