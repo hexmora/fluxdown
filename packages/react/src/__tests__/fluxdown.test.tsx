@@ -151,6 +151,10 @@ describe('Fluxdown', () => {
     expect(container.querySelector('table')).toHaveTextContent('AB12');
     expect(container.querySelectorAll('th')).toHaveLength(2);
     expect(container.querySelectorAll('td')).toHaveLength(2);
+
+    for (const element of container.querySelectorAll('table, thead, tbody, tr')) {
+      expect([...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE)).toBe(false);
+    }
   });
 
   test('keeps one div root while forwarding reactive className and style', () => {

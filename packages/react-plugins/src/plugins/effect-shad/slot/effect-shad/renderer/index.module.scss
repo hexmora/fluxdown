@@ -1,26 +1,13 @@
-@use "@prefix" as *;
-
 .root {
   display: inline;
 
-  .leading {
-    display: inline;
-  }
-
+  .leading,
   .active {
     display: inline;
-    mask-image: linear-gradient(to right, #000, transparent);
   }
 
-  .mask,
-  .maskHidden {
-    position: relative;
-    display: inline-block;
-    background-image: linear-gradient(to right, transparent, var(--#{$prefix}-colors-bg));
-    pointer-events: none;
-  }
-
-  .maskHidden {
-    opacity: 0;
+  .mask {
+    // Fade the actual text colors against its own background, including inline markup.
+    mask-composite: intersect;
   }
 }

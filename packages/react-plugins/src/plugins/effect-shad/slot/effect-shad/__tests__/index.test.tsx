@@ -63,8 +63,7 @@ describe('EffectShadRenderPlugin', () => {
     expect(view.container.textContent).toBe('leadingactive');
 
     expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: `${expected}px`,
-      marginLeft: `${-expected}px`,
+      maskImage: `linear-gradient(to right, #000, transparent), linear-gradient(to right, #000 max(0px, calc(100% - ${expected}px)), transparent)`,
     });
 
     expect(view.container.firstElementChild).not.toHaveAttribute('style');
