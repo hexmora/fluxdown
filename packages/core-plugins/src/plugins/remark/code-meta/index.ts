@@ -5,6 +5,7 @@ import { processMdast } from '@fluxdown/mdast';
 import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 
 declare global {
   interface RemarkConfigs {
@@ -13,7 +14,7 @@ declare global {
 }
 
 export class CodeMetaRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-code-meta';
+  static readonly key = RemarkPluginKeys.CodeMeta;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Lowest,

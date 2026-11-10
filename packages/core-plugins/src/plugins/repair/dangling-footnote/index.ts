@@ -1,10 +1,15 @@
-import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/types';
+import type {
+  RepairPluginEnabledContext,
+  RepairPluginRunner,
+  RepairPluginSystemConfig,
+} from '@fluxdown/types';
 
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 
-import { isRepairNodeType } from '../../../utils';
+import { isRepairMarker, isRepairNodeType, isRepairTreeTail } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
-import { isStructuralTail, removeCompleteReferences, removeIncompleteReference } from './utils';
+import { RepairPluginKeys } from '../keys';
+import { removeCompleteReferences, removeIncompleteReference } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -13,16 +18,21 @@ declare global {
 }
 
 export class DanglingFootnoteRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-dangling-footnote';
+  static readonly key = RepairPluginKeys.DanglingFootnote;
 
-  readonly config: RepairPluginSystemConfig = {
+  override enabled({ config }: RepairPluginEnabledContext): boolean {
+    return config.footnote;
+  }
+
+  override readonly config: RepairPluginSystemConfig = {
     ending: true,
     priority: PluginPriority.Low,
   };
 
-  runner: RepairPluginRunner = ({ node, parents, skipTree }) => {
+  override runner: RepairPluginRunner = ({ node, parents, skipTree }) => {
     if (node.type === 'link' || node.type === 'linkReference') {
       skipTree();
+
       return;
     }
 
@@ -30,11 +40,15 @@ export class DanglingFootnoteRepairPlugin extends BaseRepairPlugin {
       return;
     }
 
-    let value = removeCompleteReferences(node.value);
+    const isMarker = (offset: number, length: number) => isRepairMarker(node, offset, length);
 
-    if (isStructuralTail(node, parents)) {
-      value = removeIncompleteReference(value);
+    let value = node.value;
+
+    if (isRepairTreeTail(node, parents)) {
+      value = removeIncompleteReference(value, isMarker);
     }
+
+    value = removeCompleteReferences(value, isMarker);
 
     if (value !== node.value) {
       node.value = value;

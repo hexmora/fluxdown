@@ -8,7 +8,7 @@ export type RemarkPluginsInputs = {
 
   extras: PluginSet<IPluggable<IRemarkPlugin, unknown>, RemarkConfigs>;
 
-  repairs: IPluggable<IRepairPlugin, unknown>[];
+  repairs: PluginSet<IPluggable<IRepairPlugin, unknown>, RepairConfigs>;
 
   cacheStore: PluginCacheStore;
 };

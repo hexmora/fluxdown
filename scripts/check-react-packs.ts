@@ -1,5 +1,9 @@
-/* eslint-disable no-await-in-loop -- Build each entry independently to detect dependency leaks. */
-/* eslint-disable no-console -- Report isolated bundle verification in release logs. */
+/* eslint-disable no-await-in-loop --
+ * Build each entry independently to detect dependency leaks.
+ */
+/* eslint-disable no-console --
+ * Report isolated bundle verification in release logs.
+ */
 import { createRsbuild } from '@rsbuild/core';
 import assert from 'node:assert/strict';
 import { writeFile } from 'node:fs/promises';
@@ -32,8 +36,18 @@ const trackedDependencies = [
   '@fluxdown/react-base-plugins',
 ];
 
+interface PackEntry {
+  specifier: string;
+
+  allowed: string[];
+
+  requiredInitialEngines?: string[];
+
+  headless?: boolean;
+}
+
 export async function checkReactPacks(consumer: string, native = false): Promise<void> {
-  const entries: { specifier: string; allowed: string[]; headless?: boolean }[] = [
+  const entries: PackEntry[] = [
     { specifier: '@fluxdown/react-hooks', allowed: [], headless: true },
     { specifier: '@fluxdown/react-base', allowed: [], headless: true },
     { specifier: '@fluxdown/react-base-plugins/base', allowed: [], headless: true },
@@ -42,9 +56,18 @@ export async function checkReactPacks(consumer: string, native = false): Promise
     { specifier: '@fluxdown/react-base-plugins/plugins/fallback', allowed: [], headless: true },
     { specifier: 'fluxdown/raw', allowed: [] },
     { specifier: 'fluxdown/lite', allowed: [] },
+    { specifier: '@fluxdown/react-plugins/base', allowed: [] },
+    { specifier: '@fluxdown/react-plugins/lite', allowed: [] },
+    { specifier: '@fluxdown/react-plugins/plugins/tex', allowed: [] },
     {
       specifier: 'fluxdown/full',
       allowed: ['shiki', '@shikijs', 'katex', '@mathjax', 'pele', ...syntaxExtensions],
+      requiredInitialEngines: ['katex', '@mathjax'],
+    },
+    {
+      specifier: '@fluxdown/react-plugins/full',
+      allowed: ['shiki', '@shikijs', 'katex', '@mathjax', 'pele', ...syntaxExtensions],
+      requiredInitialEngines: ['katex', '@mathjax'],
     },
     { specifier: '@fluxdown/react-plugins/plugins/blockquote', allowed: [] },
     { specifier: '@fluxdown/react-base-plugins/plugins/emoji', allowed: ['remark-gemoji'] },
@@ -60,7 +83,16 @@ export async function checkReactPacks(consumer: string, native = false): Promise
       allowed: ['pele'],
     },
     { specifier: '@fluxdown/react-plugins/plugins/code-prism', allowed: ['prismjs'] },
-    { specifier: '@fluxdown/react-plugins/plugins/tex-katex', allowed: ['katex'] },
+    {
+      specifier: '@fluxdown/react-plugins/plugins/tex-katex',
+      allowed: ['katex'],
+      requiredInitialEngines: ['katex'],
+    },
+    {
+      specifier: '@fluxdown/react-plugins/plugins/tex-mathjax-katex',
+      allowed: ['katex', '@mathjax'],
+      requiredInitialEngines: ['katex', '@mathjax'],
+    },
   ];
 
   if (native)
@@ -91,7 +123,10 @@ export async function checkReactPacks(consumer: string, native = false): Promise
       },
     );
 
-  for (const [index, { specifier, allowed, headless }] of entries.entries()) {
+  for (const [
+    index,
+    { specifier, allowed, headless, requiredInitialEngines = [] },
+  ] of entries.entries()) {
     const nativeEntry = specifier.startsWith('@fluxdown/react-native');
 
     for (const format of ['import', 'require'] as const) {
@@ -193,10 +228,14 @@ export async function checkReactPacks(consumer: string, native = false): Promise
           `${specifier} (${format}) includes an unselected dependency`,
         );
 
+        /*
+         * Synchronous TeX repair validates with the engine selected by its pack.
+         * All other engines must remain lazy, including every engine in raw/lite/base.
+         */
         assert.deepEqual(
-          [...initialEngines],
-          [],
-          `${specifier} (${format}) eagerly loads an engine`,
+          initialEngines,
+          new Set(requiredInitialEngines),
+          `${specifier} (${format}) does not match its initial engine contract`,
         );
 
         for (const dependency of allowed)

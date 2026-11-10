@@ -17,11 +17,16 @@ import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-plugins/presets/repair';
 import {
   type IBasePluginConfig,
   type IPluggable,
+  type IPluggableConfig,
   type IRehypePlugin,
   type IRemarkPlugin,
   type IRepairPlugin,
   PluginPriority,
   type PluginSet,
+  type RemarkPluginConfigContext,
+  type RemarkPluginEnabledContext,
+  type RepairPluginConfigContext,
+  type RepairPluginEnabledContext,
   type RepairPluginRunner,
   type RepairPluginSystemConfig,
 } from '@fluxdown/types';
@@ -63,19 +68,21 @@ class AppendRemarkPlugin extends BaseRemarkPlugin {
 
   private readonly innerConfig: AppendRemarkPluginConfig;
 
-  plugin: Plugin<[], Root, Root> = () => (tree) => {
-    const tail = last(tree.children);
-
-    if (tail?.type === 'paragraph') {
-      tail.children.push({ type: 'text', value: this.innerConfig.suffix ?? '' });
-    }
-  };
-
   constructor(config: AppendRemarkPluginConfig = {}) {
     super();
 
     this.innerConfig = { ...config };
   }
+
+  plugin: Plugin<[], Root, Root> = () => {
+    return (tree) => {
+      const tail = last(tree.children);
+
+      if (tail?.type === 'paragraph') {
+        tail.children.push({ type: 'text', value: this.innerConfig.suffix ?? '' });
+      }
+    };
+  };
 
   override destroy() {
     if (!this.destroyed) {
@@ -93,8 +100,10 @@ class AppendRehypePlugin extends BaseRehypePlugin {
 
   config = { priority: PluginPriority.Lowest };
 
-  plugin: Plugin<[], HastRoot, HastRoot> = () => (tree) => {
-    tree.children.push({ type: 'text', value: '|rehype' });
+  plugin: Plugin<[], HastRoot, HastRoot> = () => {
+    return (tree) => {
+      tree.children.push({ type: 'text', value: '|rehype' });
+    };
   };
 
   override destroy() {
@@ -122,6 +131,12 @@ class EndingMarkerRepairPlugin extends BaseRepairPlugin {
 
   private readonly innerConfig: EndingMarkerRepairPluginConfig;
 
+  constructor(config: EndingMarkerRepairPluginConfig = {}) {
+    super();
+
+    this.innerConfig = { ...config };
+  }
+
   runner: RepairPluginRunner = ({ node }) => {
     if (node.type !== 'root') {
       return;
@@ -133,12 +148,6 @@ class EndingMarkerRepairPlugin extends BaseRepairPlugin {
       tail.children.push({ type: 'text', value: this.innerConfig.marker ?? '|ending' });
     }
   };
-
-  constructor(config: EndingMarkerRepairPluginConfig = {}) {
-    super();
-
-    this.innerConfig = { ...config };
-  }
 
   override destroy() {
     if (!this.destroyed) {
@@ -201,8 +210,12 @@ const renderTestItem = (
 ): RenderedBlock => {
   return {
     baseLength: item.baseLength,
-    destroy: () => item.destroy(),
-    fork: (params) => item.fork(params),
+    destroy: () => {
+      return item.destroy();
+    },
+    fork: (params) => {
+      return item.fork(params);
+    },
     length: item.length,
     meta: item.meta,
     range: item.range,
@@ -226,7 +239,11 @@ const collectText = (node: HastRoot | RootContent): string => {
   }
 
   if ('children' in node) {
-    return node.children.map((child) => collectText(child)).join('');
+    return node.children
+      .map((child) => {
+        return collectText(child);
+      })
+      .join('');
   }
 
   return '';
@@ -314,6 +331,16 @@ const setupCore = (initialText = 'base') => {
   };
 };
 
+const stableAttacher: Plugin<[], Root, Root> = () => {
+  return (tree) => {
+    const paragraph = tree.children[0];
+
+    if (paragraph?.type === 'paragraph') {
+      paragraph.children.push({ type: 'text', value: '|enabled' });
+    }
+  };
+};
+
 beforeEach(() => {
   AppendRemarkPlugin.destroyed.mockClear();
   AppendRehypePlugin.destroyed.mockClear();
@@ -380,7 +407,9 @@ describe('Core', () => {
     const initial = first(state.value.value);
 
     expect(
-      findElement(getFirstBlockTree(state), (element) => element.tagName === 'pre'),
+      findElement(getFirstBlockTree(state), (element) => {
+        return element.tagName === 'pre';
+      }),
     ).toBeDefined();
 
     remarks.next({ 'remark-syntax-policy': { indentedCode: false } });
@@ -388,13 +417,17 @@ describe('Core', () => {
     expect(first(state.value.value)).toBe(initial);
 
     expect(
-      findElement(getFirstBlockTree(state), (element) => element.tagName === 'pre'),
+      findElement(getFirstBlockTree(state), (element) => {
+        return element.tagName === 'pre';
+      }),
     ).toBeUndefined();
 
     remarks.next([]);
 
     expect(
-      findElement(getFirstBlockTree(state), (element) => element.tagName === 'pre'),
+      findElement(getFirstBlockTree(state), (element) => {
+        return element.tagName === 'pre';
+      }),
     ).toBeUndefined();
 
     state.destroy();
@@ -422,13 +455,17 @@ describe('Core', () => {
     );
 
     expect(
-      findElement(getFirstBlockTree(state), (element) => element.tagName === 'a')?.properties.href,
+      findElement(getFirstBlockTree(state), (element) => {
+        return element.tagName === 'a';
+      })?.properties.href,
     ).toBe('custom:example');
 
     rehypes.next({});
 
     expect(
-      findElement(getFirstBlockTree(state), (element) => element.tagName === 'a')?.properties.href,
+      findElement(getFirstBlockTree(state), (element) => {
+        return element.tagName === 'a';
+      })?.properties.href,
     ).toBeUndefined();
 
     state.destroy();
@@ -529,7 +566,9 @@ describe('Core', () => {
 
   test('lets framework-managed remark fields override user tuple options', () => {
     const harness = setupCore('abc');
-    const renderPatch = jest.fn(() => first(harness.state.value.value)!);
+    const renderPatch = jest.fn(() => {
+      return first(harness.state.value.value)!;
+    });
 
     harness.remarks.next([
       [
@@ -544,19 +583,27 @@ describe('Core', () => {
     const renderedBlock = first(harness.state.value.value);
 
     expect(
-      findElement(patchTree, (element) => element.properties?.dataPatchKey === 'actual'),
+      findElement(patchTree, (element) => {
+        return element.properties?.dataPatchKey === 'actual';
+      }),
     ).toBeDefined();
     expect(
-      findElement(patchTree, (element) => element.properties?.dataPatchKey === 'ignored'),
+      findElement(patchTree, (element) => {
+        return element.properties?.dataPatchKey === 'ignored';
+      }),
     ).toBeUndefined();
     expect(renderedBlock?.renderPatches.value).toEqual([{ key: 'actual', render: renderPatch }]);
 
-    const updatedRenderPatch = jest.fn(() => renderedBlock!);
+    const updatedRenderPatch = jest.fn(() => {
+      return renderedBlock!;
+    });
 
     harness.patches.next([{ key: 'actual', range: [2, 2], render: updatedRenderPatch }]);
 
     const updatedTree = getFirstBlockTree(harness.state);
-    const updatedParagraph = findElement(updatedTree, (element) => element.tagName === 'p');
+    const updatedParagraph = findElement(updatedTree, (element) => {
+      return element.tagName === 'p';
+    });
 
     expect(updatedParagraph?.children).toMatchObject([
       { type: 'text', value: 'ab' },
@@ -618,9 +665,476 @@ describe('Core', () => {
 
     ending.build.next({ ...DEFAULT_CONFIG, repair: true, repairEnding: true });
 
-    const values = ending.state.value.value.map((block) => collectText(block.value.value));
+    const values = ending.state.value.value.map((block) => {
+      return collectText(block.value.value);
+    });
 
     expect(values).toEqual(['first', 'second|ending']);
+  });
+
+  test('orders structural table repair before incomplete formulas without coupling their syntax', () => {
+    const harness = setupCore('| $x$ | value');
+
+    harness.remarks.next({});
+
+    harness.rehypes.next({});
+
+    harness.repairs.next({});
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true, repair: true, repairEnding: true });
+
+    expect(
+      harness.state.value.value
+        .map((block) => {
+          return collectText(block.value.value);
+        })
+        .join(''),
+    ).toBe('');
+
+    harness.text.next('| A | B |\n| --- | --- |\n| $x$ | `code');
+
+    const tree = getFirstBlockTree(harness.state);
+
+    expect(
+      findElement(tree, (element) => {
+        return element.properties?.dataType === 'inline-math';
+      }),
+    ).toBeDefined();
+
+    expect(
+      findElement(tree, (element) => {
+        return element.tagName === 'code';
+      }),
+    ).toBeDefined();
+
+    harness.state.destroy();
+  });
+
+  test('gates TeX prefix repair by math syntax and the ending-repair setting', () => {
+    const harness = setupCore('$x+\\frac{a}{');
+
+    harness.remarks.next({});
+
+    harness.rehypes.next({});
+
+    harness.repairs.next({});
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true, repair: true, repairEnding: true });
+
+    const math = findElement(getFirstBlockTree(harness.state), (element) => {
+      return element.properties?.dataType === 'inline-math';
+    });
+
+    expect(
+      math?.children.some((child) => {
+        return child.data?.repairEnding === true;
+      }),
+    ).toBe(true);
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true, repair: true, repairEnding: false });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('$x+\\frac{a}{');
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true, repair: true, repairEnding: true });
+
+    harness.remarks.next({ 'remark-syntax-math': { disabled: true } });
+
+    expect(
+      findElement(getFirstBlockTree(harness.state), (element) => {
+        return element.properties?.dataType === 'inline-math';
+      }),
+    ).toBeUndefined();
+
+    harness.state.destroy();
+  });
+
+  test('reuses candidates and rebuilds the processor when enablement changes', () => {
+    const constructed = jest.fn();
+
+    const setup = jest.fn(stableAttacher);
+
+    class ContextRemarkPlugin extends BaseRemarkPlugin {
+      static readonly key = 'remark-test-context-enabled';
+
+      plugin = setup;
+
+      constructor() {
+        super();
+
+        constructed();
+      }
+
+      override enabled({ config }: RemarkPluginEnabledContext): boolean {
+        return config.tex;
+      }
+    }
+
+    const harness = setupCore('text');
+
+    harness.remarks.next([ContextRemarkPlugin]);
+
+    harness.rehypes.next({});
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text');
+
+    expect(constructed).toHaveBeenCalledTimes(1);
+
+    expect(setup).not.toHaveBeenCalled();
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|enabled');
+
+    expect(setup).toHaveBeenCalledTimes(1);
+
+    harness.build.next(DEFAULT_CONFIG);
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text');
+
+    expect(constructed).toHaveBeenCalledTimes(1);
+
+    expect(setup).toHaveBeenCalledTimes(1);
+
+    harness.state.destroy();
+  });
+
+  test('does not construct repair plugins while the global repair switch is disabled', () => {
+    const constructed = jest.fn();
+
+    const configured = jest.fn();
+
+    class OptionalRepairPlugin extends BaseRepairPlugin {
+      static readonly key = 'repair-test-optional';
+
+      constructor() {
+        super();
+
+        constructed();
+      }
+
+      static override config(): null {
+        configured();
+
+        return null;
+      }
+
+      override runner: RepairPluginRunner = () => {};
+    }
+
+    const harness = setupCore('text');
+
+    harness.repairs.next([OptionalRepairPlugin]);
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|remark|rehype');
+
+    expect(constructed).not.toHaveBeenCalled();
+
+    expect(configured).not.toHaveBeenCalled();
+
+    harness.build.next({ ...DEFAULT_CONFIG, repair: true });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|remark|rehype');
+
+    expect(constructed).toHaveBeenCalledTimes(1);
+
+    expect(configured).toHaveBeenCalledTimes(1);
+
+    harness.state.destroy();
+  });
+
+  test('resolves constructor options before building and caches the resolved options', () => {
+    const constructed = jest.fn();
+
+    const configured = jest.fn();
+
+    class ConfiguredRemarkPlugin extends AppendRemarkPlugin {
+      constructor(config: AppendRemarkPluginConfig = {}) {
+        super(config);
+
+        constructed(config);
+      }
+
+      static override config(
+        context: RemarkPluginConfigContext,
+        outerConfig: IPluggableConfig<AppendRemarkPluginConfig>,
+      ): IPluggableConfig<AppendRemarkPluginConfig> {
+        configured(context, outerConfig);
+
+        return {
+          ...outerConfig,
+          suffix: `${outerConfig.suffix}|${context.config.tex ? 'tex' : 'plain'}`,
+        };
+      }
+    }
+
+    const options = { suffix: '|outer', priority: PluginPriority.Lowest };
+
+    const harness = setupCore('text');
+
+    harness.remarks.next([[ConfiguredRemarkPlugin, options]]);
+
+    harness.rehypes.next({});
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|outer|plain');
+
+    expect(constructed).toHaveBeenCalledTimes(1);
+
+    expect(constructed).toHaveBeenLastCalledWith({ ...options, suffix: '|outer|plain' });
+
+    expect(configured).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        remarks: expect.arrayContaining([[ConfiguredRemarkPlugin, options]]),
+        repairs: [],
+      }),
+      options,
+    );
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|outer|tex');
+
+    expect(constructed).toHaveBeenCalledTimes(2);
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true, footnote: true });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|outer|tex');
+
+    expect(constructed).toHaveBeenCalledTimes(2);
+
+    expect(options).toEqual({ suffix: '|outer', priority: PluginPriority.Lowest });
+
+    harness.state.destroy();
+  });
+
+  test('preserves outer options for null and filters configured disabled plugins before construction', () => {
+    const skipped = jest.fn();
+
+    const constructed = jest.fn();
+
+    const configured = jest.fn();
+
+    class DisabledRemarkPlugin extends BaseRemarkPlugin {
+      static readonly key = 'remark-test-config-disabled';
+
+      override plugin = stableAttacher;
+
+      static override config(): null {
+        skipped();
+
+        return null;
+      }
+    }
+
+    class DynamicRemarkPlugin extends BaseRemarkPlugin {
+      static readonly key = 'remark-test-config-dynamic';
+
+      override plugin = stableAttacher;
+
+      constructor() {
+        super();
+
+        constructed();
+      }
+
+      static override config(
+        { config }: RemarkPluginConfigContext,
+        outerConfig: IPluggableConfig<unknown>,
+      ): IPluggableConfig<unknown> {
+        return { ...outerConfig, disabled: !config.tex };
+      }
+    }
+
+    class NullRemarkPlugin extends AppendRemarkPlugin {
+      static override config(
+        _context: RemarkPluginConfigContext,
+        outerConfig: IPluggableConfig<AppendRemarkPluginConfig>,
+      ): null {
+        configured(outerConfig);
+
+        return null;
+      }
+    }
+
+    const options = { suffix: '|after', priority: PluginPriority.Lowest };
+
+    const harness = setupCore('text');
+
+    harness.remarks.next([
+      [DisabledRemarkPlugin, { disabled: true }],
+      DynamicRemarkPlugin,
+      [NullRemarkPlugin, options],
+    ]);
+
+    harness.rehypes.next({});
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|after');
+
+    expect(skipped).not.toHaveBeenCalled();
+
+    expect(constructed).not.toHaveBeenCalled();
+
+    expect(configured).toHaveBeenLastCalledWith(options);
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|enabled|after');
+
+    expect(constructed).toHaveBeenCalledTimes(1);
+
+    expect(skipped).not.toHaveBeenCalled();
+
+    harness.build.next(DEFAULT_CONFIG);
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|after');
+
+    expect(options).toEqual({ suffix: '|after', priority: PluginPriority.Lowest });
+
+    harness.state.destroy();
+  });
+
+  test('evaluates repair enablement with block-specific configuration and original descriptors', () => {
+    const contexts: RepairPluginEnabledContext[] = [];
+
+    const configurations: RepairPluginConfigContext[] = [];
+
+    const remarkConfigurations: RemarkPluginConfigContext[] = [];
+
+    class ContextRepairPlugin extends BaseRepairPlugin {
+      static readonly key = 'repair-test-context';
+
+      static override config(context: RepairPluginConfigContext): null {
+        configurations.push(context);
+
+        return null;
+      }
+
+      override enabled(context: RepairPluginEnabledContext): boolean {
+        contexts.push(context);
+
+        return context.config.repairEnding;
+      }
+
+      runner: RepairPluginRunner = ({ node }) => {
+        if (node.type !== 'root') {
+          return;
+        }
+
+        node.children.push({
+          type: 'paragraph',
+          children: [{ type: 'text', value: '|tail' }],
+        });
+      };
+    }
+
+    class ContextRemarkPlugin extends BaseRemarkPlugin {
+      static readonly key = 'remark-test-repair-config-context';
+
+      override plugin: Plugin<[], Root, Root> = () => {};
+
+      static override config(context: RemarkPluginConfigContext): null {
+        remarkConfigurations.push(context);
+
+        return null;
+      }
+    }
+
+    const harness = setupCore('first\n\nsecond');
+
+    harness.remarks.next([...PRESET_REMARK_PLUGINS, ContextRemarkPlugin]);
+
+    harness.rehypes.next({});
+
+    harness.repairs.next([ContextRepairPlugin]);
+
+    harness.build.next({ ...DEFAULT_CONFIG, repair: true, repairEnding: true });
+
+    expect(
+      harness.state.value.value.map((block) => {
+        return collectText(block.value.value);
+      }),
+    ).toEqual(['first', 'second\n|tail']);
+
+    expect(
+      contexts.map((context) => {
+        return context.config.repairEnding;
+      }),
+    ).toEqual([false, true]);
+
+    expect(configurations.map((context) => context.config.repairEnding)).toEqual([false, true]);
+
+    expect(
+      remarkConfigurations.map((context) => {
+        return context.repairs.some((plugin) => plugin instanceof ContextRepairPlugin);
+      }),
+    ).toEqual([false, true]);
+
+    expect(
+      contexts.every((context) => {
+        return context.repairs.includes(ContextRepairPlugin);
+      }),
+    ).toBe(true);
+
+    expect(
+      contexts.every((context) => {
+        return context.remarks.includes(ApplyRepairsRemarkPlugin);
+      }),
+    ).toBe(true);
+
+    harness.text.next('first\n\nsecond\n\nthird');
+
+    expect(
+      harness.state.value.value.map((block) => {
+        return collectText(block.value.value);
+      }),
+    ).toEqual(['first', 'second', 'third\n|tail']);
+
+    harness.state.destroy();
+  });
+
+  test('coordinates syntax-dependent repairs through constructor options', () => {
+    const harness = setupCore('~tail');
+
+    harness.remarks.next({});
+
+    harness.rehypes.next({});
+
+    harness.repairs.next({});
+
+    harness.build.next({ ...DEFAULT_CONFIG, repair: true, repairEnding: true });
+
+    expect(
+      findElement(getFirstBlockTree(harness.state), (node) => {
+        return node.tagName === 'del';
+      }),
+    ).toBeDefined();
+
+    harness.remarks.next({ 'remark-syntax-strikethrough': { singleTilde: false } });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('~tail');
+
+    harness.remarks.next({ 'remark-syntax-strikethrough': { disabled: true } });
+
+    harness.text.next('~~tail');
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('~~tail');
+
+    harness.text.next('| header |');
+
+    harness.remarks.next({});
+
+    expect(
+      harness.state.value.value
+        .map((block) => {
+          return collectText(block.value.value);
+        })
+        .join(''),
+    ).toBe('');
+
+    harness.remarks.next({ 'remark-syntax-table': { disabled: true } });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('| header |');
+
+    harness.state.destroy();
   });
 
   test('reacts to enabled repair extras, their configs, and list changes', () => {
@@ -672,13 +1186,19 @@ describe('Core', () => {
 
     const tree = getFirstBlockTree(harness.state);
 
-    expect(findElement(tree, (element) => element.tagName === 'img')).toBeUndefined();
+    expect(
+      findElement(tree, (element) => {
+        return element.tagName === 'img';
+      }),
+    ).toBeUndefined();
     expect(collectText(tree)).toBe('prefix ');
 
     harness.repairs.next({ 'repair-incomplete-image': { strategy: 'placeholder' } });
 
     expect(
-      findElement(getFirstBlockTree(harness.state), (element) => element.tagName === 'img'),
+      findElement(getFirstBlockTree(harness.state), (element) => {
+        return element.tagName === 'img';
+      }),
     ).toMatchObject({ properties: { alt: 'tail' } });
 
     harness.state.destroy();
@@ -695,11 +1215,11 @@ describe('Core', () => {
     expect(updated).toHaveLength(3);
     expect(first(updated)).toBe(first(initial));
     expect(nth(updated, 1)).toBe(nth(initial, 1));
-    expect(updated.map((block) => collectText(block.value.value))).toEqual([
-      'updated|remark|rehype',
-      'second|remark|rehype',
-      'third|remark|rehype',
-    ]);
+    expect(
+      updated.map((block) => {
+        return collectText(block.value.value);
+      }),
+    ).toEqual(['updated|remark|rehype', 'second|remark|rehype', 'third|remark|rehype']);
 
     const inputs = [
       harness.text,
@@ -711,7 +1231,11 @@ describe('Core', () => {
       harness.repairs,
     ];
 
-    expect(inputs.every((state) => countStateObservers(state) > 0)).toBe(true);
+    expect(
+      inputs.every((state) => {
+        return countStateObservers(state) > 0;
+      }),
+    ).toBe(true);
 
     harness.state.destroy();
     harness.state.destroy();
@@ -725,7 +1249,11 @@ describe('Core', () => {
     expect(harness.rehypes.closed).toBe(false);
     expect(harness.renders.closed).toBe(false);
     expect(harness.repairs.closed).toBe(false);
-    expect(inputs.map(countStateObservers)).toEqual(inputs.map(() => 0));
+    expect(inputs.map(countStateObservers)).toEqual(
+      inputs.map(() => {
+        return 0;
+      }),
+    );
     expect(AppendRemarkPlugin.destroyed).toHaveBeenCalledTimes(1);
     expect(AppendRehypePlugin.destroyed).toHaveBeenCalledTimes(1);
   });
@@ -757,7 +1285,7 @@ describe('Core', () => {
     expect(AppendRehypePlugin.destroyed).toHaveBeenCalledTimes(1);
   });
 
-  test('releases shared repair plugins after the last block leaves the graph', () => {
+  test('shares repair instances with unchanged options across block lifetimes', () => {
     const harness = setupCore('first\n\nsecond');
 
     harness.remarks.next({});
@@ -769,15 +1297,16 @@ describe('Core', () => {
       repairEnding: true,
     });
 
-    expect(harness.state.value.value.map((block) => collectText(block.value.value))).toEqual([
-      'first',
-      'second|ending',
-    ]);
+    expect(
+      harness.state.value.value.map((block) => {
+        return collectText(block.value.value);
+      }),
+    ).toEqual(['first', 'second|ending']);
     expect(EndingMarkerRepairPlugin.destroyed).not.toHaveBeenCalled();
 
     harness.text.next('first');
 
-    expect(EndingMarkerRepairPlugin.destroyed).not.toHaveBeenCalled();
+    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(0);
 
     harness.text.next('');
 
@@ -801,7 +1330,9 @@ describe('Core', () => {
     harness.state.destroy();
     harness.state.destroy();
 
-    expect(() => harness.state.value).toThrow('Cannot set up a destroyed state closure.');
+    expect(() => {
+      return harness.state.value;
+    }).toThrow('Cannot set up a destroyed state closure.');
     expect(AppendRemarkPlugin.destroyed).not.toHaveBeenCalled();
     expect(AppendRehypePlugin.destroyed).not.toHaveBeenCalled();
   });

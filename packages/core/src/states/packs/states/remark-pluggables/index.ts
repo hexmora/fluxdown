@@ -1,16 +1,19 @@
-import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
+import type {
+  IPluggable,
+  IRemarkPlugin,
+  IRepairPlugin,
+  RemarkPluginConfigContext,
+  RemarkPluginEnabledContext,
+  RepairPluginEnabledContext,
+} from '@fluxdown/types';
 
-import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/apply-repairs';
-import { PatchesRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/patches';
-import { SyntaxFootnoteRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-footnote';
-import { SyntaxMathRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-math';
-import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-policy';
 import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-plugins/presets/remark';
+import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-plugins/presets/repair';
 import { memoReturns } from 'stative';
 
 import type { RemarkPluggablesInputs } from './type';
 
-import { isPluggablesEqual, toPluggable } from '../../../base';
+import { isPluggableEnabled, isPluggablesEqual, PluginBuilder, toPluggable } from '../../../base';
 import { getPluggableClass, getPluggableConfig } from '../utils';
 
 export * from './type';
@@ -19,72 +22,49 @@ export const RemarkPluggables = /*#__PURE__*/ memoReturns(function RemarkPluggab
   config,
   extras,
   repairs,
+  cacheStore,
 }: RemarkPluggablesInputs): IPluggable<IRemarkPlugin, unknown>[] {
-  const pluggables = toPluggable(extras, PRESET_REMARK_PLUGINS).filter((pluggable) => {
-    const Plugin = getPluggableClass(pluggable);
+  const remarks = toPluggable(extras, PRESET_REMARK_PLUGINS);
 
-    if (Plugin === SyntaxFootnoteRemarkPlugin) {
-      return config.footnote;
-    }
+  const repairSources = config.repair ? toPluggable(repairs, PRESET_REPAIR_PLUGINS) : [];
 
-    if (Plugin === SyntaxMathRemarkPlugin) {
-      return config.tex;
-    }
+  const repairContext: RepairPluginEnabledContext = { config, remarks, repairs: repairSources };
 
-    if (Plugin === ApplyRepairsRemarkPlugin) {
-      return config.repair;
-    }
+  const repairPluggables = repairSources
+    .filter(isPluggableEnabled)
+    .map((pluggable): IPluggable<IRepairPlugin, unknown> => {
+      const Plugin = getPluggableClass(pluggable);
 
-    return true;
+      const options = Plugin.config(repairContext, getPluggableConfig(pluggable));
+
+      return options === null ? pluggable : [Plugin, options];
+    });
+
+  const repairCandidates = PluginBuilder<IRepairPlugin>({
+    plugins: repairPluggables,
+    cacheStore,
   });
 
-  return pluggables.map((pluggable) => {
-    const Plugin = getPluggableClass(pluggable);
+  const repairPlugins = repairCandidates.filter((plugin) => plugin.enabled(repairContext));
 
-    const pluginConfig = getPluggableConfig(pluggable);
+  const configContext: RemarkPluginConfigContext = { config, remarks, repairs: repairPlugins };
 
-    if (Plugin === SyntaxPolicyRemarkPlugin) {
-      return [
-        Plugin,
-        {
-          indentedCode: config.indentedCode,
-          setextHeading: config.setextHeading,
-          ...pluginConfig,
-        },
-      ];
-    }
+  const pluggables = remarks
+    .filter(isPluggableEnabled)
+    .map((pluggable): IPluggable<IRemarkPlugin, unknown> => {
+      const Plugin = getPluggableClass(pluggable);
 
-    if (Plugin === PatchesRemarkPlugin) {
-      return [
-        Plugin,
-        {
-          ...pluginConfig,
-          patches: config.patches,
-        },
-      ];
-    }
+      const options = Plugin.config(configContext, getPluggableConfig(pluggable));
 
-    if (Plugin === SyntaxMathRemarkPlugin) {
-      return [
-        Plugin,
-        {
-          ...pluginConfig,
-          repairEnding: config.repair && config.repairEnding,
-        },
-      ];
-    }
+      return options === null ? pluggable : [Plugin, options];
+    })
+    .filter(isPluggableEnabled);
 
-    if (Plugin === ApplyRepairsRemarkPlugin) {
-      return [
-        Plugin,
-        {
-          ...pluginConfig,
-          plugins: repairs,
-          ending: config.repairEnding,
-        },
-      ];
-    }
+  const candidates = PluginBuilder<IRemarkPlugin>({ plugins: pluggables, cacheStore, sort: false });
 
-    return pluggable;
-  });
+  const context: RemarkPluginEnabledContext = { config, remarks };
+
+  const enabled = candidates.map((plugin) => plugin.enabled(context));
+
+  return pluggables.filter((_pluggable, index) => enabled[index]);
 }, isPluggablesEqual);

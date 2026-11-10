@@ -3,12 +3,19 @@ import { useMemo } from 'react';
 
 import type { TexProps } from '../../../../../../../base';
 
+import { getTexRoot } from '../../../../../../tex/utils';
+import { texToSvg } from '../../../../../engine';
 import styles from '../../index.module.scss';
-import { texToSvg } from './utils';
 
-export const MathjaxTexRenderer = ({ className, mode = 'inline', style, tex }: TexProps) => {
+export const MathjaxTexRenderer = ({
+  className,
+  mode = 'inline',
+  parents,
+  style,
+  tex,
+}: TexProps) => {
   const html = useMemo(() => texToSvg(tex, mode), [mode, tex]);
-  const Root = mode === 'display' ? 'div' : 'span';
+  const Root = getTexRoot(mode, parents);
 
   return (
     <Root

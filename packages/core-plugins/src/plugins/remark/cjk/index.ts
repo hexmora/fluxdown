@@ -7,6 +7,7 @@ import { gfmStrikethroughCjkFriendly } from 'micromark-extension-cjk-friendly-gf
 
 import { appendMicromarkExtension } from '../../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 import { splitCjkAutolinks } from './utils';
 
 declare global {
@@ -16,7 +17,7 @@ declare global {
 }
 
 export class CjkRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-cjk';
+  static readonly key = RemarkPluginKeys.Cjk;
 
   readonly config: IBasePluginConfig = {
     // Select the tokenizer before the strikethrough plugin registers its extensions.

@@ -1,5 +1,9 @@
 import type { Newable } from '@fluxdown/utils';
 
+import type { RemarkPluginConfigContext, RepairPluginConfigContext } from '../compiler';
+import type { IRemarkPlugin } from './remark';
+import type { IRepairPlugin } from './repair';
+
 declare global {
   interface MapperConfigs {}
 
@@ -14,12 +18,16 @@ declare global {
   interface RenderConfigs {}
 }
 
-/** Optional plugin entries with the shared options consumed by plugin composition. */
+/**
+ * Optional plugin entries with the shared options consumed by plugin composition.
+ */
 export type PluggableConfigs<C> = {
   [K in keyof C]?: IPluggableConfig<C[K]>;
 };
 
-/** A plugin list, preset configuration, or a list with configuration overrides. */
+/**
+ * A plugin list, preset configuration, or a list with configuration overrides.
+ */
 export type PluginSet<T, C> = [T[], Partial<C>] | Partial<C> | T[];
 
 /**
@@ -64,13 +72,27 @@ export type IPluginWithConfig<C = {}> = {
   readonly config: IBasePluginConfig & C;
 };
 
+/**
+ * Resolves constructor options before an instance is built without mutating the context or options.
+ * Null preserves the original descriptor; a returned object replaces its constructor options.
+ */
+export interface PluginClassConfig<C> {
+  config(context: C, outerConfig: IPluggableConfig<unknown>): IPluggableConfig<unknown> | null;
+}
+
+type PluginClassConfigByType<T> = T extends IRepairPlugin
+  ? PluginClassConfig<RepairPluginConfigContext>
+  : T extends IRemarkPlugin
+    ? PluginClassConfig<RemarkPluginConfigContext>
+    : {};
+
 export type PluginClass<T extends IPluginWithConfig, O = void> = Newable<
   T,
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type, @typescript-eslint/no-explicit-any
   O extends void ? any[] : [O]
 > & {
   readonly key: string;
-};
+} & PluginClassConfigByType<T>;
 
 export type IPluggableConfig<C = unknown> = (unknown extends C
   ? object | Record<string, unknown>
@@ -82,7 +104,9 @@ export type IPluggableConfig<C = unknown> = (unknown extends C
    */
   priority?: PluginPriority | number;
 
-  /** Excludes this plugin from the configured list without constructing it. */
+  /**
+   * Excludes this plugin from the configured list without constructing it.
+   */
   disabled?: boolean;
 };
 

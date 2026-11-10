@@ -1,4 +1,8 @@
+import type { Parent, PhrasingContent } from 'mdast';
+
 import { nth } from 'lodash-es';
+
+import { getRepairInlineSource, isEscaped, sliceRanges } from '../../../utils';
 
 const isAsciiLetter = (value: string | undefined): boolean => {
   return value !== undefined && ((value >= 'a' && value <= 'z') || (value >= 'A' && value <= 'Z'));
@@ -46,7 +50,7 @@ const isPotentialTag = (value: string): boolean => {
   return delimiter === '/' || delimiter === '>' || /\s/.test(delimiter ?? '');
 };
 
-const hasUnquotedClosingBracket = (value: string): boolean => {
+const getHtmlClosingBracket = (value: string): number => {
   let quote: '"' | "'" | undefined;
 
   for (let index = 1; index < value.length; index += 1) {
@@ -67,25 +71,58 @@ const hasUnquotedClosingBracket = (value: string): boolean => {
     }
 
     if (character === '>') {
-      return true;
+      return index;
     }
   }
 
-  return false;
+  return -1;
 };
 
 export const getIncompleteTagStart = (value: string): number | undefined => {
-  const start = value.lastIndexOf('<');
+  let start = value.indexOf('<');
 
-  if (start === -1) {
-    return undefined;
+  while (start !== -1) {
+    const suffix = value.slice(start);
+
+    if (!isEscaped(value, start) && isPotentialTag(suffix)) {
+      const closing = getHtmlClosingBracket(suffix);
+
+      if (closing === -1) {
+        if (!/^<https?:\/\//i.test(suffix)) {
+          return start;
+        }
+      } else {
+        start += closing;
+      }
+    }
+
+    start = value.indexOf('<', start + 1);
+  }
+};
+export const getIncompleteHtmlChildren = (node: Parent): PhrasingContent[] | undefined => {
+  if (!['paragraph', 'heading', 'tableCell'].includes(node.type)) {
+    return;
   }
 
-  const suffix = value.slice(start);
+  const raw = getRepairInlineSource(node, true);
 
-  if (!isPotentialTag(suffix) || hasUnquotedClosingBracket(suffix)) {
-    return undefined;
+  if (!raw) {
+    return;
   }
 
-  return start;
+  const { source, ranges } = raw;
+
+  const start = getIncompleteTagStart(source);
+
+  if (start === undefined) {
+    return;
+  }
+
+  const range = ranges.find((item) => item.start <= start && item.end > start);
+
+  if (range?.node.type !== 'text') {
+    return;
+  }
+
+  return sliceRanges(ranges, 0, start);
 };

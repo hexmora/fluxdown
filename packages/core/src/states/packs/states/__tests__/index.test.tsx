@@ -18,7 +18,6 @@ import { Suffix } from '@fluxdown/core-plugins/plugins/mapper/suffix';
 import { HoistFootnoteRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/hoist-footnote';
 import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/apply-repairs';
 import { SyntaxMathRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-math';
-import { DanglingFootnoteRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/dangling-footnote';
 import { expectTypeOf } from 'expect-type';
 import {
   type IReactiveState,
@@ -46,7 +45,6 @@ import {
   RemarkPluggables,
   RenderPatchesMapper,
   RenderPluggables,
-  RepairPluggables,
 } from '..';
 import { BaseRenderPlugin } from '../../../../externals';
 
@@ -195,49 +193,29 @@ describe('pack state mappers', () => {
     extras.destroy();
   });
 
-  test.each(['rehype', 'repair'] as const)(
-    'preserves equal %s outputs when unrelated configuration changes',
-    (mapper) => {
-      const config = MutableState.of(DEFAULT_CONFIG);
+  test('preserves equal rehype outputs when unrelated configuration changes', () => {
+    const config = MutableState.of(DEFAULT_CONFIG);
 
-      const extras = MutableState.of({});
+    const extras = MutableState.of({});
 
-      const state =
-        mapper === 'rehype'
-          ? render(S([RehypePluggables, { config, extras }]))
-          : render(S([RepairPluggables, { config, extras }]));
+    const state = render(S([RehypePluggables, { config, extras }]));
 
-      const initial = state.value.value;
+    const initial = state.value.value;
 
-      const next = jest.fn();
+    config.next({ ...DEFAULT_CONFIG, tex: true });
 
-      state.value.subscribe(next);
+    expect(state.value.value).toBe(initial);
 
-      next.mockClear();
+    config.next({ ...DEFAULT_CONFIG, footnote: true, repair: true });
 
-      config.next({ ...DEFAULT_CONFIG, tex: true });
+    expect(state.value.value).toBe(initial);
 
-      expect(state.value.value).toBe(initial);
+    state.destroy();
 
-      expect(next).not.toHaveBeenCalled();
+    config.destroy();
 
-      config.next({ ...DEFAULT_CONFIG, footnote: true, repair: true });
-
-      if (mapper === 'rehype') {
-        expect(state.value.value).toBe(initial);
-        expect(next).not.toHaveBeenCalled();
-      } else {
-        expect(state.value.value).not.toBe(initial);
-        expect(next).toHaveBeenCalledTimes(1);
-      }
-
-      state.destroy();
-
-      config.destroy();
-
-      extras.destroy();
-    },
-  );
+    extras.destroy();
+  });
 
   test('maps raw and render patches independently', () => {
     const renderFirst = jest.fn(() => 'first');
@@ -301,8 +279,6 @@ describe('pack state mappers', () => {
       PluginSet<IPluggable<IRepairPlugin, unknown>, RepairConfigs>
     >({});
 
-    const repairs = MutableState.of<IRepairPlugin[]>([]);
-
     const rehypes = render<IPluggable<IRehypePlugin, unknown>[]>(
       S<IPluggable<IRehypePlugin, unknown>[]>(
         <RehypePluggables config={config} extras={rehypeExtras} />,
@@ -311,13 +287,7 @@ describe('pack state mappers', () => {
 
     const remarks = render<IPluggable<IRemarkPlugin, unknown>[]>(
       S<IPluggable<IRemarkPlugin, unknown>[]>(
-        <RemarkPluggables config={remarksConfig} extras={remarkExtras} repairs={repairs} />,
-      ),
-    );
-
-    const repairPluggables = render<IPluggable<IRepairPlugin, unknown>[]>(
-      S<IPluggable<IRepairPlugin, unknown>[]>(
-        <RepairPluggables config={config} extras={repairExtras} />,
+        <RemarkPluggables config={remarksConfig} extras={remarkExtras} repairs={repairExtras} />,
       ),
     );
 
@@ -326,8 +296,6 @@ describe('pack state mappers', () => {
     expect(remarks.value.value.map(getPluggableClass)).not.toContain(SyntaxMathRemarkPlugin);
 
     expect(remarks.value.value.map(getPluggableClass)).not.toContain(ApplyRepairsRemarkPlugin);
-
-    expect(repairPluggables.value.value).toEqual([]);
 
     const initialRemarks = remarks.value.value;
 
@@ -359,15 +327,9 @@ describe('pack state mappers', () => {
 
     expect(remarks.value.value.map(getPluggableClass)).toContain(ApplyRepairsRemarkPlugin);
 
-    expect(repairPluggables.value.value.map(getPluggableClass)).toContain(
-      DanglingFootnoteRepairPlugin,
-    );
-
     rehypes.destroy();
 
     remarks.destroy();
-
-    repairPluggables.destroy();
 
     config.destroy();
 
@@ -378,8 +340,6 @@ describe('pack state mappers', () => {
     remarkExtras.destroy();
 
     repairExtras.destroy();
-
-    repairs.destroy();
   });
 });
 

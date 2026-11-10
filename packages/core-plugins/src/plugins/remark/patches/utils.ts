@@ -108,9 +108,9 @@ const normalizePatches = (patches: IRawPatchItem[]): NormalizedPatch[] => {
   });
 
   // oxlint-disable-next-line unicorn/no-array-sort -- The array is locally owned.
-  const ordered = normalized.sort(
-    (left, right) => left.start - right.start || left.end - right.end || left.order - right.order,
-  );
+  const ordered = normalized.sort((left, right) => {
+    return left.start - right.start || left.end - right.end || left.order - right.order;
+  });
   const filtered: NormalizedPatch[] = [];
 
   for (const patch of ordered) {
@@ -564,7 +564,9 @@ const findParentForPoint = (
 };
 
 const addTextPatch = (targets: TextPatchTarget[], node: Text, patch: TextPatch): void => {
-  let target = targets.find((item) => item.node === node);
+  let target = targets.find((item) => {
+    return item.node === node;
+  });
 
   if (!target) {
     target = { node, patches: [] };
@@ -579,9 +581,9 @@ const addParentPatch = (
   candidate: ParentCandidate,
   patch: ParserPatch,
 ): void => {
-  let target = targets.find(
-    (item) => item.parent === candidate.parent && item.index === candidate.index,
-  );
+  let target = targets.find((item) => {
+    return item.parent === candidate.parent && item.index === candidate.index;
+  });
 
   if (!target) {
     target = { index: candidate.index, parent: candidate.parent, patches: [] };
@@ -677,6 +679,12 @@ const createText = (
     text.position = position;
   }
 
+  const raw = source.slice(start, end);
+
+  if (node.data?.source !== undefined && decodeMarkdownText(raw) === value) {
+    text.data = { source: raw };
+  }
+
   return text;
 };
 
@@ -727,10 +735,12 @@ const applyTargets = (
   parentTargets: ParentPatchTarget[],
   source: string,
 ): void => {
-  const textReplacements: TextReplacement[] = textTargets.map((target) => ({
-    node: target.node,
-    replacements: replaceText(target, source),
-  }));
+  const textReplacements: TextReplacement[] = textTargets.map((target) => {
+    return {
+      node: target.node,
+      replacements: replaceText(target, source),
+    };
+  });
   const parents: Parent[] = [];
 
   for (const node of collectNodes(root)) {
@@ -739,7 +749,11 @@ const applyTargets = (
     }
 
     for (const target of textTargets) {
-      if (node.children.some((child) => child === target.node)) {
+      if (
+        node.children.some((child) => {
+          return child === target.node;
+        })
+      ) {
         if (!parents.includes(node)) {
           parents.push(node);
         }
@@ -769,7 +783,9 @@ const applyTargets = (
         continue;
       }
 
-      const replacement = textReplacements.find((item) => item.node === child);
+      const replacement = textReplacements.find((item) => {
+        return item.node === child;
+      });
 
       nextChildren.push(...(replacement?.replacements ?? [child]));
     }

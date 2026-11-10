@@ -4,7 +4,8 @@ import { isMdastParent } from '@fluxdown/mdast';
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 
 import { BaseRepairPlugin } from '../base';
-import { INLINE_PARENT_TYPES, removeTrailingBreaks } from './utils';
+import { RepairPluginKeys } from '../keys';
+import { getTrailingBreakChildren, INLINE_PARENT_TYPES } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -13,18 +14,22 @@ declare global {
 }
 
 export class RedundantTrailingBreakRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-redundant-trailing-break';
+  static readonly key = RepairPluginKeys.RedundantTrailingBreak;
 
-  readonly config: RepairPluginSystemConfig = {
+  override readonly config: RepairPluginSystemConfig = {
     ending: false,
     priority: PluginPriority.Lowest,
   };
 
-  runner: RepairPluginRunner = ({ node }) => {
+  override runner: RepairPluginRunner = ({ node }) => {
     if (!isMdastParent(node) || INLINE_PARENT_TYPES.includes(node.type)) {
       return;
     }
 
-    removeTrailingBreaks(node);
+    const children = getTrailingBreakChildren(node);
+
+    if (children) {
+      node.children = children;
+    }
   };
 }

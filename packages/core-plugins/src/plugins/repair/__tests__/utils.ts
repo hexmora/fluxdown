@@ -6,6 +6,7 @@ import { fromMarkdown } from 'mdast-util-from-markdown';
 import { toMarkdown } from 'mdast-util-to-markdown';
 
 import { processRepairByPlugins } from '../../../utils';
+import { setTextSourceByNode } from '../../remark/utils';
 
 export interface RunRepairsOptions {
   ending?: boolean;
@@ -34,19 +35,23 @@ export const repairMarkdown = (
   plugins: IRepairPlugin | IRepairPlugin[],
   options: RunRepairsOptions = {},
 ): Root => {
-  return runRepairs(fromMarkdown(source), plugins, options);
+  return runRepairs(setTextSourceByNode(fromMarkdown(source), source), plugins, options);
 };
 
 export const stringifyMarkdown = (tree: Root): string => {
   return toMarkdown(tree).trim();
 };
 
-export const root = (children: RootContent[]): Root => ({
-  type: 'root',
-  children,
-});
+export const root = (children: RootContent[]): Root => {
+  return {
+    type: 'root',
+    children,
+  };
+};
 
-export const paragraph = (children: PhrasingContent[]): Paragraph => ({
-  type: 'paragraph',
-  children,
-});
+export const paragraph = (children: PhrasingContent[]): Paragraph => {
+  return {
+    type: 'paragraph',
+    children,
+  };
+};

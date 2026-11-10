@@ -49,15 +49,19 @@ const DEFAULT_CONFIG: BlockCompilerConfig = {
   setextHeading: false,
 };
 
-const patch = (key: string, range: IRawPatchRange = 0): IRawPatchItem => ({
-  key,
-  range,
-});
+const patch = (key: string, range: IRawPatchRange = 0): IRawPatchItem => {
+  return {
+    key,
+    range,
+  };
+};
 
-const section = (text: string, patches: IRawPatchItem[] = []): IBlockSection => ({
-  text,
-  patches,
-});
+const section = (text: string, patches: IRawPatchItem[] = []): IBlockSection => {
+  return {
+    text,
+    patches,
+  };
+};
 
 const collectText = (node: HastRoot | RootContent): string => {
   if (node.type === 'text') {
@@ -73,6 +77,7 @@ const collectText = (node: HastRoot | RootContent): string => {
 
 const createRemarkAppender = (value: string, run = jest.fn()) => {
   const plugin: IRemarkPlugin = {
+    enabled: () => true,
     config: {},
     destroy: jest.fn(),
     plugin: () => (tree) => {
@@ -1161,6 +1166,7 @@ describe('BlockCompiler', () => {
     const failure = new Error('Failed to compile remarks.');
     const throwingRemark: IRemarkPlugin = {
       config: {},
+      enabled: () => true,
       destroy: jest.fn(),
       plugin: () => {
         throw failure;

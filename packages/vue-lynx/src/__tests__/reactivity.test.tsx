@@ -108,6 +108,14 @@ describe('reactive renderer configuration', () => {
 
       readonly config = {};
 
+      static config(): null {
+        return null;
+      }
+
+      enabled(): boolean {
+        return true;
+      }
+
       readonly plugin = () => () => {
         compile();
       };

@@ -8,6 +8,7 @@ import { cloneDeep } from 'lodash-es';
 import type { SyntaxHtmlAllowedRemarkPluginConfig } from './type';
 
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 import { getTagName, isEnabledTag } from './utils';
 
 export type { SyntaxHtmlAllowedRemarkPluginConfig } from './type';
@@ -19,7 +20,7 @@ declare global {
 }
 
 export class SyntaxHtmlAllowedRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-syntax-html-allowed';
+  static readonly key = RemarkPluginKeys.SyntaxHtmlAllowed;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Lowest,

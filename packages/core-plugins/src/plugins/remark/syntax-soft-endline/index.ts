@@ -5,6 +5,7 @@ import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@
 import remarkBreaks from 'remark-breaks';
 
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 
 declare global {
   interface RemarkConfigs {
@@ -13,7 +14,7 @@ declare global {
 }
 
 export class SyntaxSoftEndlineRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-syntax-soft-endline';
+  static readonly key = RemarkPluginKeys.SyntaxSoftEndline;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Low,

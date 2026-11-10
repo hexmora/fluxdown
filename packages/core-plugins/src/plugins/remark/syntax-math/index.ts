@@ -1,19 +1,30 @@
 import type { Root } from 'mdast';
 import type { Plugin } from 'unified';
 
-import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@fluxdown/types';
+import {
+  type IBasePluginConfig,
+  type IPluggableConfig,
+  PluginPriority,
+  type RemarkPluginConfigContext,
+  type RemarkPluginEnabledContext,
+} from '@fluxdown/types';
 import { mathFromMarkdown, mathToMarkdown } from 'mdast-util-math';
 import { math } from 'micromark-extension-math';
 
 import type { SyntaxMathRemarkPluginConfig, SyntaxMathRemarkPluginInnerConfig } from './type';
 
 import { appendRemarkExtensions } from '../../../utils';
+import { getConfigIfEnabled } from '../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
+import { setTextSource } from '../utils';
 import { transformMath } from './utils';
 
 export type { PandocMathData, PandocMathMode } from '../../../typings';
 
 export type { SyntaxMathRemarkPluginConfig } from './type';
+
+export { repairMath, transformMath } from './utils';
 
 declare global {
   interface RemarkConfigs {
@@ -22,15 +33,15 @@ declare global {
 }
 
 export class SyntaxMathRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-syntax-math';
+  static readonly key = RemarkPluginKeys.SyntaxMath;
 
-  readonly config: IBasePluginConfig = {
-    priority: PluginPriority.Lowest,
+  override readonly config: IBasePluginConfig = {
+    priority: PluginPriority.Highest,
   };
 
   private readonly innerConfig: SyntaxMathRemarkPluginInnerConfig;
 
-  plugin: Plugin<[], Root, Root>;
+  override plugin: Plugin<[], Root, Root>;
 
   constructor(config: SyntaxMathRemarkPluginConfig = {}) {
     super();
@@ -38,17 +49,37 @@ export class SyntaxMathRemarkPlugin extends BaseRemarkPlugin {
     this.innerConfig = {
       repairEnding: config.repairEnding ?? false,
     };
+
     const { repairEnding } = this.innerConfig;
+
     this.plugin = function () {
+      this.use(setTextSource);
+
       appendRemarkExtensions(this.data(), {
         micromark: math(),
         fromMarkdown: mathFromMarkdown(),
         toMarkdown: mathToMarkdown(),
       });
 
-      return (tree, file) => {
-        transformMath(tree, String(file), repairEnding);
+      return (tree) => {
+        transformMath(tree, repairEnding);
       };
     };
+  }
+
+  static override config(
+    { config, remarks }: RemarkPluginConfigContext,
+    outerConfig: IPluggableConfig<SyntaxMathRemarkPluginConfig>,
+  ): IPluggableConfig<SyntaxMathRemarkPluginConfig> {
+    const repairEnabled = getConfigIfEnabled(remarks, RemarkPluginKeys.ApplyRepairs) !== undefined;
+
+    return {
+      ...outerConfig,
+      repairEnding: config.repair && config.repairEnding && !repairEnabled,
+    };
+  }
+
+  override enabled({ config }: RemarkPluginEnabledContext): boolean {
+    return config.tex;
   }
 }

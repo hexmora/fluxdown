@@ -45,8 +45,9 @@ export const isPluggableEqual = <T>(left: T | [T, unknown], right: T | [T, unkno
   );
 };
 
-export const isPluggableEnabled = (pluggable: AnyPluggable): boolean =>
-  !isArray(pluggable) || pluggable[1].disabled !== true;
+export const isPluggableEnabled = (pluggable: AnyPluggable): boolean => {
+  return !isArray(pluggable) || pluggable[1].disabled !== true;
+};
 
 export const isPluggablesEqual = <T>(
   left: readonly T[] = [],
@@ -136,7 +137,9 @@ export function toPluggable(
       return pluggable;
     }
 
-    return [Plugin, { ...(isArray(pluggable) ? pluggable[1] : {}), ...config }];
+    const options = { ...(isArray(pluggable) ? pluggable[1] : {}), ...config };
+
+    return [Plugin, options];
   });
 }
 

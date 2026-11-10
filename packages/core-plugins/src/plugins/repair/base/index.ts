@@ -1,9 +1,14 @@
 import type {
+  IPluggableConfig,
   IRepairPlugin,
+  RepairPluginCleanup,
+  RepairPluginConfigContext,
+  RepairPluginEnabledContext,
   RepairPluginHookType,
   RepairPluginRunner,
   RepairPluginSystemConfig,
 } from '@fluxdown/types';
+import type { Parent, RootContent } from 'mdast';
 
 import { noop } from 'lodash-es';
 import { Destructible } from 'stative';
@@ -20,4 +25,17 @@ export abstract class BaseRepairPlugin extends Destructible implements IRepairPl
   beforeEach: RepairPluginHookType = noop;
 
   afterEach: RepairPluginHookType = noop;
+
+  static config(
+    _context: RepairPluginConfigContext,
+    _outerConfig: IPluggableConfig<unknown>,
+  ): IPluggableConfig<unknown> | null {
+    return null;
+  }
+
+  enabled(_context: RepairPluginEnabledContext): boolean {
+    return true;
+  }
+
+  prepare(_node: Parent | RootContent): RepairPluginCleanup | void {}
 }

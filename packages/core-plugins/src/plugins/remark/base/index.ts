@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-invalid-void-type */
-import type { IBasePluginConfig, IRemarkPlugin } from '@fluxdown/types';
+import type {
+  IBasePluginConfig,
+  IPluggableConfig,
+  IRemarkPlugin,
+  RemarkPluginConfigContext,
+  RemarkPluginEnabledContext,
+} from '@fluxdown/types';
 import type { Root as MdastRoot } from 'mdast';
 import type { Plugin } from 'unified';
 import type { Node } from 'unist';
@@ -17,4 +23,15 @@ export abstract class BaseRemarkPlugin<
   config: IBasePluginConfig = {};
 
   abstract plugin: Plugin<P extends void ? [] : [P], I, O>;
+
+  static config(
+    _context: RemarkPluginConfigContext,
+    _outerConfig: IPluggableConfig<unknown>,
+  ): IPluggableConfig<unknown> | null {
+    return null;
+  }
+
+  enabled(_context: RemarkPluginEnabledContext): boolean {
+    return true;
+  }
 }

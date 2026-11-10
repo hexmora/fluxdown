@@ -8,6 +8,7 @@ import rehypeSanitize from 'rehype-sanitize';
 import type { SanitizerRehypePluginConfig } from './type';
 
 import { BaseRehypePlugin } from '../base';
+import { RehypePluginKeys } from '../keys';
 import { createSchema, restoreFootnoteLinks } from './utils';
 
 export type { SanitizerRehypePluginConfig } from './type';
@@ -19,7 +20,7 @@ declare global {
 }
 
 export class SanitizerRehypePlugin extends BaseRehypePlugin {
-  static readonly key = 'rehype-sanitizer';
+  static readonly key = RehypePluginKeys.Sanitizer;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Lowest,

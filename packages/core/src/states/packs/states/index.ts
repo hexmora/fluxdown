@@ -6,4 +6,3 @@ export * from './remark-pluggables';
 export * from './remark-plugins';
 export * from './render-patches';
 export * from './render-pluggables';
-export * from './repair-pluggables';

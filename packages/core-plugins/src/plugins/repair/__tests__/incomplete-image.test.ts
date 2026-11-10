@@ -25,6 +25,7 @@ const imageCases: ImageCase[] = [
 
 const tailImage = (source: string, plugin: IncompleteImageRepairPlugin): Image | undefined => {
   const tree = repairMarkdown(source, plugin);
+
   const container = first(tree.children);
 
   if (container?.type !== 'paragraph') {
@@ -41,6 +42,7 @@ describe('IncompleteImageRepairPlugin', () => {
     const plugin = new IncompleteImageRepairPlugin();
 
     expect(IncompleteImageRepairPlugin.key).toBe('repair-incomplete-image');
+
     expect(plugin.config).toEqual({
       ending: true,
       priority: PluginPriority.Default,
@@ -50,6 +52,7 @@ describe('IncompleteImageRepairPlugin', () => {
 
   test('normalizes and isolates the default strategy', () => {
     const config: IncompleteImageRepairPluginConfig = {};
+
     const plugin = new IncompleteImageRepairPlugin(config);
 
     config.strategy = 'discard';
@@ -99,9 +102,12 @@ describe('IncompleteImageRepairPlugin', () => {
 
   test.each(imageCases)('discards the incomplete suffix for $source', ({ source }) => {
     const tree = repairMarkdown(source, new IncompleteImageRepairPlugin({ strategy: 'discard' }));
+
     const container = first(tree.children) as Paragraph;
 
-    expect(container.children).toEqual([{ type: 'text', value: 'prefix' }]);
+    expect(container.children).toEqual([
+      { type: 'text', value: 'prefix', data: { source: 'prefix' } },
+    ]);
   });
 
   test('keeps a complete image unchanged', () => {
@@ -126,11 +132,13 @@ describe('IncompleteImageRepairPlugin', () => {
   test('repairs only the final structural branch', () => {
     const tree = root([
       paragraph([{ type: 'text', value: 'first ![not-tail' }]),
-      paragraph([{ type: 'text', value: 'last ![tail' }]),
+      paragraph([{ type: 'text', value: 'last ![tail', data: { source: 'last ![tail' } }]),
     ]);
+
     const result = runRepairs(tree, new IncompleteImageRepairPlugin());
 
     expect(first(result.children)).toEqual(first(tree.children));
+
     expect(last(result.children)).toMatchObject({
       type: 'paragraph',
       children: [

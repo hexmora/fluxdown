@@ -6,6 +6,7 @@ import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@
 import { has, last } from 'lodash-es';
 
 import { BaseRehypePlugin } from '../base';
+import { RehypePluginKeys } from '../keys';
 
 declare global {
   interface RehypeConfigs {
@@ -14,7 +15,7 @@ declare global {
 }
 
 export class HoistFootnoteRehypePlugin extends BaseRehypePlugin {
-  static readonly key = 'rehype-hoist-footnote';
+  static readonly key = RehypePluginKeys.HoistFootnote;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Lowest,
