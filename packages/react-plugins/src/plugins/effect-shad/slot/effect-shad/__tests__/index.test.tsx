@@ -63,13 +63,12 @@ describe('EffectShadRenderPlugin', () => {
     expect(view.container.textContent).toBe('leadingactive');
 
     expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: `${expected}px`,
-      marginLeft: `${-expected}px`,
+      '--mask-width': `${expected}px`,
     });
 
     expect(view.container.firstElementChild).not.toHaveAttribute('style');
 
-    expect(view.container.innerHTML).not.toContain('--');
+    expect(view.container.innerHTML).not.toContain('mask-image');
 
     patches.destroy();
 

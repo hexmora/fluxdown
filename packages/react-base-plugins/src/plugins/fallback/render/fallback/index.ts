@@ -5,6 +5,7 @@ import { createElement } from 'react';
 import type { ReactRenderMatchParams, ReactRenderParams } from '../../../../base';
 
 import { BaseReactRenderPlugin, createTypeOfSlot } from '../../../../base';
+import { isTableWhitespace } from './utils';
 
 const Element = /*#__PURE__*/ createTypeOfSlot('Element');
 
@@ -23,8 +24,14 @@ export class FallbackRenderPlugin extends BaseReactRenderPlugin {
     return true;
   }
 
-  render({ getProps, node, renderChildren }: ReactRenderParams) {
+  render({ getProps, node, parents, renderChildren }: ReactRenderParams) {
     if (node.type === 'text') {
+      const parent = parents.at(-1);
+
+      if (isTableWhitespace(node, parent)) {
+        return null;
+      }
+
       return node.value;
     }
 
