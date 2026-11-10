@@ -551,11 +551,11 @@ x^2 & x\ge 0 \\
       ['two dollars', 'prefix $$', 'prefix '],
       ['a whitespace-only double-dollar candidate', 'prefix $$   ', 'prefix '],
     ])(
-      'swallows a trailing empty candidate containing %s without creating math',
+      'retains an empty math placeholder for a trailing candidate containing %s',
       (_name, source, visibleText) => {
         const tree = parseMath(source, { repairEnding: true });
 
-        expect(collectMathNodes(tree)).toEqual([]);
+        expect(collectMathNodes(tree)).toMatchObject([{ value: '', data: { repairEnding: true } }]);
         expect(collectVisibleText(tree)).toBe(visibleText);
       },
     );
@@ -591,13 +591,13 @@ x^2 & x\ge 0 \\
     });
 
     test.each([false, true])(
-      'keeps a trailing single dollar inside an existing block-math flow when repairEnding=%s',
+      'withholds a partial block closer only while ending repair is active: %s',
       (repairEnding) => {
         expect(
           collectMathNodes(parseMath(['$$', 'aaaa', '$'].join('\n'), { repairEnding })).map(
             ({ type, value }) => ({ type, value }),
           ),
-        ).toEqual([{ type: 'math', value: 'aaaa\n$' }]);
+        ).toEqual([{ type: 'math', value: repairEnding ? 'aaaa\n' : 'aaaa\n$' }]);
       },
     );
 
@@ -630,15 +630,15 @@ f'(x) &= 2x
         expectedMode: 'display',
       },
       {
-        name: 'trims a repaired inline Pandoc candidate',
+        name: 'preserves the trailing boundary of a repaired inline Pandoc candidate',
         source: String.raw`prefix \(  x + y  `,
-        expectedValue: 'x + y',
+        expectedValue: 'x + y  ',
         expectedMode: 'inline',
       },
       {
-        name: 'trims a repaired display Pandoc candidate',
+        name: 'preserves the trailing boundary of a repaired display Pandoc candidate',
         source: String.raw`prefix \[  x + y  `,
-        expectedValue: 'x + y',
+        expectedValue: 'x + y  ',
         expectedMode: 'display',
       },
     ])('$name', ({ source, expectedValue, expectedMode }) => {
@@ -657,10 +657,10 @@ f'(x) &= 2x
     test.each([
       ['an empty inline opener', String.raw`prefix \(`, 'prefix '],
       ['a whitespace-only display opener', 'prefix \\[   ', 'prefix '],
-    ])('swallows %s without creating math', (_name, source, visibleText) => {
+    ])('retains an empty math placeholder for %s', (_name, source, visibleText) => {
       const tree = parseMath(source, { repairEnding: true });
 
-      expect(collectMathNodes(tree)).toEqual([]);
+      expect(collectMathNodes(tree)).toMatchObject([{ value: '', data: { repairEnding: true } }]);
       expect(collectVisibleText(tree)).toBe(visibleText);
     });
 
@@ -921,18 +921,15 @@ f'(x) &= 2x
       });
     });
 
-    test('preserves source offsets on math and adjacent text nodes', () => {
+    test('preserves exact provenance when closed formulas are parsed', () => {
       const tree = parseMath('a $x$ b');
       const paragraph = first(tree.children);
       const children = paragraph?.type === 'paragraph' ? paragraph.children : [];
 
-      expect(
-        children.map((node) => [node.position?.start.offset, node.position?.end.offset]),
-      ).toEqual([
-        [0, 2],
-        [2, 5],
-        [5, 7],
-      ]);
+      expect(children.map((node) => node.data?.source)).toEqual(['a ', '$x$', ' b']);
+      expect(children[1]?.position).toBeUndefined();
+      expect(paragraph?.data?.source).toBe('a $x$ b');
+      expect(tree.data?.source).toBe('a $x$ b');
     });
 
     test('exposes Pandoc mode through public MDAST data typing', () => {

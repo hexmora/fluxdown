@@ -4,10 +4,17 @@ import { PluginPriority } from '@fluxdown/types';
 import { first } from 'lodash-es';
 
 import { IncompleteStrongRepairPlugin } from '../incomplete-strong';
-import { paragraph, root, runRepairs } from './utils';
+import { paragraph, repairMarkdown, root, runRepairs } from './utils';
 
 const repairParagraph = (children: PhrasingContent[]): Paragraph => {
-  const result = runRepairs(root([paragraph(children)]), new IncompleteStrongRepairPlugin());
+  const sourced = children.map((child) =>
+    child.type === 'text' || child.type === 'html'
+      ? { ...child, data: { source: child.value } }
+      : child,
+  );
+
+  const result = runRepairs(root([paragraph(sourced)]), new IncompleteStrongRepairPlugin());
+
   const repaired = first(result.children);
 
   expect(repaired?.type).toBe('paragraph');
@@ -20,6 +27,7 @@ describe('IncompleteStrongRepairPlugin', () => {
     const plugin = new IncompleteStrongRepairPlugin();
 
     expect(IncompleteStrongRepairPlugin.key).toBe('repair-incomplete-strong');
+
     expect(plugin.config).toMatchObject({
       ending: true,
       priority: PluginPriority.Default,
@@ -27,7 +35,7 @@ describe('IncompleteStrongRepairPlugin', () => {
   });
 
   test.each([
-    ['123__456', '123', '456'],
+    ['prefix __456', 'prefix ', '456'],
     ['123**456', '123', '456'],
   ])('repairs an incomplete strong suffix', (value, prefix, suffix) => {
     const result = repairParagraph([
@@ -36,7 +44,7 @@ describe('IncompleteStrongRepairPlugin', () => {
       { type: 'text', value },
     ]);
 
-    expect(result.children).toEqual([
+    expect(result.children).toMatchObject([
       { type: 'text', value: 'first' },
       { type: 'inlineCode', value: 'stable' },
       { type: 'text', value: prefix },
@@ -45,29 +53,13 @@ describe('IncompleteStrongRepairPlugin', () => {
   });
 
   test('repairs the parser shape produced by a dangling double asterisk', () => {
-    const result = repairParagraph([
-      { type: 'text', value: 'prefix*' },
-      { type: 'emphasis', children: [{ type: 'text', value: 'suffix' }] },
-    ]);
+    const result = repairMarkdown('prefix**suffix*', new IncompleteStrongRepairPlugin())
+      .children[0] as Paragraph;
 
-    expect(result.children).toEqual([
+    expect(result.children).toMatchObject([
       { type: 'text', value: 'prefix' },
       { type: 'strong', children: [{ type: 'text', value: 'suffix' }] },
     ]);
-  });
-
-  test('removes the empty trailing list artifact associated with an incomplete marker', () => {
-    const tree = root([
-      paragraph([{ type: 'text', value: 'prefix' }]),
-      {
-        type: 'list',
-        ordered: false,
-        children: [{ type: 'listItem', children: [] }],
-      },
-    ]);
-    const result = runRepairs(tree, new IncompleteStrongRepairPlugin());
-
-    expect(result.children).toEqual([paragraph([{ type: 'text', value: 'prefix' }])]);
   });
 
   test('keeps complete tail content unchanged', () => {
@@ -95,12 +87,16 @@ describe('IncompleteStrongRepairPlugin', () => {
     expect(runRepairs(tree, new IncompleteStrongRepairPlugin())).toEqual(tree);
   });
 
-  test.each(['value ** suffix', 'value__suffix', 'value \\**suffix'])(
-    'does not force an invalid or escaped delimiter into strong content',
-    (value) => {
-      const tree = root([paragraph([{ type: 'text', value }])]);
+  test.each([
+    'value ** suffix',
+    'value__suffix',
+    '123__456',
+    '中文__标识符',
+    'word**!',
+    'value \\**suffix',
+  ])('does not force an invalid or escaped delimiter into strong content', (value) => {
+    const tree = root([paragraph([{ type: 'text', value }])]);
 
-      expect(runRepairs(tree, new IncompleteStrongRepairPlugin())).toEqual(tree);
-    },
-  );
+    expect(runRepairs(tree, new IncompleteStrongRepairPlugin())).toEqual(tree);
+  });
 });

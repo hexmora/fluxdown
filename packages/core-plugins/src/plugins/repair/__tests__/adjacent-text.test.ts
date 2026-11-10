@@ -105,7 +105,7 @@ describe('AdjacentTextRepairPlugin', () => {
     expect(first(container.children)).toEqual(text);
   });
 
-  test('keeps the first metadata and spans the full merged source position', () => {
+  test('drops stale source metadata without reading or rewriting positions', () => {
     const tree = root([
       paragraph([
         {
@@ -133,10 +133,9 @@ describe('AdjacentTextRepairPlugin', () => {
     expect(container?.type === 'paragraph' ? first(container.children) : undefined).toEqual({
       type: 'text',
       value: 'firstsecond',
-      data: { source: 'first' },
       position: {
         start: { line: 1, column: 1, offset: 0 },
-        end: { line: 1, column: 12, offset: 11 },
+        end: { line: 1, column: 6, offset: 5 },
       },
     });
   });

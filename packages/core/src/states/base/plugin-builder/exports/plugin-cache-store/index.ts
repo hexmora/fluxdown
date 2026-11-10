@@ -61,7 +61,7 @@ export class PluginCacheStore {
 
     const Plugin = tuple ? pluggable[0] : pluggable;
 
-    const config = tuple ? getSnapshot(pluggable[1]) : undefined;
+    const config = tuple ? getSnapshot([pluggable[1], pluggable[2]]) : undefined;
 
     const entries = this.classes.get(Plugin);
 

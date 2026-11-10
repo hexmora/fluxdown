@@ -1,3 +1,4 @@
+import { MathJaxMhchemFontExtension } from '@mathjax/mathjax-mhchem-font-extension/js/svg.js';
 import { MathJaxTexFont } from '@mathjax/mathjax-tex-font/js/svg.js';
 import { liteAdaptor } from '@mathjax/src/js/adaptors/liteAdaptor.js';
 import { RegisterHTMLHandler } from '@mathjax/src/js/handlers/html.js';
@@ -67,6 +68,8 @@ const texPackages = [
 ];
 
 const adaptor = liteAdaptor();
+
+MathJaxTexFont.addExtension(MathJaxMhchemFontExtension);
 
 SafeHandler(RegisterHTMLHandler(adaptor));
 

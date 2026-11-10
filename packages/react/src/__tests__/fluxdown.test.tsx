@@ -176,7 +176,7 @@ describe('Fluxdown', () => {
     expect(root).toHaveStyle({ color: 'rgb(0, 0, 255)' });
   });
 
-  test('renders images, hard breaks, and readable Tex while engines load', () => {
+  test('renders images and hard breaks while waiting for a formula engine', async () => {
     const text = [
       '![diagram](http://example.com/diagram.png "Diagram")',
       '',
@@ -192,7 +192,11 @@ describe('Fluxdown', () => {
     expect(image).toHaveAttribute('src', 'http://example.com/diagram.png');
     expect(image).toHaveAttribute('title', 'Diagram');
     expect(container.querySelector('br')).toBeInTheDocument();
-    expect(container).toHaveTextContent('x + y');
+    expect(container).not.toHaveTextContent('x + y');
+
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull());
+
+    expect(container.querySelector('[data-tex]')).toHaveAttribute('data-tex', 'x + y');
   });
 
   test('uses slot plugins supplied through aggregated plugin packs', () => {

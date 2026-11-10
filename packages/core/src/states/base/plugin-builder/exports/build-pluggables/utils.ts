@@ -21,11 +21,15 @@ export const buildPlugin = <T extends IPluginWithConfig>(pluggable: IPluggable<T
     return new pluggable();
   }
 
-  const [Plugin, config] = pluggable;
+  const [Plugin, config, context] = pluggable;
 
   const instance = new Plugin(config);
 
   try {
+    if (context !== undefined) {
+      Object.defineProperty(instance, 'context', { value: context });
+    }
+
     if (config?.priority !== undefined) {
       Object.defineProperty(instance, 'config', {
         configurable: true,

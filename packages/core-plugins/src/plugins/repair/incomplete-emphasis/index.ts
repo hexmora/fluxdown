@@ -1,10 +1,16 @@
 import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/types';
-import type { PhrasingContent } from 'mdast';
+import type { Parent } from 'mdast';
 
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last } from 'lodash-es';
 
+import {
+  isCompleteRepairPhrasingParent,
+  isRepairNodeType,
+  isRepairPhrasingParent,
+} from '../../../utils';
 import { BaseRepairPlugin } from '../base';
+import { getIncompleteDelimiterChildren, isOpenRepairTableCell } from '../utils';
 
 declare global {
   interface RepairConfigs {
@@ -21,12 +27,21 @@ export class IncompleteEmphasisRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
-    if (node.type !== 'paragraph') {
+  runner: RepairPluginRunner = ({ node, parents, skipTree }) => {
+    if (isCompleteRepairPhrasingParent(node)) {
+      skipTree();
+
       return;
     }
 
-    let branch = node;
+    if (
+      !isRepairPhrasingParent(node) &&
+      !(isRepairNodeType(node, 'tableCell') && isOpenRepairTableCell(node, parents))
+    ) {
+      return;
+    }
+
+    let branch: Parent = node;
 
     for (const parent of parents) {
       if (last(parent.children) !== branch) {
@@ -36,59 +51,10 @@ export class IncompleteEmphasisRepairPlugin extends BaseRepairPlugin {
       branch = parent;
     }
 
-    const tail = last(node.children);
+    const children = getIncompleteDelimiterChildren(node.children, 'emphasis');
 
-    if (!tail || tail.type !== 'text') {
-      return;
-    }
-
-    for (let offset = tail.value.length - 1; offset >= 0; offset -= 1) {
-      if (
-        tail.value.charAt(offset) !== '*' ||
-        tail.value.charAt(offset - 1) === '*' ||
-        tail.value.charAt(offset + 1) === '*'
-      ) {
-        continue;
-      }
-
-      let slashCount = 0;
-
-      for (
-        let slashOffset = offset - 1;
-        slashOffset >= 0 && tail.value.charAt(slashOffset) === '\\';
-        slashOffset -= 1
-      ) {
-        slashCount += 1;
-      }
-
-      if (slashCount % 2 === 1) {
-        continue;
-      }
-
-      const prefix = tail.value.slice(0, offset);
-      const suffix = tail.value.slice(offset + 1);
-
-      if (/^\s/.test(suffix)) {
-        return;
-      }
-
-      const replacement: PhrasingContent[] = [];
-
-      if (prefix.length > 0) {
-        tail.value = prefix;
-        replacement.push(tail);
-      }
-
-      if (suffix.length > 0) {
-        replacement.push({
-          type: 'emphasis',
-          children: [{ type: 'text', value: suffix }],
-        });
-      }
-
-      node.children.splice(node.children.length - 1, 1, ...replacement);
-
-      return;
+    if (children) {
+      node.children = children;
     }
   };
 }

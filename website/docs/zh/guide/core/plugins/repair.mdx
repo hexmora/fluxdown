@@ -65,6 +65,12 @@ const repairs = [StreamingIndicatorPlugin];
 
 > 遍历设置放在 `config` 中，插件自身的构造选项用独立字段保存。Core 负责执行 runner 和管理生命周期。
 
+启用 `ApplyRepairsRemarkPlugin` 后，解析器会为所有解析生成的节点记录 `data.source`，内容是产生该节点的原始 Markdown 片段。Repair 直接读取节点自身的原文，无需额外的 runner 参数，也不依赖节点的 `position`。
+
+`data.source` 是可选的。手工构造、其他插件生成或已经修复过的节点可能没有原文；依赖原文的判断应跳过这些节点，不能将 `node.value` 当作原文替代，否则转义符和字符实体可能被误判为语法。
+
+修改节点后，如果原文已不能准确描述其内容，就应删除该节点及受影响祖先的 `data.source`，保留未变动子节点的原文。Repair 执行器会清理 runner 对当前节点、直接子节点、相邻兄弟及插入替换操作造成的失效信息，递归修复也会向外传播失效。自定义插件在生命周期 hook 中修改节点，或直接跨层修改更深的后代时，需要自行清理对应节点及祖先的原文信息。
+
 ## 支持的插件
 
 将表中的子路径接在 `@fluxdown/core-plugins/plugins/repair/` 后，即为插件的完整导入路径。例如，`incomplete-image` 对应 `@fluxdown/core-plugins/plugins/repair/incomplete-image`。
@@ -83,11 +89,18 @@ const repairs = [StreamingIndicatorPlugin];
 | `IncompleteInlineCodeRepairPlugin`   | `incomplete-inline-code`    | <PresetCheck /> | 将尚未闭合的行内代码先作为代码呈现。                                |
 | `IncompleteImageRepairPlugin`        | `incomplete-image`          | <PresetCheck /> | 为未完成的图片提供占位，或通过 `strategy: 'discard'` 暂时隐藏。     |
 | `IncompleteLinkRepairPlugin`         | `incomplete-link`           | <PresetCheck /> | 将未完成的链接先按链接文字显示，等待地址补全。                      |
-| `TrailingEmptyHeadingRepairPlugin`   | `trailing-empty-heading`    | <PresetCheck /> | 暂不展示只有 `#`、还没有文字的末尾一级标题。                        |
+| `TrailingEmptyHeadingRepairPlugin`   | `trailing-empty-heading`    | <PresetCheck /> | 暂不展示还没有正文的末尾一至六级标题。                              |
 | `IncompleteStrongRepairPlugin`       | `incomplete-strong`         | <PresetCheck /> | 提前呈现尚未闭合的加粗内容。                                        |
 | `IncompleteEmphasisRepairPlugin`     | `incomplete-emphasis`       | <PresetCheck /> | 提前呈现以星号开头、尚未闭合的斜体内容。                            |
 | `IncompleteListMarkerRepairPlugin`   | `incomplete-list-marker`    | <PresetCheck /> | 隐藏末尾孤立的列表标记，等待列表正文。                              |
+| `IncompleteTableRepairPlugin`        | `incomplete-table`          | <PresetCheck /> | 暂存可能的表头和未完成的分隔行，等待表格语法确认。                  |
 | `DanglingFootnoteRepairPlugin`       | `dangling-footnote`         | <PresetCheck /> | 暂时隐藏未解析的脚注引用和末尾未完成的引用；需要 `build.footnote`。 |
+
+### 表格首行的暂存策略
+
+以未转义的 `|` 开头的末尾行会暂时隐藏；分隔行形成有效表格后正常展示，后续字符排除表格可能性时恢复原文。没有前导 `|` 的普通文本（如 `a | b`）会保留，直到下一行出现可能的表格分隔行。
+
+这项修复仅在 `repairEnding` 开启时生效。流式结束后关闭 `repairEnding`，未成表的文本会恢复；禁用 `remark-syntax-table` 时也会关闭该修复。转义竖线、字符实体和完整行内代码不会单独触发表头暂存。
 
 ### 排版边界整理
 

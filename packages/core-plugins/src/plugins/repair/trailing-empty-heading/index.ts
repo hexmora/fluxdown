@@ -27,7 +27,7 @@ export class TrailingEmptyHeadingRepairPlugin extends BaseRepairPlugin {
       return;
     }
 
-    if (node.depth !== 1 || !this.isEmpty(node)) {
+    if (!this.isEmpty(node)) {
       return;
     }
 

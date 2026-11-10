@@ -3,8 +3,9 @@ import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/typ
 import { isMdastParent } from '@fluxdown/mdast';
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 
+import { isRepairMarker } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
-import { getIncompleteTagStart } from './utils';
+import { getIncompleteHtmlChildren, getIncompleteTagStart } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -23,6 +24,16 @@ export class IncompleteHtmlTagRepairPlugin extends BaseRepairPlugin {
 
   runner: RepairPluginRunner = ({ node, parent, insertNext, break: stop }) => {
     if (isMdastParent(node)) {
+      const children = getIncompleteHtmlChildren(node);
+
+      if (children !== undefined) {
+        node.children = children;
+
+        stop();
+
+        return;
+      }
+
       if (node.children.length === 0) {
         stop();
       }
@@ -38,7 +49,7 @@ export class IncompleteHtmlTagRepairPlugin extends BaseRepairPlugin {
 
     const start = getIncompleteTagStart(node.value);
 
-    if (start === undefined) {
+    if (start === undefined || !isRepairMarker(node, start)) {
       return;
     }
 

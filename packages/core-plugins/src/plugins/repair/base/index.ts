@@ -1,5 +1,6 @@
 import type {
   IRepairPlugin,
+  RepairPluginContext,
   RepairPluginHookType,
   RepairPluginRunner,
   RepairPluginSystemConfig,
@@ -9,6 +10,8 @@ import { noop } from 'lodash-es';
 import { Destructible } from 'stative';
 
 export abstract class BaseRepairPlugin extends Destructible implements IRepairPlugin {
+  declare context?: RepairPluginContext;
+
   readonly config: RepairPluginSystemConfig = {};
 
   abstract runner: RepairPluginRunner | RepairPluginRunner[];

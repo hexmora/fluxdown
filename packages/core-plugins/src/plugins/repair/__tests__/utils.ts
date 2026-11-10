@@ -6,6 +6,7 @@ import { fromMarkdown } from 'mdast-util-from-markdown';
 import { toMarkdown } from 'mdast-util-to-markdown';
 
 import { processRepairByPlugins } from '../../../utils';
+import { captureRepairSource } from '../../remark/utils';
 
 export interface RunRepairsOptions {
   ending?: boolean;
@@ -34,7 +35,7 @@ export const repairMarkdown = (
   plugins: IRepairPlugin | IRepairPlugin[],
   options: RunRepairsOptions = {},
 ): Root => {
-  return runRepairs(fromMarkdown(source), plugins, options);
+  return runRepairs(captureRepairSource(fromMarkdown(source), source), plugins, options);
 };
 
 export const stringifyMarkdown = (tree: Root): string => {

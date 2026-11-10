@@ -6,9 +6,10 @@ import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@
 
 import { processRepairByPlugins } from '../../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { captureSource } from '../utils';
 
 export interface ApplyRepairsRemarkPluginConfig {
-  plugins: IRepairPlugin[];
+  plugins?: IRepairPlugin[];
   ending?: boolean;
   safe?: boolean;
 }
@@ -32,21 +33,31 @@ export class ApplyRepairsRemarkPlugin extends BaseRemarkPlugin {
 
   plugin: Plugin<[], Root, Root>;
 
-  constructor(config: ApplyRepairsRemarkPluginConfig = { plugins: [] }) {
+  isEnabled = () => this.context?.config.repair !== false;
+
+  constructor(config: ApplyRepairsRemarkPluginConfig = {}) {
     super();
 
     this.innerConfig = {
-      plugins: [...config.plugins],
+      plugins: [...(config.plugins ?? [])],
       ending: config.ending ?? false,
       safe: config.safe ?? true,
     };
-    this.plugin = () => (tree) => {
-      processRepairByPlugins({
-        node: tree,
-        plugins: this.innerConfig.plugins,
-        ending: this.innerConfig.ending,
-        safe: this.innerConfig.safe,
-      });
+
+    const getOptions = () => ({
+      plugins: this.context?.repairs ?? this.innerConfig.plugins,
+      ending: this.context?.config.repairEnding ?? this.innerConfig.ending,
+      safe: this.innerConfig.safe,
+    });
+
+    this.plugin = function () {
+      this.use(captureSource);
+
+      const { plugins, ending, safe } = getOptions();
+
+      return (tree) => {
+        processRepairByPlugins({ node: tree, plugins, ending, safe });
+      };
     };
   }
 }

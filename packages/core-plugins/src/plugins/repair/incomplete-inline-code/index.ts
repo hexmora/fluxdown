@@ -4,7 +4,10 @@ import type { PhrasingContent } from 'mdast';
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last, nth } from 'lodash-es';
 
+import { isRepairMarker, sliceRepairText } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
+import { isOpenRepairTableCell } from '../utils';
+import { getInlineCodeValue } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -18,11 +21,19 @@ export class IncompleteInlineCodeRepairPlugin extends BaseRepairPlugin {
   readonly config: RepairPluginSystemConfig = {
     scope: 'tail',
     ending: true,
-    priority: PluginPriority.Default,
+    priority: PluginPriority.High,
   };
 
   runner: RepairPluginRunner = ({ node, parents }) => {
-    if (node.type !== 'paragraph') {
+    if (
+      node.type !== 'paragraph' &&
+      node.type !== 'heading' &&
+      !isOpenRepairTableCell(node, parents)
+    ) {
+      return;
+    }
+
+    if (!('children' in node)) {
       return;
     }
 
@@ -38,52 +49,42 @@ export class IncompleteInlineCodeRepairPlugin extends BaseRepairPlugin {
 
     const { children } = node;
 
-    for (let childIndex = children.length - 1; childIndex >= 0; childIndex -= 1) {
+    for (let childIndex = 0; childIndex < children.length; childIndex += 1) {
       const child = nth(children, childIndex);
 
-      if (!child || (child.type !== 'text' && child.type !== 'html')) {
-        return;
-      }
-
-      if (child.type !== 'text') {
+      if (child?.type !== 'text') {
         continue;
       }
 
-      for (let offset = child.value.length - 1; offset >= 0; offset -= 1) {
+      for (let offset = 0; offset < child.value.length; offset += 1) {
         if (child.value.charAt(offset) !== '`') {
           continue;
         }
 
-        if (child.value.charAt(offset - 1) === '`' || child.value.charAt(offset + 1) === '`') {
+        let length = 1;
+
+        while (child.value.charAt(offset + length) === '`') {
+          length += 1;
+        }
+
+        if (!isRepairMarker(child, offset, length)) {
+          offset += length - 1;
+
           continue;
         }
 
-        let slashCount = 0;
+        const prefix = sliceRepairText(child, 0, offset);
 
-        for (
-          let slashOffset = offset - 1;
-          slashOffset >= 0 && child.value.charAt(slashOffset) === '\\';
-          slashOffset -= 1
-        ) {
-          slashCount += 1;
+        const value = getInlineCodeValue(node, childIndex, offset, length);
+
+        if (!prefix || value === undefined) {
+          return;
         }
 
-        if (slashCount % 2 === 1) {
-          continue;
-        }
-
-        const prefix = child.value.slice(0, offset);
-        const suffix = child.value.slice(offset + 1);
-        const following = children
-          .slice(childIndex + 1)
-          .map((item) => ('value' in item && typeof item.value === 'string' ? item.value : ''))
-          .join('');
-        const value = suffix + following;
         const replacement: PhrasingContent[] = [];
 
-        if (prefix.length > 0) {
-          child.value = prefix;
-          replacement.push(child);
+        if (prefix.value.length > 0) {
+          replacement.push(prefix);
         }
 
         if (value.length > 0) {

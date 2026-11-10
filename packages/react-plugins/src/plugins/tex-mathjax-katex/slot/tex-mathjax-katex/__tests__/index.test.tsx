@@ -14,12 +14,12 @@ const node: Element = {
 const nodeProps = { current: node, parents: [], render: () => null };
 
 describe('lazy math rendering', () => {
-  test('keeps a lightweight source fallback until KaTeX loads', async () => {
+  test('holds source until KaTeX loads instead of flashing raw TeX', async () => {
     const { container } = render(
       <TexMathjaxKatexRenderer Raw={null} {...nodeProps} className="custom-tex" tex="x^2" />,
     );
 
-    expect(container.textContent).toBe('x^2');
+    expect(container.textContent).toBe('');
     expect(container.firstElementChild).toHaveClass('custom-tex');
 
     await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull());

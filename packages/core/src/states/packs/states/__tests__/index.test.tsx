@@ -49,6 +49,19 @@ import {
   RepairPluggables,
 } from '..';
 import { BaseRenderPlugin } from '../../../../externals';
+import { buildPluggables } from '../../../base';
+
+const enabledRemarkClasses = (pluggables: IPluggable<IRemarkPlugin, unknown>[]) => {
+  return pluggables.flatMap((pluggable) => {
+    const plugin = buildPluggables(pluggable);
+
+    const enabled = plugin.isEnabled?.() !== false;
+
+    plugin.destroy();
+
+    return enabled ? [getPluggableClass(pluggable)] : [];
+  });
+};
 
 class TextRenderPlugin extends BaseRenderPlugin<string, string, string> {
   static readonly key = 'text';
@@ -323,9 +336,9 @@ describe('pack state mappers', () => {
 
     expect(rehypes.value.value.map(getPluggableClass)).not.toContain(HoistFootnoteRehypePlugin);
 
-    expect(remarks.value.value.map(getPluggableClass)).not.toContain(SyntaxMathRemarkPlugin);
+    expect(enabledRemarkClasses(remarks.value.value)).not.toContain(SyntaxMathRemarkPlugin);
 
-    expect(remarks.value.value.map(getPluggableClass)).not.toContain(ApplyRepairsRemarkPlugin);
+    expect(enabledRemarkClasses(remarks.value.value)).not.toContain(ApplyRepairsRemarkPlugin);
 
     expect(repairPluggables.value.value).toEqual([]);
 
@@ -355,9 +368,9 @@ describe('pack state mappers', () => {
 
     expect(rehypes.value.value.map(getPluggableClass)).not.toContain(HoistFootnoteRehypePlugin);
 
-    expect(remarks.value.value.map(getPluggableClass)).toContain(SyntaxMathRemarkPlugin);
+    expect(enabledRemarkClasses(remarks.value.value)).toContain(SyntaxMathRemarkPlugin);
 
-    expect(remarks.value.value.map(getPluggableClass)).toContain(ApplyRepairsRemarkPlugin);
+    expect(enabledRemarkClasses(remarks.value.value)).toContain(ApplyRepairsRemarkPlugin);
 
     expect(repairPluggables.value.value.map(getPluggableClass)).toContain(
       DanglingFootnoteRepairPlugin,

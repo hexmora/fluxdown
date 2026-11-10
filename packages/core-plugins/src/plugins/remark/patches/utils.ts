@@ -677,6 +677,12 @@ const createText = (
     text.position = position;
   }
 
+  const raw = source.slice(start, end);
+
+  if (node.data?.source !== undefined && decodeMarkdownText(raw) === value) {
+    text.data = { source: raw };
+  }
+
   return text;
 };
 

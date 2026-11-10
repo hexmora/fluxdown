@@ -64,8 +64,8 @@ const isLocalConfigEqual = (
 
 /** Retains identity-based local inputs; structural configurations use the store's snapshots. */
 export const isPrivatePluggableEqual = <T>(
-  left: T | [T, unknown],
-  right: T | [T, unknown],
+  left: T | [T, unknown, unknown?],
+  right: T | [T, unknown, unknown?],
 ): boolean => {
   if (!isArray(left) || !isArray(right)) {
     return left === right;
@@ -77,5 +77,9 @@ export const isPrivatePluggableEqual = <T>(
 
   const comparison = { private: false };
 
-  return isLocalConfigEqual(left[1], right[1], comparison) && comparison.private;
+  return (
+    isLocalConfigEqual(left[1], right[1], comparison) &&
+    isLocalConfigEqual(left[2], right[2], comparison) &&
+    comparison.private
+  );
 };

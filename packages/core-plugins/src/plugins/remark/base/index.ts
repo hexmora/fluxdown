@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-invalid-void-type */
-import type { IBasePluginConfig, IRemarkPlugin } from '@fluxdown/types';
+import type { IBasePluginConfig, IRemarkPlugin, RemarkPluginContext } from '@fluxdown/types';
 import type { Root as MdastRoot } from 'mdast';
 import type { Plugin } from 'unified';
 import type { Node } from 'unist';
@@ -14,6 +14,8 @@ export abstract class BaseRemarkPlugin<
   extends Destructible
   implements IRemarkPlugin<P, I, O>
 {
+  declare context?: RemarkPluginContext;
+
   config: IBasePluginConfig = {};
 
   abstract plugin: Plugin<P extends void ? [] : [P], I, O>;

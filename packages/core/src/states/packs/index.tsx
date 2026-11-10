@@ -20,10 +20,10 @@ import {
   RemarkPlugins,
   RenderPatchesMapper,
   RenderPluggables,
-  RepairPluggables,
 } from './states';
 
 export * from './states';
+
 export * from './type';
 
 export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
@@ -46,8 +46,6 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
   const repairSources = useDefaults(repairs, {});
 
   const mapperSources = useDefaults(mappers, {});
-
-  const repairPluggables = useCreate(<RepairPluggables config={build} extras={repairSources} />);
 
   const rehypePluggables = useCreate(<RehypePluggables config={build} extras={rehypeSources} />);
 
@@ -78,7 +76,7 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
                   cacheStore={D(cacheStore)}
                   config={config}
                   extras={remarkSources}
-                  repairs={repairPluggables}
+                  repairs={repairSources}
                 />
               )}
               getRehypes={() => (

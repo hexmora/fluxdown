@@ -34,13 +34,15 @@ export class PatchesRemarkPlugin extends BaseRemarkPlugin {
 
     this.innerConfig = cloneDeep(config);
     this.plugin = () => (tree, file) => {
-      if (!this.innerConfig.patches || this.innerConfig.patches.length === 0) {
+      const patches = this.context?.config.patches ?? this.innerConfig.patches;
+
+      if (!patches || patches.length === 0) {
         return;
       }
 
       const source = typeof file?.value === 'string' ? file.value : '';
 
-      applyPatches(tree, this.innerConfig.patches, source);
+      applyPatches(tree, patches, source);
     };
   }
 }

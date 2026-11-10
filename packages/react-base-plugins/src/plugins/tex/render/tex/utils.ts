@@ -26,7 +26,12 @@ export const getTex = ({ node }: ReactRenderMatchParams) => {
     return null;
   }
 
-  const tex = getTextContent(node).trim();
+  const content = getTextContent(node);
 
-  return tex || null;
+  const repairing =
+    node.type === 'element' && node.children.some((child) => child.data?.repairEnding === true);
+
+  const tex = repairing ? content.trimStart() : content.trim();
+
+  return tex || repairing ? tex : null;
 };

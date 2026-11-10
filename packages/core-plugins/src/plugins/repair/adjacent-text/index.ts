@@ -26,32 +26,35 @@ export class AdjacentTextRepairPlugin extends BaseRepairPlugin {
     }
 
     const children: RootContent[] = [];
+
     let currentText: Text | undefined;
+
     let changed = false;
 
     for (const child of node.children) {
       if (child.type !== 'text') {
         children.push(child);
+
         currentText = undefined;
+
         continue;
       }
 
       if (child.value.length === 0) {
         changed = true;
+
         continue;
       }
 
       if (!currentText) {
         children.push(child);
+
         currentText = child;
+
         continue;
       }
 
       currentText.value += child.value;
-
-      if (currentText.position && child.position) {
-        currentText.position.end = child.position.end;
-      }
 
       changed = true;
     }

@@ -11,7 +11,7 @@ describe('KaTeX-only rendering', () => {
   test('loads KaTeX lazily and keeps unsupported expressions as source', async () => {
     const { container, rerender } = render(<TexKatexRenderer {...nodeProps} tex="x^2" />);
 
-    expect(container.textContent).toBe('x^2');
+    expect(container.textContent).toBe('');
     await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull());
 
     const tex = String.raw`\bbox[5px]{x}`;

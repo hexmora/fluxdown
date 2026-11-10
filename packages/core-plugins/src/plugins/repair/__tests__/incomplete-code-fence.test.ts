@@ -20,7 +20,11 @@ describe('IncompleteCodeFenceRepairPlugin', () => {
   test('removes a partial closing fence parsed into a trailing code block', () => {
     const tree: Root = root([
       paragraph([{ type: 'text', value: 'prefix' }]),
-      { type: 'code', value: 'console.log(123)\n``' },
+      {
+        type: 'code',
+        value: 'console.log(123)\n``',
+        data: { source: '```\nconsole.log(123)\n``' },
+      },
     ]);
     const result = runRepairs(tree, new IncompleteCodeFenceRepairPlugin());
 
@@ -34,7 +38,7 @@ describe('IncompleteCodeFenceRepairPlugin', () => {
     ['tail\n`', 'tail\n'],
     ['tail\n``', 'tail\n'],
   ])('removes a partial opening fence parsed as tail text', (value, expected) => {
-    const tree = root([paragraph([{ type: 'text', value }])]);
+    const tree = root([paragraph([{ type: 'text', value, data: { source: value } }])]);
     const result = runRepairs(tree, new IncompleteCodeFenceRepairPlugin());
     const container = first(result.children);
 
@@ -74,5 +78,32 @@ describe('IncompleteCodeFenceRepairPlugin', () => {
     const tree = root([{ type: 'code', value: 'const marker = ``', lang: 'ts' }]);
 
     expect(runRepairs(tree, new IncompleteCodeFenceRepairPlugin())).toEqual(tree);
+  });
+  test.each([
+    ['~~~\ncode\n~~', 'code'],
+    ['````\ncode\n```', 'code'],
+    ['~~~~~\ncode\n~~~~', 'code'],
+    ['```\ncode\n  ``', 'code'],
+    ['> ~~~\n> code\n> ~~', 'code'],
+  ])('uses the actual opening fence to repair a partial closer: %s', (source, value) => {
+    const tree = repairMarkdown(source, new IncompleteCodeFenceRepairPlugin());
+    const block = tree.children[0];
+    const code = block?.type === 'blockquote' ? block.children[0] : block;
+
+    expect(code).toMatchObject({ type: 'code', value });
+  });
+
+  test.each([
+    '~~~\ncode\n``',
+    '```\ncode\n~~',
+    '    code\n    ``',
+    '```\ncode\n``\n',
+    '```\ncode\n``\n```',
+    '~~~\ncode\n~~\n~~~',
+    '```\ncode\n    ``',
+  ])('preserves disambiguated or non-fence code content: %s', (source) => {
+    expect(repairMarkdown(source, new IncompleteCodeFenceRepairPlugin())).toEqual(
+      repairMarkdown(source, []),
+    );
   });
 });

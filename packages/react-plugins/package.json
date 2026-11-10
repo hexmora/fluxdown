@@ -105,6 +105,8 @@
   "dependencies": {
     "@fluxdown/react-base-plugins": "workspace:^",
     "@fluxdown/types": "workspace:^",
+    "@fluxdown/utils": "workspace:^",
+    "@mathjax/mathjax-mhchem-font-extension": "catalog:",
     "@mathjax/mathjax-tex-font": "catalog:",
     "@mathjax/src": "catalog:",
     "@types/hast": "catalog:",

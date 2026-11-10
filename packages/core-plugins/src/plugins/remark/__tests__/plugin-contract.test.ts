@@ -46,7 +46,7 @@ describe('remark plugin contracts', () => {
     expect(new SyntaxAutolinkRemarkPlugin().config.priority).toBe(PluginPriority.Highest);
     expect(new SyntaxFootnoteRemarkPlugin().config.priority).toBe(PluginPriority.Highest);
     expect(new SyntaxHtmlAllowedRemarkPlugin().config.priority).toBe(PluginPriority.Lowest);
-    expect(new SyntaxMathRemarkPlugin().config.priority).toBe(PluginPriority.Lowest);
+    expect(new SyntaxMathRemarkPlugin().config.priority).toBe(PluginPriority.Highest);
     expect(new SyntaxPolicyRemarkPlugin().config.priority).toBe(PluginPriority.Default);
     expect(new SyntaxSoftEndlineRemarkPlugin().config.priority).toBe(PluginPriority.Low);
     expect(new SyntaxStrikethroughRemarkPlugin().config.priority).toBe(PluginPriority.Highest);

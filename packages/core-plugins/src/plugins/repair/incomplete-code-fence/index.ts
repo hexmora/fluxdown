@@ -3,8 +3,9 @@ import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/typ
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last } from 'lodash-es';
 
-import { isRepairNodeType } from '../../../utils';
+import { isRepairMarker, isRepairNodeType } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
+import { getIncompleteFenceValue } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -37,13 +38,25 @@ export class IncompleteCodeFenceRepairPlugin extends BaseRepairPlugin {
     }
 
     if (isRepairNodeType(node, 'code')) {
-      node.value = node.value.replace(/(?:\r\n|\r|\n)`{1,2}$/, '');
+      const value = getIncompleteFenceValue(node);
+
+      if (value !== undefined) {
+        node.value = value;
+      }
 
       return;
     }
 
-    if (isRepairNodeType(node, 'text')) {
-      node.value = node.value.replace(/(^|(?:\r\n|\r|\n))`{1,2}$/, '$1');
+    const tail = /(?:^|\r\n|\r|\n)(`{1,2}|~{1,2})$/.exec(node.value);
+
+    if (!tail || !tail[1]) {
+      return;
+    }
+
+    const offset = node.value.length - tail[1].length;
+
+    if (isRepairMarker(node, offset, tail[1].length)) {
+      node.value = node.value.slice(0, offset);
     }
   };
 }

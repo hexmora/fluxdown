@@ -4,10 +4,16 @@ import { PluginPriority } from '@fluxdown/types';
 import { first } from 'lodash-es';
 
 import { IncompleteEmphasisRepairPlugin } from '../incomplete-emphasis';
-import { paragraph, root, runRepairs } from './utils';
+import { paragraph, repairMarkdown, root, runRepairs } from './utils';
 
 const repairParagraph = (children: PhrasingContent[]): Paragraph => {
-  const result = runRepairs(root([paragraph(children)]), new IncompleteEmphasisRepairPlugin());
+  const sourced = children.map((child) =>
+    child.type === 'text' || child.type === 'html'
+      ? { ...child, data: { source: child.value } }
+      : child,
+  );
+
+  const result = runRepairs(root([paragraph(sourced)]), new IncompleteEmphasisRepairPlugin());
   const repaired = first(result.children);
 
   expect(repaired?.type).toBe('paragraph');
@@ -33,7 +39,7 @@ describe('IncompleteEmphasisRepairPlugin', () => {
       { type: 'text', value: '123*456' },
     ]);
 
-    expect(result.children).toEqual([
+    expect(result.children).toMatchObject([
       { type: 'text', value: 'first' },
       { type: 'inlineCode', value: 'stable' },
       { type: 'text', value: '123' },
@@ -44,7 +50,7 @@ describe('IncompleteEmphasisRepairPlugin', () => {
   test('repairs an opening delimiter preceded by whitespace when its suffix is valid', () => {
     const result = repairParagraph([{ type: 'text', value: 'prefix *suffix' }]);
 
-    expect(result.children).toEqual([
+    expect(result.children).toMatchObject([
       { type: 'text', value: 'prefix ' },
       { type: 'emphasis', children: [{ type: 'text', value: 'suffix' }] },
     ]);
@@ -53,7 +59,7 @@ describe('IncompleteEmphasisRepairPlugin', () => {
   test('removes an empty trailing emphasis marker', () => {
     const result = repairParagraph([{ type: 'text', value: 'prefix*' }]);
 
-    expect(result.children).toEqual([{ type: 'text', value: 'prefix' }]);
+    expect(result.children).toMatchObject([{ type: 'text', value: 'prefix' }]);
   });
 
   test('keeps complete tail content unchanged', () => {
@@ -87,6 +93,24 @@ describe('IncompleteEmphasisRepairPlugin', () => {
       const tree = root([paragraph([{ type: 'text', value }])]);
 
       expect(runRepairs(tree, new IncompleteEmphasisRepairPlugin())).toEqual(tree);
+    },
+  );
+  test.each(['_word', 'prefix _word', '（_中文', '*word * literal'])(
+    'repairs valid underscore and earlier valid asterisk openers: %s',
+    (source) => {
+      const tree = repairMarkdown(source, new IncompleteEmphasisRepairPlugin());
+      const container = tree.children[0] as Paragraph;
+
+      expect(container.children.some((child) => child.type === 'emphasis')).toBe(true);
+    },
+  );
+
+  test.each(['value_2', '中文_标识符', 'word*!', 'word_!'])(
+    'preserves intraword underscores and non-opening punctuation: %s',
+    (source) => {
+      expect(repairMarkdown(source, new IncompleteEmphasisRepairPlugin())).toEqual(
+        repairMarkdown(source, []),
+      );
     },
   );
 });

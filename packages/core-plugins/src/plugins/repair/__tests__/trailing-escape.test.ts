@@ -11,9 +11,10 @@ describe('TrailingEscapeRepairPlugin', () => {
     const plugin = new TrailingEscapeRepairPlugin();
 
     expect(TrailingEscapeRepairPlugin.key).toBe('repair-trailing-escape');
+
     expect(plugin.config).toMatchObject({
       ending: true,
-      priority: PluginPriority.Default,
+      priority: PluginPriority.Low,
     });
   });
 
@@ -22,11 +23,14 @@ describe('TrailingEscapeRepairPlugin', () => {
       paragraph([
         { type: 'text', value: 'first' },
         { type: 'inlineCode', value: 'code' },
-        { type: 'text', value: 'tail\\' },
+        { type: 'text', value: 'tail\\', data: { source: 'tail\\' } },
       ]),
     ]);
+
     const result = runRepairs(tree, new TrailingEscapeRepairPlugin());
+
     const container = first(result.children);
+
     const tail = last(container?.type === 'paragraph' ? container.children : []);
 
     expect(tail).toMatchObject({ type: 'text', value: 'tail' });
@@ -39,7 +43,7 @@ describe('TrailingEscapeRepairPlugin', () => {
   });
 
   test('does not run outside ending mode', () => {
-    const tree = root([paragraph([{ type: 'text', value: 'tail\\' }])]);
+    const tree = root([paragraph([{ type: 'text', value: 'tail\\', data: { source: 'tail\\' } }])]);
 
     expect(runRepairs(tree, new TrailingEscapeRepairPlugin(), { ending: false })).toEqual(tree);
   });

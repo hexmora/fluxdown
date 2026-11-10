@@ -5,7 +5,7 @@ import { memoReturns } from 'stative';
 
 import type { RemarkPluginsInputs } from './type';
 
-import { RemarkPluggables } from '..';
+import { RemarkPluggables, RepairPluggables } from '..';
 import { PluginBuilder } from '../../../base';
 
 export * from './type';
@@ -16,7 +16,9 @@ export const RemarkPlugins = /*#__PURE__*/ memoReturns(function RemarkPlugins({
   repairs,
   cacheStore,
 }: RemarkPluginsInputs): IRemarkPlugin[] {
-  const repairPlugins = PluginBuilder<IRepairPlugin>({ plugins: repairs, cacheStore });
+  const repairPluggables = RepairPluggables({ config, extras: repairs, remarks: extras });
+
+  const repairPlugins = PluginBuilder<IRepairPlugin>({ plugins: repairPluggables, cacheStore });
 
   const plugins = RemarkPluggables({ config, extras, repairs: repairPlugins });
 

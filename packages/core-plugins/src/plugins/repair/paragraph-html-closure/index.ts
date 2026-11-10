@@ -4,7 +4,7 @@ import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 
 import { isRepairNodeType } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
-import { closeParagraphTags, isRightmostNode } from './utils';
+import { getClosedParagraphChildren, isRightmostNode } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -32,6 +32,10 @@ export class ParagraphHtmlClosureRepairPlugin extends BaseRepairPlugin {
       return;
     }
 
-    closeParagraphTags(node);
+    const children = getClosedParagraphChildren(node);
+
+    if (children) {
+      node.children = children;
+    }
   };
 }

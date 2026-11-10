@@ -13,7 +13,7 @@ export interface SyntaxPolicyRemarkPluginConfig {
   setextHeading?: boolean;
 }
 
-type SyntaxPolicyRemarkPluginInnerConfig = Required<SyntaxPolicyRemarkPluginConfig>;
+type SyntaxPolicyRemarkPluginInnerConfig = SyntaxPolicyRemarkPluginConfig;
 
 declare global {
   interface RemarkConfigs {
@@ -35,22 +35,26 @@ export class SyntaxPolicyRemarkPlugin extends BaseRemarkPlugin {
   constructor(config: SyntaxPolicyRemarkPluginConfig = {}) {
     super();
 
-    this.innerConfig = {
-      indentedCode: config.indentedCode ?? false,
-      setextHeading: config.setextHeading ?? false,
-    };
-    const { indentedCode, setextHeading } = this.innerConfig;
-    const disabledConstructs: string[] = [];
+    this.innerConfig = { ...config };
 
-    if (!indentedCode) {
-      disabledConstructs.push('codeIndented');
-    }
-
-    if (!setextHeading) {
-      disabledConstructs.push('setextUnderline');
-    }
+    const getOptions = () => ({
+      indentedCode: this.innerConfig.indentedCode ?? this.context?.config.indentedCode ?? false,
+      setextHeading: this.innerConfig.setextHeading ?? this.context?.config.setextHeading ?? false,
+    });
 
     this.plugin = function () {
+      const { indentedCode, setextHeading } = getOptions();
+
+      const disabledConstructs: string[] = [];
+
+      if (!indentedCode) {
+        disabledConstructs.push('codeIndented');
+      }
+
+      if (!setextHeading) {
+        disabledConstructs.push('setextUnderline');
+      }
+
       const extension: Extension = {
         disable: {
           null: [...disabledConstructs],

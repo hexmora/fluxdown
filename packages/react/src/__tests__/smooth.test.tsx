@@ -273,7 +273,7 @@ describe('Fluxdown smooth streaming', () => {
       <Fluxdown build={{ tex: true }} streaming={{ smooth: true, effect: false }} text="$x$" />,
     );
 
-    await clock.advanceUntil(() => view.container.textContent === 'x');
+    await clock.advanceUntil(() => view.container.querySelector('[data-mode="inline"]') !== null);
 
     view.rerender(<Fluxdown build={{ tex: false }} streaming={false} text="$x$" />);
 
