@@ -37,11 +37,12 @@ describe('Fluxdown shad streaming', () => {
     expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('ghijklmnop');
 
     expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: '15px',
-      marginLeft: '-15px',
+      maskImage: `linear-gradient(to right, #000, transparent), linear-gradient(to right, #000 max(0px, calc(100% - 15px)), transparent)`,
     });
 
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveAttribute('aria-hidden', 'true');
+    expect(view.container.querySelector(`.${styles.mask}`)).toHaveTextContent('ghijklmnop');
+
+    expect(view.container.querySelector(`.${styles.mask}`)).not.toHaveAttribute('aria-hidden');
 
     expect(view.container.firstElementChild?.getAttribute('style')).not.toContain('shad');
 
@@ -71,8 +72,7 @@ describe('Fluxdown shad streaming', () => {
     view.rerender(<Fluxdown streaming={streaming} text="abc" />);
 
     expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: `${expected}px`,
-      marginLeft: `${-expected}px`,
+      maskImage: `linear-gradient(to right, #000, transparent), linear-gradient(to right, #000 max(0px, calc(100% - ${expected}px)), transparent)`,
     });
 
     expect(view.container.firstElementChild?.getAttribute('style')).not.toContain('shad');
@@ -110,8 +110,7 @@ describe('Fluxdown shad streaming', () => {
     expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('gh');
 
     expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: '24px',
-      marginLeft: '-24px',
+      maskImage: `linear-gradient(to right, #000, transparent), linear-gradient(to right, #000 max(0px, calc(100% - 24px)), transparent)`,
     });
 
     const active = view.container.querySelector(`.${styles.active}`);
@@ -125,8 +124,7 @@ describe('Fluxdown shad streaming', () => {
     );
 
     expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: '10px',
-      marginLeft: '-10px',
+      maskImage: `linear-gradient(to right, #000, transparent), linear-gradient(to right, #000 max(0px, calc(100% - 10px)), transparent)`,
     });
 
     expect(view.container.querySelector(`.${styles.active}`)).toBe(active);
@@ -142,8 +140,7 @@ describe('Fluxdown shad streaming', () => {
     expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('efgh');
 
     expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: '0px',
-      marginLeft: '0px',
+      maskImage: `linear-gradient(to right, #000, transparent), linear-gradient(to right, #000 max(0px, calc(100% - 0px)), transparent)`,
     });
 
     view.rerender(
@@ -233,5 +230,53 @@ describe('Fluxdown shad streaming', () => {
     expect(container.querySelector(`.${styles.active}`)).toHaveTextContent('');
 
     expect(jest.getTimerCount()).toBe(timers);
+  });
+
+  test.each([
+    { prefix: '> ', selector: 'blockquote > p' },
+    { prefix: '> > ', selector: 'blockquote > blockquote > p' },
+    { prefix: '> - ', selector: 'blockquote > ul > li' },
+    { prefix: '> ## ', selector: 'blockquote > h2' },
+  ])('fades new text inside $selector without hiding its content', async ({ prefix, selector }) => {
+    jest.useFakeTimers();
+
+    const streaming: StreamingConfig = { effect: ['shad', { length: 20 }], smooth: false };
+    const view = render(<Fluxdown streaming={streaming} text={`${prefix}Start `} />);
+
+    view.rerender(
+      <Fluxdown streaming={streaming} text={`${prefix}Start *soft* **strong** tail`} />,
+    );
+
+    const container = view.container.querySelector(selector);
+    const active = container?.querySelector(`.${styles.mask}`);
+
+    expect(active).toHaveTextContent('soft strong tail');
+    expect(active).not.toHaveAttribute('aria-hidden');
+    expect(active?.querySelector('em')).toHaveTextContent('soft');
+    expect(active?.querySelector('strong')).toHaveTextContent('strong');
+
+    await act(async () => jest.advanceTimersByTime(200));
+
+    expect(container).toHaveTextContent('Start soft strong tail');
+    expect(container?.querySelector(`.${styles.mask}`)).toBeNull();
+  });
+
+  test.each([
+    { initial: '> `code', appended: '> `code grows`', selector: 'blockquote code' },
+    {
+      initial: '> ```text\n> code',
+      appended: '> ```text\n> code grows\n> ```',
+      selector: 'blockquote pre code',
+    },
+  ])('keeps $selector unshaded as its text grows', ({ initial, appended, selector }) => {
+    jest.useFakeTimers();
+
+    const streaming: StreamingConfig = { effect: 'shad', smooth: false };
+    const view = render(<Fluxdown streaming={streaming} text={initial} />);
+
+    view.rerender(<Fluxdown streaming={streaming} text={appended} />);
+
+    expect(view.container.querySelector(selector)).toHaveTextContent('code grows');
+    expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
   });
 });

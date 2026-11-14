@@ -1,6 +1,28 @@
-import { texToSvg } from '../renderer/components/mathjax-tex/utils';
+import { texToSvg } from '../mathjax';
 
 describe('MathJax synchronous SVG rendering', () => {
+  test.each([
+    [String.raw`\ce{H2 + O2 -> H2O}`, 'E429'],
+    [String.raw`\ce{A <=> B}`, 'E408'],
+    [String.raw`\ce{A ->[catalyst] B}`, 'E422'],
+  ])('provides vector chemistry arrows without private-use fallback text: %s', (source, glyph) => {
+    for (const mode of ['inline', 'display', 'inline'] as const) {
+      const html = texToSvg(source, mode);
+
+      const container = document.createElement('div');
+
+      expect(html).toContain('<svg');
+
+      container.innerHTML = html!;
+
+      expect(container.querySelector(`path[data-c="${glyph}"]`)).not.toBeNull();
+
+      expect(container.querySelector('svg text')).toBeNull();
+
+      expect(html).not.toMatch(/[\uE000-\uF8FF]/u);
+    }
+  });
+
   test.each([
     ['AMS', String.raw`\begin{aligned}a&=b+c\\d&=e\end{aligned}`],
     ['chemistry', String.raw`\ce{H2O}`],

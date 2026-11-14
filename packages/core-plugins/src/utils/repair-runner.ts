@@ -1,4 +1,4 @@
-import type { IRepairPlugin } from '@fluxdown/types';
+import type { IRepairPlugin, RepairPluginCleanup } from '@fluxdown/types';
 import type { OmitWithType } from '@fluxdown/utils';
 import type { Parent, Root, RootContent } from 'mdast';
 
@@ -10,6 +10,8 @@ import {
 import { PluginPriority } from '@fluxdown/types';
 import { isFunction } from 'lodash-es';
 
+import { RepairSourceTracker } from './repair-source';
+
 type RepairProcessOptions<T extends Parent | RootContent> = OmitWithType<
   ProcessMdastParams<T>,
   'node' | 'runner'
@@ -19,7 +21,7 @@ const getPluginName = (plugin: IRepairPlugin) => {
   return plugin.constructor?.name ?? 'Unnamed';
 };
 
-export type RunRepairPluginParams<T extends Parent | RootContent> = {
+interface RepairPluginExecution<T extends Parent | RootContent> {
   /**
    * Repair plugin being executed.
    */
@@ -35,7 +37,10 @@ export type RunRepairPluginParams<T extends Parent | RootContent> = {
    * @default true
    */
   safe?: boolean;
-} & RepairProcessOptions<T>;
+}
+
+export type RunRepairPluginParams<T extends Parent | RootContent> = RepairPluginExecution<T> &
+  RepairProcessOptions<T>;
 
 export const runRepairPlugin = <T extends Parent | RootContent>({
   plugin,
@@ -44,6 +49,7 @@ export const runRepairPlugin = <T extends Parent | RootContent>({
   ...processOptions
 }: RunRepairPluginParams<T>) => {
   const runners = isFunction(plugin.runner) ? [plugin.runner] : [...plugin.runner];
+
   const { ending: _ending, priority: _priority, ...pluginOptions } = plugin.config;
 
   const options = { ...processOptions, ...pluginOptions };
@@ -60,17 +66,25 @@ export const runRepairPlugin = <T extends Parent | RootContent>({
     const runner = original.bind(plugin);
 
     const handleRunner = (params: ProcessMdastRunnerParams<T>) => {
-      runner({
-        ...params,
-        recursive(nextNode) {
-          runRepairPlugin<Parent>({
-            plugin,
-            node: nextNode,
-            safe,
-            ...processOptions,
-          });
-        },
-      });
+      const tracker = new RepairSourceTracker(params);
+
+      try {
+        runner({
+          ...params,
+          insertNext(content, replaceCurrent) {
+            params.insertNext(content, replaceCurrent);
+
+            tracker.recordInsertions(content);
+          },
+          recursive(nextNode) {
+            tracker.runRecursive(nextNode, () => {
+              runRepairPlugin<Parent>({ plugin, node: nextNode, safe, ...processOptions });
+            });
+          },
+        });
+      } finally {
+        tracker.invalidate();
+      }
     };
 
     try {
@@ -94,7 +108,7 @@ export const runRepairPlugin = <T extends Parent | RootContent>({
   plugin.after(node);
 };
 
-export type ProcessRepairByPluginsParams<T extends Parent | RootContent = Root> = {
+interface RepairPluginPass {
   /**
    * Repair plugins to execute.
    */
@@ -105,7 +119,26 @@ export type ProcessRepairByPluginsParams<T extends Parent | RootContent = Root> 
    * @default false
    */
   ending?: boolean;
-} & OmitWithType<RunRepairPluginParams<T>, 'plugin'>;
+}
+
+export type ProcessRepairByPluginsParams<T extends Parent | RootContent = Root> = RepairPluginPass &
+  OmitWithType<RunRepairPluginParams<T>, 'plugin'>;
+
+const releaseRepairPass = (cleanups: RepairPluginCleanup[]): void => {
+  const errors: unknown[] = [];
+
+  for (let index = cleanups.length - 1; index >= 0; index -= 1) {
+    try {
+      cleanups[index]?.();
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+
+  if (errors.length > 0) {
+    throw errors[0];
+  }
+};
 
 export const processRepairByPlugins = <T extends Parent | RootContent>({
   node,
@@ -126,15 +159,29 @@ export const processRepairByPlugins = <T extends Parent | RootContent>({
   const currentPlugins = orderedPlugins.filter((item) => {
     const { ending: endingOnly = false } = item.config;
 
-    return endingOnly ? ending : true;
+    return item.isEnabled?.() !== false && (!endingOnly || ending);
   });
 
-  for (const plugin of currentPlugins) {
-    runRepairPlugin({
-      plugin,
-      node,
-      safe,
-      ...processOptions,
-    });
+  const cleanups: RepairPluginCleanup[] = [];
+
+  try {
+    for (const plugin of currentPlugins) {
+      const cleanup = plugin.prepare?.(node);
+
+      if (cleanup) {
+        cleanups.push(cleanup);
+      }
+    }
+
+    for (const plugin of currentPlugins) {
+      runRepairPlugin({
+        plugin,
+        node,
+        safe,
+        ...processOptions,
+      });
+    }
+  } finally {
+    releaseRepairPass(cleanups);
   }
 };

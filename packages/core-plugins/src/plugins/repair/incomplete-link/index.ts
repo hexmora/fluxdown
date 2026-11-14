@@ -1,10 +1,17 @@
 import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/types';
-import type { PhrasingContent } from 'mdast';
+import type { Parent, PhrasingContent } from 'mdast';
 
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
-import { last, max } from 'lodash-es';
+import { last } from 'lodash-es';
 
+import {
+  isCompleteRepairPhrasingParent,
+  isRepairNodeType,
+  isRepairPhrasingParent,
+} from '../../../utils';
 import { BaseRepairPlugin } from '../base';
+import { getIncompleteResource, isIncompleteTaskMarker, isOpenRepairTableCell } from '../utils';
+import { getIncompleteAutolinkChildren, getPendingReferenceTree } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -21,95 +28,64 @@ export class IncompleteLinkRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
-    if (node.type !== 'paragraph') {
-      return;
-    }
+  runner: RepairPluginRunner[] = [
+    ({ node, skipTree }) => {
+      if (node.type === 'root' && 'children' in node) {
+        const children = getPendingReferenceTree(node);
 
-    let branch = node;
+        if (children) {
+          node.children = children;
+        }
 
-    for (const parent of parents) {
-      if (last(parent.children) !== branch) {
+        skipTree();
+      }
+    },
+    ({ node, parents, skipTree }) => {
+      if (isCompleteRepairPhrasingParent(node)) {
+        skipTree();
+
         return;
       }
 
-      branch = parent;
-    }
-
-    const tail = last(node.children);
-
-    if (!tail || tail.type !== 'text') {
-      return;
-    }
-
-    const lineStart = (max([tail.value.lastIndexOf('\n'), tail.value.lastIndexOf('\r')]) ?? -1) + 1;
-    let opener = -1;
-
-    for (let offset = tail.value.length - 1; offset >= lineStart; offset -= 1) {
       if (
-        tail.value.charAt(offset) !== '[' ||
-        tail.value.charAt(offset - 1) === '!' ||
-        tail.value.charAt(offset - 1) === '['
+        (!isRepairPhrasingParent(node) &&
+          !(isRepairNodeType(node, 'tableCell') && isOpenRepairTableCell(node, parents))) ||
+        node.type === 'link' ||
+        parents.some((parent) => parent.type === 'link') ||
+        isIncompleteTaskMarker(node, parents)
       ) {
-        continue;
-      }
-
-      let slashCount = 0;
-
-      for (
-        let slashOffset = offset - 1;
-        slashOffset >= 0 && tail.value.charAt(slashOffset) === '\\';
-        slashOffset -= 1
-      ) {
-        slashCount += 1;
-      }
-
-      if (slashCount % 2 === 1) {
-        continue;
-      }
-
-      opener = offset;
-      break;
-    }
-
-    if (opener < 0 || tail.value.charAt(opener + 1) === '^') {
-      return;
-    }
-
-    const suffix = tail.value.slice(opener + 1);
-    const close = suffix.lastIndexOf(']');
-    let label = suffix;
-
-    if (close >= 0) {
-      label = suffix.slice(0, close);
-      const remainder = suffix.slice(close + 1);
-
-      if (remainder.length > 0 && (!remainder.startsWith('(') || remainder.endsWith(')'))) {
         return;
       }
-    }
 
-    const prefix = tail.value.slice(0, opener);
-    const replacement: PhrasingContent[] = [];
+      let branch: Parent = node;
 
-    if (prefix.length > 0) {
-      if (label.length === 0) {
-        replacement.push({ type: 'text', value: prefix });
-      } else {
-        tail.value = prefix;
-        replacement.push(tail);
+      for (const parent of parents) {
+        if (last(parent.children) !== branch) {
+          return;
+        }
+
+        branch = parent;
       }
-    }
 
-    if (label.length > 0) {
-      replacement.push({
-        type: 'link',
-        url: '#',
-        title: null,
-        children: [{ type: 'text', value: label }],
-      });
-    }
+      const candidate = getIncompleteResource(node, false);
 
-    node.children.splice(node.children.length - 1, 1, ...replacement);
-  };
+      if (!candidate) {
+        const autolink = getIncompleteAutolinkChildren(node, parents);
+
+        if (autolink) {
+          node.children.splice(0, node.children.length, ...autolink);
+        }
+
+        return;
+      }
+
+      const replacement: PhrasingContent[] = [...candidate.prefix];
+
+      if (candidate.label.length > 0) {
+        replacement.push({ type: 'link', url: '#', title: null, children: candidate.label });
+      }
+
+      node.children.splice(0, node.children.length, ...replacement);
+    },
+  ];
 }

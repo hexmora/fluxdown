@@ -4,7 +4,7 @@ import type { Parent } from 'mdast';
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { last, nth } from 'lodash-es';
 
-import { isRepairNodeType } from '../../../utils';
+import { getRepairSourceOffset, isRepairNodeType } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
 
 declare global {
@@ -19,7 +19,7 @@ export class TrailingEscapeRepairPlugin extends BaseRepairPlugin {
   readonly config: RepairPluginSystemConfig = {
     scope: 'tail',
     ending: true,
-    priority: PluginPriority.Default,
+    priority: PluginPriority.Low,
   };
 
   runner: RepairPluginRunner = ({ node, parents }) => {
@@ -27,13 +27,21 @@ export class TrailingEscapeRepairPlugin extends BaseRepairPlugin {
       return;
     }
 
+    const source = node.data?.source;
+
+    if (source === undefined || !node.value.endsWith('\\')) {
+      return;
+    }
+
+    const offset = getRepairSourceOffset(node, node.value.length - 1);
+
+    if (offset === undefined) {
+      return;
+    }
+
     let trailingEscapes = 0;
 
-    for (
-      let index = node.value.length - 1;
-      index >= 0 && nth(node.value, index) === '\\';
-      index -= 1
-    ) {
+    for (let index = offset; index >= 0 && nth(source, index) === '\\'; index -= 1) {
       trailingEscapes += 1;
     }
 

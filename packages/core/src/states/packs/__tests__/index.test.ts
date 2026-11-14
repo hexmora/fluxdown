@@ -22,6 +22,7 @@ import {
   type IRepairPlugin,
   PluginPriority,
   type PluginSet,
+  type RepairPluginContext,
   type RepairPluginRunner,
   type RepairPluginSystemConfig,
 } from '@fluxdown/types';
@@ -312,6 +313,14 @@ const setupCore = (initialText = 'base') => {
     state,
     text,
   };
+};
+
+const stableAttacher: Plugin<[], Root, Root> = () => (tree) => {
+  const paragraph = tree.children[0];
+
+  if (paragraph?.type === 'paragraph') {
+    paragraph.children.push({ type: 'text', value: '|enabled' });
+  }
 };
 
 beforeEach(() => {
@@ -623,6 +632,194 @@ describe('Core', () => {
     expect(values).toEqual(['first', 'second|ending']);
   });
 
+  test('orders structural table repair before incomplete formulas without coupling their syntax', () => {
+    const harness = setupCore('| $x$ | value');
+
+    harness.remarks.next({});
+
+    harness.rehypes.next({});
+
+    harness.repairs.next({});
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true, repair: true, repairEnding: true });
+
+    expect(harness.state.value.value.map((block) => collectText(block.value.value)).join('')).toBe(
+      '',
+    );
+
+    harness.text.next('| A | B |\n| --- | --- |\n| $x$ | `code');
+
+    const tree = getFirstBlockTree(harness.state);
+
+    expect(
+      findElement(tree, (element) => element.properties?.dataType === 'inline-math'),
+    ).toBeDefined();
+
+    expect(findElement(tree, (element) => element.tagName === 'code')).toBeDefined();
+
+    harness.state.destroy();
+  });
+
+  test('gates TeX prefix repair by math syntax and the ending-repair setting', () => {
+    const harness = setupCore('$x+\\frac{a}{');
+
+    harness.remarks.next({});
+
+    harness.rehypes.next({});
+
+    harness.repairs.next({});
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true, repair: true, repairEnding: true });
+
+    const math = findElement(
+      getFirstBlockTree(harness.state),
+      (element) => element.properties?.dataType === 'inline-math',
+    );
+
+    expect(math?.children.some((child) => child.data?.repairEnding === true)).toBe(true);
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true, repair: true, repairEnding: false });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('$x+\\frac{a}{');
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true, repair: true, repairEnding: true });
+
+    harness.remarks.next({ 'remark-syntax-math': { disabled: true } });
+
+    expect(
+      findElement(
+        getFirstBlockTree(harness.state),
+        (element) => element.properties?.dataType === 'inline-math',
+      ),
+    ).toBeUndefined();
+
+    harness.state.destroy();
+  });
+
+  test('rebuilds the processor when context changes the enabled state of a shared attacher', () => {
+    class ContextRemarkPlugin extends BaseRemarkPlugin {
+      static readonly key = 'remark-test-context-enabled';
+
+      plugin = stableAttacher;
+
+      isEnabled = () => this.context?.config.tex === true;
+    }
+
+    const harness = setupCore('text');
+
+    harness.remarks.next([ContextRemarkPlugin]);
+
+    harness.rehypes.next({});
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text');
+
+    harness.build.next({ ...DEFAULT_CONFIG, tex: true });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text|enabled');
+
+    harness.build.next(DEFAULT_CONFIG);
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('text');
+
+    harness.state.destroy();
+  });
+
+  test('injects block-specific compiler configuration and original plugin descriptors', () => {
+    const contexts: RepairPluginContext[] = [];
+
+    class ContextRepairPlugin extends BaseRepairPlugin {
+      static readonly key = 'repair-test-context';
+
+      runner: RepairPluginRunner = ({ node }) => {
+        if (node.type !== 'root' || !this.context) {
+          return;
+        }
+
+        contexts.push(this.context);
+
+        node.children.push({
+          type: 'paragraph',
+          children: [
+            { type: 'text', value: this.context.config.repairEnding ? '|tail' : '|sealed' },
+          ],
+        });
+      };
+    }
+
+    const harness = setupCore('first\n\nsecond');
+
+    harness.remarks.next({});
+
+    harness.rehypes.next({});
+
+    harness.repairs.next([ContextRepairPlugin]);
+
+    harness.build.next({ ...DEFAULT_CONFIG, repair: true, repairEnding: true });
+
+    expect(harness.state.value.value.map((block) => collectText(block.value.value))).toEqual([
+      'first\n|sealed',
+      'second\n|tail',
+    ]);
+
+    expect(contexts.map((context) => context.config.repairEnding)).toEqual([false, true]);
+
+    expect(contexts.every((context) => context.repairs.includes(ContextRepairPlugin))).toBe(true);
+
+    expect(contexts.every((context) => context.remarks.includes(ApplyRepairsRemarkPlugin))).toBe(
+      true,
+    );
+
+    harness.text.next('first\n\nsecond\n\nthird');
+
+    expect(harness.state.value.value.map((block) => collectText(block.value.value))).toEqual([
+      'first\n|sealed',
+      'second\n|sealed',
+      'third\n|tail',
+    ]);
+
+    harness.state.destroy();
+  });
+
+  test('lets syntax-dependent repairs read enabled remark options at runtime', () => {
+    const harness = setupCore('~tail');
+
+    harness.remarks.next({});
+
+    harness.rehypes.next({});
+
+    harness.repairs.next({});
+
+    harness.build.next({ ...DEFAULT_CONFIG, repair: true, repairEnding: true });
+
+    expect(
+      findElement(getFirstBlockTree(harness.state), (node) => node.tagName === 'del'),
+    ).toBeDefined();
+
+    harness.remarks.next({ 'remark-syntax-strikethrough': { singleTilde: false } });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('~tail');
+
+    harness.remarks.next({ 'remark-syntax-strikethrough': { disabled: true } });
+
+    harness.text.next('~~tail');
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('~~tail');
+
+    harness.text.next('| header |');
+
+    harness.remarks.next({});
+
+    expect(harness.state.value.value.map((block) => collectText(block.value.value)).join('')).toBe(
+      '',
+    );
+
+    harness.remarks.next({ 'remark-syntax-table': { disabled: true } });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('| header |');
+
+    harness.state.destroy();
+  });
+
   test('reacts to enabled repair extras, their configs, and list changes', () => {
     const harness = setupCore('base');
 
@@ -757,7 +954,7 @@ describe('Core', () => {
     expect(AppendRehypePlugin.destroyed).toHaveBeenCalledTimes(1);
   });
 
-  test('releases shared repair plugins after the last block leaves the graph', () => {
+  test('releases repair instances when their block-specific compiler context retires', () => {
     const harness = setupCore('first\n\nsecond');
 
     harness.remarks.next({});
@@ -777,21 +974,21 @@ describe('Core', () => {
 
     harness.text.next('first');
 
-    expect(EndingMarkerRepairPlugin.destroyed).not.toHaveBeenCalled();
+    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(2);
 
     harness.text.next('');
 
     expect(harness.state.value.value).toEqual([]);
-    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(1);
+    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(3);
 
     harness.text.next('rebuilt');
 
     expect(collectText(getFirstBlockTree(harness.state))).toBe('rebuilt|ending');
-    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(1);
+    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(3);
 
     harness.state.destroy();
 
-    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(2);
+    expect(EndingMarkerRepairPlugin.destroyed).toHaveBeenCalledTimes(4);
     expect(harness.repairs.closed).toBe(false);
   });
 

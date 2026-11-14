@@ -1,6 +1,4 @@
-import type { Parent } from 'mdast';
-
-import { last } from 'lodash-es';
+import type { Parent, RootContent, Text } from 'mdast';
 
 export const INLINE_PARENT_TYPES: string[] = [
   'delete',
@@ -12,34 +10,46 @@ export const INLINE_PARENT_TYPES: string[] = [
 
 const TRAILING_LINE_ENDINGS = /[\r\n]+$/;
 
-export const removeTrailingBreaks = (parent: Parent): void => {
-  while (parent.children.length > 0) {
-    const child = last(parent.children);
+export const getTrailingBreakChildren = (parent: Parent): RootContent[] | undefined => {
+  let end = parent.children.length;
+
+  while (end > 0) {
+    const child = parent.children[end - 1];
 
     if (!child) {
-      return;
+      break;
     }
 
     if (child.type === 'break') {
-      parent.children.pop();
+      end -= 1;
+
       continue;
     }
 
     if (child.type !== 'text') {
-      return;
+      break;
     }
 
     const value = child.value.replace(TRAILING_LINE_ENDINGS, '');
 
     if (value === child.value) {
-      return;
+      break;
     }
 
     if (value.length > 0) {
-      child.value = value;
-      return;
+      const { source: _source, ...data } = child.data ?? {};
+
+      const text: Text = { ...child, value, data };
+
+      if (Object.keys(data).length === 0) {
+        delete text.data;
+      }
+
+      return [...parent.children.slice(0, end - 1), text];
     }
 
-    parent.children.pop();
+    end -= 1;
   }
+
+  return end === parent.children.length ? undefined : parent.children.slice(0, end);
 };

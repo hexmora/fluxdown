@@ -1,19 +1,25 @@
 import type { Parent } from 'mdast';
 
-import { last, nth } from 'lodash-es';
+import { last } from 'lodash-es';
 
 import { COMPLETE_FOOTNOTE_REFERENCE, INCOMPLETE_FOOTNOTE_REFERENCE } from './consts';
 
-export const removeCompleteReferences = (value: string): string => {
+export const removeCompleteReferences = (
+  value: string,
+  isMarker: (offset: number, length: number) => boolean,
+): string => {
   return value.replace(COMPLETE_FOOTNOTE_REFERENCE, (match, offset: number) => {
-    return isEscaped(value, offset) ? match : '';
+    return isMarker(offset, match.length) ? '' : match;
   });
 };
 
-export const removeIncompleteReference = (value: string): string => {
+export const removeIncompleteReference = (
+  value: string,
+  isMarker: (offset: number, length: number) => boolean,
+): string => {
   const match = INCOMPLETE_FOOTNOTE_REFERENCE.exec(value);
 
-  if (!match || match.index === undefined || isEscaped(value, match.index)) {
+  if (!match || match.index === undefined || !isMarker(match.index, match[0].length)) {
     return value;
   }
 
@@ -32,14 +38,4 @@ export const isStructuralTail = (node: unknown, parents: Parent[]): boolean => {
   }
 
   return true;
-};
-
-const isEscaped = (value: string, offset: number): boolean => {
-  let precedingEscapes = 0;
-
-  for (let index = offset - 1; index >= 0 && nth(value, index) === '\\'; index -= 1) {
-    precedingEscapes += 1;
-  }
-
-  return precedingEscapes % 2 === 1;
 };

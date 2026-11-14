@@ -195,6 +195,75 @@ const hasFootnoteReference = (text: string): boolean => {
   return false;
 };
 
+/** Explicit references need later definitions even before the lexer can resolve them. */
+const hasExplicitReference = (source: string): boolean => {
+  if (!source.includes('][')) {
+    return false;
+  }
+
+  const openers: number[] = [];
+
+  for (let index = 0; index < source.length; index += 1) {
+    const character = source[index];
+
+    if (character === '\\') {
+      index += 1;
+
+      continue;
+    }
+
+    if (character === '[') {
+      openers.push(index);
+
+      continue;
+    }
+
+    if (character !== ']') {
+      continue;
+    }
+
+    const opener = openers.pop();
+
+    if (opener === undefined || opener + 1 === index || source[index + 1] !== '[') {
+      continue;
+    }
+
+    const start = index + 2;
+
+    for (let end = start; end < source.length && end - start <= 999; end += 1) {
+      if (source[end] === '\\') {
+        end += 1;
+      } else if (source[end] === '[') {
+        break;
+      } else if (source[end] === ']') {
+        const identifier = source.slice(start, end) || source.slice(opener + 1, index);
+
+        if (/[^\t\n\r ]/.test(identifier) && !/\n[ \t]*\n/.test(identifier)) {
+          return true;
+        }
+
+        break;
+      }
+    }
+  }
+
+  return false;
+};
+
+const hasDocumentScopedTokens = (tokens: Token[]): boolean => {
+  // Keep parsed code, HTML and links opaque, but allow formatting inside an outer label.
+  const source = tokens
+    .map((token) =>
+      (token.type === 'text' && !('tokens' in token && token.tokens?.length)) ||
+      token.type === 'escape'
+        ? token.raw
+        : '\0'.repeat(token.raw.length),
+    )
+    .join('');
+
+  return hasExplicitReference(source) || tokens.some(hasDocumentScopedSyntax);
+};
+
 export const hasDocumentScopedSyntax = (token: Token): boolean => {
   const tree = token as TokenTree;
 
@@ -213,19 +282,19 @@ export const hasDocumentScopedSyntax = (token: Token): boolean => {
   }
 
   if (tree.type === 'text' && (!tree.tokens || tree.tokens.length === 0)) {
-    return hasFootnoteReference(tree.raw);
+    return hasFootnoteReference(tree.raw) || hasExplicitReference(tree.raw);
   }
 
-  if (tree.tokens?.some(hasDocumentScopedSyntax)) {
+  if (tree.tokens && hasDocumentScopedTokens(tree.tokens)) {
     return true;
   }
 
-  if (tree.items?.some((item) => item.tokens.some(hasDocumentScopedSyntax))) {
+  if (tree.items?.some((item) => hasDocumentScopedTokens(item.tokens))) {
     return true;
   }
 
   const tableCells = [...(tree.header ?? []), ...(tree.rows?.flat() ?? [])];
-  return tableCells.some((cell) => cell.tokens.some(hasDocumentScopedSyntax));
+  return tableCells.some((cell) => hasDocumentScopedTokens(cell.tokens));
 };
 
 type NormalizedMarkdown = {

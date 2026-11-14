@@ -3,6 +3,7 @@
 .root {
   color: inherit;
   font-style: italic;
+  font-synthesis-style: auto;
 
   > strong {
     font-weight: var(--#{$prefix}-typography-font-weight-bold);

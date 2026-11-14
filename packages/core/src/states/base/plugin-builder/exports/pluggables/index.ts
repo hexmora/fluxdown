@@ -34,13 +34,20 @@ export const isPluginConfigEqual = (left: unknown, right: unknown) => {
   });
 };
 
-export const isPluggableEqual = <T>(left: T | [T, unknown], right: T | [T, unknown]): boolean => {
+export const isPluggableEqual = <T>(
+  left: T | [T, unknown, unknown?],
+  right: T | [T, unknown, unknown?],
+): boolean => {
   return (
     left === right ||
     ((isArray(left) ? left[0] : left) === (isArray(right) ? right[0] : right) &&
       isPluginConfigEqual(
         isArray(left) ? left[1] : undefined,
         isArray(right) ? right[1] : undefined,
+      ) &&
+      isPluginConfigEqual(
+        isArray(left) ? left[2] : undefined,
+        isArray(right) ? right[2] : undefined,
       ))
   );
 };
@@ -136,7 +143,11 @@ export function toPluggable(
       return pluggable;
     }
 
-    return [Plugin, { ...(isArray(pluggable) ? pluggable[1] : {}), ...config }];
+    const options = { ...(isArray(pluggable) ? pluggable[1] : {}), ...config };
+
+    return isArray(pluggable) && pluggable[2] !== undefined
+      ? [Plugin, options, pluggable[2]]
+      : [Plugin, options];
   });
 }
 

@@ -1,15 +1,19 @@
 import cn from 'classnames';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
 import type { TexKatexRendererProps } from '../../type';
 
+import { getTexRoot, useTexRenderResult } from '../../../../../../../base';
+import { katexTexToHtml } from '../../../../../../../base/tex-katex';
 import { TexRenderer } from '../../../../../../tex';
 import styles from './index.module.scss';
-import { katexTexToHtml } from './utils';
 
 const TexKatexRenderer = ({ Fallback = TexRenderer, ...props }: TexKatexRendererProps) => {
-  const { className, mode = 'inline', style, tex } = props;
-  const html = useMemo(() => katexTexToHtml(tex, mode), [mode, tex]);
+  const { className, mode = 'inline', parents, style } = props;
+
+  const result = useTexRenderResult(props, katexTexToHtml);
+
+  const { html } = result;
 
   useEffect(() => {
     void import('katex/dist/katex.min.css').catch(() => {
@@ -21,14 +25,14 @@ const TexKatexRenderer = ({ Fallback = TexRenderer, ...props }: TexKatexRenderer
     return <Fallback {...props} />;
   }
 
-  const Root = mode === 'display' ? 'div' : 'span';
+  const Root = getTexRoot(mode, parents);
 
   return (
     <Root
       className={cn(styles.root, className)}
       dangerouslySetInnerHTML={{ __html: html }}
       data-mode={mode}
-      data-tex={tex}
+      data-tex={result.tex}
       style={style}
     />
   );

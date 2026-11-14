@@ -1,4 +1,4 @@
-import type { IPluggable, IRepairPlugin, PluginSet } from '@fluxdown/types';
+import type { IPluggable, IRemarkPlugin, IRepairPlugin, PluginSet } from '@fluxdown/types';
 
 import type { BlockCompilerConfig } from '../../../hast';
 
@@ -6,4 +6,6 @@ export type RepairPluggablesInputs = {
   config: BlockCompilerConfig;
 
   extras: PluginSet<IPluggable<IRepairPlugin, unknown>, RepairConfigs>;
+
+  remarks?: PluginSet<IPluggable<IRemarkPlugin, unknown>, RemarkConfigs>;
 };

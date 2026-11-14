@@ -13,6 +13,9 @@ type HastProcessor = Processor<MdastRoot, MdastRoot, HastRoot, undefined, undefi
 
 type ProcessorPlugin = IRemarkPlugin | IRehypePlugin;
 
+const getEnabledRemarks = (remarks: IRemarkPlugin[]): IRemarkPlugin[] =>
+  remarks.filter((remark) => remark.isEnabled?.() !== false);
+
 export interface ProcessorSnapshot {
   remarks: object[];
 
@@ -30,7 +33,7 @@ const getHastProcessor = ({
 }: Omit<MarkdownCompilerInputs, 'text'>) => {
   const markdown = unified().use(remarkParse);
 
-  for (const remark of remarks) {
+  for (const remark of getEnabledRemarks(remarks)) {
     markdown.use(remark.plugin);
   }
 
@@ -64,7 +67,7 @@ export const isProcessorEqual = (
   { remarks = [], rehypes = [], idPrefix }: MarkdownCompilerInputs,
 ): boolean =>
   snapshot.idPrefix === idPrefix &&
-  isAttachersEqual(snapshot.remarks, remarks) &&
+  isAttachersEqual(snapshot.remarks, getEnabledRemarks(remarks)) &&
   isAttachersEqual(snapshot.rehypes, rehypes);
 
 export const createProcessorSnapshot = ({
@@ -72,7 +75,7 @@ export const createProcessorSnapshot = ({
   rehypes = [],
   idPrefix,
 }: MarkdownCompilerInputs): ProcessorSnapshot => ({
-  remarks: remarks.map(getAttacher),
+  remarks: getEnabledRemarks(remarks).map(getAttacher),
   rehypes: rehypes.map(getAttacher),
   idPrefix,
   processor: getHastProcessor({ remarks, rehypes, idPrefix }).freeze(),

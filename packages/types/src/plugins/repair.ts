@@ -3,7 +3,15 @@ import type { OmitWithType } from '@fluxdown/utils';
 import type { Parent, RootContent } from 'mdast';
 import type { IDestructible } from 'stative';
 
+import type { RepairPluginContext } from '../compiler';
 import type { IBasePluginConfig, IPluginWithConfig } from './base';
+
+declare module 'unist' {
+  interface Data {
+    /** Original Markdown captured at the parser boundary. Remove after changing this node. */
+    source?: string;
+  }
+}
 
 /**
  * Framework-owned execution metadata for a repair plugin.
@@ -57,10 +65,21 @@ export type RepairPluginHookType = (
   node: Parent | RootContent,
 ) => void;
 
+export type RepairPluginCleanup = () => void;
+
+export type RepairPluginPrepare = (node: Parent | RootContent) => void | RepairPluginCleanup;
+
 /**
  * Contract implemented by mdast repair plugins.
  */
 export interface IRepairPlugin extends IDestructible, IPluginWithConfig<RepairPluginConfig> {
+  context?: RepairPluginContext;
+
+  isEnabled?: () => boolean;
+
+  /** Prepare shared pass resources and release them after every plugin has run. */
+  prepare?: RepairPluginPrepare;
+
   /**
    * Framework metadata. Plugin-specific constructor options are intentionally
    * kept separate from this object.

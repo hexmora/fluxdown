@@ -17,7 +17,13 @@ import type {
 import type { IncompleteInlineCodeRepairPlugin } from '../incomplete-inline-code';
 import type { IncompleteLinkRepairPlugin } from '../incomplete-link';
 import type { IncompleteListMarkerRepairPlugin } from '../incomplete-list-marker';
+import type { IncompleteMathRepairPlugin } from '../incomplete-math';
+import type {
+  IncompleteStrikethroughRepairPlugin,
+  IncompleteStrikethroughRepairPluginConfig,
+} from '../incomplete-strikethrough';
 import type { IncompleteStrongRepairPlugin } from '../incomplete-strong';
+import type { IncompleteTableRepairPlugin } from '../incomplete-table';
 import type { ParagraphHtmlClosureRepairPlugin } from '../paragraph-html-closure';
 import type { RedundantBreakBeforeHtmlRepairPlugin } from '../redundant-break-before-html';
 import type { RedundantTrailingBreakRepairPlugin } from '../redundant-trailing-break';
@@ -35,7 +41,9 @@ type ParameterlessRepairPluginClass =
   | typeof IncompleteInlineCodeRepairPlugin
   | typeof IncompleteLinkRepairPlugin
   | typeof IncompleteListMarkerRepairPlugin
+  | typeof IncompleteMathRepairPlugin
   | typeof IncompleteStrongRepairPlugin
+  | typeof IncompleteTableRepairPlugin
   | typeof ParagraphHtmlClosureRepairPlugin
   | typeof RedundantBreakBeforeHtmlRepairPlugin
   | typeof RedundantTrailingBreakRepairPlugin
@@ -54,6 +62,12 @@ describe('repair plugin config contracts', () => {
   test('publishes constructor config only for incomplete-image behavior', () => {
     expectTypeOf<ConstructorConfig<typeof IncompleteImageRepairPlugin>>().toEqualTypeOf<
       IncompleteImageRepairPluginConfig | undefined
+    >();
+  });
+
+  test('publishes the strikethrough syntax option as constructor config', () => {
+    expectTypeOf<ConstructorConfig<typeof IncompleteStrikethroughRepairPlugin>>().toEqualTypeOf<
+      IncompleteStrikethroughRepairPluginConfig | undefined
     >();
   });
 

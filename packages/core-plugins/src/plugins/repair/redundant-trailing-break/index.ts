@@ -4,7 +4,7 @@ import { isMdastParent } from '@fluxdown/mdast';
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 
 import { BaseRepairPlugin } from '../base';
-import { INLINE_PARENT_TYPES, removeTrailingBreaks } from './utils';
+import { getTrailingBreakChildren, INLINE_PARENT_TYPES } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -25,6 +25,10 @@ export class RedundantTrailingBreakRepairPlugin extends BaseRepairPlugin {
       return;
     }
 
-    removeTrailingBreaks(node);
+    const children = getTrailingBreakChildren(node);
+
+    if (children) {
+      node.children = children;
+    }
   };
 }

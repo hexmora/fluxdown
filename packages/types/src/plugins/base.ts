@@ -88,4 +88,4 @@ export type IPluggableConfig<C = unknown> = (unknown extends C
 
 export type IPluggable<T extends IPluginWithConfig, O = void, P = O> =
   | PluginClass<T>
-  | [PluginClass<T, unknown extends P ? void : P>, IPluggableConfig<O>];
+  | [PluginClass<T, unknown extends P ? void : P>, IPluggableConfig<O>, unknown?];

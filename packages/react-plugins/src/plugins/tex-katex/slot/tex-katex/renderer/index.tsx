@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 
 import type { TexKatexRendererProps } from './type';
 
-import { TexRenderer } from '../../../../tex';
+import { TexLoadingRenderer, TexRenderer } from '../../../../tex';
 
 export type { TexKatexRendererProps } from './type';
 
@@ -11,7 +11,7 @@ const LazyKatexTexRenderer = /*#__PURE__*/ lazy(() =>
 );
 
 export const TexKatexRenderer = (props: TexKatexRendererProps) => (
-  <Suspense fallback={<TexRenderer {...props} />}>
+  <Suspense fallback={<TexLoadingRenderer {...props} />}>
     <LazyKatexTexRenderer {...props} />
   </Suspense>
 );

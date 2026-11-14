@@ -98,9 +98,11 @@ describe('Fluxdown streaming effects', () => {
 
     expect(active).toHaveTextContent('bcdef');
 
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      width: '24px',
-      marginLeft: '-24px',
+    expect(view.container.querySelector(`.${styles.mask}`)).toBe(active);
+
+    expect(active).toHaveStyle({
+      maskImage:
+        'linear-gradient(to right, #000, transparent), linear-gradient(to right, #000 max(0px, calc(100% - 24px)), transparent)',
     });
 
     view.rerender(

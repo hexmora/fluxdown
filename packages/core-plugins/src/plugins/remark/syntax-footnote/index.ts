@@ -17,6 +17,8 @@ declare global {
 export class SyntaxFootnoteRemarkPlugin extends BaseRemarkPlugin {
   static readonly key = 'remark-syntax-footnote';
 
+  isEnabled = () => this.context?.config.footnote !== false;
+
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Highest,
   };

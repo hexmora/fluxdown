@@ -4,7 +4,7 @@ import { createElement } from 'react';
 
 import type { ReactRenderMatchParams, ReactRenderParams } from '../../../../base';
 
-import { BaseReactRenderPlugin, createTypeOfSlot } from '../../../../base';
+import { BaseReactRenderPlugin, createTypeOfSlot, isHastElement } from '../../../../base';
 
 const Element = /*#__PURE__*/ createTypeOfSlot('Element');
 
@@ -23,8 +23,19 @@ export class FallbackRenderPlugin extends BaseReactRenderPlugin {
     return true;
   }
 
-  render({ getProps, node, renderChildren }: ReactRenderParams) {
+  render({ getProps, node, parents, renderChildren }: ReactRenderParams) {
     if (node.type === 'text') {
+      const parent = parents.at(-1);
+
+      if (
+        parent &&
+        isHastElement(parent) &&
+        /^(?:table|thead|tbody|tfoot|tr|colgroup)$/.test(parent.tagName) &&
+        /^\s*$/.test(node.value)
+      ) {
+        return null;
+      }
+
       return node.value;
     }
 

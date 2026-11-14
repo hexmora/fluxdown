@@ -65,6 +65,12 @@ The built-in HTML processing already allows the `class` attribute on `span`. Wit
 
 > Put traversal settings in `config` and keep constructor options in a separate field. Core runs the plugin and manages its lifecycle.
 
+With `ApplyRepairsRemarkPlugin` enabled, the parser records `data.source` on every parsed node. It contains the original Markdown fragment that produced that node. Repairs read this local source directly, without an additional runner parameter or a dependency on node positions.
+
+`data.source` is optional. Hand-built nodes, nodes created by other plugins, and repaired nodes may have no source. Skip checks that require source in that case; substituting `node.value` can mistake escaped characters and decoded entities for syntax.
+
+When a mutation makes the source inaccurate, remove `data.source` from the changed node and affected ancestors while preserving it on unchanged children. The runner clears stale metadata for changes to the current node, its direct children, adjacent siblings, and insertion or replacement operations. Recursive repairs propagate invalidation to outer ancestors. Custom plugins that mutate nodes in lifecycle hooks or directly modify deeper descendants must clear the affected node and ancestor source metadata themselves.
+
 ## Supported plugins
 
 Append a subpath from the table to `@fluxdown/core-plugins/plugins/repair/` to import a plugin. For example, `incomplete-image` becomes `@fluxdown/core-plugins/plugins/repair/incomplete-image`.
@@ -83,11 +89,18 @@ A check marks plugins included in `PRESET_REPAIR_PLUGINS`, exported from `@fluxd
 | `IncompleteInlineCodeRepairPlugin`   | `incomplete-inline-code`    | <PresetCheck /> | Presents unfinished inline code as code before its closing backtick arrives.                         |
 | `IncompleteImageRepairPlugin`        | `incomplete-image`          | <PresetCheck /> | Creates a placeholder for an unfinished image, or hides it with `strategy: 'discard'`.               |
 | `IncompleteLinkRepairPlugin`         | `incomplete-link`           | <PresetCheck /> | Presents an unfinished link's text while waiting for the URL to complete.                            |
-| `TrailingEmptyHeadingRepairPlugin`   | `trailing-empty-heading`    | <PresetCheck /> | Hides a trailing level-one heading that contains only `#` and no text.                               |
+| `TrailingEmptyHeadingRepairPlugin`   | `trailing-empty-heading`    | <PresetCheck /> | Hides trailing empty headings at levels one through six until their content arrives.                 |
 | `IncompleteStrongRepairPlugin`       | `incomplete-strong`         | <PresetCheck /> | Presents bold content before its closing delimiter arrives.                                          |
 | `IncompleteEmphasisRepairPlugin`     | `incomplete-emphasis`       | <PresetCheck /> | Presents italic content opened with an asterisk before it is closed.                                 |
 | `IncompleteListMarkerRepairPlugin`   | `incomplete-list-marker`    | <PresetCheck /> | Hides a trailing list marker while waiting for the item's content.                                   |
+| `IncompleteTableRepairPlugin`        | `incomplete-table`          | <PresetCheck /> | Holds a possible table header and unfinished delimiter row until the syntax is resolved.             |
 | `DanglingFootnoteRepairPlugin`       | `dangling-footnote`         | <PresetCheck /> | Temporarily hides unresolved and incomplete trailing footnote references; requires `build.footnote`. |
+
+### Holding an unfinished table header
+
+A trailing line beginning with an unescaped `|` is held temporarily. It appears as a table once a valid delimiter row arrives, or returns as ordinary text when subsequent input rules out a table. Text without a leading pipe, such as `a | b`, stays visible until the next line begins a possible table delimiter.
+
+This repair requires `repairEnding`. Disable it when streaming finishes to restore text that never became a table. Disabling `remark-syntax-table` also disables this repair. Escaped pipes, character entities, and complete inline code do not independently trigger header holding.
 
 ### Formatting boundaries
 
