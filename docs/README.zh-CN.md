@@ -68,6 +68,7 @@ import "fluxdown/styles.css";
 - [架构介绍](https://fluxdown.dev/zh/guide/architecture.html) — 了解共享核心与渲染层的分工。
 - [平滑化](https://fluxdown.dev/zh/guide/common/streaming-effects/smoothing.html) — 调整新文本的显示节奏。
 - [动画效果](https://fluxdown.dev/zh/guide/common/streaming-effects/animation/index.html) — 选择新内容的入场方式。
+- [语法修复](https://fluxdown.dev/zh/guide/common/syntax-repair/index.html) — 让流式输出中的未完成 Markdown 保持可读。
 - [插件设计](https://fluxdown.dev/zh/guide/common/plugin-design.html) — 扩展内容处理与渲染。
 - [横向演示](https://fluxdown.dev/zh/guide/common/features/renderers.html) — 对比同一份内容在各渲染库中的呈现。
 - [Core](https://fluxdown.dev/zh/guide/core/quick-start.html) — 直接处理响应式内容块。

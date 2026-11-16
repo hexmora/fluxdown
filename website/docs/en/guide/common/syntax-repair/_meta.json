@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "plugins",
+    "label": "Writing plugins"
+  },
+  {
+    "type": "file",
+    "name": "benchmark",
+    "label": "Benchmark"
+  }
+]

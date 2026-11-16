@@ -12,7 +12,8 @@
     "check:seo": "tsx seo/check.ts",
     "lint": "oxlint .",
     "typecheck": "pnpm run build:renderers && tsc --noEmit && tsc --noEmit -p react-lynx/tsconfig.json && tsc --noEmit -p vue-lynx/tsconfig.json",
-    "build:renderers": "pnpm --filter @fluxdown/vue-base-plugins --filter @fluxdown/vue-base --filter @fluxdown/vue-plugins --filter @fluxdown/vue --filter @fluxdown/solid-plugins --filter @fluxdown/solid build && pnpm --workspace-root exec moon run angular:build"
+    "build:renderers": "pnpm --filter @fluxdown/vue-base-plugins --filter @fluxdown/vue-base --filter @fluxdown/vue-plugins --filter @fluxdown/vue --filter @fluxdown/solid-plugins --filter @fluxdown/solid build && pnpm --workspace-root exec moon run angular:build",
+    "benchmark:repair": "node scripts/benchmark-repair/index.mjs"
   },
   "dependencies": {
     "@angular/common": "catalog:",
@@ -44,8 +45,10 @@
   },
   "devDependencies": {
     "@angular/compiler-cli": "catalog:",
+    "@ant-design/x-markdown": "catalog:benchmark-repair",
     "@babel/core": "catalog:",
     "@fluxdown/react-lynx": "workspace:^",
+    "@fluxdown/types": "workspace:^",
     "@fluxdown/vue-lynx": "workspace:^",
     "@lynx-js/react": "catalog:",
     "@lynx-js/react-rsbuild-plugin": "catalog:",
@@ -66,9 +69,17 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "babel-loader": "catalog:",
+    "esbuild": "catalog:benchmark-repair",
+    "jsdom": "catalog:",
     "less": "catalog:",
+    "markdown-it": "catalog:benchmark-repair",
+    "markdown-it-task-lists": "catalog:benchmark-repair",
+    "marked": "catalog:benchmark-repair",
     "oxlint": "catalog:",
+    "react-markdown": "catalog:benchmark-repair",
+    "remark-gfm": "catalog:benchmark-repair",
     "sass": "catalog:",
+    "streamdown": "catalog:benchmark-repair",
     "typescript": "catalog:angular",
     "vue-lynx": "catalog:"
   }

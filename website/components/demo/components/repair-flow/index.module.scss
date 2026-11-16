@@ -1,0 +1,100 @@
+.diagram {
+  margin: 20px 0;
+  padding: 20px 12px;
+  border: 1px solid var(--site-line);
+  border-radius: 12px;
+  background: var(--site-surface);
+  color: var(--site-ink);
+  overflow-x: auto;
+}
+
+.flow {
+  display: grid;
+  grid-template-columns: 20px 95px 24px minmax(250px, 1fr) 42px 85px 20px;
+  align-items: center;
+  gap: 8px;
+  min-width: 600px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.tree {
+  display: grid;
+  gap: 8px;
+  padding: 20px 4px;
+  border: 1px solid var(--site-line);
+  border-radius: 7px;
+
+  strong {
+    font-family: var(--rp-font-family-mono);
+    font-size: 14px;
+  }
+
+  > span {
+    color: var(--site-muted);
+    font-size: 10px;
+  }
+}
+
+.repair {
+  padding: 14px 10px;
+  border: 1px solid var(--site-accent-line);
+  border-radius: 7px;
+  background: var(--site-accent-tint);
+
+  > strong {
+    color: var(--site-accent);
+    font-weight: 600;
+  }
+}
+
+.diagram .steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 10px;
+
+  li {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 6px;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  span {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--site-accent-line);
+    border-radius: 50%;
+    color: var(--site-accent);
+    background: var(--site-surface);
+  }
+}
+
+.conversion {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  color: var(--site-muted);
+
+  small {
+    font-size: 10px;
+  }
+}
+
+.arrow {
+  color: var(--site-accent);
+  font-size: 20px;
+}
+
+.omitted {
+  color: var(--site-muted);
+  font-size: 22px;
+}

@@ -3,12 +3,12 @@
     "type": "dir",
     "name": "smoothing",
     "label": "Smoothing",
-    "collapsed": false
+    "collapsed": true
   },
   {
     "type": "dir",
     "name": "animation",
     "label": "Animation",
-    "collapsed": false
+    "collapsed": true
   }
 ]

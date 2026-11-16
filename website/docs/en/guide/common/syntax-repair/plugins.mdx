@@ -1,0 +1,128 @@
+import {
+  RepairPluginDemo,
+  RepairLifecycle,
+} from '../../../../../components/demo';
+
+# Writing plugins - Fluxdown {#plugin-documentation}
+
+Repair plugins process Markdown AST nodes before conversion to HAST and component rendering. Override a built-in plugin's options or add your own processing.
+
+## Custom plugins
+
+This plugin adds a paragraph containing `…` after the generating final block, and stops adding it when the stream ends.
+
+<RepairPluginDemo />
+
+```ts
+import type { RepairPluginRunner } from '@fluxdown/types';
+
+import { BaseRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/base';
+
+export class StreamingIndicatorRepairPlugin extends BaseRepairPlugin {
+  static readonly key = 'repair-streaming-indicator';
+
+  override readonly config = { ending: true, allows: 'root' };
+
+  override runner: RepairPluginRunner = ({ node, break: stop }) => {
+    if (node.type !== 'root' || !('children' in node)) {
+      return;
+    }
+
+    node.children.push({
+      type: 'paragraph',
+      children: [{ type: 'text', value: '…' }],
+    });
+
+    stop();
+  };
+}
+```
+
+Add `StreamingIndicatorRepairPlugin` to `plugins.repairs`; see [Pass to a component](#pass-to-a-component) for each renderer’s integration.
+
+## Configuration fields
+
+See [Plugin design · Shared options](../plugin-design.mdx#shared-options) for `disabled`, `priority` and their defaults.
+
+### Plugin configuration
+
+These fields belong to the class instance's `config: RepairPluginSystemConfig`. They are not arbitrary built-in plugins' constructor options. Declare them in your own class to choose its traversal behavior.
+
+| Field        | Type                      | Default       | Meaning                                                                               |
+| ------------ | ------------------------- | ------------- | ------------------------------------------------------------------------------------- |
+| `ending`     | `boolean`                 | `false`       | When true, run only in passes where `repairEnding` is enabled.                        |
+| `scope`      | `'tree' \| 'tail'`        | `'tree'`      | Traverse the whole tree, or follow each last child under the default traversal order. |
+| `allows`     | `string \| string[]`      | Unrestricted. | Invoke runners only for these node types; still traverse children of other types.     |
+| `order`      | `'pre' \| 'post' \| 'in'` | `'pre'`       | Visit nodes in pre-order, post-order or in-order.                                     |
+| `rightFirst` | `boolean`                 | `false`       | Visit right children first without changing the parent/child ordering rule.           |
+
+### Switch configuration
+
+| Option                   | Controls                       | Default behavior                                                                                |
+| ------------------------ | ------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `build.repair`           | The entire repair stage.       | Enabled.                                                                                        |
+| `streaming.repairEnding` | Repairs at the generating end. | Enabled with `streaming: true` or a streaming options object; disabled with `streaming: false`. |
+| `build.tex`              | Formula parsing and repair.    | Depends on the selected preset; must be enabled for math repair.                                |
+| `build.footnote`         | Footnote parsing and repair.   | Depends on the selected preset; must be enabled for footnote repair.                            |
+
+When using Core directly, pass the list to `repairs` and set `repair` and `repairEnding` in `build`. UI components translate `streaming` into the ending flag. See [Core quick start](../../core/quick-start.md).
+
+### Plugin members
+
+See [Plugin design · Plugin members](../plugin-design.mdx#plugin-members) for `key`, static methods, `constructor`, `config` and `destroy`. Apart from `runner`, the hooks below do nothing in the base class; override only those you need.
+
+<RepairLifecycle />
+
+#### runner {#runner}
+
+**Type:** `RepairPluginRunner | RepairPluginRunner[]`
+
+Visit nodes and modify the syntax tree. Each runner gets its own traversal.
+
+| Parameter                            | Meaning                                                                                      |
+| ------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `node`                               | The current mdast node.                                                                      |
+| `parent` / `parents`                 | The direct parent and the ancestor chain, nearest first; the root's `parent` is `undefined`. |
+| `index`                              | Position within the parent, or `undefined` for the root.                                     |
+| `break()`                            | Stop this runner's traversal; rename it to `stop` when destructuring.                        |
+| `skipTree()`                         | Skip children when the traversal order permits it.                                           |
+| `insertNext(nodes, replaceCurrent?)` | Insert after the current node, or replace it when the second argument is true.               |
+| `recursive(node)`                    | Run this same plugin recursively from another parent node.                                   |
+
+Original source is available through the optional `node.data.source`.
+
+#### prepare {#prepare}
+
+**Type:** `RepairPluginPrepare`
+
+Prepare shared information for the pass. Return an optional cleanup function, called in reverse order after all plugins finish.
+
+#### before / after {#before-after}
+
+**Type:** `RepairPluginHookType`
+
+Called once before and after all runners of this plugin, receiving the pass root.
+
+#### beforeEach / afterEach {#beforeeach-aftereach}
+
+**Type:** `RepairPluginHookType`
+
+Called before and after each runner’s traversal, receiving the pass root.
+
+## Built-in plugin configuration
+
+Other built-in repairs have no additional constructor options. See the [Core plugin catalog](../../core/plugins/repair.mdx#supported-plugins) for full import paths.
+
+| Plugin                                | Field                                  | Default behavior                                                                        | Meaning                                                                                                                                                    |
+| ------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `IncompleteImageRepairPlugin`         | `strategy: 'placeholder' \| 'discard'` | `'placeholder'`                                                                         | Retain the incomplete image node, or remove it temporarily.                                                                                                |
+| `IncompleteStrikethroughRepairPlugin` | `singleTilde: boolean`                 | `true` when constructed alone; follows the strikethrough syntax plugin in the pipeline. | Whether a single `~` delimits strikethrough; parsing and repair must use the same rule.                                                                    |
+| `TexRepairPlugin`                     | `render: TexRender`                    | Built-in KaTeX validation.                                                              | Synchronously try a TeX prefix, returning a string on success or `null` on failure. The result only determines validity; it is not used as the final HTML. |
+
+### Pass to a component {#pass-to-a-component}
+
+Use `plugins.repairs` to configure built-in plugins or add the custom plugin above. See [Plugin design · Declarations and configuration](../plugin-design.mdx#declarations-and-configuration) for declaration rules, overrides and complete examples for each renderer.
+
+Set `streaming` to match the receiving state; see [Syntax repair · Start, pause and finish](./index.mdx#start-pause-and-finish).
+
+Continue to the [built-in catalog](../../core/plugins/repair.mdx), or compare repair strategies in the [Benchmark](./benchmark.mdx).

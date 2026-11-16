@@ -41,7 +41,10 @@ add a Changeset for it; stable preparation raises its minimum dependency version
 
 1. Open **Actions → Prepare release → Run workflow** and choose `main` to create
    or refresh the version PR.
-2. Review the versions, dependency updates, changelogs, and lockfile. All required
+   After versioning and installation, `release:version` runs the website's
+   `benchmark:repair` command and refreshes `website/benchmark/repair.json` using
+   the versioned workspace source and its npm package version.
+2. Review the versions, dependency updates, changelogs, lockfile, and benchmark snapshot. All required
    checks must pass. If GitHub asks to approve the bot PR's workflows, approve CI.
 3. Merge the version PR. **Publish npm packages** builds and verifies the packages
    from that merge's fixed commit SHA.

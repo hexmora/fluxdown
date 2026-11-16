@@ -68,6 +68,7 @@ See the quick starts for [React](https://fluxdown.dev/guide/react/quick-start.ht
 - [Architecture](https://fluxdown.dev/guide/architecture.html) — understand the shared core and renderer layers.
 - [Smoothing](https://fluxdown.dev/guide/common/streaming-effects/smoothing.html) — control the pace of incoming text.
 - [Animation](https://fluxdown.dev/guide/common/streaming-effects/animation/index.html) — choose how new content appears.
+- [Syntax repair](https://fluxdown.dev/guide/common/syntax-repair/index.html) — keep unfinished Markdown readable during streaming.
 - [Plugin design](https://fluxdown.dev/guide/common/plugin-design.html) — extend content processing and rendering.
 - [Side-by-side demo](https://fluxdown.dev/guide/common/features/renderers.html) — compare the same content across renderers.
 - [Core](https://fluxdown.dev/guide/core/quick-start.html) — work with reactive content blocks directly.

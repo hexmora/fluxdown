@@ -1,0 +1,34 @@
+import {
+  RepairBenchmark,
+  RepairJumpDemo,
+} from '../../../../../components/demo';
+
+# Syntax repair benchmark - Fluxdown {#syntax-repair-benchmark}
+
+## Metric definition
+
+Each appended Unicode code point is one input frame. **Jump-frame rate** is the number of input frames containing a jump divided by all input frames for each case, then averaged with equal weight across cases and expressed as a percentage. It is not a ratio of pooled frame counts. Lower values mean fewer semantic changes to content already shown.
+
+Multiple changes in one frame count as one jump frame. The final completion-signal frame is excluded from both numerator and denominator.
+
+### What counts as a jump?
+
+| Change between frames                                                    | Counted?     |
+| ------------------------------------------------------------------------ | ------------ |
+| New content appears while existing content keeps its role                | No           |
+| `10` first appears as prose, then becomes a list number                  | Yes          |
+| Visible prose changes into emphasis, code, a table cell, or another role | Yes          |
+| Visible content is withdrawn or reappears after withdrawal               | Yes          |
+| Exposed Markdown markers are subsequently consumed or reinterpreted      | Yes          |
+| A bare URL is first recognized as an automatic link                      | No           |
+| Only wrapping, position, or dimensions change                            | Not measured |
+
+The detector extracts text characters and semantic ancestors (lists, emphasis, code, links) from each DOM snapshot, aligns them to received source characters, and compares their roles.
+
+<RepairJumpDemo />
+
+## Benchmark
+
+The table shows jump-frame rates for each syntax category in the current snapshot.
+
+<RepairBenchmark />

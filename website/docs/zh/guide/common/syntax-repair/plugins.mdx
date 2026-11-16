@@ -1,0 +1,128 @@
+import {
+  RepairPluginDemo,
+  RepairLifecycle,
+} from '../../../../../components/demo';
+
+# 编写插件 - Fluxdown {#插件文档}
+
+Repair 插件处理 Markdown AST，在转换成 HAST、交给组件渲染之前修复节点。可以覆盖某个内置插件的配置，也可以添加自己的处理。
+
+## 自定义插件
+
+这个插件在生成中的最后一个内容块之后加一段 `…`；结束后不再添加。
+
+<RepairPluginDemo />
+
+```ts
+import type { RepairPluginRunner } from '@fluxdown/types';
+
+import { BaseRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/base';
+
+export class StreamingIndicatorRepairPlugin extends BaseRepairPlugin {
+  static readonly key = 'repair-streaming-indicator';
+
+  override readonly config = { ending: true, allows: 'root' };
+
+  override runner: RepairPluginRunner = ({ node, break: stop }) => {
+    if (node.type !== 'root' || !('children' in node)) {
+      return;
+    }
+
+    node.children.push({
+      type: 'paragraph',
+      children: [{ type: 'text', value: '…' }],
+    });
+
+    stop();
+  };
+}
+```
+
+将 `StreamingIndicatorRepairPlugin` 加入 `plugins.repairs`；各渲染库的传参方式见[接入组件](#接入组件)。
+
+## 配置字段
+
+`disabled`、`priority` 的含义与默认值见[插件设计 · 通用选项](../plugin-design.mdx#通用选项)。
+
+### 插件配置
+
+这些字段属于类实例的 `config: RepairPluginSystemConfig`，不是任意内置插件的构造选项。需要改变某类插件的遍历方式时，在自己的类中声明。
+
+| 字段         | 类型                      | 默认值   | 含义                                                       |
+| ------------ | ------------------------- | -------- | ---------------------------------------------------------- |
+| `ending`     | `boolean`                 | `false`  | 为 `true` 时仅在 `repairEnding` 开启的修复轮次执行。       |
+| `scope`      | `'tree' \| 'tail'`        | `'tree'` | 遍历整棵树，或在默认遍历顺序下只沿每层最后一个子节点向下。 |
+| `allows`     | `string \| string[]`      | 不限制。 | 仅对指定节点类型调用 runner；其他节点的子树仍参与遍历。    |
+| `order`      | `'pre' \| 'post' \| 'in'` | `'pre'`  | 前序、后序或中序访问节点。                                 |
+| `rightFirst` | `boolean`                 | `false`  | 先访问右侧子节点，不改变父子访问关系。                     |
+
+### 开关配置
+
+| 配置                     | 作用                   | 默认行为                                                                |
+| ------------------------ | ---------------------- | ----------------------------------------------------------------------- |
+| `build.repair`           | 是否运行整个修复阶段。 | 开启。                                                                  |
+| `streaming.repairEnding` | 是否处理生成中的末尾。 | `streaming: true` 或传入流式配置对象时开启；`streaming: false` 时关闭。 |
+| `build.tex`              | 是否识别与修复公式。   | 由所用预设决定，需开启后才执行公式修复。                                |
+| `build.footnote`         | 是否识别与处理脚注。   | 由所用预设决定，需开启后才执行脚注修复。                                |
+
+直接接入 Core 时，将列表传入 `repairs`，并在 `build` 中设置 `repair`、`repairEnding`；界面组件的 `streaming` 会替你转换末尾开关。见 [Core 快速开始](../../core/quick-start.md)。
+
+### 插件成员字段
+
+`key`、static 方法、`constructor`、`config` 与 `destroy` 见[插件设计 · 插件成员](../plugin-design.mdx#插件成员)。除 `runner` 外，下列钩子在基类中默认不做处理，按需 `override`。
+
+<RepairLifecycle />
+
+#### runner {#runner}
+
+**类型：** `RepairPluginRunner | RepairPluginRunner[]`
+
+遍历节点并修改语法树；每个 runner 单独执行一次遍历。
+
+| 参数                                 | 含义                                                                   |
+| ------------------------------------ | ---------------------------------------------------------------------- |
+| `node`                               | 当前访问的 mdast 节点。                                                |
+| `parent` / `parents`                 | 直接父节点，以及从近到远的父节点链；根节点的 `parent` 为 `undefined`。 |
+| `index`                              | 当前节点在父节点中的位置，根节点为 `undefined`。                       |
+| `break()`                            | 停止当前 runner 的遍历；解构时可重命名为 `stop`。                      |
+| `skipTree()`                         | 在当前遍历顺序允许时跳过子树。                                         |
+| `insertNext(nodes, replaceCurrent?)` | 在当前节点之后插入节点；第二项为 `true` 时替换当前节点。               |
+| `recursive(node)`                    | 从另一个父节点递归运行同一插件。                                       |
+
+原文可读取可选的 `node.data.source`。
+
+#### prepare {#prepare}
+
+**类型：** `RepairPluginPrepare`
+
+为本轮准备共享信息，可返回清理函数；全部插件执行后逆序清理。
+
+#### before / after {#before-after}
+
+**类型：** `RepairPluginHookType`
+
+在当前插件的全部 runner 执行前、后各调用一次，接收本轮根节点。
+
+#### beforeEach / afterEach {#beforeeach-aftereach}
+
+**类型：** `RepairPluginHookType`
+
+在每个 runner 的遍历前、后各调用一次，接收本轮根节点。
+
+## 内置插件配置
+
+没有列在这里的内置 repair 不提供额外构造选项。完整导入路径见 [Core 插件清单](../../core/plugins/repair.mdx#支持的插件)。
+
+| 插件                                  | 字段                                   | 默认行为                                            | 含义                                                                                                    |
+| ------------------------------------- | -------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `IncompleteImageRepairPlugin`         | `strategy: 'placeholder' \| 'discard'` | `'placeholder'`                                     | 保留未完成图片的节点，或暂时移除。                                                                      |
+| `IncompleteStrikethroughRepairPlugin` | `singleTilde: boolean`                 | 单独构造时为 `true`；接入管线后跟随删除线语法插件。 | 是否把单个 `~` 作为删除线边界；优先保证解析与修复使用同一规则。                                         |
+| `TexRepairPlugin`                     | `render: TexRender`                    | 内置 KaTeX 校验。                                   | 同步尝试一个 TeX 前缀，成功返回字符串，失败返回 `null`。返回内容只用于判定有效性，不作为最终渲染 HTML。 |
+
+### 接入组件 {#接入组件}
+
+通过 `plugins.repairs` 配置内置插件或添加上面的自定义插件。声明方式、覆盖规则与各渲染库的完整示例见[插件设计 · 声明与配置](../plugin-design.mdx#声明与配置)。
+
+`streaming` 随接收状态变化，开启、暂停与结束的设置见[语法修复 · 开启、暂停与结束](./index.mdx#开启暂停与结束)。
+
+继续查看[内置插件清单](../../core/plugins/repair.mdx)，或用 [Benchmark](./benchmark.mdx) 对照不同修复策略的结果。

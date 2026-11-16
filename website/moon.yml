@@ -26,6 +26,8 @@ fileGroups:
   sources:
     - docs/**/*
     - components/**/*
+    - benchmark/**/*
+    - scripts/benchmark-repair/**/*
     - theme/**/*
     - seo/**/*
     - react-lynx/**/*

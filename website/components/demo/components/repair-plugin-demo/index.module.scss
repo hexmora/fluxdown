@@ -1,0 +1,56 @@
+.demo {
+  .controls {
+    display: flex;
+    gap: 8px;
+    padding: 14px 20px;
+
+    button {
+      min-height: 34px;
+      padding: 4px 12px;
+      border: 1px solid var(--site-line);
+      border-radius: 5px;
+      background: var(--site-surface);
+      color: var(--site-muted);
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+
+      &[aria-pressed="true"] {
+        border-color: var(--site-accent);
+        color: var(--site-accent);
+      }
+
+      &:hover {
+        background: var(--site-hover);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--site-accent);
+        outline-offset: 3px;
+      }
+    }
+  }
+
+  .results {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--site-line);
+
+    section + section {
+      border-left: 1px solid var(--site-line);
+    }
+
+    h4 {
+      margin: 0;
+      padding: 12px 20px 0;
+      color: var(--site-muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
+
+  .preview {
+    min-height: 110px;
+    padding: 16px 20px;
+  }
+}
