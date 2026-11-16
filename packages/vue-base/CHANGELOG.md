@@ -1,5 +1,17 @@
 # @fluxdown/vue-base
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [fba214a]
+- Updated dependencies [fba214a]
+- Updated dependencies [fba214a]
+  - @fluxdown/core-plugins@0.14.0
+  - @fluxdown/core@0.13.0
+  - @fluxdown/types@0.11.0
+  - @fluxdown/vue-base-plugins@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
