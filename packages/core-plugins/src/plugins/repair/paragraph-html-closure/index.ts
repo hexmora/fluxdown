@@ -2,9 +2,10 @@ import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/typ
 
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 
-import { isRepairNodeType } from '../../../utils';
+import { isRepairNodeType, isRepairTreeTail } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
-import { closeParagraphTags, isRightmostNode } from './utils';
+import { RepairPluginKeys } from '../keys';
+import { getClosedParagraphChildren } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -13,25 +14,29 @@ declare global {
 }
 
 export class ParagraphHtmlClosureRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-paragraph-html-closure';
+  static readonly key = RepairPluginKeys.ParagraphHtmlClosure;
 
-  readonly config: RepairPluginSystemConfig = {
+  override readonly config: RepairPluginSystemConfig = {
     ending: false,
     allows: 'paragraph',
     priority: PluginPriority.Low,
   };
 
-  runner: RepairPluginRunner = ({ node, parents, skipTree }) => {
+  override runner: RepairPluginRunner = ({ node, parents, skipTree }) => {
     if (!isRepairNodeType(node, 'paragraph')) {
       return;
     }
 
     skipTree();
 
-    if (isRightmostNode(node, parents)) {
+    if (isRepairTreeTail(node, parents)) {
       return;
     }
 
-    closeParagraphTags(node);
+    const children = getClosedParagraphChildren(node);
+
+    if (children) {
+      node.children = children;
+    }
   };
 }

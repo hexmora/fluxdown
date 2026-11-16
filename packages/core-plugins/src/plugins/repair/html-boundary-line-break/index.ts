@@ -5,6 +5,7 @@ import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { nth } from 'lodash-es';
 
 import { BaseRepairPlugin } from '../base';
+import { RepairPluginKeys } from '../keys';
 
 declare global {
   interface RepairConfigs {
@@ -13,17 +14,17 @@ declare global {
 }
 
 export class HtmlBoundaryLineBreakRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-html-boundary-line-break';
+  static readonly key = RepairPluginKeys.HtmlBoundaryLineBreak;
 
   private static readonly trailingLineEnding = /(?:\r\n|\n|\r)$/;
 
-  readonly config: RepairPluginSystemConfig = {
+  override readonly config: RepairPluginSystemConfig = {
     ending: false,
     allows: 'html',
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parent, index }) => {
+  override runner: RepairPluginRunner = ({ node, parent, index }) => {
     if (node.type !== 'html' || !parent || index === undefined || index === 0) {
       return;
     }

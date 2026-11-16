@@ -1,12 +1,18 @@
 import type { Root } from 'mdast';
 import type { Plugin } from 'unified';
 
-import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@fluxdown/types';
-import { cloneDeep } from 'lodash-es';
+import {
+  type IBasePluginConfig,
+  type IPluggableConfig,
+  PluginPriority,
+  type RemarkPluginConfigContext,
+} from '@fluxdown/types';
+import { cloneDeep, isString } from 'lodash-es';
 
 import type { PatchesRemarkPluginConfig } from './type';
 
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 import { applyPatches } from './utils';
 
 export type { PatchesRemarkPluginConfig } from './type';
@@ -19,7 +25,7 @@ declare global {
 }
 
 export class PatchesRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-patches';
+  static readonly key = RemarkPluginKeys.Patches;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Highest,
@@ -33,14 +39,28 @@ export class PatchesRemarkPlugin extends BaseRemarkPlugin {
     super();
 
     this.innerConfig = cloneDeep(config);
-    this.plugin = () => (tree, file) => {
-      if (!this.innerConfig.patches || this.innerConfig.patches.length === 0) {
-        return;
-      }
 
-      const source = typeof file?.value === 'string' ? file.value : '';
+    this.plugin = () => {
+      return (tree, file) => {
+        const patches = this.innerConfig.patches;
 
-      applyPatches(tree, this.innerConfig.patches, source);
+        if (!patches || patches.length === 0) {
+          return;
+        }
+
+        const source = isString(file?.value) ? file.value : '';
+
+        applyPatches(tree, patches, source);
+      };
     };
+  }
+
+  static override prepareConfig(
+    context: RemarkPluginConfigContext,
+    outerConfig: IPluggableConfig<PatchesRemarkPluginConfig>,
+  ): IPluggableConfig<PatchesRemarkPluginConfig> {
+    const { config } = context;
+
+    return { ...outerConfig, patches: config.patches };
   }
 }

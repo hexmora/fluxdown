@@ -1,5 +1,7 @@
+import type { SlotPluginContext } from '@fluxdown/types';
+
 import { isPluggablesEqual, PluginBuilder } from '@fluxdown/core';
-import { set } from 'lodash-es';
+import { identity, set } from 'lodash-es';
 import { render, S } from 'stative';
 import { computed, onScopeDispose } from 'vue';
 
@@ -10,7 +12,12 @@ import { useStateOf, useStateValue } from '../composables';
 export const useSlots = (source: () => readonly AnySlotPluggable[]) => {
   const plugins = useStateOf(() => [...source()], isPluggablesEqual);
 
-  const builder = render(S([PluginBuilder<AnySlotPlugin>, { plugins }]));
+  const builder = render(
+    S([
+      PluginBuilder<AnySlotPlugin>,
+      { plugins, context: S([identity<SlotPluginContext>, { plugins }]) },
+    ]),
+  );
 
   const instances = useStateValue(builder.value);
 

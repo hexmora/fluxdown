@@ -1,7 +1,9 @@
 <script lang="ts">
+  import type { SlotPluginContext } from '@fluxdown/types';
   import type { Snippet } from 'svelte';
 
   import { isPluggablesEqual, PluginBuilder } from '@fluxdown/core';
+  import { identity } from 'lodash-es';
   import { MutableState, render, S } from 'stative';
   import { onDestroy, untrack } from 'svelte';
 
@@ -19,7 +21,7 @@
 
   const source = untrack(() => new MutableState({ initial: [...plugins], distinctor: isPluggablesEqual }));
 
-  const builder = render(S([PluginBuilder<AnySlotPlugin>, { plugins: source }]));
+  const builder = render(S([PluginBuilder<AnySlotPlugin>, { plugins: source, context: S([identity<SlotPluginContext>, { plugins: source }]) }]));
 
   let instances = $state.raw(builder.value.value);
 

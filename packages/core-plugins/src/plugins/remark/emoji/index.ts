@@ -5,6 +5,7 @@ import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@
 import remarkGemoji from 'remark-gemoji';
 
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 
 declare global {
   interface RemarkConfigs {
@@ -13,7 +14,7 @@ declare global {
 }
 
 export class EmojiRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-emoji';
+  static readonly key = RemarkPluginKeys.Emoji;
 
   readonly config: IBasePluginConfig = {
     // Parse math from source positions before replacing text nodes with emoji.

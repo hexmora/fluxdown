@@ -11,7 +11,7 @@ const LazyMathjaxTexRenderer = /*#__PURE__*/ lazy(() =>
 
 const MathjaxTexRenderer = (props: TexProps) => {
   return (
-    <Suspense fallback={<TexRenderer {...props} />}>
+    <Suspense fallback={null}>
       <LazyMathjaxTexRenderer {...props} />
     </Suspense>
   );

@@ -1,12 +1,18 @@
 import type { Root as MdastRoot } from 'mdast';
 import type { Plugin } from 'unified';
 
-import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@fluxdown/types';
+import {
+  type IBasePluginConfig,
+  type IPluggableConfig,
+  PluginPriority,
+  type RemarkPluginEnabledContext,
+} from '@fluxdown/types';
 import { gfmFootnoteFromMarkdown, gfmFootnoteToMarkdown } from 'mdast-util-gfm-footnote';
 import { gfmFootnote } from 'micromark-extension-gfm-footnote';
 
 import { appendRemarkExtensions } from '../../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 
 declare global {
   interface RemarkConfigs {
@@ -15,7 +21,7 @@ declare global {
 }
 
 export class SyntaxFootnoteRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-syntax-footnote';
+  static readonly key = RemarkPluginKeys.SyntaxFootnote;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Highest,
@@ -28,4 +34,10 @@ export class SyntaxFootnoteRemarkPlugin extends BaseRemarkPlugin {
       toMarkdown: gfmFootnoteToMarkdown(),
     });
   };
+
+  static override enabled(context: RemarkPluginEnabledContext): boolean {
+    const { config } = context;
+
+    return config.footnote;
+  }
 }

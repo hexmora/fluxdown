@@ -29,11 +29,17 @@ describe('TrailingEmptyHeadingRepairPlugin', () => {
     expect(result.children).toHaveLength(1);
   });
 
-  test('keeps an empty heading of another depth', () => {
-    const tree = root([{ type: 'heading', depth: 2, children: [{ type: 'text', value: ' ' }] }]);
+  test.each<1 | 2 | 3 | 4 | 5 | 6>([1, 2, 3, 4, 5, 6])(
+    'hides every empty heading depth: %s',
+    (depth) => {
+      const tree = root([{ type: 'heading', depth, children: [] }]);
 
-    expect(runRepairs(tree, new TrailingEmptyHeadingRepairPlugin())).toEqual(tree);
-  });
+      expect(runRepairs(tree, new TrailingEmptyHeadingRepairPlugin()).children).toEqual([]);
+      expect(runRepairs(tree, new TrailingEmptyHeadingRepairPlugin(), { ending: false })).toEqual(
+        tree,
+      );
+    },
+  );
 
   test('keeps an empty level-one heading that is not last', () => {
     const tree = root([

@@ -18,6 +18,8 @@ const DOCUMENTS = [
   '<script>\n\nconst text = "[^not]";\n</script>\n\n<!-- comment -->\n\nafter\n',
   '$$\na+b\n\n---\n$$\nafter\n\n\\[\nx\n\\]\ncontinued\n\nend\n',
   '# Title\n\nRead [the reference][ref].\n\n[ref]: https://example.test\n',
+  '# Title\n\nRead [**the reference**][ref] and [ref][].\n\nMiddle.\n\n[ref]: /url "Title"\n',
+  '# Title\n\n`[literal][ref]` and \\[escaped][ref].\n\nNext paragraph.\n',
   'Paragraph\n\nFootnote[^note].\n\n[^note]: definition\n',
   'Paragraph [x](https://example.test\n"title\n\npart")\n\nnext\n',
   '| a | b |\n| - | - |\n| 1 | 2 |\n$$\n[ref]: hidden\n$$\n2. item\n\nafter\n',
@@ -141,6 +143,28 @@ describe('incremental Markdown chunking', () => {
       chunker.chunk(prefix + tail.slice(0, 3), CONFIG);
 
       expect(chunker.chunk(prefix + tail, CONFIG)).toEqual([prefix + tail]);
+    }
+  });
+
+  test('retains reference context through definition labels and incomplete titles', () => {
+    const chunker = new LexerChunker();
+
+    const prefix = '# Stable\n\nRead [label][ref] and [ref][].\n\n';
+
+    chunker.chunk('# Stable\n\nRead ', CONFIG);
+
+    let text = prefix;
+
+    for (const character of 'Middle.\n\n[ref]: https://example.test "Title"\n\nAfter.') {
+      text += character;
+
+      expect(chunker.chunk(text, CONFIG)).toEqual([text]);
+    }
+
+    for (const replacement of ['# Stable\n\nPlain.\n\nNext', '# Stable\n', '', prefix]) {
+      expect(chunker.chunk(replacement, CONFIG)).toEqual(
+        new LexerChunker().chunk(replacement, CONFIG),
+      );
     }
   });
 

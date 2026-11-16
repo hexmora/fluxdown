@@ -10,6 +10,7 @@ import { type IReadableClosure, once, useDefaults, useSwitchMap } from 'stative'
 import type { SuffixInputs, SuffixPluginConfig, SuffixType } from './type';
 
 import { withKey } from '../../../utils';
+import { MapperPluginKeys } from '../keys';
 import { SuffixBlocks } from './states';
 
 export * from './type';
@@ -26,7 +27,7 @@ declare global {
 }
 
 export const Suffix = /*#__PURE__*/ withKey(
-  'suffix',
+  MapperPluginKeys.Suffix,
   /*#__PURE__*/ once(function Suffix({
     source,
     enabled: _enabled,

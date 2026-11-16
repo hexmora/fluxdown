@@ -2,10 +2,16 @@ import type { Root as MdastRoot } from 'mdast';
 import type { Extension } from 'micromark-util-types';
 import type { Plugin } from 'unified';
 
-import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@fluxdown/types';
+import {
+  type IBasePluginConfig,
+  type IPluggableConfig,
+  PluginPriority,
+  type RemarkPluginConfigContext,
+} from '@fluxdown/types';
 
 import { appendMicromarkExtension } from '../../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 
 export interface SyntaxPolicyRemarkPluginConfig {
   indentedCode?: boolean;
@@ -13,7 +19,7 @@ export interface SyntaxPolicyRemarkPluginConfig {
   setextHeading?: boolean;
 }
 
-type SyntaxPolicyRemarkPluginInnerConfig = Required<SyntaxPolicyRemarkPluginConfig>;
+type SyntaxPolicyRemarkPluginInnerConfig = SyntaxPolicyRemarkPluginConfig;
 
 declare global {
   interface RemarkConfigs {
@@ -22,7 +28,7 @@ declare global {
 }
 
 export class SyntaxPolicyRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-syntax-policy';
+  static readonly key = RemarkPluginKeys.SyntaxPolicy;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Default,
@@ -35,22 +41,21 @@ export class SyntaxPolicyRemarkPlugin extends BaseRemarkPlugin {
   constructor(config: SyntaxPolicyRemarkPluginConfig = {}) {
     super();
 
-    this.innerConfig = {
-      indentedCode: config.indentedCode ?? false,
-      setextHeading: config.setextHeading ?? false,
-    };
-    const { indentedCode, setextHeading } = this.innerConfig;
-    const disabledConstructs: string[] = [];
+    this.innerConfig = { ...config };
 
-    if (!indentedCode) {
-      disabledConstructs.push('codeIndented');
-    }
-
-    if (!setextHeading) {
-      disabledConstructs.push('setextUnderline');
-    }
+    const { indentedCode = false, setextHeading = false } = this.innerConfig;
 
     this.plugin = function () {
+      const disabledConstructs: string[] = [];
+
+      if (!indentedCode) {
+        disabledConstructs.push('codeIndented');
+      }
+
+      if (!setextHeading) {
+        disabledConstructs.push('setextUnderline');
+      }
+
       const extension: Extension = {
         disable: {
           null: [...disabledConstructs],
@@ -58,6 +63,19 @@ export class SyntaxPolicyRemarkPlugin extends BaseRemarkPlugin {
       };
 
       appendMicromarkExtension(this.data(), extension);
+    };
+  }
+
+  static override prepareConfig(
+    context: RemarkPluginConfigContext,
+    outerConfig: IPluggableConfig<SyntaxPolicyRemarkPluginConfig>,
+  ): IPluggableConfig<SyntaxPolicyRemarkPluginConfig> {
+    const { config } = context;
+
+    return {
+      indentedCode: config.indentedCode,
+      setextHeading: config.setextHeading,
+      ...outerConfig,
     };
   }
 }

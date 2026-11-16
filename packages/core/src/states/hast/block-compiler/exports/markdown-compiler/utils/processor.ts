@@ -53,27 +53,37 @@ const getHastProcessor = ({
   return processor;
 };
 
-const getAttacher = ({ plugin }: ProcessorPlugin): object => plugin;
+const getAttacher = ({ plugin }: ProcessorPlugin): object => {
+  return plugin;
+};
 
-const isAttachersEqual = (snapshots: object[], plugins: ProcessorPlugin[]): boolean =>
-  snapshots.length === plugins.length &&
-  plugins.every(({ plugin }, index) => plugin === snapshots[index]);
+const isAttachersEqual = (snapshots: object[], plugins: ProcessorPlugin[]): boolean => {
+  return (
+    snapshots.length === plugins.length &&
+    plugins.every(({ plugin }, index) => plugin === snapshots[index])
+  );
+};
 
 export const isProcessorEqual = (
   snapshot: ProcessorSnapshot,
   { remarks = [], rehypes = [], idPrefix }: MarkdownCompilerInputs,
-): boolean =>
-  snapshot.idPrefix === idPrefix &&
-  isAttachersEqual(snapshot.remarks, remarks) &&
-  isAttachersEqual(snapshot.rehypes, rehypes);
+): boolean => {
+  return (
+    snapshot.idPrefix === idPrefix &&
+    isAttachersEqual(snapshot.remarks, remarks) &&
+    isAttachersEqual(snapshot.rehypes, rehypes)
+  );
+};
 
 export const createProcessorSnapshot = ({
   remarks = [],
   rehypes = [],
   idPrefix,
-}: MarkdownCompilerInputs): ProcessorSnapshot => ({
-  remarks: remarks.map(getAttacher),
-  rehypes: rehypes.map(getAttacher),
-  idPrefix,
-  processor: getHastProcessor({ remarks, rehypes, idPrefix }).freeze(),
-});
+}: MarkdownCompilerInputs): ProcessorSnapshot => {
+  return {
+    remarks: remarks.map(getAttacher),
+    rehypes: rehypes.map(getAttacher),
+    idPrefix,
+    processor: getHastProcessor({ remarks, rehypes, idPrefix }).freeze(),
+  };
+};

@@ -21,7 +21,7 @@ describe('DanglingFootnoteRepairPlugin', () => {
     'removes an incomplete footnote candidate from the structural tail',
     (value) => {
       const result = runRepairs(
-        root([paragraph([{ type: 'text', value }])]),
+        root([paragraph([{ type: 'text', value, data: { source: value } }])]),
         new DanglingFootnoteRepairPlugin(),
       );
 
@@ -35,13 +35,17 @@ describe('DanglingFootnoteRepairPlugin', () => {
   test('removes unresolved textual references while preserving parsed references', () => {
     const tree: Root = root([
       paragraph([
-        { type: 'text', value: 'first[^missing] middle' },
+        {
+          type: 'text',
+          value: 'first[^missing] middle',
+          data: { source: 'first[^missing] middle' },
+        },
         {
           type: 'footnoteReference',
           identifier: 'defined',
           label: 'defined',
         },
-        { type: 'text', value: ' tail[^other]' },
+        { type: 'text', value: ' tail[^other]', data: { source: ' tail[^other]' } },
       ]),
       {
         type: 'footnoteDefinition',
@@ -87,7 +91,7 @@ describe('DanglingFootnoteRepairPlugin', () => {
   test.each(['literal [^invalid^label]', 'literal [^invalid^'])(
     'keeps a malformed footnote candidate containing another caret: %s',
     (value) => {
-      const tree = root([paragraph([{ type: 'text', value }])]);
+      const tree = root([paragraph([{ type: 'text', value, data: { source: value } }])]);
 
       expect(runRepairs(tree, new DanglingFootnoteRepairPlugin())).toEqual(tree);
     },

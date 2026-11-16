@@ -4,6 +4,7 @@ import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 import { nth } from 'lodash-es';
 
 import { BaseRepairPlugin } from '../base';
+import { RepairPluginKeys } from '../keys';
 
 declare global {
   interface RepairConfigs {
@@ -12,15 +13,15 @@ declare global {
 }
 
 export class RedundantBreakBeforeHtmlRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-redundant-break-before-html';
+  static readonly key = RepairPluginKeys.RedundantBreakBeforeHtml;
 
-  readonly config: RepairPluginSystemConfig = {
+  override readonly config: RepairPluginSystemConfig = {
     ending: false,
     allows: 'html',
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parent, index }) => {
+  override runner: RepairPluginRunner = ({ node, parent, index }) => {
     if (
       node.type !== 'html' ||
       !parent ||

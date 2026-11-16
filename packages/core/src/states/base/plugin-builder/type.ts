@@ -11,6 +11,8 @@ export type PluggableOf<T extends AnyPluggable> =
 export interface PluginBuilderInputs<T extends IPluginWithConfig> {
   plugins: IPluggable<T, unknown>[];
 
+  context?: unknown;
+
   sort?: boolean;
 
   cacheStore?: PluginCacheStore;

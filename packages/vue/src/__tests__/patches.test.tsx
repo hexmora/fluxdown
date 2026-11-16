@@ -1,20 +1,23 @@
+import { BaseRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/base';
 import { mount } from '@vue/test-utils';
 
 import { FluxdownLite } from '../packs/lite';
 
-const createPatches = (label: string) => [
-  {
-    key: 'stable-range',
-    range: [6, 11] as [number, number],
-    render: (text?: string) => {
-      return (
-        <mark>
-          {label}:{text}
-        </mark>
-      );
+const createPatches = (label: string) => {
+  return [
+    {
+      key: 'stable-range',
+      range: [6, 11] as [number, number],
+      render: (text?: string) => {
+        return (
+          <mark>
+            {label}:{text}
+          </mark>
+        );
+      },
     },
-  },
-];
+  ];
+};
 
 describe('render patches', () => {
   test('renders point and range patches in source order', () => {
@@ -44,16 +47,12 @@ describe('render patches', () => {
   test('updates patch render callbacks without recompiling unchanged Markdown', async () => {
     const compile = vi.fn();
 
-    class CompileCounter {
+    class CompileCounter extends BaseRemarkPlugin {
       static readonly key = 'test-compile-counter';
 
-      readonly config = {};
-
-      readonly plugin = () => () => {
+      override readonly plugin = () => () => {
         compile();
       };
-
-      destroy() {}
     }
 
     const wrapper = mount(FluxdownLite, {
@@ -77,13 +76,25 @@ describe('render patches', () => {
     const wrapper = mount(FluxdownLite, {
       props: {
         text: 'visible',
-        patches: [{ range: [50, 60], render: () => <mark>hidden</mark> }],
+        patches: [
+          {
+            range: [50, 60],
+            render: () => <mark>hidden</mark>,
+          },
+        ],
       },
     });
 
     expect(wrapper.text()).toBe('visible');
 
-    await wrapper.setProps({ patches: [{ range: [0, 7], render: (text) => <mark>{text}</mark> }] });
+    await wrapper.setProps({
+      patches: [
+        {
+          range: [0, 7],
+          render: (text) => <mark>{text}</mark>,
+        },
+      ],
+    });
 
     expect(wrapper.get('mark').text()).toBe('visible');
   });

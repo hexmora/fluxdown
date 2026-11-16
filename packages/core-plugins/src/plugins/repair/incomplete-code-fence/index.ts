@@ -1,10 +1,11 @@
 import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/types';
 
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
-import { last } from 'lodash-es';
 
-import { isRepairNodeType } from '../../../utils';
+import { isRepairMarker, isRepairNodeType, isRepairTreeTail } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
+import { RepairPluginKeys } from '../keys';
+import { getIncompleteFenceValue } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -13,37 +14,43 @@ declare global {
 }
 
 export class IncompleteCodeFenceRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-incomplete-code-fence';
+  static readonly key = RepairPluginKeys.IncompleteCodeFence;
 
-  readonly config: RepairPluginSystemConfig = {
+  override readonly config: RepairPluginSystemConfig = {
     scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
+  override runner: RepairPluginRunner = ({ node, parents }) => {
     if (!isRepairNodeType(node, 'code') && !isRepairNodeType(node, 'text')) {
       return;
     }
 
-    let branch: unknown = node;
-
-    for (const parent of parents) {
-      if (last(parent.children) !== branch) {
-        return;
-      }
-
-      branch = parent;
+    if (!isRepairTreeTail(node, parents)) {
+      return;
     }
 
     if (isRepairNodeType(node, 'code')) {
-      node.value = node.value.replace(/(?:\r\n|\r|\n)`{1,2}$/, '');
+      const value = getIncompleteFenceValue(node);
+
+      if (value !== undefined) {
+        node.value = value;
+      }
 
       return;
     }
 
-    if (isRepairNodeType(node, 'text')) {
-      node.value = node.value.replace(/(^|(?:\r\n|\r|\n))`{1,2}$/, '$1');
+    const tail = /(?:^|\r\n|\r|\n)(`{1,2}|~{1,2})$/.exec(node.value);
+
+    if (!tail || !tail[1]) {
+      return;
+    }
+
+    const offset = node.value.length - tail[1].length;
+
+    if (isRepairMarker(node, offset, tail[1].length)) {
+      node.value = node.value.slice(0, offset);
     }
   };
 }

@@ -5,11 +5,16 @@
   padding: var(--#{$prefix}-spacing-sm) var(--#{$prefix}-spacing-lg);
 
   border-inline-start: 3px solid var(--#{$prefix}-colors-border-emphasis);
-  border-radius: 0 var(--#{$prefix}-radius-md) var(--#{$prefix}-radius-md) 0;
+  border-start-end-radius: var(--#{$prefix}-radius-md);
+  border-end-end-radius: var(--#{$prefix}-radius-md);
   background: var(--#{$prefix}-colors-surface-subtle);
 
   color: var(--#{$prefix}-colors-fg-muted);
   line-height: var(--#{$prefix}-typography-line-height-md);
+
+  & & {
+    margin-block: var(--#{$prefix}-spacing-sm);
+  }
 
   > :first-child {
     margin-top: 0;
@@ -17,9 +22,5 @@
 
   > :last-child {
     margin-bottom: 0;
-  }
-
-  & & {
-    margin-block: var(--#{$prefix}-spacing-sm);
   }
 }

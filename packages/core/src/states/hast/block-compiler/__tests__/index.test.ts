@@ -49,15 +49,19 @@ const DEFAULT_CONFIG: BlockCompilerConfig = {
   setextHeading: false,
 };
 
-const patch = (key: string, range: IRawPatchRange = 0): IRawPatchItem => ({
-  key,
-  range,
-});
+const patch = (key: string, range: IRawPatchRange = 0): IRawPatchItem => {
+  return {
+    key,
+    range,
+  };
+};
 
-const section = (text: string, patches: IRawPatchItem[] = []): IBlockSection => ({
-  text,
-  patches,
-});
+const section = (text: string, patches: IRawPatchItem[] = []): IBlockSection => {
+  return {
+    text,
+    patches,
+  };
+};
 
 const collectText = (node: HastRoot | RootContent): string => {
   if (node.type === 'text') {

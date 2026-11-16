@@ -3,14 +3,20 @@ import { isArray } from 'lodash-es';
 import { memoReturns } from 'stative';
 
 import type { MapperPluggable } from '../../../base';
-import type { MapperPluggablesInputs } from './type';
+import type { MapperPluggablesInputs, MapperPluginContext } from './type';
 
-import { isPluggablesEqual, mergePluginPluggables, toPluggable } from '../../../base';
+import {
+  isPluggablesEqual,
+  mergePluginPluggables,
+  preparePluggables,
+  toPluggable,
+} from '../../../base';
 
 export * from './type';
 
 export const MapperPluggables = /*#__PURE__*/ memoReturns(function MapperPluggables({
   extras,
+  config,
 }: MapperPluggablesInputs): MapperPluggable[] {
   const plugins = toPluggable(extras);
 
@@ -18,5 +24,9 @@ export const MapperPluggables = /*#__PURE__*/ memoReturns(function MapperPluggab
     (Plugin) => !plugins.some((item) => (isArray(item) ? item[0] : item) === Plugin),
   );
 
-  return mergePluginPluggables([], toPluggable(extras, defaults));
+  const mappers = mergePluginPluggables([], toPluggable(extras, defaults));
+
+  const context: MapperPluginContext = { config, mappers };
+
+  return preparePluggables(mappers, context);
 }, isPluggablesEqual);

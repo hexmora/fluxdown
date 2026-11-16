@@ -70,7 +70,11 @@ const collectHastText = (node: HastRoot | HastRootContent): string => {
   }
 
   if ('children' in node) {
-    return node.children.map((child) => collectHastText(child)).join('');
+    return node.children
+      .map((child) => {
+        return collectHastText(child);
+      })
+      .join('');
   }
 
   return '';
@@ -222,10 +226,12 @@ describe('SyntaxMathRemarkPlugin', () => {
       },
     ])('$name', ({ source, expected }) => {
       expect(
-        collectMathNodes(parseMath(source)).map(({ type, value }) => ({
-          type,
-          value,
-        })),
+        collectMathNodes(parseMath(source)).map(({ type, value }) => {
+          return {
+            type,
+            value,
+          };
+        }),
       ).toEqual(expected);
     });
 
@@ -338,14 +344,22 @@ describe('SyntaxMathRemarkPlugin', () => {
     test('parses a valid expression after an escaped leading dollar', () => {
       const tree = parseMath('Escapes work: \\$$x$.');
 
-      expect(collectMathNodes(tree).map(({ value }) => value)).toEqual(['x']);
+      expect(
+        collectMathNodes(tree).map(({ value }) => {
+          return value;
+        }),
+      ).toEqual(['x']);
       expect(collectVisibleText(tree)).toContain('$');
     });
 
     test('preserves an escaped trailing dollar after a valid expression', () => {
       const tree = parseMath('Escapes work: $x$\\$.');
 
-      expect(collectMathNodes(tree).map(({ value }) => value)).toEqual(['x']);
+      expect(
+        collectMathNodes(tree).map(({ value }) => {
+          return value;
+        }),
+      ).toEqual(['x']);
       expect(collectVisibleText(tree)).toContain('$');
     });
 
@@ -490,7 +504,9 @@ x^2 & x\ge 0 \\
 
     test('parses multiple inline delimiters in order', () => {
       expect(
-        collectMathNodes(parseMath(String.raw`a \(1\) b \(2\) c`)).map(({ value }) => value),
+        collectMathNodes(parseMath(String.raw`a \(1\) b \(2\) c`)).map(({ value }) => {
+          return value;
+        }),
       ).toEqual(['1', '2']);
     });
 
@@ -539,11 +555,17 @@ x^2 & x\ge 0 \\
       },
     ])('$name', ({ source, expected }) => {
       expect(
-        collectMathNodes(parseMath(source, { repairEnding: true })).map(({ type, value }) => ({
-          type,
-          value,
-        })),
-      ).toEqual(expected.map((value) => ({ type: 'inlineMath', value })));
+        collectMathNodes(parseMath(source, { repairEnding: true })).map(({ type, value }) => {
+          return {
+            type,
+            value,
+          };
+        }),
+      ).toEqual(
+        expected.map((value) => {
+          return { type: 'inlineMath', value };
+        }),
+      );
     });
 
     test.each([
@@ -551,11 +573,11 @@ x^2 & x\ge 0 \\
       ['two dollars', 'prefix $$', 'prefix '],
       ['a whitespace-only double-dollar candidate', 'prefix $$   ', 'prefix '],
     ])(
-      'swallows a trailing empty candidate containing %s without creating math',
+      'retains an empty math placeholder for a trailing candidate containing %s',
       (_name, source, visibleText) => {
         const tree = parseMath(source, { repairEnding: true });
 
-        expect(collectMathNodes(tree)).toEqual([]);
+        expect(collectMathNodes(tree)).toMatchObject([{ value: '', data: { repairEnding: true } }]);
         expect(collectVisibleText(tree)).toBe(visibleText);
       },
     );
@@ -575,7 +597,11 @@ x^2 & x\ge 0 \\
         repairEnding: true,
       });
 
-      expect(collectMathNodes(tree).map(({ value }) => value)).toEqual(['b']);
+      expect(
+        collectMathNodes(tree).map(({ value }) => {
+          return value;
+        }),
+      ).toEqual(['b']);
       expect(collectVisibleText(tree)).toContain('p1 $a');
     });
 
@@ -591,13 +617,15 @@ x^2 & x\ge 0 \\
     });
 
     test.each([false, true])(
-      'keeps a trailing single dollar inside an existing block-math flow when repairEnding=%s',
+      'withholds a partial block closer only while ending repair is active: %s',
       (repairEnding) => {
         expect(
           collectMathNodes(parseMath(['$$', 'aaaa', '$'].join('\n'), { repairEnding })).map(
-            ({ type, value }) => ({ type, value }),
+            ({ type, value }) => {
+              return { type, value };
+            },
           ),
-        ).toEqual([{ type: 'math', value: 'aaaa\n$' }]);
+        ).toEqual([{ type: 'math', value: repairEnding ? 'aaaa\n' : 'aaaa\n$' }]);
       },
     );
 
@@ -630,15 +658,15 @@ f'(x) &= 2x
         expectedMode: 'display',
       },
       {
-        name: 'trims a repaired inline Pandoc candidate',
+        name: 'preserves the trailing boundary of a repaired inline Pandoc candidate',
         source: String.raw`prefix \(  x + y  `,
-        expectedValue: 'x + y',
+        expectedValue: 'x + y  ',
         expectedMode: 'inline',
       },
       {
-        name: 'trims a repaired display Pandoc candidate',
+        name: 'preserves the trailing boundary of a repaired display Pandoc candidate',
         source: String.raw`prefix \[  x + y  `,
-        expectedValue: 'x + y',
+        expectedValue: 'x + y  ',
         expectedMode: 'display',
       },
     ])('$name', ({ source, expectedValue, expectedMode }) => {
@@ -657,10 +685,10 @@ f'(x) &= 2x
     test.each([
       ['an empty inline opener', String.raw`prefix \(`, 'prefix '],
       ['a whitespace-only display opener', 'prefix \\[   ', 'prefix '],
-    ])('swallows %s without creating math', (_name, source, visibleText) => {
+    ])('retains an empty math placeholder for %s', (_name, source, visibleText) => {
       const tree = parseMath(source, { repairEnding: true });
 
-      expect(collectMathNodes(tree)).toEqual([]);
+      expect(collectMathNodes(tree)).toMatchObject([{ value: '', data: { repairEnding: true } }]);
       expect(collectVisibleText(tree)).toBe(visibleText);
     });
 
@@ -685,7 +713,9 @@ f'(x) &= 2x
     test('does not throw when a repaired Pandoc candidate ends after a TeX command backslash', () => {
       const source = '\\(\\frac{1}{2}+\\';
 
-      expect(() => parseMath(source, { repairEnding: true })).not.toThrow();
+      expect(() => {
+        return parseMath(source, { repairEnding: true });
+      }).not.toThrow();
     });
 
     test('does not mutate its caller-owned config', () => {
@@ -880,13 +910,15 @@ f'(x) &= 2x
     test('preserves text changes made by an earlier remark transformer', () => {
       const processor = unified()
         .use(remarkParse)
-        .use(() => (tree: MdastRoot) => {
-          const paragraph = first(tree.children);
-          const text = paragraph?.type === 'paragraph' ? first(paragraph.children) : undefined;
+        .use(() => {
+          return (tree: MdastRoot) => {
+            const paragraph = first(tree.children);
+            const text = paragraph?.type === 'paragraph' ? first(paragraph.children) : undefined;
 
-          if (text?.type === 'text') {
-            text.value = 'changed by an earlier plugin';
-          }
+            if (text?.type === 'text') {
+              text.value = 'changed by an earlier plugin';
+            }
+          };
         })
         .use(new SyntaxMathRemarkPlugin().plugin);
       const source = 'original text';
@@ -921,18 +953,19 @@ f'(x) &= 2x
       });
     });
 
-    test('preserves source offsets on math and adjacent text nodes', () => {
+    test('preserves exact provenance when closed formulas are parsed', () => {
       const tree = parseMath('a $x$ b');
       const paragraph = first(tree.children);
       const children = paragraph?.type === 'paragraph' ? paragraph.children : [];
 
       expect(
-        children.map((node) => [node.position?.start.offset, node.position?.end.offset]),
-      ).toEqual([
-        [0, 2],
-        [2, 5],
-        [5, 7],
-      ]);
+        children.map((node) => {
+          return node.data?.source;
+        }),
+      ).toEqual(['a ', '$x$', ' b']);
+      expect(children[1]?.position).toBeUndefined();
+      expect(paragraph?.data?.source).toBe('a $x$ b');
+      expect(tree.data?.source).toBe('a $x$ b');
     });
 
     test('exposes Pandoc mode through public MDAST data typing', () => {
@@ -949,7 +982,9 @@ f'(x) &= 2x
     });
 
     test('handles empty Markdown without output or errors', () => {
-      expect(() => parseMath('')).not.toThrow();
+      expect(() => {
+        return parseMath('');
+      }).not.toThrow();
       expect(collectMathNodes(parseMath(''))).toEqual([]);
       expect(parseMathPlaceholders('')).toEqual([]);
     });

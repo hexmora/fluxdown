@@ -6,8 +6,10 @@ import { loadSvgRenderer } from './utils';
 
 const LazySvgRenderer = /*#__PURE__*/ lazy(loadSvgRenderer);
 
-export const TexSvgRenderer = ({ Raw, ...props }: TexProps) => (
-  <Suspense fallback={Raw && <Raw {...props} />}>
-    <LazySvgRenderer {...props} Raw={Raw} />
-  </Suspense>
-);
+export const TexSvgRenderer = ({ Raw, ...props }: TexProps) => {
+  return (
+    <Suspense fallback={null}>
+      <LazySvgRenderer {...props} Raw={Raw} />
+    </Suspense>
+  );
+};

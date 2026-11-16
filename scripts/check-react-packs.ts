@@ -1,5 +1,9 @@
-/* eslint-disable no-await-in-loop -- Build each entry independently to detect dependency leaks. */
-/* eslint-disable no-console -- Report isolated bundle verification in release logs. */
+/* eslint-disable no-await-in-loop --
+ * Build each entry independently to detect dependency leaks.
+ */
+/* eslint-disable no-console --
+ * Report isolated bundle verification in release logs.
+ */
 import { createRsbuild } from '@rsbuild/core';
 import assert from 'node:assert/strict';
 import { writeFile } from 'node:fs/promises';
@@ -32,21 +36,89 @@ const trackedDependencies = [
   '@fluxdown/react-base-plugins',
 ];
 
+interface PackEntry {
+  specifier: string;
+
+  allowed: string[];
+
+  requiredInitialEngines?: string[];
+
+  requiredInitialCjsEngines?: string[];
+
+  headless?: boolean;
+}
+
 export async function checkReactPacks(consumer: string, native = false): Promise<void> {
-  const entries: { specifier: string; allowed: string[]; headless?: boolean }[] = [
+  const entries: PackEntry[] = [
+    {
+      specifier: '@fluxdown/core-plugins/plugins/repair/tex',
+      allowed: ['katex'],
+      requiredInitialEngines: ['katex'],
+      headless: true,
+    },
     { specifier: '@fluxdown/react-hooks', allowed: [], headless: true },
-    { specifier: '@fluxdown/react-base', allowed: [], headless: true },
-    { specifier: '@fluxdown/react-base-plugins/base', allowed: [], headless: true },
-    { specifier: '@fluxdown/react-base-plugins/plugins/blockquote', allowed: [], headless: true },
-    { specifier: '@fluxdown/react-base-plugins/plugins/effect-scale', allowed: [], headless: true },
-    { specifier: '@fluxdown/react-base-plugins/plugins/fallback', allowed: [], headless: true },
-    { specifier: 'fluxdown/raw', allowed: [] },
-    { specifier: 'fluxdown/lite', allowed: [] },
+    {
+      specifier: '@fluxdown/react-base',
+      allowed: ['katex'],
+      requiredInitialEngines: ['katex'],
+      headless: true,
+    },
+    {
+      specifier: '@fluxdown/react-base-plugins/base',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: [],
+      headless: true,
+    },
+    {
+      specifier: '@fluxdown/react-base-plugins/plugins/blockquote',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: [],
+      headless: true,
+    },
+    {
+      specifier: '@fluxdown/react-base-plugins/plugins/effect-scale',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: [],
+      headless: true,
+    },
+    {
+      specifier: '@fluxdown/react-base-plugins/plugins/fallback',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: [],
+      headless: true,
+    },
+    { specifier: 'fluxdown/raw', allowed: ['katex'], requiredInitialEngines: ['katex'] },
+    { specifier: 'fluxdown/lite', allowed: ['katex'], requiredInitialEngines: ['katex'] },
+    {
+      specifier: '@fluxdown/react-plugins/base',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: [],
+    },
+    {
+      specifier: '@fluxdown/react-plugins/lite',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: [],
+    },
+    {
+      specifier: '@fluxdown/react-plugins/plugins/tex',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: [],
+    },
     {
       specifier: 'fluxdown/full',
       allowed: ['shiki', '@shikijs', 'katex', '@mathjax', 'pele', ...syntaxExtensions],
+      requiredInitialEngines: ['katex'],
     },
-    { specifier: '@fluxdown/react-plugins/plugins/blockquote', allowed: [] },
+    {
+      specifier: '@fluxdown/react-plugins/full',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: ['shiki', '@shikijs', 'katex', '@mathjax', 'pele', ...syntaxExtensions],
+    },
+    {
+      specifier: '@fluxdown/react-plugins/plugins/blockquote',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: [],
+    },
     { specifier: '@fluxdown/react-base-plugins/plugins/emoji', allowed: ['remark-gemoji'] },
     {
       specifier: '@fluxdown/react-base-plugins/plugins/cjk',
@@ -57,44 +129,85 @@ export async function checkReactPacks(consumer: string, native = false): Promise
     },
     {
       specifier: '@fluxdown/react-plugins/plugins/code-pele',
+      requiredInitialCjsEngines: ['katex'],
       allowed: ['pele'],
     },
-    { specifier: '@fluxdown/react-plugins/plugins/code-prism', allowed: ['prismjs'] },
-    { specifier: '@fluxdown/react-plugins/plugins/tex-katex', allowed: ['katex'] },
+    {
+      specifier: '@fluxdown/react-plugins/plugins/code-prism',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: ['prismjs'],
+    },
+    {
+      specifier: '@fluxdown/react-plugins/plugins/tex-katex',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: ['katex'],
+    },
+    {
+      specifier: '@fluxdown/react-plugins/plugins/tex-mathjax-katex',
+      requiredInitialCjsEngines: ['katex'],
+      allowed: ['katex', '@mathjax'],
+    },
   ];
 
   if (native)
     entries.push(
-      { specifier: '@fluxdown/react-native/raw', allowed: [] },
-      { specifier: '@fluxdown/react-native/lite', allowed: ['react-native-svg'] },
+      {
+        specifier: '@fluxdown/react-native/raw',
+        allowed: ['katex'],
+        requiredInitialEngines: ['katex'],
+      },
+      {
+        specifier: '@fluxdown/react-native/lite',
+        allowed: ['katex', 'react-native-svg'],
+        requiredInitialEngines: ['katex'],
+      },
       {
         specifier: '@fluxdown/react-native/full',
-        allowed: [...nativeEngines, ...syntaxExtensions, 'react-native-svg'],
+        allowed: ['katex', ...nativeEngines, ...syntaxExtensions, 'react-native-svg'],
+        requiredInitialEngines: ['katex'],
       },
-      { specifier: '@fluxdown/react-native-plugins/plugins/paragraph', allowed: [] },
+      {
+        specifier: '@fluxdown/react-native-plugins/plugins/paragraph',
+        requiredInitialCjsEngines: ['katex'],
+        allowed: [],
+      },
       {
         specifier: '@fluxdown/react-native-plugins/plugins/tex-svg',
+        requiredInitialCjsEngines: ['katex'],
         allowed: ['mathjax-full', 'react-native-svg'],
       },
-      { specifier: '@fluxdown/react-native-plugins/plugins/effect-chunk', allowed: [] },
+      {
+        specifier: '@fluxdown/react-native-plugins/plugins/effect-chunk',
+        requiredInitialCjsEngines: ['katex'],
+        allowed: [],
+      },
       {
         specifier: '@fluxdown/react-native-plugins/plugins/effect-scale',
+        requiredInitialCjsEngines: ['katex'],
         allowed: ['react-native-svg'],
       },
       {
         specifier: '@fluxdown/react-native-plugins/plugins/effect-shad',
+        requiredInitialCjsEngines: ['katex'],
         allowed: ['react-native-svg'],
       },
       {
         specifier: '@fluxdown/react-native-plugins/plugins/effect-suffix',
+        requiredInitialCjsEngines: ['katex'],
         allowed: [],
       },
     );
 
-  for (const [index, { specifier, allowed, headless }] of entries.entries()) {
+  for (const [
+    index,
+    { specifier, allowed, headless, requiredInitialEngines = [], requiredInitialCjsEngines = [] },
+  ] of entries.entries()) {
     const nativeEntry = specifier.startsWith('@fluxdown/react-native');
 
     for (const format of ['import', 'require'] as const) {
+      const cjsEngines = format === 'require' ? requiredInitialCjsEngines : [];
+      const allowedDependencies = new Set([...allowed, ...cjsEngines]);
+
       const name = `pack-${index}-${format}`;
       const file = path.join(consumer, `${name}.${format === 'import' ? 'mjs' : 'cjs'}`);
       const source =
@@ -134,7 +247,7 @@ export async function checkReactPacks(consumer: string, native = false): Promise
         });
         assert(stats, `${specifier}: missing bundle stats`);
         const forbidden = new Set(
-          dependencies.filter((dependency) => !allowed.includes(dependency)),
+          dependencies.filter((dependency) => !allowedDependencies.has(dependency)),
         );
 
         if (nativeEntry) {
@@ -193,13 +306,18 @@ export async function checkReactPacks(consumer: string, native = false): Promise
           `${specifier} (${format}) includes an unselected dependency`,
         );
 
+        /*
+         * Core presets synchronously validate TeX with KaTeX. CommonJS utility
+         * imports retain the core barrel and its presets; ESM can remove them.
+         * Other rendering engines must remain lazy in both formats.
+         */
         assert.deepEqual(
-          [...initialEngines],
-          [],
-          `${specifier} (${format}) eagerly loads an engine`,
+          initialEngines,
+          new Set([...requiredInitialEngines, ...cjsEngines]),
+          `${specifier} (${format}) does not match its initial engine contract`,
         );
 
-        for (const dependency of allowed)
+        for (const dependency of allowedDependencies)
           assert(
             bundledDependencies.has(dependency),
             `${specifier} (${format}) is missing ${dependency}`,

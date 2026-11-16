@@ -20,7 +20,9 @@ import { TableNoralizerRemarkPlugin } from '../table-noralizer';
 
 describe('remark plugin contracts', () => {
   test('exposes unique stable keys for all built-in plugins', () => {
-    const keys = PRESET_REMARK_PLUGINS.map((PluginClass) => PluginClass.key);
+    const keys = PRESET_REMARK_PLUGINS.map((PluginClass) => {
+      return PluginClass.key;
+    });
 
     expect(keys).toEqual([
       'remark-apply-repairs',
@@ -46,7 +48,7 @@ describe('remark plugin contracts', () => {
     expect(new SyntaxAutolinkRemarkPlugin().config.priority).toBe(PluginPriority.Highest);
     expect(new SyntaxFootnoteRemarkPlugin().config.priority).toBe(PluginPriority.Highest);
     expect(new SyntaxHtmlAllowedRemarkPlugin().config.priority).toBe(PluginPriority.Lowest);
-    expect(new SyntaxMathRemarkPlugin().config.priority).toBe(PluginPriority.Lowest);
+    expect(new SyntaxMathRemarkPlugin().config.priority).toBe(PluginPriority.Highest);
     expect(new SyntaxPolicyRemarkPlugin().config.priority).toBe(PluginPriority.Default);
     expect(new SyntaxSoftEndlineRemarkPlugin().config.priority).toBe(PluginPriority.Low);
     expect(new SyntaxStrikethroughRemarkPlugin().config.priority).toBe(PluginPriority.Highest);

@@ -2,19 +2,21 @@ import { mount } from '@vue/test-utils';
 
 import { FluxdownLite } from '../packs/lite';
 
-const createPatches = (label: string) => [
-  {
-    key: 'stable-range',
-    range: [6, 11] as [number, number],
-    render: (text?: string) => {
-      return (
-        <text class="patch-range">
-          {label}:{text}
-        </text>
-      );
+const createPatches = (label: string) => {
+  return [
+    {
+      key: 'stable-range',
+      range: [6, 11] as [number, number],
+      render: (text?: string) => {
+        return (
+          <text class="patch-range">
+            {label}:{text}
+          </text>
+        );
+      },
     },
-  },
-];
+  ];
+};
 
 describe('render patches', () => {
   test('renders point and range patches in source order', () => {
@@ -49,6 +51,14 @@ describe('render patches', () => {
 
       readonly config = {};
 
+      static prepareConfig(): null {
+        return null;
+      }
+
+      static enabled(): boolean {
+        return true;
+      }
+
       readonly plugin = () => () => {
         compile();
       };
@@ -77,14 +87,24 @@ describe('render patches', () => {
     const wrapper = mount(FluxdownLite, {
       props: {
         text: 'visible',
-        patches: [{ range: [50, 60], render: () => <text class="patch-range">hidden</text> }],
+        patches: [
+          {
+            range: [50, 60],
+            render: () => <text class="patch-range">hidden</text>,
+          },
+        ],
       },
     });
 
     expect(wrapper.text()).toBe('visible');
 
     await wrapper.setProps({
-      patches: [{ range: [0, 7], render: (text) => <text class="patch-range">{text}</text> }],
+      patches: [
+        {
+          range: [0, 7],
+          render: (text) => <text class="patch-range">{text}</text>,
+        },
+      ],
     });
 
     expect(wrapper.get('.patch-range').text()).toBe('visible');

@@ -5,6 +5,7 @@ import { processMdast } from '@fluxdown/mdast';
 import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 import { normalizeTableColumns } from './utils';
 
 declare global {
@@ -14,7 +15,7 @@ declare global {
 }
 
 export class TableNoralizerRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-table-noralizer';
+  static readonly key = RemarkPluginKeys.TableNoralizer;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Low,

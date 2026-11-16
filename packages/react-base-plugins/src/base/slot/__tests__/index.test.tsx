@@ -1,3 +1,4 @@
+import type { IPluggableConfig, SlotPluginContext } from '@fluxdown/types';
 import type { Element } from 'hast';
 import type { ComponentType, ReactNode } from 'react';
 
@@ -7,7 +8,7 @@ import { has, keys } from 'lodash-es';
 
 import type { AnySlotPluggable, Slots, SlotType } from '..';
 
-import { createTypeOfSlot, SlotProvider, useSlots } from '..';
+import { BaseSlotPlugin, createTypeOfSlot, SlotProvider, useSlots } from '..';
 
 interface SlotComponentProps {
   Raw: ComponentType<Omit<SlotComponentProps, 'Raw'>> | null;
@@ -261,6 +262,91 @@ describe('slots', () => {
     expect(screen.queryByTestId('changing-slot-a')).not.toBeInTheDocument();
 
     expect(screen.getByTestId('changing-slot-b')).toHaveTextContent('B[content]');
+  });
+
+  test('resolves static slot hooks before construction and refreshes them with the list', async () => {
+    interface ConditionalSlotConfig {
+      label?: string;
+    }
+
+    const counts: LifecycleCounts = { created: 0, destroyed: 0 };
+
+    class ConditionalSlot extends BaseSlotPlugin<'Paragraph'> {
+      static readonly key = 'conditional-slot';
+
+      readonly type = 'Paragraph';
+
+      readonly label: string;
+
+      constructor(config: ConditionalSlotConfig = {}) {
+        super();
+
+        this.label = config.label ?? '';
+
+        counts.created += 1;
+      }
+
+      static override enabled(context: SlotPluginContext): boolean {
+        const { plugins } = context;
+
+        return plugins.length > 1;
+      }
+
+      static override prepareConfig(
+        context: SlotPluginContext,
+        outerConfig: IPluggableConfig<ConditionalSlotConfig>,
+      ): IPluggableConfig<ConditionalSlotConfig> {
+        const { plugins } = context;
+
+        const { label = 'slot' } = outerConfig;
+
+        return { ...outerConfig, label: `${label}:${plugins.length}` };
+      }
+
+      readonly Component = () => null;
+
+      override destroy() {
+        counts.destroyed += 1;
+      }
+    }
+
+    const Companion = createSlotPlugin('companion-slot', 'Paragraph', WrappedParagraph);
+
+    const Extra = createSlotPlugin('extra-slot', 'Paragraph', WrappedParagraph);
+
+    const conditional: AnySlotPluggable = [ConditionalSlot, { label: 'configured' }];
+
+    const view = renderHook<Partial<Slots>, AnySlotPluggable[]>((plugins) => useSlots(plugins), {
+      initialProps: [conditional],
+    });
+
+    expect(view.result.current.Paragraph).toBeUndefined();
+
+    expect(counts.created).toBe(0);
+
+    view.rerender([conditional, Companion]);
+
+    expect(view.result.current.Paragraph?.[0]).toMatchObject({ label: 'configured:2' });
+
+    expect(counts.created).toBe(1);
+
+    view.rerender([conditional, Companion, Extra]);
+
+    expect(view.result.current.Paragraph?.[0]).toMatchObject({ label: 'configured:3' });
+
+    expect(counts).toEqual({ created: 2, destroyed: 1 });
+
+    view.rerender([Companion, Extra]);
+
+    expect(counts).toEqual({ created: 2, destroyed: 2 });
+
+    view.rerender([conditional]);
+
+    expect(view.result.current.Paragraph).toBeUndefined();
+
+    await waitFor(() => {
+      expect(counts).toEqual({ created: 2, destroyed: 2 });
+    });
   });
 
   test('destroys retired and mounted slot instances exactly once', async () => {

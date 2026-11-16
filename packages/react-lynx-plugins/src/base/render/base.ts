@@ -1,4 +1,4 @@
-import type { IBasePluginConfig } from '@fluxdown/types';
+import type { IBasePluginConfig, IPluggableConfig, RenderPluginContext } from '@fluxdown/types';
 import type { ReactNode } from '@lynx-js/react';
 
 import { Destructible } from 'stative';
@@ -15,6 +15,17 @@ export abstract class BaseReactLynxRenderPlugin
   implements IReactLynxRenderPlugin
 {
   readonly config: IBasePluginConfig = {};
+
+  static enabled(_context: RenderPluginContext): boolean {
+    return true;
+  }
+
+  static prepareConfig(
+    _context: RenderPluginContext,
+    _outerConfig: IPluggableConfig<unknown>,
+  ): IPluggableConfig<unknown> | null {
+    return null;
+  }
 
   abstract match(params: ReactLynxRenderMatchParams): boolean;
 
