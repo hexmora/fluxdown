@@ -1,0 +1,372 @@
+import { FrameworkCodeTabs } from '../../../../components/framework-code-tabs';
+
+# Plugin design - Fluxdown {#plugin-design}
+
+Fluxdown uses plugin classes to organize capabilities and separate configuration to control them. Applications pass declarations; Fluxdown creates, reuses, and releases instances. Updating configuration updates the plugin list.
+
+## Declarations and configuration
+
+A **pluggable** is a plugin class or a `[PluginClass, options]` tuple:
+
+| Declaration                                              | Meaning                                                                |
+| -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `IncompleteImageRepairPlugin`                            | Uses the default strategy: show a placeholder for an unfinished image. |
+| `[IncompleteImageRepairPlugin, { strategy: 'discard' }]` | Uses the same plugin, temporarily hiding unfinished images.            |
+
+The class implements behavior, and its constructor receives options. There is no need for a new class per configuration or a manual `new` on component updates. Mappers use reactive functions, keeping the same “function or `[function, options]`” declaration model.
+
+### Pass configuration to a component
+
+This example connects image repair to a `hideIncompleteImages` prop. Each framework component consumes the helper's result, which returns new configuration when the setting changes:
+
+```ts
+// image-repairs.ts
+import type { IPluggable, IRepairPlugin } from '@fluxdown/types';
+
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/incomplete-image';
+
+export const imageRepairs = (
+  hideIncompleteImages: boolean,
+): IPluggable<IRepairPlugin, unknown>[] => {
+  return [
+    [
+      IncompleteImageRepairPlugin,
+      { strategy: hideIncompleteImages ? 'discard' : 'placeholder' },
+    ],
+  ];
+};
+```
+
+Select your renderer:
+
+<FrameworkCodeTabs frameworks={['React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
+
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message({ text, hideIncompleteImages }: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={text}
+      plugins={{ repairs: imageRepairs(hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue';
+import { Fluxdown } from '@fluxdown/vue';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+const props = defineProps<MessageProps>();
+const plugins = computed(() => ({
+  repairs: imageRepairs(props.hideIncompleteImages),
+}));
+</script>
+
+<template>
+  <Fluxdown :streaming="true" :text="props.text" :plugins="plugins" />
+</template>
+```
+
+```svelte
+<script lang="ts">
+  import { Fluxdown } from '@fluxdown/svelte';
+
+  import { imageRepairs } from './image-repairs';
+
+  type MessageProps = {
+    text: string;
+    hideIncompleteImages: boolean;
+  };
+
+  let { text, hideIncompleteImages }: MessageProps = $props();
+  let plugins = $derived({ repairs: imageRepairs(hideIncompleteImages) });
+</script>
+
+<Fluxdown streaming {text} {plugins} />
+```
+
+```ts
+import { Component, computed, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+import { imageRepairs } from './image-repairs';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown
+    [streaming]="true"
+    [text]="text()"
+    [plugins]="plugins()"
+  />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+  readonly hideIncompleteImages = input(false);
+
+  readonly plugins = computed(() => ({
+    repairs: imageRepairs(this.hideIncompleteImages()),
+  }));
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message({ text, hideIncompleteImages }: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={text}
+      plugins={{ repairs: imageRepairs(hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-lynx';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message({ text, hideIncompleteImages }: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={text}
+      plugins={{ repairs: imageRepairs(hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue';
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+const props = defineProps<MessageProps>();
+const plugins = computed(() => ({
+  repairs: imageRepairs(props.hideIncompleteImages),
+}));
+</script>
+
+<template>
+  <Fluxdown :streaming="true" :text="props.text" :plugins="plugins" />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/solid';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message(props: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={props.text}
+      plugins={{ repairs: imageRepairs(props.hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/taro';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message({ text, hideIncompleteImages }: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={text}
+      plugins={{ repairs: imageRepairs(hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue';
+import { Fluxdown } from '@fluxdown/uni-app';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+const props = defineProps<MessageProps>();
+const plugins = computed(() => ({
+  repairs: imageRepairs(props.hideIncompleteImages),
+}));
+</script>
+
+<template>
+  <Fluxdown :streaming="true" :text="props.text" :plugins="plugins" />
+</template>
+```
+
+</FrameworkCodeTabs>
+
+The example enables `streaming` to demonstrate both unfinished-image strategies. Set it to `false` when receiving content ends.
+
+### Shared options
+
+These options belong in the tuple's configuration object and are supported by every plugin type. Plugin-specific options, such as `strategy`, go in the same object.
+
+| Option     | Type                       | Default behavior                                  | Purpose                                                            |
+| ---------- | -------------------------- | ------------------------------------------------- | ------------------------------------------------------------------ |
+| `disabled` | `boolean`                  | `false`                                           | Excludes the plugin from the current list without constructing it. |
+| `priority` | `PluginPriority \| number` | Uses the plugin's priority, or `0` if unspecified | Lower values run first; equal values keep declaration order.       |
+
+Import `PluginPriority` from `@fluxdown/types`. Its values are `Highest (-2)`, `High (-1)`, `Default (0)`, `Low (1)`, and `Lowest (2)`.
+
+## Reactive updates
+
+Pass a new list or configuration object so the framework or state stream can observe the change. Avoid mutating fields on the original object. Updated declarations go through these steps:
+
+| Stage                | Processing                                                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| ① Merge declarations | Combine presets and external configuration, matching configuration by `key`.                                              |
+| ② Check eligibility  | Exclude `disabled: true`, then evaluate `enabled(context)`.                                                               |
+| ③ Prepare options    | Call `prepareConfig(context, outerConfig)`, then exclude any result with `disabled: true`.                                |
+| ④ Update instances   | Reuse or create instances from the plugin class and resolved options, execute by priority, and release retired instances. |
+
+Context changes also reevaluate both static methods. Context is passed only while resolving declarations; it is neither stored on instances nor used in place of constructor options.
+
+Mapper configuration fields become readable closures, so changing values can update an existing reactive computation. Stative manages its state and cleanup; see [Mapper plugins](../core/plugins/mapper.mdx).
+
+## Plugin members
+
+These members are shared by class plugins. Base classes supply defaults; override only what a plugin needs. For mappers, `key` is optional, and `enabled` and `prepareConfig` are optional hooks on the function object.
+
+### key <span className="field-tag">static</span> {#key}
+
+**Type:** `string`
+
+A stable configuration name used to match preset overrides. Class plugins declare `static readonly key`; use different names for different capabilities. Instance reuse also checks the class and configuration, not only `key`.
+
+### enabled <span className="field-tag">static</span> {#enabled}
+
+**Signature:** `enabled(context): boolean`
+
+**Default:** `true`
+
+Determines eligibility before construction. For example, TeX repair participates only when formula compilation is enabled. This is an excerpt from that class:
+
+```ts
+class TexRepairPlugin extends BaseRepairPlugin {
+  // Other members omitted.
+
+  static override enabled(context: RepairPluginEnabledContext): boolean {
+    const { config } = context;
+
+    return config.tex;
+  }
+}
+```
+
+Returning `false` excludes the declaration. An explicit `disabled: true` takes precedence over this method.
+
+### prepareConfig <span className="field-tag">static</span> {#prepareconfig}
+
+**Signature:** `prepareConfig(context, outerConfig): Config | null`
+
+**Default:** `null`
+
+Converts context into constructor options. `Config` means the plugin's `IPluggableConfig<Options>`, including its own options and the shared ones.
+
+| Return value                  | Result                                                                            |
+| ----------------------------- | --------------------------------------------------------------------------------- |
+| `null`                        | Preserves the original declaration and external configuration.                    |
+| An options object             | Replaces constructor options without an implicit merge; `{}` means empty options. |
+| Options with `disabled: true` | Excludes the declaration without constructing it.                                 |
+
+For example, the syntax policy plugin supplies defaults from compilation settings, then lets explicit plugin options override them. This is an excerpt from that class:
+
+```ts
+class SyntaxPolicyRemarkPlugin extends BaseRemarkPlugin {
+  // Other members omitted.
+
+  static override prepareConfig(
+    context: RemarkPluginConfigContext,
+    outerConfig: IPluggableConfig<SyntaxPolicyRemarkPluginConfig>,
+  ): IPluggableConfig<SyntaxPolicyRemarkPluginConfig> {
+    const { config } = context;
+
+    return {
+      indentedCode: config.indentedCode,
+      setextHeading: config.setextHeading,
+      ...outerConfig,
+    };
+  }
+}
+```
+
+`...outerConfig` also preserves shared options such as `priority`. Both static methods read their inputs and return results without modifying context, external configuration, or global state.
+
+### constructor {#constructor}
+
+Receives constructor options resolved by `prepareConfig`. Keep plugin-specific options in the plugin's own fields. Applications pass declarations without manually creating instances.
+
+### config {#config}
+
+Instance execution metadata, including the default `priority`, read by the processing pipeline. Its role differs from constructor options; plugin-specific options do not all belong here.
+
+### destroy {#destroy}
+
+**Signature:** `destroy(): void`
+
+The owning pipeline calls this when an instance is retired, releasing subscriptions, caches, and other resources. Keep necessary runtime state in lifecycle-managed instances rather than static fields.

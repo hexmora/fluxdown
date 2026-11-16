@@ -1,0 +1,372 @@
+import { FrameworkCodeTabs } from '../../../../components/framework-code-tabs';
+
+# 插件设计 - Fluxdown {#插件设计}
+
+Fluxdown 用插件类组织处理能力，用独立的配置决定如何使用。应用传入声明，Fluxdown 负责创建、复用和释放实例；配置更新时，插件列表随之更新。
+
+## 声明与配置
+
+一个 **pluggable** 是插件类，或 `[插件类, 配置]` 元组：
+
+| 声明                                                     | 含义                                   |
+| -------------------------------------------------------- | -------------------------------------- |
+| `IncompleteImageRepairPlugin`                            | 使用默认策略，为未完成的图片显示占位。 |
+| `[IncompleteImageRepairPlugin, { strategy: 'discard' }]` | 使用同一个插件，暂时隐藏未完成的图片。 |
+
+类负责实现行为，构造函数接收选项；无需为每种配置创建新类，也无需在组件更新时手动 `new` 插件。Mapper 使用响应式函数，保留相同的“函数或 `[函数, 配置]`”声明方式。
+
+### 传入组件
+
+下面把图片修复策略接到 `hideIncompleteImages` 属性。配置函数由各框架组件实际消费，开关变化时返回新的配置：
+
+```ts
+// image-repairs.ts
+import type { IPluggable, IRepairPlugin } from '@fluxdown/types';
+
+import { IncompleteImageRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/incomplete-image';
+
+export const imageRepairs = (
+  hideIncompleteImages: boolean,
+): IPluggable<IRepairPlugin, unknown>[] => {
+  return [
+    [
+      IncompleteImageRepairPlugin,
+      { strategy: hideIncompleteImages ? 'discard' : 'placeholder' },
+    ],
+  ];
+};
+```
+
+选择应用使用的渲染库：
+
+<FrameworkCodeTabs frameworks={['React', 'Vue', 'Svelte', 'Angular', 'React Native', 'React Lynx', 'Vue Lynx', 'Solid', 'Taro', 'uni-app']}>
+
+```tsx
+import { Fluxdown } from 'fluxdown';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message({ text, hideIncompleteImages }: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={text}
+      plugins={{ repairs: imageRepairs(hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue';
+import { Fluxdown } from '@fluxdown/vue';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+const props = defineProps<MessageProps>();
+const plugins = computed(() => ({
+  repairs: imageRepairs(props.hideIncompleteImages),
+}));
+</script>
+
+<template>
+  <Fluxdown :streaming="true" :text="props.text" :plugins="plugins" />
+</template>
+```
+
+```svelte
+<script lang="ts">
+  import { Fluxdown } from '@fluxdown/svelte';
+
+  import { imageRepairs } from './image-repairs';
+
+  type MessageProps = {
+    text: string;
+    hideIncompleteImages: boolean;
+  };
+
+  let { text, hideIncompleteImages }: MessageProps = $props();
+  let plugins = $derived({ repairs: imageRepairs(hideIncompleteImages) });
+</script>
+
+<Fluxdown streaming {text} {plugins} />
+```
+
+```ts
+import { Component, computed, input } from '@angular/core';
+import { Fluxdown } from '@fluxdown/angular';
+
+import { imageRepairs } from './image-repairs';
+
+@Component({
+  selector: 'app-message',
+  imports: [Fluxdown],
+  template: `<fluxdown
+    [streaming]="true"
+    [text]="text()"
+    [plugins]="plugins()"
+  />`,
+})
+export class Message {
+  readonly text = input.required<string>();
+  readonly hideIncompleteImages = input(false);
+
+  readonly plugins = computed(() => ({
+    repairs: imageRepairs(this.hideIncompleteImages()),
+  }));
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-native';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message({ text, hideIncompleteImages }: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={text}
+      plugins={{ repairs: imageRepairs(hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/react-lynx';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message({ text, hideIncompleteImages }: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={text}
+      plugins={{ repairs: imageRepairs(hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue';
+import { Fluxdown } from '@fluxdown/vue-lynx';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+const props = defineProps<MessageProps>();
+const plugins = computed(() => ({
+  repairs: imageRepairs(props.hideIncompleteImages),
+}));
+</script>
+
+<template>
+  <Fluxdown :streaming="true" :text="props.text" :plugins="plugins" />
+</template>
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/solid';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message(props: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={props.text}
+      plugins={{ repairs: imageRepairs(props.hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```tsx
+import { Fluxdown } from '@fluxdown/taro';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+export function Message({ text, hideIncompleteImages }: MessageProps) {
+  return (
+    <Fluxdown
+      streaming
+      text={text}
+      plugins={{ repairs: imageRepairs(hideIncompleteImages) }}
+    />
+  );
+}
+```
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue';
+import { Fluxdown } from '@fluxdown/uni-app';
+
+import { imageRepairs } from './image-repairs';
+
+type MessageProps = {
+  text: string;
+  hideIncompleteImages: boolean;
+};
+
+const props = defineProps<MessageProps>();
+const plugins = computed(() => ({
+  repairs: imageRepairs(props.hideIncompleteImages),
+}));
+</script>
+
+<template>
+  <Fluxdown :streaming="true" :text="props.text" :plugins="plugins" />
+</template>
+```
+
+</FrameworkCodeTabs>
+
+示例显式开启 `streaming`，便于观察未完成图片的两种策略。实际接收结束后，将它设为 `false`。
+
+### 通用选项
+
+以下选项放在元组的配置对象中，各类插件均支持。插件自己的选项（如 `strategy`）也放在同一对象中。
+
+| 选项       | 类型                       | 默认行为                       | 作用                                     |
+| ---------- | -------------------------- | ------------------------------ | ---------------------------------------- |
+| `disabled` | `boolean`                  | `false`                        | 为 `true` 时从当前列表排除，不创建实例。 |
+| `priority` | `PluginPriority \| number` | 沿用插件优先级，未声明时为 `0` | 数值越小越先执行，相同时保持声明顺序。   |
+
+`PluginPriority` 从 `@fluxdown/types` 导入，提供 `Highest (-2)`、`High (-1)`、`Default (0)`、`Low (1)`、`Lowest (2)`。
+
+## 响应式更新
+
+传入新的列表或配置对象，让框架或状态流观察到变化；不要只修改原对象上的字段。更新后的声明按以下步骤处理：
+
+| 阶段           | 处理                                                                                |
+| -------------- | ----------------------------------------------------------------------------------- |
+| ① 合并声明     | 合并预设与外部配置，按 `key` 匹配配置。                                             |
+| ② 计算启用条件 | 排除 `disabled: true`，再执行 `enabled(context)`。                                  |
+| ③ 准备配置     | 执行 `prepareConfig(context, outerConfig)`，再次排除返回配置中的 `disabled: true`。 |
+| ④ 更新实例     | 根据插件类与最终配置复用或创建实例，按优先级执行，释放不再需要的实例。              |
+
+上下文变化时也会重新计算两个 static 方法。上下文只在解析声明时传入，不存入实例，也不代替构造配置。
+
+Mapper 的配置字段会转为可读闭包，值变化可以更新已有的响应式计算；其状态与清理由 Stative 管理，详见 [Mapper 插件](../core/plugins/mapper.mdx)。
+
+## 插件成员
+
+以下列出类插件共享的成员。基类提供默认行为，只需覆盖与当前插件有关的成员。Mapper 的 `key` 可选，`enabled` 和 `prepareConfig` 是函数对象上的同名可选钩子。
+
+### key <span className="field-tag">static</span> {#key}
+
+**类型：** `string`
+
+插件的稳定配置名称，用于匹配预设覆盖。类插件应声明 `static readonly key`；不同能力使用不同名称。实例能否复用还会检查插件类和配置，不只看 `key`。
+
+### enabled <span className="field-tag">static</span> {#enabled}
+
+**签名：** `enabled(context): boolean`
+
+**默认值：** `true`
+
+构造前决定当前插件是否参与。例如，TeX repair 只在编译配置开启公式时启用。下面是该类中方法的节选：
+
+```ts
+class TexRepairPlugin extends BaseRepairPlugin {
+  // 其他成员省略。
+
+  static override enabled(context: RepairPluginEnabledContext): boolean {
+    const { config } = context;
+
+    return config.tex;
+  }
+}
+```
+
+返回 `false` 会排除声明；显式配置的 `disabled: true` 优先于此方法。
+
+### prepareConfig <span className="field-tag">static</span> {#prepareconfig}
+
+**签名：** `prepareConfig(context, outerConfig): Config | null`
+
+**默认值：** `null`
+
+将上下文转换成构造选项。`Config` 是当前插件的 `IPluggableConfig<Options>`，包含它自己的选项及通用选项。
+
+| 返回值                     | 结果                                             |
+| -------------------------- | ------------------------------------------------ |
+| `null`                     | 沿用原始声明和外部配置。                         |
+| 配置对象                   | 替换构造选项，不隐式合并；返回 `{}` 表示空配置。 |
+| 含 `disabled: true` 的配置 | 排除声明，不创建实例。                           |
+
+例如，语法策略插件用编译配置补充默认值，再让显式插件选项覆盖它们。下面是该类中方法的节选：
+
+```ts
+class SyntaxPolicyRemarkPlugin extends BaseRemarkPlugin {
+  // 其他成员省略。
+
+  static override prepareConfig(
+    context: RemarkPluginConfigContext,
+    outerConfig: IPluggableConfig<SyntaxPolicyRemarkPluginConfig>,
+  ): IPluggableConfig<SyntaxPolicyRemarkPluginConfig> {
+    const { config } = context;
+
+    return {
+      indentedCode: config.indentedCode,
+      setextHeading: config.setextHeading,
+      ...outerConfig,
+    };
+  }
+}
+```
+
+`...outerConfig` 同时保留 `priority` 等通用选项。两个 static 方法只读取输入、返回结果，不修改上下文、外部配置或全局状态。
+
+### constructor {#constructor}
+
+接收 `prepareConfig` 处理后的构造选项。插件专有选项保存在自己的字段中，应用传入声明即可，无需手动创建实例。
+
+### config {#config}
+
+实例上的执行信息，包括默认 `priority` 等字段，由处理流程读取。它与传给构造函数的选项职责不同；插件专有选项不必全部放进这里。
+
+### destroy {#destroy}
+
+**签名：** `destroy(): void`
+
+实例不再使用时，由对应的处理流程调用，用于释放订阅、缓存等资源。需要运行状态时，保存在受生命周期管理的实例中，不放在 static 字段里。
