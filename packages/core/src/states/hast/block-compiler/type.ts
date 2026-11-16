@@ -1,9 +1,10 @@
 import type {
+  CompilerConfig,
   IBlockRawMeta,
   IBlockState,
-  IRawPatchItem,
   IRehypePlugin,
   IRemarkPlugin,
+  RemarkCompilerConfig,
 } from '@fluxdown/types';
 import type { IReadableClosure } from 'stative';
 
@@ -12,30 +13,11 @@ import type { IBlockSection } from '../../base';
 
 export interface IBlockCompiler extends IReadableClosure<IBlockState<HastRoot>[]> {}
 
-export type IBlockCompilerConfig = {
-  repair: boolean;
+export type IBlockCompilerConfig = CompilerConfig;
 
-  repairEnding: boolean;
+export type BlockCompilerConfig = CompilerConfig;
 
-  footnote: boolean;
-
-  /** Stable namespace for generated footnote IDs. React supplies a hydration-safe instance ID. */
-  idPrefix?: string;
-
-  tex: boolean;
-
-  /** Recognize indented code blocks. */
-  indentedCode: boolean;
-
-  /** Recognize headings underlined with equals signs or dashes. */
-  setextHeading: boolean;
-};
-
-export type BlockCompilerConfig = IBlockCompilerConfig;
-
-export type BlockRemarksConfig = BlockCompilerConfig & {
-  patches: IRawPatchItem[];
-};
+export type BlockRemarksConfig = RemarkCompilerConfig;
 
 export type BlockCompilerInputs = {
   sections: IReadableClosure<IBlockSection[]>;

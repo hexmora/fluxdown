@@ -1,9 +1,13 @@
 import { isArray, isObject } from 'lodash-es';
 
+interface PrivateConfigComparison {
+  private: boolean;
+}
+
 const isLocalConfigEqual = (
   left: unknown,
   right: unknown,
-  comparison: { private: boolean },
+  comparison: PrivateConfigComparison,
   ancestors: object[] = [],
 ): boolean => {
   if (!isObject(left) || !isObject(right)) {
@@ -62,7 +66,9 @@ const isLocalConfigEqual = (
   }
 };
 
-/** Retains identity-based local inputs; structural configurations use the store's snapshots. */
+/**
+ * Retains identity-based local inputs; structural configurations use the store's snapshots.
+ */
 export const isPrivatePluggableEqual = <T>(
   left: T | [T, unknown],
   right: T | [T, unknown],

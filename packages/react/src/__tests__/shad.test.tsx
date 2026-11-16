@@ -2,7 +2,7 @@ import { act, cleanup, render } from '@testing-library/react';
 import { createRef } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import type { FluxdownRef } from '../packs/full';
+import type { FluxdownRef, StreamingConfig } from '../packs/full';
 
 import styles from '../../../react-plugins/src/plugins/effect-shad/slot/effect-shad/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
@@ -156,6 +156,54 @@ describe('Fluxdown shad streaming', () => {
     expect(view.container.textContent).toBe('firstseco');
 
     expect(readFades(view.container).map(({ text }) => text)).toEqual(['se', 'co']);
+  });
+
+  test.each([
+    { prefix: '> ', selector: 'blockquote > p' },
+    { prefix: '> > ', selector: 'blockquote > blockquote > p' },
+    { prefix: '> - ', selector: 'blockquote > ul > li' },
+    { prefix: '> ## ', selector: 'blockquote > h2' },
+  ])('fades new text inside $selector without hiding its content', ({ prefix, selector }) => {
+    jest.useFakeTimers();
+
+    const streaming: StreamingConfig = { effect: ['shad', { length: 20 }], smooth: false };
+
+    const view = render(<Fluxdown streaming={streaming} text={`${prefix}Start `} />);
+
+    view.rerender(
+      <Fluxdown streaming={streaming} text={`${prefix}Start *soft* **strong** tail`} />,
+    );
+
+    const container = view.container.querySelector(selector)!;
+
+    expect(container).toHaveTextContent('Start soft strong tail');
+
+    expect(container.querySelector(`em ${FADE}`)).toHaveTextContent('soft');
+
+    expect(container.querySelector(`strong ${FADE}`)).toHaveTextContent('strong');
+
+    expect(container.querySelector('[aria-hidden]')).toBeNull();
+  });
+
+  test.each([
+    { initial: '> `code', appended: '> `code grows`', selector: 'blockquote code' },
+    {
+      initial: '> ```text\n> code',
+      appended: '> ```text\n> code grows\n> ```',
+      selector: 'blockquote pre code',
+    },
+  ])('keeps $selector unshaded as its text grows', ({ initial, appended, selector }) => {
+    jest.useFakeTimers();
+
+    const streaming = { effect: 'shad' as const, smooth: false };
+
+    const view = render(<Fluxdown streaming={streaming} text={initial} />);
+
+    view.rerender(<Fluxdown streaming={streaming} text={appended} />);
+
+    expect(view.container.querySelector(selector)).toHaveTextContent('code grows');
+
+    expect(view.container.querySelector(`${selector} ${FADE}`)).toBeNull();
   });
 
   test('renders full server content without fades', () => {

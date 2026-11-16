@@ -1,6 +1,8 @@
+import type { SlotPluginContext } from '@fluxdown/types';
+
 import { isPluggablesEqual, PluginBuilder } from '@fluxdown/core';
 import { useDeferredUnmount, useStateOf, useStateValue, useStatic } from '@fluxdown/react-hooks';
-import { set } from 'lodash-es';
+import { identity, set } from 'lodash-es';
 import { useMemo } from 'react';
 import { render, S } from 'stative';
 
@@ -15,6 +17,7 @@ export const useSlots = (pluggables: readonly AnySlotPluggable[]): Partial<Slots
         PluginBuilder<AnySlotPlugin>,
         {
           plugins,
+          context: S([identity<SlotPluginContext>, { plugins }]),
         },
       ]),
     ),

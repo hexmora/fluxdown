@@ -10,6 +10,7 @@ import { D, type IReadableClosure, once, useDefaults, useSwitchMap } from 'stati
 import type { SmoothInputs, SmoothPluginConfig } from './type';
 
 import { withKey } from '../../../utils';
+import { MapperPluginKeys } from '../keys';
 import { IntervalSmoothDriver, RafSmoothDriver, SpringSmoothInterpolator } from './modules';
 import { CutoffBlocks, SmoothCursor } from './states';
 
@@ -23,7 +24,7 @@ declare global {
 }
 
 export const Smooth = /*#__PURE__*/ withKey(
-  'smooth',
+  MapperPluginKeys.Smooth,
   /*#__PURE__*/ once<<T>(inputs: SmoothInputs<T>) => IReadableClosure<IBlockState<T>[]>>(
     function Smooth<T>({
       source,

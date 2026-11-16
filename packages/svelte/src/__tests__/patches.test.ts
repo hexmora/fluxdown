@@ -2,21 +2,24 @@ import type { IPatchItem } from '@fluxdown/core';
 import type { SvelteNode } from '@fluxdown/svelte-plugins/base';
 import type { IPluginItem } from '@fluxdown/svelte-plugins/typings';
 
+import { BaseRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/base';
 import { createElement } from '@fluxdown/svelte-plugins/base';
 import { cleanup, render, screen } from '@testing-library/svelte';
 import { afterEach, expect, test } from 'vitest';
 
 import { Fluxdown } from '../packs/full';
 
-const createPatches = (label: string): IPatchItem<SvelteNode>[] => [
-  {
-    key: 'stable-range',
-    range: [6, 11],
-    render: (text?: string) => {
-      return createElement('mark', { 'data-testid': 'replacement' }, `${label}:${text}`);
+const createPatches = (label: string): IPatchItem<SvelteNode>[] => {
+  return [
+    {
+      key: 'stable-range',
+      range: [6, 11],
+      render: (text?: string) => {
+        return createElement('mark', { 'data-testid': 'replacement' }, `${label}:${text}`);
+      },
     },
-  },
-];
+  ];
+};
 
 afterEach(cleanup);
 
@@ -51,16 +54,12 @@ test('renders point and replacement patches in source order and passes replaced 
 test('updates patch renderers without recompiling unchanged Markdown', async () => {
   let compileCount = 0;
 
-  class CompileCounterRemarkPlugin {
+  class CompileCounterRemarkPlugin extends BaseRemarkPlugin {
     static readonly key = 'test-patch-compile-counter';
 
-    readonly config = {};
-
-    readonly plugin = () => () => {
+    override readonly plugin = () => () => {
       compileCount += 1;
     };
-
-    destroy() {}
   }
 
   const plugins: IPluginItem[] = [{ remarks: [CompileCounterRemarkPlugin] }];

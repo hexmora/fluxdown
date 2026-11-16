@@ -1,11 +1,10 @@
 import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/types';
-import type { Parent } from 'mdast';
 
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
-import { last } from 'lodash-es';
 
-import { isRepairNodeType } from '../../../utils';
+import { isRepairNodeType, isRepairTreeTail } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
+import { RepairPluginKeys } from '../keys';
 
 declare global {
   interface RepairConfigs {
@@ -14,16 +13,16 @@ declare global {
 }
 
 export class TrailingEmptyCodeBlockRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-trailing-empty-code-block';
+  static readonly key = RepairPluginKeys.TrailingEmptyCodeBlock;
 
-  readonly config: RepairPluginSystemConfig = {
+  override readonly config: RepairPluginSystemConfig = {
     scope: 'tail',
     ending: true,
     priority: PluginPriority.Default,
   };
 
-  runner: RepairPluginRunner = ({ node, parent, parents, insertNext }) => {
-    if (!isRepairNodeType(node, 'code') || !parent || !this.isStructuralTail(node, parents)) {
+  override runner: RepairPluginRunner = ({ node, parent, parents, insertNext }) => {
+    if (!isRepairNodeType(node, 'code') || !parent || !isRepairTreeTail(node, parents)) {
       return;
     }
 
@@ -33,18 +32,4 @@ export class TrailingEmptyCodeBlockRepairPlugin extends BaseRepairPlugin {
 
     insertNext([], true);
   };
-
-  private isStructuralTail(node: unknown, parents: Parent[]): boolean {
-    let child = node;
-
-    for (const parent of parents) {
-      if (last(parent.children) !== child) {
-        return false;
-      }
-
-      child = parent;
-    }
-
-    return true;
-  }
 }

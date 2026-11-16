@@ -18,6 +18,11 @@
   },
   {
     "type": "file",
+    "name": "plugin-design",
+    "label": "Plugin design"
+  },
+  {
+    "type": "file",
     "name": "features/renderers",
     "label": "Side-by-side demo"
   }

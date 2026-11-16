@@ -8,6 +8,7 @@ import type {
   Slots,
 } from '@fluxdown/angular-plugins/typings';
 import type { MapperPluggable } from '@fluxdown/core';
+import type { SlotPluginContext } from '@fluxdown/types';
 import type { PluggableConfigs, PluginSet } from '@fluxdown/types';
 import type { Subscription } from 'rxjs';
 import type { IReadableClosure } from 'stative';
@@ -27,7 +28,7 @@ import { AngularDomRenderer, RenderContext, toPluginList } from '@fluxdown/angul
 import { Core, isPluggablesEqual, isPluginSetEqual, PluginBuilder } from '@fluxdown/core';
 import { PRESET_MAPPER_PLUGINS } from '@fluxdown/core-plugins/presets/mapper';
 import { assert } from '@fluxdown/utils';
-import { castArray, isString, set, uniqueId } from 'lodash-es';
+import { castArray, identity, isString, set, uniqueId } from 'lodash-es';
 import { shallowEqual } from 'shallow-equal';
 import { batch, D, MutableState, render, S } from 'stative';
 
@@ -200,7 +201,12 @@ export class FluxdownRaw implements AfterViewInit, OnChanges, OnDestroy, Fluxdow
   ngAfterViewInit() {
     this.range = this.renderer.createRange(this.element.nativeElement);
 
-    this.slotBuilder = render(S([PluginBuilder<AnySlotPlugin>, { plugins: this.slots }]));
+    this.slotBuilder = render(
+      S([
+        PluginBuilder<AnySlotPlugin>,
+        { plugins: this.slots, context: S([identity<SlotPluginContext>, { plugins: this.slots }]) },
+      ]),
+    );
 
     const updateSlots = () => {
       const slots: Partial<Slots> = {};

@@ -1,4 +1,4 @@
-import type { Paragraph, Parent, PhrasingContent } from 'mdast';
+import type { Paragraph, PhrasingContent } from 'mdast';
 
 import { first, last, nth } from 'lodash-es';
 
@@ -54,6 +54,7 @@ const parseHtmlTag = (value: string): ParsedHtmlTag | undefined => {
   }
 
   let index = 1;
+
   const closing = nth(source, index) === '/';
 
   if (closing) {
@@ -73,6 +74,7 @@ const parseHtmlTag = (value: string): ParsedHtmlTag | undefined => {
   }
 
   const name = source.slice(nameStart, index);
+
   const delimiter = nth(source, index);
 
   if (delimiter !== '>' && delimiter !== '/' && !/\s/.test(delimiter ?? '')) {
@@ -116,29 +118,20 @@ const parseHtmlTag = (value: string): ParsedHtmlTag | undefined => {
   };
 };
 
-export const isRightmostNode = (node: Paragraph, parents: Parent[]) => {
-  let child: object = node;
-
-  for (const parent of parents) {
-    if (last(parent.children) !== child) {
-      return false;
-    }
-
-    child = parent;
-  }
-
-  return true;
+const closingNode = (tag: OpenHtmlTag): PhrasingContent => {
+  return {
+    type: 'html',
+    value: `</${tag.name}>`,
+  };
 };
 
-const closingNode = (tag: OpenHtmlTag): PhrasingContent => ({
-  type: 'html',
-  value: `</${tag.name}>`,
-});
-
-export const closeParagraphTags = (paragraph: Paragraph): void => {
+export const getClosedParagraphChildren = (paragraph: Paragraph): PhrasingContent[] | undefined => {
   const stack: OpenHtmlTag[] = [];
+
   const positions = new Map<string, number[]>();
+
   const children: PhrasingContent[] = [];
+
   let changed = false;
 
   const pushOpeningTag = (tag: ParsedHtmlTag) => {
@@ -190,6 +183,7 @@ export const closeParagraphTags = (paragraph: Paragraph): void => {
 
             if (openTag) {
               children.push(closingNode(openTag));
+
               changed = true;
             }
           }
@@ -201,11 +195,13 @@ export const closeParagraphTags = (paragraph: Paragraph): void => {
 
             if (openTag) {
               children.push(closingNode(openTag));
+
               changed = true;
             }
           }
 
           stack.length = 0;
+
           positions.clear();
         }
       }
@@ -219,11 +215,10 @@ export const closeParagraphTags = (paragraph: Paragraph): void => {
 
     if (openTag) {
       children.push(closingNode(openTag));
+
       changed = true;
     }
   }
 
-  if (changed) {
-    paragraph.children = children;
-  }
+  return changed ? children : undefined;
 };

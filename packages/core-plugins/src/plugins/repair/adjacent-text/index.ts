@@ -1,10 +1,11 @@
 import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/types';
-import type { RootContent, Text } from 'mdast';
 
 import { isMdastParent } from '@fluxdown/mdast';
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
 
 import { BaseRepairPlugin } from '../base';
+import { RepairPluginKeys } from '../keys';
+import { getAdjacentTextChildren } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -13,51 +14,22 @@ declare global {
 }
 
 export class AdjacentTextRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-adjacent-text';
+  static readonly key = RepairPluginKeys.AdjacentText;
 
-  readonly config: RepairPluginSystemConfig = {
+  override readonly config: RepairPluginSystemConfig = {
     ending: false,
     priority: PluginPriority.Lowest,
   };
 
-  runner: RepairPluginRunner = ({ node }) => {
+  override runner: RepairPluginRunner = ({ node }) => {
     if (!isMdastParent(node)) {
       return;
     }
 
-    const children: RootContent[] = [];
-    let currentText: Text | undefined;
-    let changed = false;
+    const children = getAdjacentTextChildren(node.children);
 
-    for (const child of node.children) {
-      if (child.type !== 'text') {
-        children.push(child);
-        currentText = undefined;
-        continue;
-      }
-
-      if (child.value.length === 0) {
-        changed = true;
-        continue;
-      }
-
-      if (!currentText) {
-        children.push(child);
-        currentText = child;
-        continue;
-      }
-
-      currentText.value += child.value;
-
-      if (currentText.position && child.position) {
-        currentText.position.end = child.position.end;
-      }
-
-      changed = true;
-    }
-
-    if (changed) {
-      node.children.splice(0, node.children.length, ...children);
+    if (children) {
+      node.children = children;
     }
   };
 }

@@ -10,6 +10,7 @@ import {
   buildPluggables,
   isPluggableEnabled,
   isPluggableEqual,
+  preparePluggables,
   sortPluginInstances,
 } from './exports';
 import { isPrivatePluggableEqual } from './utils';
@@ -20,6 +21,7 @@ export * from './type';
 export function PluginBuilder<T extends IPluginWithConfig & IDestructible>({
   plugins,
   sort = true,
+  context,
   cacheStore,
 }: PluginBuilderInputs<T>): T[] {
   const state = useCurrent(() => {
@@ -72,7 +74,10 @@ export function PluginBuilder<T extends IPluginWithConfig & IDestructible>({
   try {
     state.instances = cacheDiffMap({
       prev: state.pluggables.map((pluggable, index) => [pluggable, state.instances[index]]),
-      current: plugins.filter(isPluggableEnabled),
+      current:
+        context === undefined
+          ? plugins.filter(isPluggableEnabled)
+          : preparePluggables(plugins, context),
       mapper: (pluggable) => {
         const instance = cacheStore ? cacheStore.build(pluggable) : buildPluggables(pluggable);
 

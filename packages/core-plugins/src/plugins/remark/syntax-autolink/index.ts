@@ -10,6 +10,7 @@ import { gfmAutolinkLiteral } from 'micromark-extension-gfm-autolink-literal';
 
 import { appendRemarkExtensions } from '../../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 
 declare global {
   interface RemarkConfigs {
@@ -18,7 +19,7 @@ declare global {
 }
 
 export class SyntaxAutolinkRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-syntax-autolink';
+  static readonly key = RemarkPluginKeys.SyntaxAutolink;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Highest,

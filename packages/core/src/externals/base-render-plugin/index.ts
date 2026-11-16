@@ -1,4 +1,4 @@
-import type { IBasePluginConfig } from '@fluxdown/types';
+import type { IBasePluginConfig, IPluggableConfig, RenderPluginContext } from '@fluxdown/types';
 
 import { Destructible } from 'stative';
 
@@ -11,6 +11,17 @@ export abstract class BaseRenderPlugin<E, P, R, C = {}>
   implements IRenderPlugin<E, P, R, C>
 {
   config: IBasePluginConfig = {};
+
+  static enabled(_context: RenderPluginContext): boolean {
+    return true;
+  }
+
+  static prepareConfig(
+    _context: RenderPluginContext,
+    _outerConfig: IPluggableConfig<unknown>,
+  ): IPluggableConfig<unknown> | null {
+    return null;
+  }
 
   abstract match(params: IRenderPluginMatchParams<E, P>): boolean;
 

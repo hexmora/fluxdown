@@ -51,8 +51,6 @@ export class TexKatexRenderer {
 
       const fallback = tex.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
-      this.content.set(fallback);
-
       void this.render(tex, mode)
         .then((html) => {
           if (!active) {
@@ -66,6 +64,8 @@ export class TexKatexRenderer {
         .catch(() => {
           if (active) {
             this.failed.set(true);
+
+            this.content.set(fallback);
           }
         });
     });

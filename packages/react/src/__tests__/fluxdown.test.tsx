@@ -1,6 +1,7 @@
 import type { AnySlotPluggable, IReactRenderPluggable } from '@fluxdown/react-plugins/base';
-import type { IPluggable, IPluggableConfig, IRemarkPlugin } from '@fluxdown/types';
+import type { IPluggableConfig } from '@fluxdown/types';
 
+import { BaseRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/base';
 import { SyntaxSoftEndlineRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-soft-endline';
 import { ParagraphRenderPlugin } from '@fluxdown/react-base-plugins/plugins/paragraph';
 import { ParagraphSlotPlugin } from '@fluxdown/react-plugins/plugins/paragraph';
@@ -13,11 +14,13 @@ import type { FluxdownRef, IPluginItem } from '../packs/full';
 
 import { Fluxdown } from '../packs/full';
 
-type RemarkPluggable = IPluggable<IRemarkPlugin, unknown>;
+interface ConfiguredRemarkPluginConfig {
+  suffix?: string;
+}
 
 declare global {
   interface RemarkConfigs {
-    'test-configured-remark': IPluggableConfig<{ suffix?: string }>;
+    'test-configured-remark': IPluggableConfig<ConfiguredRemarkPluginConfig>;
   }
 }
 
@@ -45,21 +48,21 @@ const createParagraphSlotPlugin = (
   return TestParagraphSlotPlugin as unknown as AnySlotPluggable;
 };
 
-const NestedSlotA = ({ children }: ParagraphSlotProps) => (
-  <span data-testid="fluxdown-slot-a">A[{children}]</span>
-);
+const NestedSlotA = ({ children }: ParagraphSlotProps) => {
+  return <span data-testid="fluxdown-slot-a">A[{children}]</span>;
+};
 
-const NestedSlotB = ({ Raw, children }: ParagraphSlotProps) => (
-  <span data-testid="fluxdown-slot-b">B[{Raw ? <Raw>{children}</Raw> : children}]</span>
-);
+const NestedSlotB = ({ Raw, children }: ParagraphSlotProps) => {
+  return <span data-testid="fluxdown-slot-b">B[{Raw ? <Raw>{children}</Raw> : children}]</span>;
+};
 
-const IsolatedSlotA = ({ children }: ParagraphSlotProps) => (
-  <span data-testid="isolated-fluxdown-a">A[{children}]</span>
-);
+const IsolatedSlotA = ({ children }: ParagraphSlotProps) => {
+  return <span data-testid="isolated-fluxdown-a">A[{children}]</span>;
+};
 
-const IsolatedSlotB = ({ children }: ParagraphSlotProps) => (
-  <span data-testid="isolated-fluxdown-b">B[{children}]</span>
-);
+const IsolatedSlotB = ({ children }: ParagraphSlotProps) => {
+  return <span data-testid="isolated-fluxdown-b">B[{children}]</span>;
+};
 
 describe('Fluxdown', () => {
   test('disables individual parser and render presets without reintroducing defaults', () => {
@@ -151,6 +154,10 @@ describe('Fluxdown', () => {
     expect(container.querySelector('table')).toHaveTextContent('AB12');
     expect(container.querySelectorAll('th')).toHaveLength(2);
     expect(container.querySelectorAll('td')).toHaveLength(2);
+
+    for (const element of container.querySelectorAll('table, thead, tbody, tr')) {
+      expect([...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE)).toBe(false);
+    }
   });
 
   test('keeps one div root while forwarding reactive className and style', () => {
@@ -172,7 +179,7 @@ describe('Fluxdown', () => {
     expect(root).toHaveStyle({ color: 'rgb(0, 0, 255)' });
   });
 
-  test('renders images, hard breaks, and readable Tex while engines load', () => {
+  test('renders images and hard breaks while waiting for a formula engine', async () => {
     const text = [
       '![diagram](http://example.com/diagram.png "Diagram")',
       '',
@@ -188,7 +195,11 @@ describe('Fluxdown', () => {
     expect(image).toHaveAttribute('src', 'http://example.com/diagram.png');
     expect(image).toHaveAttribute('title', 'Diagram');
     expect(container.querySelector('br')).toBeInTheDocument();
-    expect(container).toHaveTextContent('x + y');
+    expect(container).not.toHaveTextContent('x + y');
+
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull());
+
+    expect(container.querySelector('[data-tex]')).toHaveAttribute('data-tex', 'x + y');
   });
 
   test('uses slot plugins supplied through aggregated plugin packs', () => {
@@ -281,32 +292,31 @@ describe('Fluxdown', () => {
     const pluginKey = 'test-configured-remark';
     let receivedConfig: unknown;
 
-    class ConfiguredRemarkPlugin {
+    class ConfiguredRemarkPlugin extends BaseRemarkPlugin {
       static readonly key = pluginKey;
-
-      readonly config = {};
 
       private readonly suffix: string;
 
-      constructor(config: { suffix?: string } = {}) {
+      constructor(config: ConfiguredRemarkPluginConfig = {}) {
+        super();
+
         receivedConfig = config;
+
         this.suffix = config.suffix ?? '';
       }
 
-      readonly plugin = () => (tree: { children: unknown[] }) => {
+      override readonly plugin = () => (tree: { children: unknown[] }) => {
         tree.children.push({
           type: 'paragraph',
           children: [{ type: 'text', value: this.suffix }],
         });
       };
-
-      destroy() {}
     }
 
     const renderConfigured = (suffix: string) => {
       const plugin: IPluginItem = {
         config: { [pluginKey]: { suffix } },
-        remarks: [ConfiguredRemarkPlugin as unknown as RemarkPluggable],
+        remarks: [ConfiguredRemarkPlugin],
       };
 
       return <Fluxdown text="base" plugins={single ? plugin : [plugin]} />;

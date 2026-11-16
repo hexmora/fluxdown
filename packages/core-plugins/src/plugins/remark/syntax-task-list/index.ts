@@ -10,6 +10,7 @@ import { gfmTaskListItem } from 'micromark-extension-gfm-task-list-item';
 
 import { appendRemarkExtensions } from '../../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 
 declare global {
   interface RemarkConfigs {
@@ -18,7 +19,7 @@ declare global {
 }
 
 export class SyntaxTaskListRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-syntax-task-list';
+  static readonly key = RemarkPluginKeys.SyntaxTaskList;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Highest,

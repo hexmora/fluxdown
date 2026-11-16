@@ -28,6 +28,7 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
+    "./plugins/repair/utils": null,
     "./plugins/mapper/*": "./src/plugins/mapper/*/index.tsx",
     "./plugins/rehype/*": "./src/plugins/rehype/*/index.ts",
     "./plugins/remark/*": "./src/plugins/remark/*/index.ts",
@@ -37,6 +38,7 @@
   },
   "publishConfig": {
     "exports": {
+      "./plugins/repair/utils": null,
       "./plugins/*": {
         "import": {
           "types": "./dist/esm/plugins/*/index.d.ts",
@@ -83,7 +85,9 @@
     "@types/hast": "catalog:",
     "@types/mdast": "catalog:",
     "@types/unist": "catalog:",
+    "character-entities": "catalog:",
     "hast-util-sanitize": "catalog:",
+    "katex": "catalog:",
     "lodash-es": "catalog:",
     "mdast-util-from-markdown": "catalog:",
     "mdast-util-gfm-autolink-literal": "catalog:",
@@ -102,6 +106,7 @@
     "micromark-extension-gfm-task-list-item": "catalog:",
     "micromark-extension-math": "catalog:",
     "micromark-util-character": "catalog:",
+    "micromark-util-decode-string": "catalog:",
     "micromark-util-types": "catalog:",
     "rehype-raw": "catalog:",
     "rehype-sanitize": "catalog:",

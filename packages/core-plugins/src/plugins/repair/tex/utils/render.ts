@@ -1,8 +1,10 @@
 import { renderToString } from 'katex';
 
-export const katexTexToHtml = (tex: string, mode: 'display' | 'inline') => {
+import type { TexRender } from '../type';
+
+export const renderTex: TexRender = (source, mode) => {
   try {
-    return renderToString(tex, {
+    return renderToString(source, {
       displayMode: mode === 'display',
       maxExpand: 1000,
       maxSize: 20,

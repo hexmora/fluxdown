@@ -1,4 +1,4 @@
-import type { IRemarkPlugin, IRepairPlugin } from '@fluxdown/types';
+import type { IRemarkPlugin } from '@fluxdown/types';
 
 import { shallowEqual } from 'shallow-equal';
 import { memoReturns } from 'stative';
@@ -16,9 +16,7 @@ export const RemarkPlugins = /*#__PURE__*/ memoReturns(function RemarkPlugins({
   repairs,
   cacheStore,
 }: RemarkPluginsInputs): IRemarkPlugin[] {
-  const repairPlugins = PluginBuilder<IRepairPlugin>({ plugins: repairs, cacheStore });
-
-  const plugins = RemarkPluggables({ config, extras, repairs: repairPlugins });
+  const plugins = RemarkPluggables({ config, extras, repairs, cacheStore });
 
   return PluginBuilder<IRemarkPlugin>({ plugins, cacheStore });
 }, shallowEqual);

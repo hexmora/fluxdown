@@ -1,24 +1,27 @@
 import type { IPatchItem } from '@fluxdown/core';
 import type { JSX } from 'solid-js';
 
+import { BaseRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/base';
 import { render } from '@solidjs/testing-library';
 import { createSignal } from 'solid-js';
 
 import { FluxdownLite } from '../packs/lite';
 
-const createPatches = (label: string): IPatchItem<JSX.Element>[] => [
-  {
-    key: 'stable-range',
-    range: [6, 11],
-    render: (text?: string) => {
-      return (
-        <mark>
-          {label}:{text}
-        </mark>
-      );
+const createPatches = (label: string): IPatchItem<JSX.Element>[] => {
+  return [
+    {
+      key: 'stable-range',
+      range: [6, 11],
+      render: (text?: string) => {
+        return (
+          <mark>
+            {label}:{text}
+          </mark>
+        );
+      },
     },
-  },
-];
+  ];
+};
 
 describe('render patches', () => {
   test('renders point and range patches in source order', () => {
@@ -48,16 +51,12 @@ describe('render patches', () => {
   test('updates patch callbacks without recompiling unchanged Markdown', () => {
     const compile = vi.fn();
 
-    class CompileCounter {
+    class CompileCounter extends BaseRemarkPlugin {
       static readonly key = 'test-compile-counter';
 
-      readonly config = {};
-
-      readonly plugin = () => () => {
+      override readonly plugin = () => () => {
         compile();
       };
-
-      destroy() {}
     }
 
     const [patches, setPatches] = createSignal(createPatches('first'));

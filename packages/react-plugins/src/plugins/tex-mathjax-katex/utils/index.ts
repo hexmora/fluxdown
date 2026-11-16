@@ -1,3 +1,4 @@
+import { MathJaxMhchemFontExtension } from '@mathjax/mathjax-mhchem-font-extension/js/svg.js';
 import { MathJaxTexFont } from '@mathjax/mathjax-tex-font/js/svg.js';
 import { liteAdaptor } from '@mathjax/src/js/adaptors/liteAdaptor.js';
 import { RegisterHTMLHandler } from '@mathjax/src/js/handlers/html.js';
@@ -68,10 +69,12 @@ const texPackages = [
 
 const adaptor = liteAdaptor();
 
+MathJaxTexFont.addExtension(MathJaxMhchemFontExtension);
+
 SafeHandler(RegisterHTMLHandler(adaptor));
 
-const createDocument = () =>
-  mathjax.document('', {
+const createDocument = () => {
+  return mathjax.document('', {
     InputJax: new TeX({
       packages: texPackages,
       maxBuffer: 32 * 1024,
@@ -87,7 +90,9 @@ const createDocument = () =>
         throw error;
       },
     }),
-    // The original TeX font keeps conversion synchronous without dynamic font loading.
+    /*
+     * The original TeX font keeps conversion synchronous without dynamic font loading.
+     */
     OutputJax: new SVG({ fontCache: 'none', fontData: MathJaxTexFont }),
     safeOptions: {
       allow: {
@@ -98,14 +103,21 @@ const createDocument = () =>
       },
     },
   });
+};
 
 export const texToSvg = (tex: string, mode: 'display' | 'inline') => {
+  if (!tex) {
+    return '';
+  }
+
   const source = tex.replace(/\p{Cc}/gu, (character) =>
     character === '\n' || character === '\t' ? character : '',
   );
 
   try {
-    // TeX retains user-defined macros, so each formula needs its own parsing context.
+    /*
+     * TeX retains user-defined macros, so each formula needs its own parsing context.
+     */
     const document = createDocument();
     const node = document.convert(source, {
       display: mode === 'display',

@@ -1,4 +1,4 @@
-import type { BlockRemarksConfig, MapperPluggable } from '@fluxdown/core';
+import type { MapperPluggable, RemarkPluginsInputs } from '@fluxdown/core';
 
 import {
   BaseRenderer,
@@ -9,7 +9,6 @@ import {
   PluginCacheStore,
   RehypePluggables,
   RemarkPlugins,
-  RepairPluggables,
   TextChunker,
 } from '@fluxdown/core';
 import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
@@ -70,16 +69,21 @@ export const createPipeline = (smooth: boolean) => {
   const text = MutableState.of('');
   const scope = renderHooks(() => {
     const cacheStore = new PluginCacheStore();
-    const repairs = RepairPluggables({ config: BUILD, extras: [] });
+
     const rehypeState = useCreate(
       S([
         () =>
-          PluginBuilder({ cacheStore, plugins: RehypePluggables({ config: BUILD, extras: [] }) }),
+          PluginBuilder({
+            cacheStore,
+            plugins: RehypePluggables({ config: BUILD, extras: [] }),
+          }),
         {},
       ]),
     );
-    const buildRemarks = ({ config }: { config: BlockRemarksConfig }) =>
-      RemarkPlugins({ config, extras: [], repairs, cacheStore });
+
+    const buildRemarks = ({ config }: Pick<RemarkPluginsInputs, 'config'>) =>
+      RemarkPlugins({ config, extras: [], repairs: [], cacheStore });
+
     const config = useCreate(D(BUILD));
     const sections = TextChunker({
       text: useCreate(text),

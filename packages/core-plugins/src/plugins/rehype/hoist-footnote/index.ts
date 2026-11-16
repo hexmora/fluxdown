@@ -2,10 +2,16 @@ import type { Root as HastRoot } from 'hast';
 import type { Plugin } from 'unified';
 
 import { isHastElement } from '@fluxdown/hast';
-import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@fluxdown/types';
+import {
+  type IBasePluginConfig,
+  type IPluggableConfig,
+  PluginPriority,
+  type RehypePluginContext,
+} from '@fluxdown/types';
 import { has, last } from 'lodash-es';
 
 import { BaseRehypePlugin } from '../base';
+import { RehypePluginKeys } from '../keys';
 
 declare global {
   interface RehypeConfigs {
@@ -14,11 +20,17 @@ declare global {
 }
 
 export class HoistFootnoteRehypePlugin extends BaseRehypePlugin {
-  static readonly key = 'rehype-hoist-footnote';
+  static readonly key = RehypePluginKeys.HoistFootnote;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Lowest,
   };
+
+  static override enabled(context: RehypePluginContext): boolean {
+    const { config } = context;
+
+    return config.footnote;
+  }
 
   plugin: Plugin<[], HastRoot, HastRoot> = () => (tree) => {
     const lastChild = last(tree.children);

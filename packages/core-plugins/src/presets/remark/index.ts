@@ -14,6 +14,8 @@ import { SyntaxTableRemarkPlugin } from '../../plugins/remark/syntax-table';
 import { SyntaxTaskListRemarkPlugin } from '../../plugins/remark/syntax-task-list';
 import { TableNoralizerRemarkPlugin } from '../../plugins/remark/table-noralizer';
 
+export * from '../../plugins/remark/keys';
+
 export const PRESET_REMARK_PLUGINS: PluginClass<IRemarkPlugin>[] = [
   ApplyRepairsRemarkPlugin,
   CodeMetaRemarkPlugin,

@@ -1,8 +1,7 @@
-import type { Data, Parent, Root, RootContent, Text } from 'mdast';
+import type { Break, Data, Delete, Emphasis, Parent, Root, RootContent, Strong, Text } from 'mdast';
 import type { InlineMath } from 'mdast-util-math';
-import type { Point, Position } from 'unist';
 
-import { first, last } from 'lodash-es';
+import { findLast } from 'lodash-es';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 
 import {
@@ -20,13 +19,20 @@ type PandocMode = 'inline' | 'display';
 
 type ParsedContent = RootContent[];
 
-type MathLiteral = InlineMath | Text;
+type MathLiteral = InlineMath | Text | Break | Emphasis | Strong | Delete;
 
 type MathData = Data;
 
-interface DollarCloseCache {
-  adjacentValidity: Array<boolean | undefined>;
-  inlineResults: Array<number | undefined>;
+interface SourcedLiteral {
+  node: MathLiteral;
+  source: string;
+  quoteDepth: number;
+}
+
+interface ParsedLiteral {
+  content: ParsedContent;
+
+  preserveFallback: boolean;
 }
 
 const decodeMarkdownText = (value: string): string => {
@@ -80,62 +86,36 @@ const countDollarRun = (value: string, index: number): number => {
   return length;
 };
 
-const pointAtOffset = (source: string, offset: number): Point => {
-  let line = 1;
-  let column = 1;
-
-  for (let index = 0; index < offset; index += 1) {
-    const character = source[index];
-
-    if (character === '\r' && source[index + 1] === '\n') {
-      index += 1;
-      line += 1;
-      column = 1;
-    } else if (character === '\r' || character === '\n') {
-      line += 1;
-      column = 1;
-    } else {
-      column += 1;
-    }
-  }
-
-  return { line, column, offset };
-};
-
-const createPosition = (source: string, start: number, end: number): Position => {
-  return {
-    start: pointAtOffset(source, start),
-    end: pointAtOffset(source, end),
-  };
-};
-
 const createPlaceholderData = (
   value: string,
   dataType: typeof INLINE_MATH_PLACEHOLDER | typeof BLOCK_MATH_PLACEHOLDER,
   data: MathData = {},
+  repairEnding = false,
 ): MathData => {
+  const { source: _source, repairEnding: _repairEnding, ...metadata } = data;
+
   return {
-    ...data,
+    ...metadata,
+    ...(!repairEnding && _source !== undefined ? { source: _source } : {}),
+    ...(repairEnding ? { repairEnding: true } : {}),
     hName: 'span',
     hProperties: {
       dataType,
     },
-    hChildren: [{ type: 'text', value }],
+    hChildren: [{ type: 'text', value, ...(repairEnding ? { data: { repairEnding: true } } : {}) }],
   };
 };
 
 const createInlineMath = (
   value: string,
   pandocMode?: PandocMode,
-  position?: Position,
+  repairEnding = false,
+  source?: string,
 ): InlineMath => {
-  const data: MathData = pandocMode
-    ? {
-        pandocMath: {
-          mode: pandocMode,
-        },
-      }
-    : {};
+  const data: MathData = {
+    ...(pandocMode ? { pandocMath: { mode: pandocMode } } : {}),
+    ...(source !== undefined ? { source } : {}),
+  };
 
   return {
     type: 'inlineMath',
@@ -144,33 +124,121 @@ const createInlineMath = (
       value,
       pandocMode === 'display' ? BLOCK_MATH_PLACEHOLDER : INLINE_MATH_PLACEHOLDER,
       data,
+      repairEnding,
     ),
-    position,
   };
 };
 
-const appendText = (content: ParsedContent, value: string, position?: Position): void => {
-  if (!value) {
-    return;
+const rawSourceOffset = (literal: SourcedLiteral, offset: number): number => {
+  const raw = literal.node.data?.source ?? '';
+
+  if (raw === literal.source) {
+    return offset;
   }
 
-  const previous = last(content);
+  const parts = raw.split(/(\r\n|\r|\n)/);
 
-  if (previous?.type === 'text') {
-    previous.value += value;
+  let rawOffset = 0;
 
-    if (previous.position && position) {
-      previous.position.end = position.end;
+  let normalizedOffset = 0;
+
+  for (const [index, part] of parts.entries()) {
+    const normalized =
+      index > 0 && index % 2 === 0
+        ? normalizeContainerSource('\n' + part, literal.quoteDepth).slice(1)
+        : part;
+
+    if (offset <= normalizedOffset + normalized.length) {
+      return rawOffset + part.length - normalized.length + offset - normalizedOffset;
     }
 
-    return;
+    rawOffset += part.length;
+
+    normalizedOffset += normalized.length;
   }
 
-  content.push({
-    type: 'text',
-    value,
-    position,
-  });
+  return raw.length;
+};
+
+const sourceForRange = (nodes: SourcedLiteral[], start: number, end: number): string => {
+  const parts: string[] = [];
+
+  let offset = 0;
+
+  for (const literal of nodes) {
+    const from = Math.max(0, start - offset);
+
+    const to = Math.min(literal.source.length, end - offset);
+
+    offset += literal.source.length;
+
+    if (from < to) {
+      parts.push(
+        literal.node.data?.source?.slice(
+          rawSourceOffset(literal, from),
+          rawSourceOffset(literal, to),
+        ) ?? '',
+      );
+    }
+  }
+
+  return parts.join('');
+};
+
+const sliceLiteralContent = (
+  nodes: SourcedLiteral[],
+  start: number,
+  end: number,
+): ParsedContent => {
+  const content: ParsedContent = [];
+
+  let offset = 0;
+
+  for (const literal of nodes) {
+    const { node, source } = literal;
+
+    const from = Math.max(0, start - offset);
+
+    const to = Math.min(source.length, end - offset);
+
+    offset += source.length;
+
+    if (from >= to) {
+      continue;
+    }
+
+    if (from === 0 && to === source.length && node.type !== 'inlineMath') {
+      content.push(node);
+
+      continue;
+    }
+
+    const raw = sourceForRange([literal], from, to);
+
+    content.push({
+      type: 'text',
+      value: decodeMarkdownText(source.slice(from, to)),
+      data: { source: raw },
+    });
+  }
+
+  return content;
+};
+
+const canOpenMathAt = (nodes: SourcedLiteral[], offset: number): boolean => {
+  let start = 0;
+
+  for (const { node, source } of nodes) {
+    const end = start + source.length;
+
+    if (offset < end) {
+      return node.type === 'text' || node.type === 'inlineMath';
+    }
+
+    start = end;
+  }
+
+  return false;
 };
 
 const getOpeningPadding = (value: string): string | undefined => {
@@ -222,37 +290,64 @@ const normalizeClosedDollarValue = (value: string): string | undefined => {
   return normalized.trim() === normalized && normalized.length > 0 ? normalized : undefined;
 };
 
+const hasTexControlWord = (value: string): boolean => {
+  for (let index = 0; index < value.length - 1; index += 1) {
+    if (
+      value[index] === '\\' &&
+      /[A-Za-z]/.test(value[index + 1] ?? '') &&
+      !isEscaped(value, index)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 const normalizeRepairedDollarValue = (
   value: string,
   delimiterLength: number,
+  trailingWhitespace = '',
 ): string | undefined => {
   if (/[\r\n]/.test(value)) {
     return undefined;
   }
 
-  const normalized = value.trim();
+  const partialCloser =
+    delimiterLength === 2 &&
+    trailingWhitespace.length === 0 &&
+    value.endsWith('$') &&
+    value.at(-2) !== '$' &&
+    !isEscaped(value, value.length - 1);
+
+  const candidate = partialCloser ? value.slice(0, -1) : value;
+
+  const normalized = candidate.trim();
 
   if (!normalized) {
     return '';
   }
 
-  const eligible =
-    !/\s/.test(normalized) || normalized.startsWith('\\') || MATH_OPERATOR_PATTERN.test(normalized);
+  const hasMathSignal =
+    normalized.startsWith('\\') ||
+    hasTexControlWord(normalized) ||
+    MATH_OPERATOR_PATTERN.test(normalized);
+
+  const eligible = !/\s/.test(normalized) || hasMathSignal;
 
   if (!eligible) {
     return undefined;
   }
 
-  if (/^\s/.test(value)) {
-    const eligibleSingle = normalized.startsWith('\\') || MATH_OPERATOR_PATTERN.test(normalized);
+  if (/^\s/.test(candidate)) {
     const eligibleDouble = !/\s/.test(normalized);
 
-    if (delimiterLength === 1 ? !eligibleSingle : !eligibleDouble) {
+    if (delimiterLength === 1 ? !hasMathSignal : !eligibleDouble) {
       return undefined;
     }
   }
 
-  return normalized;
+  return candidate.trimStart();
 };
 
 const findPandocClose = (value: string, start: number, close: string): number => {
@@ -265,113 +360,131 @@ const findPandocClose = (value: string, start: number, close: string): number =>
   return -1;
 };
 
-const findDollarClose = (
-  value: string,
-  start: number,
-  delimiterLength: number,
-  cache: DollarCloseCache,
-): number => {
-  if (delimiterLength === 1) {
-    const cached = cache.inlineResults[start];
+class DollarCloseFinder {
+  private adjacentValidity: Array<boolean | undefined> = [];
 
-    if (cached !== undefined) {
-      return cached;
-    }
-  }
+  private inlineResults: Array<number | undefined> = [];
 
-  let closeIndex = -1;
+  constructor(
+    private value: string,
+    private repairEnding: boolean,
+  ) {}
 
-  for (let index = start; index < value.length; index += 1) {
-    if (value[index] !== '$' || isEscaped(value, index)) {
-      continue;
-    }
+  find(start: number, delimiterLength: number): number {
+    const { value, repairEnding } = this;
 
-    const runLength = countDollarRun(value, index);
+    if (delimiterLength === 1) {
+      const cached = this.inlineResults[start];
 
-    if (delimiterLength === 1 && runLength === 1) {
-      if (value[index - 1] !== '$') {
-        closeIndex = index;
-        break;
+      if (cached !== undefined) {
+        return cached;
       }
     }
 
-    if (delimiterLength === 1 && runLength === 2) {
-      let adjacentValid = cache.adjacentValidity[index];
+    let closeIndex = -1;
 
-      if (adjacentValid === undefined) {
-        const adjacentValueStart = index + 2;
-        const adjacentClose = findDollarClose(value, adjacentValueStart, 1, cache);
+    for (let index = start; index < value.length; index += 1) {
+      if (value[index] !== '$' || isEscaped(value, index)) {
+        continue;
+      }
 
-        if (adjacentClose === -1) {
-          adjacentValid = false;
-        } else {
-          const adjacentValue = normalizeClosedDollarValue(
-            value.slice(adjacentValueStart, adjacentClose),
-          );
-          const adjacentNext = adjacentClose + 1;
+      const runLength = countDollarRun(value, index);
 
-          adjacentValid = adjacentValue !== undefined && !/\d/.test(value[adjacentNext] ?? '');
+      if (delimiterLength === 1 && runLength === 1) {
+        if (value[index - 1] !== '$') {
+          closeIndex = index;
+          break;
+        }
+      }
+
+      if (delimiterLength === 1 && runLength === 2) {
+        let adjacentValid = this.adjacentValidity[index];
+
+        if (adjacentValid === undefined) {
+          const adjacentValueStart = index + 2;
+          const adjacentClose = this.find(adjacentValueStart, 1);
+
+          if (adjacentClose === -1) {
+            adjacentValid =
+              repairEnding &&
+              normalizeRepairedDollarValue(value.slice(adjacentValueStart), 1) !== undefined;
+          } else {
+            const adjacentValue = normalizeClosedDollarValue(
+              value.slice(adjacentValueStart, adjacentClose),
+            );
+            const adjacentNext = adjacentClose + 1;
+
+            adjacentValid = adjacentValue !== undefined && !/\d/.test(value[adjacentNext] ?? '');
+          }
+
+          this.adjacentValidity[index] = adjacentValid;
         }
 
-        cache.adjacentValidity[index] = adjacentValid;
+        if (adjacentValid) {
+          closeIndex = index;
+          break;
+        }
       }
 
-      if (adjacentValid) {
+      if (delimiterLength === 2 && runLength === 2) {
         closeIndex = index;
         break;
       }
+
+      index += runLength - 1;
     }
 
-    if (delimiterLength === 2 && runLength === 2) {
-      closeIndex = index;
-      break;
+    if (delimiterLength === 1) {
+      this.inlineResults[start] = closeIndex;
     }
 
-    index += runLength - 1;
+    return closeIndex;
+  }
+}
+
+const normalizeContainerSource = (source: string, quoteDepth: number): string => {
+  if (quoteDepth === 0) {
+    return source;
   }
 
-  if (delimiterLength === 1) {
-    cache.inlineResults[start] = closeIndex;
-  }
+  return source.replace(/(\r\n|\r|\n)([^\r\n]*)/g, (_match, endline: string, line: string) => {
+    let content = line;
 
-  return closeIndex;
-};
+    for (let depth = 0; depth < quoteDepth; depth += 1) {
+      content = content.replace(/^[ \t]*>[ \t]?/, '');
+    }
 
-const sourceForNode = (node: RootContent, source: string): string => {
-  const start = node.position?.start.offset;
-  const end = node.position?.end.offset;
-
-  if (typeof start === 'number' && typeof end === 'number' && source.length >= end) {
-    return source.slice(start, end);
-  }
-
-  return 'value' in node && typeof node.value === 'string' ? node.value : '';
+    return endline + content;
+  });
 };
 
 const sourceForLiterals = (
   nodes: MathLiteral[],
-  source: string,
-): { offset: number | undefined; value: string } => {
-  const initial = first(nodes);
-  const final = last(nodes);
-  const start = initial?.position?.start.offset;
-  const end = final?.position?.end.offset;
-
-  if (typeof start === 'number' && typeof end === 'number' && source.length >= end) {
-    return {
-      offset: start,
-      value: source.slice(start, end),
-    };
+  quoteDepth: number,
+): SourcedLiteral[] | undefined => {
+  if (
+    nodes.some((node) => {
+      return typeof node.data?.source !== 'string';
+    })
+  ) {
+    return undefined;
   }
 
-  return {
-    offset: undefined,
-    value: nodes.map((node) => sourceForNode(node, source)).join(''),
-  };
+  return nodes.map((node) => {
+    return {
+      node,
+      source: normalizeContainerSource(node.data?.source ?? '', quoteDepth),
+      quoteDepth,
+    };
+  });
 };
 
 const isMathLiteral = (node: RootContent): node is MathLiteral => {
-  return node.type === 'text' || node.type === 'inlineMath';
+  if (node.type === 'strong' || node.type === 'emphasis' || node.type === 'delete') {
+    return node.children.every(isMathLiteral);
+  }
+
+  return node.type === 'text' || node.type === 'inlineMath' || node.type === 'break';
 };
 
 const hasMathSyntaxCandidate = (value: string): boolean => {
@@ -380,31 +493,34 @@ const hasMathSyntaxCandidate = (value: string): boolean => {
   );
 };
 
-const hasChangedText = (nodes: MathLiteral[], source: string): boolean => {
+const hasChangedText = (nodes: RootContent[], quoteDepth: number): boolean => {
   return nodes.some((node) => {
-    if (node.type !== 'text') {
-      return false;
+    if (typeof node.data?.source !== 'string') {
+      return true;
     }
 
-    const start = node.position?.start.offset;
-    const end = node.position?.end.offset;
+    if (node.type === 'text') {
+      return (
+        node.value !== decodeMarkdownText(normalizeContainerSource(node.data.source, quoteDepth))
+      );
+    }
 
-    return (
-      typeof start === 'number' &&
-      typeof end === 'number' &&
-      node.value !== decodeMarkdownText(source.slice(start, end))
-    );
+    return 'children' in node && hasChangedText(node.children, quoteDepth);
   });
 };
 
-const bridgeInlineMath = (math: InlineMath): void => {
+const bridgeInlineMath = (math: InlineMath): InlineMath => {
   const mode = math.data?.pandocMath?.mode;
 
-  math.data = createPlaceholderData(
-    math.value,
-    mode === 'display' ? BLOCK_MATH_PLACEHOLDER : INLINE_MATH_PLACEHOLDER,
-    math.data,
-  );
+  return {
+    ...math,
+    data: createPlaceholderData(
+      math.value,
+      mode === 'display' ? BLOCK_MATH_PLACEHOLDER : INLINE_MATH_PLACEHOLDER,
+      math.data,
+      math.data?.repairEnding,
+    ),
+  };
 };
 
 const hasRepeatedPandocOpen = (value: string, open: string): boolean => {
@@ -420,27 +536,26 @@ const hasRepeatedPandocOpen = (value: string, open: string): boolean => {
 const parseLiteral = (
   raw: string,
   repairEnding: boolean,
-  source: string,
-  sourceOffset: number,
-): { content: ParsedContent; preserveFallback: boolean } => {
-  const dollarCloseCache: DollarCloseCache = {
-    adjacentValidity: [],
-    inlineResults: [],
-  };
+  literals: SourcedLiteral[],
+  trailingWhitespace: string,
+): ParsedLiteral => {
+  const dollarCloseFinder = new DollarCloseFinder(raw, repairEnding);
   const content: ParsedContent = [];
   let textStart = 0;
   let index = 0;
   let adjacentOpenIndex = -1;
 
   const flushText = (end: number): void => {
-    appendText(
-      content,
-      decodeMarkdownText(raw.slice(textStart, end)),
-      createPosition(source, sourceOffset + textStart, sourceOffset + end),
-    );
+    content.push(...sliceLiteralContent(literals, textStart, end));
   };
 
   while (index < raw.length) {
+    if ((raw[index] !== '$' && raw[index] !== '\\') || !canOpenMathAt(literals, index)) {
+      index += 1;
+
+      continue;
+    }
+
     const pandocMode: PandocMode | undefined = raw.startsWith(PANDOC_INLINE_OPEN, index)
       ? 'inline'
       : raw.startsWith(PANDOC_DISPLAY_OPEN, index)
@@ -459,7 +574,8 @@ const parseLiteral = (
           createInlineMath(
             raw.slice(valueStart, closeIndex),
             pandocMode,
-            createPosition(source, sourceOffset + index, sourceOffset + closeIndex + close.length),
+            false,
+            sourceForRange(literals, index, closeIndex + close.length),
           ),
         );
         index = closeIndex + close.length;
@@ -479,17 +595,9 @@ const parseLiteral = (
 
         flushText(index);
 
-        if (candidate.trim()) {
-          const repairedCandidate = candidate.trim();
+        const value = candidate.trimStart();
 
-          content.push(
-            createInlineMath(
-              repairedCandidate,
-              pandocMode,
-              createPosition(source, sourceOffset + index, sourceOffset + raw.length),
-            ),
-          );
-        }
+        content.push(createInlineMath(value ? value + trailingWhitespace : '', pandocMode, true));
 
         index = raw.length;
         textStart = index;
@@ -506,10 +614,12 @@ const parseLiteral = (
 
       if (delimiterLength === 1 || delimiterLength === 2) {
         const valueStart = index + delimiterLength;
-        const closeIndex = findDollarClose(raw, valueStart, delimiterLength, dollarCloseCache);
+        const closeIndex = dollarCloseFinder.find(valueStart, delimiterLength);
 
         if (closeIndex !== -1) {
-          const normalized = normalizeClosedDollarValue(raw.slice(valueStart, closeIndex));
+          const value = raw.slice(valueStart, closeIndex);
+
+          const normalized = normalizeClosedDollarValue(value);
           const next = closeIndex + delimiterLength;
           const followedByDigit = delimiterLength === 1 && /\d/.test(raw[next] ?? '');
 
@@ -519,11 +629,8 @@ const parseLiteral = (
               createInlineMath(
                 normalized,
                 undefined,
-                createPosition(
-                  source,
-                  sourceOffset + index,
-                  sourceOffset + closeIndex + delimiterLength,
-                ),
+                false,
+                sourceForRange(literals, index, closeIndex + delimiterLength),
               ),
             );
             adjacentOpenIndex =
@@ -532,21 +639,30 @@ const parseLiteral = (
             textStart = index;
             continue;
           }
+
+          if (
+            repairEnding &&
+            (normalized !== undefined ||
+              MATH_OPERATOR_PATTERN.test(value) ||
+              hasTexControlWord(value))
+          ) {
+            index = next;
+
+            continue;
+          }
         } else if (repairEnding) {
-          const normalized = normalizeRepairedDollarValue(raw.slice(valueStart), delimiterLength);
+          const normalized = normalizeRepairedDollarValue(
+            raw.slice(valueStart),
+            delimiterLength,
+            trailingWhitespace,
+          );
 
           if (normalized !== undefined) {
             flushText(index);
 
-            if (normalized) {
-              content.push(
-                createInlineMath(
-                  normalized,
-                  undefined,
-                  createPosition(source, sourceOffset + index, sourceOffset + raw.length),
-                ),
-              );
-            }
+            content.push(
+              createInlineMath(normalized ? normalized + trailingWhitespace : '', undefined, true),
+            );
 
             index = raw.length;
             textStart = index;
@@ -564,7 +680,7 @@ const parseLiteral = (
   return { content, preserveFallback: false };
 };
 
-const findFinalRepairLeaf = (node: Root | RootContent): RootContent | undefined => {
+const findFinalRepairLeaf = (node: Parent | RootContent): RootContent | undefined => {
   if ('children' in node) {
     let index = node.children.length - 1;
 
@@ -580,18 +696,102 @@ const findFinalRepairLeaf = (node: Root | RootContent): RootContent | undefined 
   return node;
 };
 
+/**
+ * Markdown excludes final whitespace from text spans; recover only verified ancestor suffixes.
+ */
+const getRepairTrailingWhitespace = (root: Parent): string => {
+  const parents: Parent[] = [];
+
+  let node: Parent | RootContent = root;
+
+  while ('children' in node) {
+    const child: RootContent | undefined = findLast(node.children, (item) => {
+      return item.type !== 'parserPatch';
+    });
+
+    if (!child) {
+      return '';
+    }
+
+    parents.push(node);
+
+    node = child;
+  }
+
+  let source = node.data?.source;
+
+  let whitespace = '';
+
+  for (let index = parents.length - 1; index >= 0; index -= 1) {
+    const raw = parents[index]?.data?.source;
+
+    if (source === undefined || raw === undefined) {
+      return '';
+    }
+
+    const start = raw.lastIndexOf(source);
+
+    const suffix = raw.slice(start + source.length);
+
+    if (start < 0 || !/^[ \t\r\n]*$/.test(suffix)) {
+      return '';
+    }
+
+    whitespace += suffix;
+
+    source = raw;
+  }
+
+  return whitespace;
+};
+
+const isUnclosedBlockMath = (source: string | undefined): boolean => {
+  if (source === undefined) {
+    return false;
+  }
+
+  const lines = source.split(/\r?\n/);
+
+  const opening = /^ {0,3}(\${2,})/.exec(lines[0] ?? '');
+
+  if (!opening?.[1]) {
+    return false;
+  }
+
+  const closing = /^[ \t]*(?:>[ \t]*)*(\${2,})[ \t]*$/.exec(lines.at(-1) ?? '');
+
+  return lines.length === 1 || (closing?.[1]?.length ?? 0) < opening[1].length;
+};
+
+const getRepairedBlockMathValue = (
+  value: string,
+  source: string,
+  trailingWhitespace: string,
+): string => {
+  const whitespace = /[ \t\r\n]*$/.exec(source)?.[0] ?? '';
+
+  const normalized = value.trimEnd() + whitespace + trailingWhitespace;
+
+  const partialCloser =
+    trailingWhitespace.length === 0 &&
+    /^ {0,3}\$\$(?!\$)/.test(source) &&
+    /\r?\n[ \t]{0,3}\$$/.test(source);
+
+  return partialCloser ? normalized.replace(/(^|\r?\n)[ \t]{0,3}\$$/, '$1') : normalized;
+};
+
 const processParent = (
   parent: Parent,
-  source: string,
   repairTarget: RootContent | undefined,
-): void => {
-  const children = parent.children.slice();
+  quoteDepth = 0,
+  repairOnly = false,
+  trailingWhitespace = '',
+): boolean => {
+  const depth = quoteDepth + (parent.type === 'blockquote' ? 1 : 0);
 
-  for (const child of children) {
-    if ('children' in child) {
-      processParent(child, source, repairTarget);
-    }
-  }
+  let changed = false;
+
+  let consumed = false;
 
   const nextChildren: RootContent[] = [];
 
@@ -602,19 +802,25 @@ const processParent = (
       continue;
     }
 
-    if (child.type === 'text' || child.type === 'inlineMath') {
-      if (child.type === 'inlineMath' && !child.position) {
-        bridgeInlineMath(child);
-        nextChildren.push(child);
-        continue;
-      }
+    if (repairOnly && child.type === 'inlineMath') {
+      nextChildren.push(child);
 
+      continue;
+    }
+
+    if (isMathLiteral(child)) {
       const literals = [child];
+
+      const includesPendingOpener = repairOnly && hasMathSyntaxCandidate(child.data?.source ?? '');
 
       while (index + 1 < parent.children.length) {
         const next = parent.children[index + 1];
 
-        if (!next || !isMathLiteral(next)) {
+        if (
+          !next ||
+          !isMathLiteral(next) ||
+          (repairOnly && next.type === 'inlineMath' && !includesPendingOpener)
+        ) {
           break;
         }
 
@@ -622,56 +828,122 @@ const processParent = (
         index += 1;
       }
 
-      const literalSource = sourceForLiterals(literals, source);
+      const sources = sourceForLiterals(literals, depth);
+
+      const literalSource = sources
+        ?.map(({ source }) => {
+          return source;
+        })
+        .join('');
 
       if (
-        literalSource.offset === undefined ||
-        !hasMathSyntaxCandidate(literalSource.value) ||
-        hasChangedText(literals, source)
+        sources === undefined ||
+        literalSource === undefined ||
+        !hasMathSyntaxCandidate(literalSource) ||
+        hasChangedText(literals, depth)
       ) {
-        for (const literal of literals) {
-          if (literal.type === 'inlineMath') {
-            bridgeInlineMath(literal);
-          }
+        nextChildren.push(
+          ...literals.map((literal) => {
+            return literal.type === 'inlineMath' ? bridgeInlineMath(literal) : literal;
+          }),
+        );
 
-          nextChildren.push(literal);
-        }
+        changed ||= literals.some((literal) => {
+          return literal.type === 'inlineMath';
+        });
 
         continue;
       }
 
       const parsed = parseLiteral(
-        literalSource.value,
-        literals.some((literal) => literal === repairTarget),
-        source,
-        literalSource.offset,
+        literalSource,
+        literals.some((literal) => {
+          return findFinalRepairLeaf(literal) === repairTarget;
+        }),
+        sources,
+        trailingWhitespace,
       );
 
-      if (parsed.preserveFallback) {
+      const repaired = parsed.content.some((node) => {
+        return node.data?.repairEnding === true;
+      });
+
+      if (parsed.preserveFallback || (repairOnly && !repaired)) {
         nextChildren.push(...literals);
       } else {
         nextChildren.push(...parsed.content);
+
+        changed ||=
+          parsed.content.length !== literals.length ||
+          parsed.content.some((node, offset) => {
+            return node !== literals[offset];
+          });
+
+        consumed ||= repaired;
       }
 
       continue;
     }
 
     if (child.type === 'math') {
-      child.data = createPlaceholderData(child.value, BLOCK_MATH_PLACEHOLDER, child.data);
-    }
+      const incomplete = child === repairTarget && isUnclosedBlockMath(child.data?.source);
 
-    nextChildren.push(child);
+      if (repairOnly && !incomplete) {
+        nextChildren.push(child);
+
+        continue;
+      }
+
+      const source = normalizeContainerSource(child.data?.source ?? '', depth);
+
+      const value = incomplete
+        ? getRepairedBlockMathValue(child.value, source, trailingWhitespace)
+        : child.value;
+
+      nextChildren.push({
+        ...child,
+        value,
+        data: createPlaceholderData(value, BLOCK_MATH_PLACEHOLDER, child.data, incomplete),
+      });
+
+      changed = true;
+
+      consumed ||= incomplete;
+    } else {
+      nextChildren.push(child);
+    }
   }
 
-  parent.children = nextChildren;
+  for (const child of nextChildren) {
+    if (
+      'children' in child &&
+      processParent(child, repairTarget, depth, repairOnly, trailingWhitespace)
+    ) {
+      consumed = true;
+    }
+  }
+
+  if (changed) {
+    parent.children = nextChildren;
+  }
+
+  if (consumed && parent.data) {
+    delete parent.data.source;
+  }
+
+  return consumed;
 };
 
-export const transformMath = (tree: Root, source: string, repairEnding: boolean): void => {
-  const finalLeaf = findFinalRepairLeaf(tree);
-  const repairTarget =
-    repairEnding && (finalLeaf?.type === 'text' || finalLeaf?.type === 'inlineMath')
-      ? finalLeaf
-      : undefined;
+export const transformMath = (tree: Root, repairEnding: boolean): void => {
+  processParent(
+    tree,
+    repairEnding ? findFinalRepairLeaf(tree) : undefined,
+    0,
+    false,
+    repairEnding ? getRepairTrailingWhitespace(tree) : '',
+  );
+};
 
-  processParent(tree, source, repairTarget);
+export const repairMath = (tree: Parent): void => {
+  processParent(tree, findFinalRepairLeaf(tree), 0, true, getRepairTrailingWhitespace(tree));
 };

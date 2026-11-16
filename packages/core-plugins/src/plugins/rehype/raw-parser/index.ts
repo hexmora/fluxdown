@@ -6,6 +6,8 @@ import { cloneDeep } from 'lodash-es';
 import rehypeRaw, { type Options } from 'rehype-raw';
 
 import { BaseRehypePlugin } from '../base';
+import { RehypePluginKeys } from '../keys';
+import { getRawParserOptions, unwrapRepairText, wrapRepairText } from './utils';
 
 export type RawParserRehypePluginConfig = Options;
 
@@ -16,7 +18,7 @@ declare global {
 }
 
 export class RawParserRehypePlugin extends BaseRehypePlugin {
-  static readonly key = 'rehype-raw-parser';
+  static readonly key = RehypePluginKeys.RawParser;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Lowest,
@@ -30,6 +32,11 @@ export class RawParserRehypePlugin extends BaseRehypePlugin {
     super();
 
     this.innerConfig = cloneDeep(config);
-    this.plugin = () => rehypeRaw(this.innerConfig);
+
+    this.plugin = () => {
+      const parse = rehypeRaw(getRawParserOptions(this.innerConfig));
+
+      return (tree, file) => unwrapRepairText(parse(wrapRepairText(tree), file));
+    };
   }
 }

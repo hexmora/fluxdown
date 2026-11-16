@@ -1,5 +1,6 @@
 import type { IPluggable, IRemarkPlugin, IRepairPlugin, PluginSet } from '@fluxdown/types';
 
+import type { PluginCacheStore } from '../../../base';
 import type { BlockRemarksConfig } from '../../../hast';
 
 export type RemarkPluggablesInputs = {
@@ -7,5 +8,7 @@ export type RemarkPluggablesInputs = {
 
   extras: PluginSet<IPluggable<IRemarkPlugin, unknown>, RemarkConfigs>;
 
-  repairs: IRepairPlugin[];
+  repairs: PluginSet<IPluggable<IRepairPlugin, unknown>, RepairConfigs>;
+
+  cacheStore?: PluginCacheStore;
 };
