@@ -1,5 +1,21 @@
 # @fluxdown/vue
 
+## 0.3.1
+
+### Patch Changes
+
+- fba214a: Update cross-framework patch and reactivity regression fixtures for the shared remark-plugin admission contract.
+- fba214a: Resolve plugin enablement and constructor configuration through optional static `enabled` and `prepareConfig` hooks across all plugin types. Keep context outside instances and refresh active pluggables when reactive inputs change.
+
+  Include `TexRepairPlugin` in the default core repair preset. Core plugins depend on KaTeX to select a valid streaming prefix when no custom `render` is supplied; renderer plugins use this preset without separate repair registration.
+
+  Keep repair output intact across all renderer adapters, including trailing TeX whitespace and empty pending formulas. Validate streaming TeX in the repair layer and preserve lazy loading in renderer components, with an empty loading placeholder instead of raw-source flashes. Default compiler presets now include KaTeX; MathJax-only syntax is deferred until the formula closes unless a custom validator is configured.
+
+- Updated dependencies [fba214a]
+  - @fluxdown/vue-base-plugins@0.2.1
+  - @fluxdown/vue-plugins@0.3.1
+  - @fluxdown/vue-base@0.2.1
+
 ## 0.3.0
 
 ### Minor Changes

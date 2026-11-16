@@ -1,5 +1,18 @@
 # @fluxdown/lynx
 
+## 0.4.1
+
+### Patch Changes
+
+- fba214a: Update cross-framework patch and reactivity regression fixtures for the shared remark-plugin admission contract.
+- Updated dependencies [fba214a]
+- Updated dependencies [fba214a]
+- Updated dependencies [fba214a]
+  - @fluxdown/core-plugins@0.14.0
+  - @fluxdown/core@0.13.0
+  - @fluxdown/types@0.11.0
+  - @fluxdown/react-lynx-plugins@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes
