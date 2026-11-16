@@ -3,7 +3,7 @@
     "type": "dir",
     "name": "streaming-effects",
     "label": "流式特效",
-    "collapsed": false
+    "collapsed": true
   },
   {
     "type": "file",
@@ -14,7 +14,13 @@
     "type": "dir",
     "name": "features",
     "label": "其他功能",
-    "collapsed": false
+    "collapsed": true
+  },
+  {
+    "type": "dir",
+    "name": "syntax-repair",
+    "label": "语法修复",
+    "collapsed": true
   },
   {
     "type": "file",

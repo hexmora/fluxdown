@@ -1,0 +1,504 @@
+{
+  "meta": {
+    "generatedAt": "2026-11-16T19:20:50.796Z",
+    "date": "2026-11-16",
+    "cases": 1327,
+    "framesPerLibrary": 35741,
+    "categories": [
+      "强调与删除线",
+      "行内代码",
+      "嵌套行内",
+      "列表与任务",
+      "标题与引用",
+      "围栏代码",
+      "链接与图片",
+      "自动链接",
+      "表格",
+      "普通文本与歧义",
+      "转义与实体",
+      "混合文档",
+      "歧义与普通文本"
+    ],
+    "corpusSha256": "ee09f8c62fde6b56f8263f4aa959dd9ba282956f028ec19681b6851585e51251",
+    "fluxdownCommit": "b5a67bde25660b40a4f234d5c240d62a476a6e4d",
+    "fluxdownSourceHash": "583e0384cc3915e4dec53d14e48e9c3452cc5e3a22fe10b73e52b7a5e6373bc2",
+    "lockfileSha256": "f3b89d5e18628b3051ef6d966f55108e826df64f2419b967062bf1b9890d1bb9",
+    "source": "workspace release candidate",
+    "environment": {
+      "node": "v24.22.1",
+      "react": "19.3.0",
+      "jsdom": "29.0.0"
+    },
+    "method": "semantic-roles-v1; settled DOM; Unicode code-point inputs; equal-weight mean of case jump-frame rates; completion frame excluded"
+  },
+  "libraries": [
+    {
+      "id": "fluxdown",
+      "name": "Fluxdown",
+      "version": "0.14.4",
+      "source": "https://github.com/hexmora/fluxdown",
+      "profile": "React full; default repair, repairEnding; smooth/effect off; tex/footnote off; indentedCode/setextHeading on; code toolbar/highlighter disabled.",
+      "metrics": {
+        "cases": 1327,
+        "jumpFrameRate": 0.002765583601221955
+      },
+      "categories": [
+        {
+          "category": "强调与删除线",
+          "cases": 341,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "行内代码",
+          "cases": 114,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "嵌套行内",
+          "cases": 189,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "列表与任务",
+          "cases": 150,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "标题与引用",
+          "cases": 58,
+          "jumpFrameRate": 0.021691048415186348
+        },
+        {
+          "category": "围栏代码",
+          "cases": 92,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "链接与图片",
+          "cases": 110,
+          "jumpFrameRate": 0.0006512260924025631
+        },
+        {
+          "category": "自动链接",
+          "cases": 24,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "表格",
+          "cases": 105,
+          "jumpFrameRate": 0.0197479322412171
+        },
+        {
+          "category": "普通文本与歧义",
+          "cases": 21,
+          "jumpFrameRate": 0.0026455026455026454
+        },
+        {
+          "category": "转义与实体",
+          "cases": 55,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "混合文档",
+          "cases": 9,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "歧义与普通文本",
+          "cases": 59,
+          "jumpFrameRate": 0.0035783952490355026
+        }
+      ]
+    },
+    {
+      "id": "streamdown",
+      "name": "Streamdown",
+      "version": "2.7.1",
+      "source": "https://github.com/vercel/streamdown",
+      "profile": "Official streaming mode and parseIncompleteMarkdown; completion switches to static mode; animation, controls and link-safety UI off.",
+      "metrics": {
+        "cases": 1327,
+        "jumpFrameRate": 0.08226831820205516
+      },
+      "categories": [
+        {
+          "category": "强调与删除线",
+          "cases": 341,
+          "jumpFrameRate": 0.08816505359236769
+        },
+        {
+          "category": "行内代码",
+          "cases": 114,
+          "jumpFrameRate": 0.06366526878032004
+        },
+        {
+          "category": "嵌套行内",
+          "cases": 189,
+          "jumpFrameRate": 0.1382533952627783
+        },
+        {
+          "category": "列表与任务",
+          "cases": 150,
+          "jumpFrameRate": 0.10284428775377756
+        },
+        {
+          "category": "标题与引用",
+          "cases": 58,
+          "jumpFrameRate": 0.04695387619494352
+        },
+        {
+          "category": "围栏代码",
+          "cases": 92,
+          "jumpFrameRate": 0.057711983044805897
+        },
+        {
+          "category": "链接与图片",
+          "cases": 110,
+          "jumpFrameRate": 0.09830906265124073
+        },
+        {
+          "category": "自动链接",
+          "cases": 24,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "表格",
+          "cases": 105,
+          "jumpFrameRate": 0.058038991434305146
+        },
+        {
+          "category": "普通文本与歧义",
+          "cases": 21,
+          "jumpFrameRate": 0.009448223733938018
+        },
+        {
+          "category": "转义与实体",
+          "cases": 55,
+          "jumpFrameRate": 0.06862758277358313
+        },
+        {
+          "category": "混合文档",
+          "cases": 9,
+          "jumpFrameRate": 0.058468907415329036
+        },
+        {
+          "category": "歧义与普通文本",
+          "cases": 59,
+          "jumpFrameRate": 0.014429344086026212
+        }
+      ]
+    },
+    {
+      "id": "xmarkdown",
+      "name": "Ant Design X Markdown",
+      "version": "2.10.0",
+      "source": "https://ant-design-x.antgroup.com/x-markdowns/introduce",
+      "profile": "Official streaming incompleteMarkdown=complete; hasNextChunk tracks stream state; typewriter/animation off.",
+      "metrics": {
+        "cases": 1327,
+        "jumpFrameRate": 0.05642164347154502
+      },
+      "categories": [
+        {
+          "category": "强调与删除线",
+          "cases": 341,
+          "jumpFrameRate": 0.047574555004741115
+        },
+        {
+          "category": "行内代码",
+          "cases": 114,
+          "jumpFrameRate": 0.04911691286653586
+        },
+        {
+          "category": "嵌套行内",
+          "cases": 189,
+          "jumpFrameRate": 0.09166960794953695
+        },
+        {
+          "category": "列表与任务",
+          "cases": 150,
+          "jumpFrameRate": 0.11393646497327857
+        },
+        {
+          "category": "标题与引用",
+          "cases": 58,
+          "jumpFrameRate": 0.04291120930434754
+        },
+        {
+          "category": "围栏代码",
+          "cases": 92,
+          "jumpFrameRate": 0.05404327732477333
+        },
+        {
+          "category": "链接与图片",
+          "cases": 110,
+          "jumpFrameRate": 0.027852485321673708
+        },
+        {
+          "category": "自动链接",
+          "cases": 24,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "表格",
+          "cases": 105,
+          "jumpFrameRate": 0.03544385438629339
+        },
+        {
+          "category": "普通文本与歧义",
+          "cases": 21,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "转义与实体",
+          "cases": 55,
+          "jumpFrameRate": 0.06457229303408286
+        },
+        {
+          "category": "混合文档",
+          "cases": 9,
+          "jumpFrameRate": 0.03887750241066072
+        },
+        {
+          "category": "歧义与普通文本",
+          "cases": 59,
+          "jumpFrameRate": 0.008231534353169447
+        }
+      ]
+    },
+    {
+      "id": "reactmarkdown",
+      "name": "react-markdown + GFM",
+      "version": "10.1.0",
+      "source": "https://github.com/remarkjs/react-markdown",
+      "profile": "ReactMarkdown + remark-gfm 4.0.1; full received prefix rendered each update; no streaming repair.",
+      "metrics": {
+        "cases": 1327,
+        "jumpFrameRate": 0.09680595058659394
+      },
+      "categories": [
+        {
+          "category": "强调与删除线",
+          "cases": 341,
+          "jumpFrameRate": 0.13578744650093325
+        },
+        {
+          "category": "行内代码",
+          "cases": 114,
+          "jumpFrameRate": 0.08040475180588813
+        },
+        {
+          "category": "嵌套行内",
+          "cases": 189,
+          "jumpFrameRate": 0.13077887710477396
+        },
+        {
+          "category": "列表与任务",
+          "cases": 150,
+          "jumpFrameRate": 0.12633380337910052
+        },
+        {
+          "category": "标题与引用",
+          "cases": 58,
+          "jumpFrameRate": 0.07378732455239122
+        },
+        {
+          "category": "围栏代码",
+          "cases": 92,
+          "jumpFrameRate": 0.057711983044805897
+        },
+        {
+          "category": "链接与图片",
+          "cases": 110,
+          "jumpFrameRate": 0.06873557381317019
+        },
+        {
+          "category": "自动链接",
+          "cases": 24,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "表格",
+          "cases": 105,
+          "jumpFrameRate": 0.06377751435479635
+        },
+        {
+          "category": "普通文本与歧义",
+          "cases": 21,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "转义与实体",
+          "cases": 55,
+          "jumpFrameRate": 0.08233093205587981
+        },
+        {
+          "category": "混合文档",
+          "cases": 9,
+          "jumpFrameRate": 0.06401080193336163
+        },
+        {
+          "category": "歧义与普通文本",
+          "cases": 59,
+          "jumpFrameRate": 0.006331174825691276
+        }
+      ]
+    },
+    {
+      "id": "markdownit",
+      "name": "markdown-it",
+      "version": "15.0.3",
+      "source": "https://github.com/markdown-it/markdown-it",
+      "profile": "html=false, linkify=true; markdown-it-task-lists 2.1.1; full prefix rendered each update; no streaming repair.",
+      "metrics": {
+        "cases": 1327,
+        "jumpFrameRate": 0.0971978318890758
+      },
+      "categories": [
+        {
+          "category": "强调与删除线",
+          "cases": 341,
+          "jumpFrameRate": 0.13578744650093325
+        },
+        {
+          "category": "行内代码",
+          "cases": 114,
+          "jumpFrameRate": 0.08040475180588813
+        },
+        {
+          "category": "嵌套行内",
+          "cases": 189,
+          "jumpFrameRate": 0.13077887710477396
+        },
+        {
+          "category": "列表与任务",
+          "cases": 150,
+          "jumpFrameRate": 0.12633380337910052
+        },
+        {
+          "category": "标题与引用",
+          "cases": 58,
+          "jumpFrameRate": 0.07378732455239122
+        },
+        {
+          "category": "围栏代码",
+          "cases": 92,
+          "jumpFrameRate": 0.057711983044805897
+        },
+        {
+          "category": "链接与图片",
+          "cases": 110,
+          "jumpFrameRate": 0.07346308734402009
+        },
+        {
+          "category": "自动链接",
+          "cases": 24,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "表格",
+          "cases": 105,
+          "jumpFrameRate": 0.06377751435479635
+        },
+        {
+          "category": "普通文本与歧义",
+          "cases": 21,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "转义与实体",
+          "cases": 55,
+          "jumpFrameRate": 0.08233093205587981
+        },
+        {
+          "category": "混合文档",
+          "cases": 9,
+          "jumpFrameRate": 0.06401080193336163
+        },
+        {
+          "category": "歧义与普通文本",
+          "cases": 59,
+          "jumpFrameRate": 0.006331174825691276
+        }
+      ]
+    },
+    {
+      "id": "marked",
+      "name": "Marked",
+      "version": "18.2.0",
+      "source": "https://github.com/markedjs/marked",
+      "profile": "gfm=true; full prefix rendered each update; no streaming repair.",
+      "metrics": {
+        "cases": 1327,
+        "jumpFrameRate": 0.09680595058659394
+      },
+      "categories": [
+        {
+          "category": "强调与删除线",
+          "cases": 341,
+          "jumpFrameRate": 0.13578744650093325
+        },
+        {
+          "category": "行内代码",
+          "cases": 114,
+          "jumpFrameRate": 0.08040475180588813
+        },
+        {
+          "category": "嵌套行内",
+          "cases": 189,
+          "jumpFrameRate": 0.13077887710477396
+        },
+        {
+          "category": "列表与任务",
+          "cases": 150,
+          "jumpFrameRate": 0.12633380337910052
+        },
+        {
+          "category": "标题与引用",
+          "cases": 58,
+          "jumpFrameRate": 0.07378732455239122
+        },
+        {
+          "category": "围栏代码",
+          "cases": 92,
+          "jumpFrameRate": 0.057711983044805897
+        },
+        {
+          "category": "链接与图片",
+          "cases": 110,
+          "jumpFrameRate": 0.06873557381317019
+        },
+        {
+          "category": "自动链接",
+          "cases": 24,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "表格",
+          "cases": 105,
+          "jumpFrameRate": 0.06377751435479635
+        },
+        {
+          "category": "普通文本与歧义",
+          "cases": 21,
+          "jumpFrameRate": 0
+        },
+        {
+          "category": "转义与实体",
+          "cases": 55,
+          "jumpFrameRate": 0.08233093205587981
+        },
+        {
+          "category": "混合文档",
+          "cases": 9,
+          "jumpFrameRate": 0.06401080193336163
+        },
+        {
+          "category": "歧义与普通文本",
+          "cases": 59,
+          "jumpFrameRate": 0.006331174825691276
+        }
+      ]
+    }
+  ]
+}

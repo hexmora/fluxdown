@@ -1,0 +1,74 @@
+.diagram {
+  margin: 20px 0;
+  padding: 18px;
+  border: 1px solid var(--site-line);
+  border-radius: 12px;
+  background: var(--site-surface);
+  color: var(--site-ink);
+  overflow-x: auto;
+}
+
+.flow {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) 18px minmax(250px, 1.7fr) 18px minmax(120px, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-width: 560px;
+  text-align: center;
+}
+
+.stage {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 14px 6px;
+  font-size: 11px;
+  line-height: 1.6;
+
+  > strong {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  small {
+    color: var(--site-muted);
+    font-size: 10px;
+  }
+}
+
+.run {
+  border: 1px solid var(--site-accent-line);
+  border-radius: 7px;
+  background: var(--site-accent-tint);
+
+  > strong {
+    color: var(--site-accent);
+  }
+}
+
+.hooks {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.runner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.diagram code {
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--site-inset);
+  color: var(--site-ink);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.arrow {
+  color: var(--site-accent);
+  font-size: 20px;
+}

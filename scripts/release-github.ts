@@ -394,9 +394,10 @@ function verifyVersionDiff(candidate: Candidate, target: string) {
       (path) =>
         packageFiles.has(path) ||
         path === 'pnpm-lock.yaml' ||
+        path === 'website/benchmark/repair.json' ||
         /^\.changeset\/[^/]+\.md$/.test(path),
     ),
-    'A version PR may only change package manifests, changelogs, lockfile and consumed changesets',
+    'A version PR may only change package manifests, changelogs, lockfile, consumed changesets and the repair benchmark snapshot',
   );
   // Content identity survives merge/squash/rebase; unrelated source edits cannot enter the candidate.
   if (target !== candidate.headSha) {

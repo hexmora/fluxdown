@@ -40,7 +40,7 @@ tasks:
       - package.json
       - pnpm-lock.yaml
   version:
-    script: pnpm exec changeset version && pnpm install --no-frozen-lockfile
+    script: pnpm exec changeset version && pnpm install --no-frozen-lockfile && pnpm --filter @fluxdown/website benchmark:repair
     env:
       # Changesets formats after rewriting manifests; refresh installation below.
       PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "false"

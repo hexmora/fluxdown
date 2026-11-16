@@ -3,7 +3,7 @@
     "type": "dir",
     "name": "streaming-effects",
     "label": "Streaming effects",
-    "collapsed": false
+    "collapsed": true
   },
   {
     "type": "file",
@@ -14,7 +14,13 @@
     "type": "dir",
     "name": "features",
     "label": "Other features",
-    "collapsed": false
+    "collapsed": true
+  },
+  {
+    "type": "dir",
+    "name": "syntax-repair",
+    "label": "Syntax repair",
+    "collapsed": true
   },
   {
     "type": "file",

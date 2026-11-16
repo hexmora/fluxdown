@@ -1,0 +1,56 @@
+import { RepairDemo, RepairFlow } from '../../../../../components/demo';
+
+# Syntax repair - Fluxdown {#syntax-repair}
+
+Markdown can stop halfway through a link, a list number, or a formula denominator while a response is arriving. Fluxdown renders the structure it can already identify and holds uncertain endings until more text arrives.
+
+## Stop at any character
+
+Six short cases share one progress control. Scrub, slow down or advance one character at a time, comparing received Markdown with repair off and on in each row. Finish the stream to inspect the state after ending repair stops.
+
+<RepairDemo />
+
+> Watch whether content changes its semantic role: a number appearing as text and then becoming a list marker is a syntax transition. Appending text, wrapping a line, or extending a formula with new input is not by itself a syntax transition.
+
+## Where repair happens
+
+<RepairFlow />
+
+Syntax repair controls what appears; [smoothing](../streaming-effects/smoothing.mdx) controls when it appears.
+
+## Supported syntax
+
+This table describes the main built-in behaviors. It does not imply that every incomplete input has an unambiguous final meaning.
+
+| Syntax                             | Streaming behavior                                                                                                                        |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Strong, emphasis and strikethrough | Render unfinished formatting, including adjacent delimiters and nesting; strikethrough follows the active syntax configuration.           |
+| Inline code                        | Preserve code semantics and multi-backtick boundaries; Markdown characters inside code are not repaired as formatting.                    |
+| Fenced code                        | Hold incomplete fences so trailing backticks do not appear as code content.                                                               |
+| Headings and blockquotes           | Hold empty heading markers; process nested text, lists and code boundaries inside quotes.                                                 |
+| Ordered, unordered and task lists  | Hold uncertain numbers, isolated markers and unfinished task markers until list structure is known.                                       |
+| Links and images                   | Preserve readable link labels while waiting for destinations; show images once their addresses are complete.                              |
+| Reference links and footnotes      | Handle references waiting for later definitions and attach their destinations when available. Footnotes require the corresponding syntax. |
+| Tables                             | Hold headers and delimiter rows with clear table signals; continue repairing code, formatting and links in open cells.                    |
+| HTML                               | Trim incomplete tags and attributes, and reconcile paragraph/HTML closing and line-break boundaries.                                      |
+| Escapes and entities               | Hold trailing backslashes and incomplete character references; preserve escaped literals.                                                 |
+| Inline and display math            | Recognize open formula boundaries, then retain a TeX prefix accepted by KaTeX.                                                            |
+
+Repairs for tables, strikethrough and other extensions check whether the matching syntax is enabled. Math also requires `build.tex`. See the [Core repair catalog](../../core/plugins/repair.mdx#supported-plugins) for exact plugin names and import paths.
+
+## Start, pause and finish
+
+| State                         | Application input                                                        | Result                                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Generating                    | Accumulated `text`, with `streaming` set to `true` or an options object. | With repair enabled, unfinished endings are repaired by default.                                      |
+| Paused for inspection         | Stop appending, but keep streaming enabled.                              | Preserve the current repaired view.                                                                   |
+| Finished, cancelled or failed | Set `streaming` to `false`.                                              | Stop ending completion and parse the actual received source; ordinary boundary cleanup can still run. |
+
+See [Writing plugins](./plugins.mdx) for integration and configuration.
+
+## Continue reading
+
+| Page                             | What it covers                                                                     |
+| -------------------------------- | ---------------------------------------------------------------------------------- |
+| [Writing plugins](./plugins.mdx) | Override built-ins, declare a repair, and configure traversal and lifecycle hooks. |
+| [Benchmark](./benchmark.mdx)     | Compare transition-frame rates across popular renderers on shared input.           |

@@ -246,6 +246,15 @@ catalogs:
     vue: 3.4.21
   vue-language-tools:
     typescript: npm:@typescript/typescript6@6.0.2
+  benchmark-repair:
+    "@ant-design/x-markdown": 2.10.0
+    esbuild: 0.28.2
+    markdown-it: 15.0.3
+    markdown-it-task-lists: 2.1.1
+    react-markdown: 10.1.0
+    remark-gfm: 4.0.1
+    streamdown: 2.7.1
+    marked: 18.2.0
 
 packageExtensions:
   # Perfectionist and its typescript-eslint utilities still use the legacy

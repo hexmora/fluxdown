@@ -607,6 +607,31 @@ catalogs:
     vue:
       specifier: ^3.5.0
       version: 3.5.44
+  benchmark-repair:
+    "@ant-design/x-markdown":
+      specifier: 2.10.0
+      version: 2.10.0
+    esbuild:
+      specifier: 0.28.2
+      version: 0.28.2
+    markdown-it:
+      specifier: 15.0.3
+      version: 15.0.3
+    markdown-it-task-lists:
+      specifier: 2.1.1
+      version: 2.1.1
+    react-markdown:
+      specifier: 10.1.0
+      version: 10.1.0
+    remark-gfm:
+      specifier: 4.0.1
+      version: 4.0.1
+    streamdown:
+      specifier: 2.7.1
+      version: 2.7.1
+    marked:
+      specifier: 18.2.0
+      version: 18.2.0
 
 overrides:
   '@rspack/core@2.2.9': 2.3.1
@@ -3381,6 +3406,9 @@ importers:
       '@fluxdown/react-lynx':
         specifier: workspace:^
         version: link:../packages/react-lynx
+      '@fluxdown/types':
+        specifier: workspace:^
+        version: link:../packages/types
       '@fluxdown/vue-lynx':
         specifier: workspace:^
         version: link:../packages/vue-lynx
@@ -3456,6 +3484,33 @@ importers:
       vue-lynx:
         specifier: 'catalog:'
         version: 0.5.1(@lynx-js/types@4.3.0)(@rsbuild/core@2.2.3(core-js@3.51.0))(@rsbuild/plugin-vue@2.0.1(@rsbuild/core@2.2.3(core-js@3.51.0))(@rspack/core@2.3.1(@swc/helpers@0.5.23))(vue@3.5.44(typescript@6.0.3)))(@types/react@18.3.31)(tslib@2.8.1)(webpack@5.112.2(@swc/core@1.16.2(@swc/helpers@0.5.23))(esbuild@0.28.2)(postcss@8.5.31))
+      "@ant-design/x-markdown":
+        specifier: catalog:benchmark-repair
+        version: 2.10.0(@types/react@18.3.31)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      esbuild:
+        specifier: catalog:benchmark-repair
+        version: 0.28.2
+      markdown-it:
+        specifier: catalog:benchmark-repair
+        version: 15.0.3
+      markdown-it-task-lists:
+        specifier: catalog:benchmark-repair
+        version: 2.1.1
+      marked:
+        specifier: catalog:benchmark-repair
+        version: 18.2.0
+      react-markdown:
+        specifier: catalog:benchmark-repair
+        version: 10.1.0(@types/react@18.3.31)(react@19.3.0)
+      remark-gfm:
+        specifier: catalog:benchmark-repair
+        version: 4.0.1
+      streamdown:
+        specifier: catalog:benchmark-repair
+        version: 2.7.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      jsdom:
+        specifier: "catalog:"
+        version: 29.0.0(@noble/hashes@1.8.0)
 
 packages:
 
@@ -18740,6 +18795,69 @@ packages:
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
+  "@ant-design/x-markdown@2.10.0":
+    resolution:
+      integrity: sha512-R49v405eZ/Z/rvv6Vp3Fo7TmI9gERwNOsFtIpK+DwKcueHm69sk58yCKhg2zMQ9R6i5pWkNIEtxPkdMAPS7M0w==
+    peerDependencies:
+      react: ">=18.0.0"
+      react-dom: ">=18.0.0"
+  html-react-parser@5.2.17:
+    resolution:
+      integrity: sha512-m+K/7Moq1jodAB4VL0RXSOmtwLUYoAsikZhwd+hGQe5Vtw2dbWfpFd60poxojMU0Tsh9w59mN1QLEcoHz0Dx9w==
+    peerDependencies:
+      "@types/react": ^18.3.31
+      react: 0.14 || 15 || 16 || 17 || 18 || 19
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
+  html-dom-parser@5.1.8:
+    resolution:
+      integrity: sha512-MCIUng//mF2qTtGHXJWr6OLfHWmg3Pm8ezpfiltF83tizPWY17JxT4dRLE8lykJ5bChJELoY3onQKPbufJHxYA==
+  htmlparser2@10.1.0:
+    resolution:
+      integrity: sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==
+  react-property@2.0.2:
+    resolution:
+      integrity: sha512-+PbtI3VuDV0l6CleQMsx2gtK0JZbZKbpdu5ynr+lbsuvtmgbNcS3VM0tuY2QjFNOcWxvXeHjDpy42RO+4U2rug==
+  marked@16.4.2:
+    resolution:
+      integrity: sha512-TI3V8YYWvkVf3KJe1dRkpnjs68JUPyEa5vjKrp1XEEJUAOaQc+Qj+L1qWbPd0SJuAdQkFU0h73sXXqwDYxsiDA==
+    engines:
+      node: ">= 20"
+    hasBin: true
+  markdown-it-task-lists@2.1.1:
+    resolution:
+      integrity: sha512-TxFAc76Jnhb2OUu+n3yz9RMu4CwGfaT788br6HhEDlvWfdeJcLUsxk1Hgw2yJio0OXsxv7pyIPmvECY7bMbluA==
+  marked@18.2.0:
+    resolution:
+      integrity: sha512-KaeL+tAbtvI930q7HE2PN5lYXYdT8EiSmxHlN6F3rsfb57wd5mp5W5TLazpdj4inTQBJdgjYwbs40W/0VUGU+Q==
+    engines:
+      node: ">= 20"
+    hasBin: true
+  react-markdown@10.1.0:
+    resolution:
+      integrity: sha512-qKxVopLT/TyA6BX3Ue5NwabOsAzm0Q7kAPwq6L+wWDwisYs7R8vZ0nRXqq6rkueboxpkjvLGU9fWifiX/ZZFxQ==
+    peerDependencies:
+      "@types/react": ^18.3.31
+      react: ">=18"
+  html-url-attributes@3.0.1:
+    resolution:
+      integrity: sha512-ol6UPyBWqsrO6EJySPz2O7ZSr856WDrEzM5zMqp+FJJLGMW35cLYmmZnl0vztAZxRUoNZJFTCohfjuIJ8I4QBQ==
+  streamdown@2.7.1:
+    resolution:
+      integrity: sha512-pIz4XOB+e7iyqSJABXC9PoyHifBZVQx/7U0Qo/vdOIERqGXfgEhJxkXENsuWMO8TGXkaQ5ewV9jnliK7q47T8w==
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+  rehype-harden@1.1.9:
+    resolution:
+      integrity: sha512-MdIR9vx9nPo7dTRC2DLb8Ywdx2oDcIuLAFKGA5CmTidkuxli55iRjfMvXL/Lqw7cRG4qMQj441AXxJ5Yw9nC9w==
+  remend@1.4.0:
+    resolution:
+      integrity: sha512-mHiYhhwphs1IgIZmkToKLwJn0U99IjPXuutkA2acrNcG0vlEq2G4TGnd2eT0saIHwh2KjaCpvleHcsd5SAz96A==
+  tailwind-merge@3.7.0:
+    resolution:
+      integrity: sha512-XPPUyAc+cvspz3lHTcR/QgPfW2A0lv/xQNIjX3HGhLR+Nq2lHaLq5MtTesHn8GUr3W3DguT2KT5x3NVgRtYwmA==
 
 snapshots:
 
@@ -39181,3 +39299,81 @@ snapshots:
   zone.js@0.16.3: {}
 
   zwitch@2.0.4: {}
+  "@ant-design/x-markdown@2.10.0(@types/react@18.3.31)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)":
+    dependencies:
+      clsx: 2.1.1
+      dompurify: 3.4.17
+      html-react-parser: 5.2.17(@types/react@18.3.31)(react@19.3.0)
+      katex: 0.16.47
+      marked: 16.4.2
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
+    transitivePeerDependencies:
+      - "@types/react"
+  html-react-parser@5.2.17(@types/react@18.3.31)(react@19.3.0):
+    dependencies:
+      domhandler: 5.0.3
+      html-dom-parser: 5.1.8
+      react: 19.3.0
+      react-property: 2.0.2
+      style-to-js: 1.1.21
+    optionalDependencies:
+      "@types/react": 18.3.31
+  html-dom-parser@5.1.8:
+    dependencies:
+      domhandler: 5.0.3
+      htmlparser2: 10.1.0
+  htmlparser2@10.1.0:
+    dependencies:
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      domutils: 3.2.2
+      entities: 7.0.1
+  react-property@2.0.2: {}
+  marked@16.4.2: {}
+  markdown-it-task-lists@2.1.1: {}
+  marked@18.2.0: {}
+  react-markdown@10.1.0(@types/react@18.3.31)(react@19.3.0):
+    dependencies:
+      "@types/hast": 3.0.4
+      "@types/mdast": 4.0.4
+      "@types/react": 18.3.31
+      devlop: 1.1.0
+      hast-util-to-jsx-runtime: 2.3.6
+      html-url-attributes: 3.0.1
+      mdast-util-to-hast: 13.2.1
+      react: 19.3.0
+      remark-parse: 11.0.0
+      remark-rehype: 11.1.2
+      unified: 11.0.5
+      unist-util-visit: 5.1.0
+      vfile: 6.0.3
+    transitivePeerDependencies:
+      - supports-color
+  html-url-attributes@3.0.1: {}
+  streamdown@2.7.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+    dependencies:
+      clsx: 2.1.1
+      hast-util-to-jsx-runtime: 2.3.6
+      html-url-attributes: 3.0.1
+      marked: 18.2.0
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
+      rehype-harden: 1.1.9
+      rehype-raw: 7.0.0
+      rehype-sanitize: 6.0.0
+      remark-gfm: 4.0.1
+      remark-parse: 11.0.0
+      remark-rehype: 11.1.2
+      remend: 1.4.0
+      tailwind-merge: 3.7.0
+      unified: 11.0.5
+      unist-util-visit: 5.1.0
+      unist-util-visit-parents: 6.0.2
+    transitivePeerDependencies:
+      - supports-color
+  rehype-harden@1.1.9:
+    dependencies:
+      unist-util-visit: 5.1.0
+  remend@1.4.0: {}
+  tailwind-merge@3.7.0: {}

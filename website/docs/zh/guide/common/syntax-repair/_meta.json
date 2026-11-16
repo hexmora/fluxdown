@@ -1,0 +1,12 @@
+[
+  {
+    "type": "file",
+    "name": "plugins",
+    "label": "编写插件"
+  },
+  {
+    "type": "file",
+    "name": "benchmark",
+    "label": "Benchmark"
+  }
+]
