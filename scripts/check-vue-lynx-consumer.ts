@@ -167,12 +167,8 @@ void invalid;
 
         const styles = JSON.stringify(bundle.styleInfo);
 
-        for (const selector of [
-          'fluxdown-scale',
-          'fluxdown-shad-active',
-          'fluxdown-suffix',
-          'fluxdown-table',
-        ]) {
+        // Chunk and shad only add reduced-motion rules, which the Lynx encoder omits.
+        for (const selector of ['fluxdown-scale', 'fluxdown-suffix', 'fluxdown-table']) {
           assert(styles.includes(selector), `Missing Vue Lynx stylesheet: ${selector}`);
         }
 

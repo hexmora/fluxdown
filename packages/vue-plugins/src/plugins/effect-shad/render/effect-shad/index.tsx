@@ -2,11 +2,7 @@ import type { IPluggableConfig } from '@fluxdown/types';
 import type { VueRenderMatchParams, VueRenderParams } from '@fluxdown/vue-base-plugins/base';
 
 import { assert } from '@fluxdown/utils';
-import {
-  BaseVueRenderPlugin,
-  getTextContent,
-  isElementWithTag,
-} from '@fluxdown/vue-base-plugins/base';
+import { BaseVueRenderPlugin } from '@fluxdown/vue-base-plugins/base';
 
 import { createTypeOfSlot } from '../../../../base';
 import { getShadConfig, isShadNode } from './utils';
@@ -29,19 +25,6 @@ export class EffectShadRenderPlugin extends BaseVueRenderPlugin {
   render({ node, renderChildren }: VueRenderParams) {
     assert(isShadNode(node));
 
-    const [leading, active] = node.children;
-
-    assert(leading && isElementWithTag(leading, 'span'));
-
-    assert(active && isElementWithTag(active, 'span'));
-
-    return (
-      <Shad
-        {...getShadConfig(node)}
-        active={renderChildren(active)}
-        isActive={getTextContent(active).length > 0}
-        leading={renderChildren(leading)}
-      />
-    );
+    return <Shad {...getShadConfig(node)}>{renderChildren(node)}</Shad>;
   }
 }

@@ -3,16 +3,12 @@ import { mount } from '@vue/test-utils';
 import type { UniTextNode } from '../../../../typings/render';
 
 import { InlineText } from '..';
-import { MaskedText } from '../../masked-text';
 import { ScaleText } from '../../scale-text';
 
 test.each(['scale', 'chunk', 'shad'] as const)(
   'keeps the same visible effect tree when %s becomes ordinary text',
   async (type) => {
-    const effect =
-      type === 'shad'
-        ? { type, maskText: 'word next', trailingText: ' next' }
-        : { type, start: -1, duration: 200, from: 0, blur: 0.08 };
+    const effect = { type, start: -1, duration: 200, from: 0, blur: 0.08 };
 
     const parts: UniTextNode[] = [{ text: 'word ', effect }];
 
@@ -68,17 +64,12 @@ test('does not create an effect layer for words that have never animated', async
 test.each(['scale', 'chunk', 'shad'] as const)(
   'reuses the %s effect layer and child components when the same word resumes',
   async (type) => {
-    const effect =
-      type === 'shad'
-        ? { type, maskText: 'sa', trailingText: '' }
-        : { type, start: -1, duration: 200, from: 0, blur: 0.08 };
+    const effect = { type, start: -1, duration: 200, from: 0, blur: 0.08 };
 
     const wrapper = mount(InlineText, { props: { parts: [{ text: 'sa', effect }] } });
 
-    const Component = type === 'shad' ? MaskedText : ScaleText;
-
     const children = () =>
-      wrapper.findAllComponents(Component).filter((child) => child.vm.$.type === Component);
+      wrapper.findAllComponents(ScaleText).filter((child) => child.vm.$.type === ScaleText);
 
     const instances = children().map((child) => child.vm.$);
 
@@ -123,26 +114,13 @@ test.each(['scale', 'chunk', 'shad'] as const)(
 test.each(['scale', 'chunk', 'shad'] as const)(
   'retains a completed %s drawing when its word closes',
   async (type) => {
-    const effect =
-      type === 'shad'
-        ? { type, maskText: 'word', trailingText: '' }
-        : { type, start: -1, duration: 200, from: 0, blur: 0.08 };
+    const effect = { type, start: -1, duration: 200, from: 0, blur: 0.08 };
 
-    const wrapper = mount(InlineText, {
-      props: { parts: [{ text: 'word', effect }], tail: true },
-    });
+    const wrapper = mount(InlineText, { props: { parts: [{ text: 'word', effect }] } });
 
     const layer = wrapper.get<HTMLElement>('.fluxdown-inline-text__effect').element;
 
     const text = wrapper.find('text').element;
-
-    await wrapper.setProps({ tail: false });
-
-    expect(wrapper.get<HTMLElement>('.fluxdown-inline-text__effect').element).toBe(layer);
-
-    expect(wrapper.get<HTMLElement>('.fluxdown-inline-text__effect').element.style.opacity).toBe(
-      '',
-    );
 
     await wrapper.setProps({ parts: [{ text: 'word' }] });
 
@@ -152,24 +130,19 @@ test.each(['scale', 'chunk', 'shad'] as const)(
   },
 );
 
-test('passes a closed tail to the retained mask without replacing its drawing', async () => {
-  const effect = { type: 'shad' as const, maskText: 'word', trailingText: '' };
+test('fades shad linearly and chunk with easing', () => {
+  vi.spyOn(performance, 'now').mockReturnValue(1100);
 
-  const wrapper = mount(InlineText, { props: { parts: [{ text: 'word', effect }] } });
+  const opacityOf = (type: 'shad' | 'chunk') =>
+    mount(InlineText, {
+      props: { parts: [{ text: 'a', effect: { type, start: 1000, duration: 400 } }] },
+    })
+      .getComponent(ScaleText)
+      .props('textStyle').opacity;
 
-  await wrapper.setProps({ parts: [{ text: 'word' }] });
+  expect(opacityOf('shad')).toBeCloseTo(0.25);
 
-  expect(wrapper.find('.fluxdown-inline-text__effect').exists()).toBe(true);
-
-  const instance = wrapper.getComponent(MaskedText).vm.$;
-
-  await wrapper.setProps({ tail: false });
-
-  expect(wrapper.getComponent(MaskedText).vm.$).toBe(instance);
-
-  expect(wrapper.getComponent(MaskedText).props('tail')).toBe(false);
-
-  expect(wrapper.find('.fluxdown-inline-text__effect').exists()).toBe(true);
+  expect(opacityOf('chunk')).not.toBeCloseTo(0.25);
 });
 
 test('retains completed glyphs when scale merges them into the ordinary prefix', async () => {
@@ -230,7 +203,7 @@ test('keeps the whole-word placeholder on one line', () => {
 });
 
 test('retains a long word placeholder across a pause, resumed output and completion', async () => {
-  const effect = { type: 'shad' as const, maskText: 'supercali', trailingText: '' };
+  const effect = { type: 'shad' as const, start: -1, duration: 200 };
 
   const wrapper = mount(InlineText, {
     props: { parts: [{ text: 'supercali', effect }] },
@@ -254,7 +227,6 @@ test('retains a long word placeholder across a pause, resumed output and complet
 
   await wrapper.setProps({
     parts: [{ text: 'supercalifragilisticexpialidocious ' }],
-    tail: false,
   });
 
   expect(wrapper.get('.fluxdown-inline-text__placeholder text').element).toBe(placeholder);

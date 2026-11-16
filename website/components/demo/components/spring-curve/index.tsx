@@ -31,7 +31,7 @@ export const SpringEquation = () => {
     <div className={styles.equation} data-demo="spring-equation">
       <Fluxdown
         build={{ tex: true }}
-        text={String.raw`$$F = k(r - x), \qquad a = \frac{F}{m}$$`}
+        text={String.raw`$$F = k(r - x) - c\,v, \qquad a = \frac{F}{m}$$`}
         theme={{ tokens: { colors: { bg: 'transparent', fg: 'var(--site-ink)' } } }}
       />
     </div>

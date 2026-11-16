@@ -1,18 +1,25 @@
+@use "@prefix" as *;
+
 .root {
+  // Fading runs wrap naturally across lines, including their whitespace.
   display: inline;
 
-  .leading,
-  .active {
-    display: inline;
+  &.active {
+    // Linear opacity over time reads as an even gradient across the tail at a steady pace.
+    animation: appear var(--#{$prefix}-shad-duration) linear both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
   }
 
-  .mask {
-    /*
-     * Fade the actual text colors against its own background, including inline markup.
-     */
-    mask-image:
-      linear-gradient(to right, #000, transparent),
-      linear-gradient(to right, #000 max(0px, calc(100% - var(--mask-width))), transparent);
-    mask-composite: intersect;
+  to {
+    opacity: 1;
   }
 }

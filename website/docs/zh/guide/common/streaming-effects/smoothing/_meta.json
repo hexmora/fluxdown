@@ -1,12 +1,12 @@
 [
   {
     "type": "file",
-    "name": "ticker",
-    "label": "节奏器"
+    "name": "driver",
+    "label": "驱动"
   },
   {
     "type": "file",
-    "name": "scheduler",
-    "label": "追踪器"
+    "name": "interpolation",
+    "label": "插值"
   }
 ]

@@ -1,4 +1,4 @@
-import { SpringSmoothScheduler } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { SpringSmoothInterpolator } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 
 export const ARRIVALS = [
   { time: 600, total: 25 },
@@ -13,8 +13,8 @@ export const DURATION = 6000;
 export const TOTAL = 220;
 
 export const createSpringTrace = () => {
-  const scheduler = new SpringSmoothScheduler();
-  scheduler.start(0);
+  const interpolator = new SpringSmoothInterpolator();
+  interpolator.start(0);
   let received = 0;
   let visible = 0;
   let nextArrival = 0;
@@ -23,11 +23,11 @@ export const createSpringTrace = () => {
   for (let time = 20; time <= DURATION; time += 20) {
     const arrival = ARRIVALS[nextArrival];
     if (arrival && time >= arrival.time) {
-      scheduler.push(arrival.total - received, arrival.time);
+      interpolator.push(arrival.total - received, arrival.time);
       received = arrival.total;
       nextArrival += 1;
     }
-    visible += scheduler.tick(time);
+    visible += interpolator.tick(time);
     samples.push({ time, received, visible });
   }
   return samples;

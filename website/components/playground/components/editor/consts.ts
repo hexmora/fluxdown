@@ -1,3 +1,5 @@
+import type { EditorTuning } from './type';
+
 export const COPY = {
   en: {
     title: 'Try your own Markdown.',
@@ -18,6 +20,20 @@ export const COPY = {
     chunkEffect: 'Chunk entrance',
     suffixCursorEffect: 'Suffix · Cursor',
     suffixDotEffect: 'Suffix · Dot',
+    speed: 'Speed',
+    tune: 'Tune',
+    frequency: 'Spring frequency',
+    damping: 'Damping ratio',
+    underdamped: 'Underdamped',
+    critical: 'Critically damped',
+    overdamped: 'Overdamped',
+    pace: 'Chunk pace',
+    paceFast: 'Fast',
+    paceSteady: 'Steady',
+    paceSlow: 'Slow',
+    fadeLength: 'Fade length',
+    entranceDuration: 'Entrance duration',
+    resetTuning: 'Restore defaults',
     placeholder: 'Write some Markdown…',
     empty: 'Your preview starts here.',
     characters: 'characters',
@@ -42,9 +58,56 @@ export const COPY = {
     chunkEffect: '分块入场',
     suffixCursorEffect: '末尾标记 · 方块',
     suffixDotEffect: '末尾标记 · 圆点',
+    speed: '速度',
+    tune: '调参',
+    frequency: '弹簧频率',
+    damping: '阻尼比',
+    underdamped: '欠阻尼',
+    critical: '临界阻尼',
+    overdamped: '过阻尼',
+    pace: '分块节奏',
+    paceFast: '快',
+    paceSteady: '适中',
+    paceSlow: '慢',
+    fadeLength: '渐变长度',
+    entranceDuration: '入场时长',
+    resetTuning: '恢复默认',
     placeholder: '写点 Markdown…',
     empty: '你的预览，从这里开始。',
     characters: '个字符',
     note: '内容保留在当前标签页，渲染库选择会自动记住。',
   },
+};
+
+/**
+ * Playback rates offered for slowing every animation down.
+ */
+export const ANIMATION_SPEEDS = [0.1, 0.25, 0.5, 1] as const;
+
+/**
+ * Default scale entrance duration, in milliseconds at 1×.
+ */
+export const SCALE_DURATION = 200;
+
+/**
+ * Default chunk entrance duration, in milliseconds at 1×.
+ */
+export const CHUNK_DURATION = 400;
+
+/**
+ * Default longest per-character trailing fade, in milliseconds at 1×.
+ */
+export const SHAD_DURATION = 400;
+
+/**
+ * Delay multipliers for simulated chunk arrivals.
+ */
+export const CHUNK_PACES = { fast: 0.25, steady: 1, slow: 2.5 } as const;
+
+export const DEFAULT_TUNING: EditorTuning = {
+  frequency: 5,
+  dampingRatio: 1,
+  pace: 'steady',
+  fadeLength: 10,
+  entranceDuration: SCALE_DURATION,
 };

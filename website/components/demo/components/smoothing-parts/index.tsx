@@ -10,7 +10,7 @@ export const SmoothingPartsDiagram = () => {
     <figure aria-label={labels.label} className={styles.diagram} data-demo="smoothing-parts">
       <div className={styles.inputs}>
         <div className={styles.input}>
-          <strong>{labels.ticker}</strong>
+          <strong>{labels.driver}</strong>
           <span className={styles.caption}>{labels.when}</span>
           <div className={styles.ticks}>
             {[80, 160, 240].map((time) => (
@@ -37,9 +37,9 @@ export const SmoothingPartsDiagram = () => {
       >
         <path d="M25 0V10H50V23M75 0V10H50M48 19L50 23L52 19" />
       </svg>
-      <div className={styles.scheduler}>
+      <div className={styles.interpolation}>
         <div>
-          <strong>{labels.scheduler}</strong>
+          <strong>{labels.interpolation}</strong>
           <span className={styles.caption}>{labels.distance}</span>
         </div>
         <strong className={styles.step}>+2</strong>

@@ -168,12 +168,12 @@ describe('comparison utilities', () => {
     expect(isPropsEqual(base, { ...base, plugins: [pack, pack] })).toBe(false);
   });
 
-  test('compares smoothing enablement and ticker choices', () => {
+  test('compares smoothing enablement and driver choices', () => {
     const base: FluxdownProps = { text: 'content' };
 
     const smooth: FluxdownProps = {
       ...base,
-      streaming: { smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' } },
+      streaming: { smooth: { enabled: true, driver: 'raf', interpolation: 'spring' } },
     };
 
     expect(isPropsEqual(base, { ...base, streaming: false })).toBe(true);
@@ -183,21 +183,21 @@ describe('comparison utilities', () => {
     expect(
       isPropsEqual(smooth, {
         ...base,
-        streaming: { smooth: { enabled: true, ticker: 'raf', scheduler: 'spring' } },
+        streaming: { smooth: { enabled: true, driver: 'raf', interpolation: 'spring' } },
       }),
     ).toBe(true);
 
     expect(
       isPropsEqual(smooth, {
         ...base,
-        streaming: { smooth: { enabled: false, ticker: 'raf', scheduler: 'spring' } },
+        streaming: { smooth: { enabled: false, driver: 'raf', interpolation: 'spring' } },
       }),
     ).toBe(false);
 
     expect(
       isPropsEqual(smooth, {
         ...base,
-        streaming: { smooth: { enabled: true, ticker: 'interval', scheduler: 'spring' } },
+        streaming: { smooth: { enabled: true, driver: 'interval', interpolation: 'spring' } },
       }),
     ).toBe(false);
   });
@@ -232,7 +232,7 @@ describe('comparison utilities', () => {
     ).toBe(true);
 
     expect(
-      isPropsEqual(base, { ...base, streaming: { effect: ['shad', { maskWidth: 24 }] } }),
+      isPropsEqual(base, { ...base, streaming: { effect: ['shad', { duration: 800 }] } }),
     ).toBe(false);
 
     expect(

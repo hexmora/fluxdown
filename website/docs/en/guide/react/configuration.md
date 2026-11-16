@@ -49,15 +49,15 @@ Repair unfinished syntax at the streaming tail. Set this to `false` to disable t
 
 **Default:** `true` (when `streaming` is an object)
 
-Reveal new content gradually. `true` uses the built-in spring scheduler and selects an available ticker automatically; `false` immediately reveals all received content. Pass an object to choose the ticker and scheduler:
+Reveal new content gradually. `true` uses the built-in spring interpolation and selects an available driver automatically; `false` immediately reveals all received content. Pass an object to choose the driver and interpolation:
 
 ```tsx
 <Fluxdown
   streaming={{
     smooth: {
       enabled: true,
-      ticker: 'raf',
-      scheduler: 'spring',
+      driver: 'raf',
+      interpolation: 'spring',
     },
   }}
   text={text}
@@ -72,19 +72,23 @@ Reveal new content gradually. `true` uses the built-in spring scheduler and sele
 
 Set this to `true` when using a `smooth` object to enable progressive output. Disabling it immediately reveals all content received so far.
 
-### smooth.ticker <span className="field-tag">Required</span> {#smoothticker}
+### smooth.driver <span className="field-tag">Optional</span> {#smoothdriver}
 
-**Type:** `'raf' | 'interval' | SmoothTickerClass`
+**Type:** `'raf' | 'interval' | SmoothDriverClass`
 
-Choose the clock that drives output: `'raf'` follows animation frames, `'interval'` uses a timer, and a custom ticker class can provide your own timing.
+**Default:** `'raf'` when animation frames are available, otherwise `'interval'`
 
-### smooth.scheduler <span className="field-tag">Required</span> {#smoothscheduler}
+Choose the clock that drives output: `'raf'` follows animation frames, `'interval'` uses a timer, and a custom driver class can provide your own timing.
 
-**Type:** `'spring' | SmoothSchedulerClass`
+### smooth.interpolation <span className="field-tag">Optional</span> {#smoothinterpolation}
 
-Determine how much content to reveal on each update. Use `'spring'` for the built-in spring scheduler, or pass a custom scheduler class.
+**Type:** `'spring' | SmoothInterpolatorClass`
 
-> Usually, `smooth: true` is enough. Import `SmoothConfig` from `fluxdown`, and `SmoothTickerClass` and `SmoothSchedulerClass` from `@fluxdown/core-plugins/plugins/mapper/smooth`.
+**Default:** `'spring'`
+
+Turn elapsed time into visible progress. Use `'spring'` for the built-in closed-form spring, or pass a custom interpolator class.
+
+> Usually, `smooth: true` is enough. Import `SmoothConfig` from `fluxdown`, and `SmoothDriverClass` and `SmoothInterpolatorClass` from `@fluxdown/core-plugins/plugins/mapper/smooth`. The previous names `ticker` and `scheduler` still work for one release and are deprecated.
 
 ### streaming.effect <span className="field-tag">Optional</span> {#streamingeffect}
 

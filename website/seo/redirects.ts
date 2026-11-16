@@ -12,11 +12,23 @@ const lynxPages = [
   'streaming',
 ];
 
+// Keep the smoothing guide URLs after renaming ticker and scheduler to driver and interpolation.
+const smoothingPages = [
+  ['ticker', 'driver'],
+  ['scheduler', 'interpolation'],
+] as const;
+
+const smoothing = 'guide/common/streaming-effects/smoothing';
+
 export const redirects = new Map<string, string>(
-  ['', 'zh/'].flatMap((locale) =>
-    lynxPages.map(
+  ['', 'zh/'].flatMap((locale) => [
+    ...lynxPages.map(
       (page) =>
         [`${locale}guide/lynx/${page}.html`, `${locale}guide/react-lynx/${page}.html`] as const,
     ),
-  ),
+    ...smoothingPages.map(
+      ([from, to]) =>
+        [`${locale}${smoothing}/${from}.html`, `${locale}${smoothing}/${to}.html`] as const,
+    ),
+  ]),
 );

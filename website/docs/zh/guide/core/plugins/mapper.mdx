@@ -63,7 +63,7 @@ const mappers: MapperPluggable<SmoothConfig>[] = [
 | 插件     | 子路径   |    是否内置     | 作用                                                       |
 | -------- | -------- | :-------------: | ---------------------------------------------------------- |
 | `Smooth` | `smooth` | <PresetCheck /> | 将新内容按时间逐步释放，让成批到达的文本平滑显示。         |
-| `Shad`   | `shad`   | <PresetCheck /> | 为刚出现的末尾文字生成渐变标记，由渲染器呈现。             |
+| `Shad`   | `shad`   | <PresetCheck /> | 为每个新出现的字符生成淡入标记，由渲染器播放。             |
 | `Scale`  | `scale`  | <PresetCheck /> | 为新出现的字符生成缩放、淡入和模糊消退标记，由渲染器呈现。 |
 | `Chunk`  | `chunk`  | <PresetCheck /> | 为新出现的文字分组生成淡入标记，由渲染器呈现。             |
 | `Suffix` | `suffix` | <PresetCheck /> | 为流式末尾生成光标或圆点标记，由渲染器呈现。               |

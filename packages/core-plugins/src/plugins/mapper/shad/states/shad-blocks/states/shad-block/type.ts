@@ -2,14 +2,15 @@ import type { IBlockState } from '@fluxdown/types';
 import type { Root as HastRoot } from 'hast';
 import type { IReadableClosure } from 'stative';
 
-import type { ShadPosition } from '../../../shad-progress';
+import type { FadeConcurrency } from '../../../../utils';
+import type { ShadAnimationInputs } from '../../type';
 
-export interface ShadBlockInputs {
+export interface ShadBlockInputs extends ShadAnimationInputs {
   source: IBlockState<HastRoot>;
 
-  tail: IReadableClosure<IBlockState<HastRoot> | undefined>;
+  initial: boolean;
 
-  progress: IReadableClosure<ShadPosition>;
+  clock: IReadableClosure<number>;
 
-  maskWidth: IReadableClosure<number>;
+  concurrency: FadeConcurrency;
 }

@@ -1,12 +1,12 @@
 [
   {
     "type": "file",
-    "name": "ticker",
-    "label": "Ticker"
+    "name": "driver",
+    "label": "Driver"
   },
   {
     "type": "file",
-    "name": "scheduler",
-    "label": "Scheduler"
+    "name": "interpolation",
+    "label": "Interpolation"
   }
 ]

@@ -1,10 +1,9 @@
 import type { IPluggableConfig } from '@fluxdown/types';
 
 import type { SlotBaseProps } from '../../../../base/slot/type';
-import type { UniRenderNode } from '../../../../typings/render';
 
 import { BaseSlotPlugin } from '../../../../base';
-import { getInlineText, hasInlineEffect, mapInlineText } from '../../../../base/slot/utils';
+import { hasInlineEffect, mapInlineText } from '../../../../base/slot/utils';
 import { ShadRenderer } from './renderer';
 
 declare global {
@@ -21,42 +20,16 @@ export class EffectShadSlotPlugin extends BaseSlotPlugin<'Shad'> {
   readonly type = 'Shad';
 
   renderInline(props: SlotBaseProps & Record<string, unknown>) {
-    if (this.Component !== ShadRenderer) {
+    if (this.Component !== ShadRenderer || hasInlineEffect(props.children ?? [])) {
       return null;
     }
 
-    const leading = props.leading as UniRenderNode;
+    const effect = {
+      type: 'shad' as const,
+      start: Number(props.start),
+      duration: Number(props.duration),
+    };
 
-    const active = props.active as UniRenderNode;
-
-    if (hasInlineEffect([leading, active])) {
-      return null;
-    }
-
-    const text = getInlineText(active);
-
-    const maskText = props.isActive ? text : '';
-
-    let cursor = 0;
-
-    return [
-      leading,
-      ...mapInlineText([active], (value) => {
-        cursor += value.length;
-
-        return {
-          text: value,
-          ...(maskText
-            ? {
-                effect: {
-                  type: 'shad' as const,
-                  maskText,
-                  trailingText: text.slice(cursor),
-                },
-              }
-            : {}),
-        };
-      }),
-    ];
+    return mapInlineText(props.children ?? [], (text) => ({ text, effect }));
   }
 }

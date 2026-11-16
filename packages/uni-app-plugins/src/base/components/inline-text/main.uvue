@@ -6,10 +6,9 @@ import type { InlineTextProps } from './type';
 
 import { InheritedText } from '../inherited-text';
 import { toText } from '../inherited-text/utils';
-import { MaskedText } from '../masked-text';
 import { InlinePart } from './components/part';
 
-const props = withDefaults(defineProps<InlineTextProps>(), { tail: true });
+const props = defineProps<InlineTextProps>();
 
 const text = computed(() => props.parts.map((part) => part.text).join(''));
 
@@ -36,12 +35,6 @@ watch(active, (value) => {
     kind.value = value;
   }
 });
-
-const mask = computed(() => {
-  const last = props.parts.at(-1)?.effect;
-
-  return last?.type === 'shad' && last.maskText ? last : null;
-});
 </script>
 
 <template>
@@ -63,22 +56,12 @@ const mask = computed(() => {
         >
       </view>
       <view v-if="kind" class="fluxdown-inline-text__effect" aria-hidden="true">
-        <MaskedText
-          v-if="kind === 'shad'"
-          :text="text"
+        <InlinePart
+          v-for="{ part, key } in parts"
+          :key="key"
+          :node="part"
           :text-style="textStyle"
-          :mask-text="mask?.maskText ?? ''"
-          :trailing-text="mask?.trailingText ?? ''"
-          :tail="props.tail"
         />
-        <template v-else>
-          <InlinePart
-            v-for="{ part, key } in parts"
-            :key="key"
-            :node="part"
-            :text-style="textStyle"
-          />
-        </template>
       </view>
     </view>
   </InheritedText>

@@ -1,33 +1,33 @@
 import {
-  BaseSmoothScheduler,
-  IntervalSmoothTicker,
+  BaseSmoothInterpolator,
+  IntervalSmoothDriver,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 
-export class FastTicker extends IntervalSmoothTicker {
+export class FastDriver extends IntervalSmoothDriver {
   constructor() {
     super(50);
   }
 }
 
-export class SlowTicker extends IntervalSmoothTicker {
+export class SlowDriver extends IntervalSmoothDriver {
   constructor() {
     super(160);
   }
 }
 
-export class CoarseTicker extends IntervalSmoothTicker {
+export class CoarseDriver extends IntervalSmoothDriver {
   constructor() {
     super(320);
   }
 }
 
-export class SteadyTicker extends IntervalSmoothTicker {
+export class SteadyDriver extends IntervalSmoothDriver {
   constructor() {
     super(80);
   }
 }
 
-export class StepScheduler extends BaseSmoothScheduler {
+export class StepInterpolator extends BaseSmoothInterpolator {
   protected readonly defaultTuple = [2];
 
   private position = 0;
@@ -56,10 +56,10 @@ export class StepScheduler extends BaseSmoothScheduler {
   }
 }
 
-export class SmallStepScheduler extends StepScheduler {
+export class SmallStepInterpolator extends StepInterpolator {
   protected override readonly defaultTuple = [1];
 }
 
-export class LargeStepScheduler extends StepScheduler {
+export class LargeStepInterpolator extends StepInterpolator {
   protected override readonly defaultTuple = [4];
 }

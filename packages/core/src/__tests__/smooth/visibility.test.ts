@@ -3,7 +3,7 @@ import { batch, ReactiveState, render, S } from 'stative';
 
 import type { HastRoot } from '../../typings';
 
-import { DoubleStepSmoothScheduler, StepSmoothScheduler } from '../utils/smooth';
+import { DoubleStepSmoothInterpolator, StepSmoothInterpolator } from '../utils/smooth';
 import {
   collectText,
   createBlock,
@@ -11,10 +11,10 @@ import {
   firstBlock,
   latest,
   paragraph,
-  PrimarySmoothTicker,
+  PrimarySmoothDriver,
   resetSmoothTests,
   root,
-  SecondarySmoothTicker,
+  SecondarySmoothDriver,
   setupSmooth,
   text,
   visibleText,
@@ -58,29 +58,29 @@ describe('Smooth visibility', () => {
 
     harness.source.next([current.block]);
 
-    harness.ticker.next(SecondarySmoothTicker);
+    harness.driver.next(SecondarySmoothDriver);
 
-    harness.scheduler.next(DoubleStepSmoothScheduler);
+    harness.interpolation.next(DoubleStepSmoothInterpolator);
 
-    expect(PrimarySmoothTicker.instances).toHaveLength(0);
+    expect(PrimarySmoothDriver.instances).toHaveLength(0);
 
-    expect(SecondarySmoothTicker.instances).toHaveLength(0);
+    expect(SecondarySmoothDriver.instances).toHaveLength(0);
 
-    expect(StepSmoothScheduler.instances).toHaveLength(0);
+    expect(StepSmoothInterpolator.instances).toHaveLength(0);
 
     expect(visibleText(harness.state.value.value)).toEqual(['latest']);
 
     expect(forkStale).not.toHaveBeenCalled();
 
-    expect(PrimarySmoothTicker.instances).toHaveLength(0);
+    expect(PrimarySmoothDriver.instances).toHaveLength(0);
 
-    expect(SecondarySmoothTicker.instances).toHaveLength(0);
+    expect(SecondarySmoothDriver.instances).toHaveLength(0);
 
     current.source.next(paragraph('latest content'));
 
-    expect(SecondarySmoothTicker.instances).toHaveLength(1);
+    expect(SecondarySmoothDriver.instances).toHaveLength(1);
 
-    expect(DoubleStepSmoothScheduler.instances).toHaveLength(1);
+    expect(DoubleStepSmoothInterpolator.instances).toHaveLength(1);
 
     harness.state.destroy();
   });
@@ -104,9 +104,9 @@ describe('Smooth visibility', () => {
 
     expect(output.map((block) => block.meta.value.blockCount)).toEqual([2, 2]);
 
-    expect(PrimarySmoothTicker.instances).toHaveLength(0);
+    expect(PrimarySmoothDriver.instances).toHaveLength(0);
 
-    expect(StepSmoothScheduler.instances).toHaveLength(0);
+    expect(StepSmoothInterpolator.instances).toHaveLength(0);
 
     expect(harness.state.value.value).toBe(output);
 
@@ -128,7 +128,7 @@ describe('Smooth visibility', () => {
 
     const fork = firstBlock(harness.state.value.value);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     expect(fork.range.value).toEqual({ start: 0, end: 0 });
 
@@ -136,21 +136,21 @@ describe('Smooth visibility', () => {
 
     expect(a.meta.value.blockCount).toBe(2);
 
-    ticker.tick(16);
+    driver.tick(16);
 
-    ticker.tick(32);
+    driver.tick(32);
 
     expect(collectText(fork.value.value)).toBe('ab');
 
     expect(sizes).toEqual([0, 1]);
 
-    ticker.tick(48);
+    driver.tick(48);
 
     expect(harness.state.value.value).toHaveLength(1);
 
     expect(fork.range.value).toEqual({ start: 0, end: 3 });
 
-    ticker.tick(64);
+    driver.tick(64);
 
     const output = harness.state.value.value;
 
@@ -162,9 +162,9 @@ describe('Smooth visibility', () => {
 
     expect(sizes).toEqual([0, 1, 2]);
 
-    ticker.tick(80);
+    driver.tick(80);
 
-    ticker.tick(96);
+    driver.tick(96);
 
     expect(harness.state.value.value).toBe(output);
 
@@ -210,23 +210,23 @@ describe('Smooth visibility', () => {
 
     const fork = firstBlock(harness.state.value.value);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     expect(collectText(fork.value.value)).toBe('');
 
-    ticker.tick(16);
+    driver.tick(16);
 
     expect(fork.value.value).toEqual(root([element('p', [element('strong', [text('👩🏽‍💻')])])]));
 
-    ticker.tick(32);
+    driver.tick(32);
 
     expect(collectText(fork.value.value)).toBe('👩🏽‍💻é');
 
-    ticker.tick(48);
+    driver.tick(48);
 
     expect(fork.value.value).toEqual(root([element('p', [strong, image])]));
 
-    ticker.tick(64);
+    driver.tick(64);
 
     expect(collectText(fork.value.value)).toBe('👩🏽‍💻éz');
 
@@ -266,11 +266,11 @@ describe('Smooth visibility', () => {
 
     block.source.next(paragraph('abcd'));
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     expect(collectText(fork.value.value)).toBe('ab');
 
-    ticker.tick(16);
+    driver.tick(16);
 
     expect(collectText(fork.value.value)).toBe('abc');
 
@@ -278,7 +278,7 @@ describe('Smooth visibility', () => {
 
     expect(collectText(fork.value.value)).toBe('wxy');
 
-    ticker.tick(32);
+    driver.tick(32);
 
     expect(collectText(fork.value.value)).toBe('wxyz');
 
@@ -300,8 +300,8 @@ describe('Smooth visibility', () => {
         {
           source,
           enabled: ReactiveState.of(true),
-          ticker: ReactiveState.of(PrimarySmoothTicker),
-          scheduler: ReactiveState.of(StepSmoothScheduler),
+          driver: ReactiveState.of(PrimarySmoothDriver),
+          interpolation: ReactiveState.of(StepSmoothInterpolator),
         },
       ]),
     );
@@ -314,7 +314,7 @@ describe('Smooth visibility', () => {
 
     expect(collectText(fork.value.value)).toBe('abc');
 
-    latest(PrimarySmoothTicker.instances).tick(16);
+    latest(PrimarySmoothDriver.instances).tick(16);
 
     expect(collectText(fork.value.value)).toBe('abcd');
 
@@ -330,20 +330,20 @@ describe('Smooth visibility', () => {
 
     harness.source.next([block.block]);
 
-    const ticker = latest(PrimarySmoothTicker.instances);
+    const driver = latest(PrimarySmoothDriver.instances);
 
     const fork = firstBlock(harness.state.value.value);
 
-    ticker.tick(16);
+    driver.tick(16);
 
-    ticker.tick(32);
+    driver.tick(32);
 
     block.source.next(paragraph('abcde'));
 
     expect(collectText(fork.value.value)).toBe('ab');
 
     for (const time of [48, 64, 80]) {
-      ticker.tick(time);
+      driver.tick(time);
     }
 
     expect(collectText(fork.value.value)).toBe('abcde');
@@ -357,7 +357,7 @@ describe('Smooth visibility', () => {
     expect(collectText(fork.value.value)).toBe('a');
 
     for (const time of [96, 112, 128]) {
-      ticker.tick(time);
+      driver.tick(time);
     }
 
     expect(collectText(fork.value.value)).toBe('abcd');

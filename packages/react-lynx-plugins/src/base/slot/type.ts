@@ -197,12 +197,7 @@ export type ScaleProps = SlotBaseProps<
 
 export type ScaleWordProps = SlotBaseProps<{}, true>;
 
-export type ShadProps = SlotBaseProps<{
-  leading: ReactNode;
-  active: ReactNode;
-  isActive: boolean;
-  maskWidth: number;
-}>;
+export type ShadProps = SlotBaseProps<{ start: number; duration: number }, true>;
 
 export type SuffixProps = SlotBaseProps<{ type: SuffixType }, true>;
 

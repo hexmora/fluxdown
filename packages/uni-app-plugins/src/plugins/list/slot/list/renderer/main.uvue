@@ -49,7 +49,7 @@ const nested = computed(
         "
       />
       <view :style="{ flex: 1, paddingLeft: `${theme.tokens.spacing.xs}px` }"
-        ><RenderNodes :nodes="[props.render(item)]" :tail="index === entries.length - 1"
+        ><RenderNodes :nodes="[props.render(item)]"
       /></view>
     </view>
   </view>

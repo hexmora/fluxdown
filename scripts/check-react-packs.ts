@@ -189,7 +189,7 @@ export async function checkReactPacks(consumer: string, native = false): Promise
       {
         specifier: '@fluxdown/react-native-plugins/plugins/effect-shad',
         requiredInitialCjsEngines: ['katex'],
-        allowed: ['react-native-svg'],
+        allowed: [],
       },
       {
         specifier: '@fluxdown/react-native-plugins/plugins/effect-suffix',

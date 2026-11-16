@@ -68,24 +68,38 @@ describe('streaming effect renderers', () => {
     expect(root.textContent).toBe('Complete chunk');
   });
 
-  test('uses pixel widths for the shad mask without changing text flow', () => {
-    const [active, setActive] = createSignal(true);
+  test('resumes a shad fade from its own start time and settles once it has finished', () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1100);
 
-    const view = render(() => (
-      <ShadRenderer leading="stable " active="tail" isActive={active()} maskWidth={64} />
+    const running = render(() => (
+      <ShadRenderer start={1000} duration={400}>
+        tail
+      </ShadRenderer>
     ));
 
-    const mask = view.container.querySelector('[aria-hidden="true"]') as HTMLElement;
+    const element = running.container.firstElementChild as HTMLElement;
 
-    expect(mask.style.width).toBe('64px');
+    expect(element.getAttribute('data-fluxdown-shad')).toBe('fade');
 
-    expect(mask.style.marginLeft).toBe('-64px');
+    expect(element.className).toContain('active');
 
-    expect(view.container.textContent).toBe('stable tail');
+    expect(element.style.animationDelay).toBe('-100ms');
 
-    setActive(false);
+    expect(element.style.getPropertyValue(`--${PREFIX}-shad-duration`)).toBe('400ms');
 
-    expect(mask.className).toContain('maskHidden');
+    expect(element.textContent).toBe('tail');
+
+    running.unmount();
+
+    now.mockReturnValue(1500);
+
+    const settled = render(() => (
+      <ShadRenderer start={1000} duration={400}>
+        tail
+      </ShadRenderer>
+    ));
+
+    expect(settled.container.firstElementChild!.className).not.toContain('active');
   });
 
   test.each(['cursor', 'dot', 'custom'] as const)('marks %s suffix as decorative', (type) => {

@@ -1,0 +1,79 @@
+import { DriverDemo } from '../../../../../../components/demo/components/smoothing-controls-demo';
+
+# 驱动 - Fluxdown {#驱动}
+
+平滑化要不断回答两个问题：**什么时候更新，以及这次显示多少。** 驱动（driver）负责前一个，后一个交给[插值](./interpolation.mdx)。
+
+浏览器里，默认驱动跟随动画帧。通常保持默认就好；需要降低更新频率，或接入宿主提供的时钟时，再换一个驱动。
+
+## 调慢每一拍
+
+两边接收相同的文字，也使用相同的弹簧插值。试着把右侧的更新间隔切到 `320 ms`：文字会一小段一小段地出现；切到 `50 ms`，步幅就细一些。
+
+「已收到」的进度条会随着输入分批跳动。它停下来时，下面的文字仍可以继续展开。点击输出区域，可以让下一批内容提前到达。
+
+<DriverDemo />
+
+更新次数少了，每次前进的距离可能变大。驱动不直接决定阅读速度：弹簧插值会根据经过的时间和积压的内容计算进度。
+
+## 使用内置驱动
+
+`'raf'` 跟随 `requestAnimationFrame`，适合浏览器里的连续呈现。`'interval'` 使用定时器，默认约每 16.7 毫秒一拍。直接写 `smooth: true` 时，Fluxdown 会自动选择可用的方式。
+
+下面以 React 为例。其他框架也通过 `streaming.smooth` 传入同样的配置：
+
+```tsx
+<Fluxdown
+  streaming={{
+    smooth: { enabled: true, driver: 'raf', interpolation: 'spring' },
+    effect: false,
+  }}
+  text={text}
+/>
+```
+
+这里关闭了入场特效，方便观察更新间隔。实际使用时可以继续搭配[动画效果](../animation/index.mdx)。
+
+## 自定义间隔
+
+只想改频率，不必重新写定时器。继承 `IntervalSmoothDriver`，在构造时指定间隔即可；演示里的 `160 ms` 就是这样实现的：
+
+```tsx
+import { IntervalSmoothDriver } from '@fluxdown/core-plugins/plugins/mapper/smooth';
+import { Fluxdown } from 'fluxdown';
+
+class SlowDriver extends IntervalSmoothDriver {
+  constructor() {
+    super(160);
+  }
+}
+
+export function Message({ text }: { text: string }) {
+  return (
+    <Fluxdown
+      streaming={{
+        smooth: { enabled: true, driver: SlowDriver, interpolation: 'spring' },
+        effect: false,
+      }}
+      text={text}
+    />
+  );
+}
+```
+
+传入的是**类**，不是 `new SlowDriver()`。Fluxdown 会创建实例，并在内容追平后按需暂停计时；新内容到达时重新启动，组件销毁时清理。把类放在组件外，也能避免每次渲染都换一个驱动。
+
+## 接入自己的时钟
+
+如果宿主有独立的帧回调，可以继承 `BaseSmoothDriver`。需要提供的能力很少：
+
+| 成员      | 做什么                                 |
+| --------- | -------------------------------------- |
+| `running` | 表明是否正在发出时间戳。               |
+| `start()` | 开始订阅宿主时钟，返回启动时的时间戳。 |
+| `stop()`  | 取消回调，停止发出时间戳。             |
+| `now()`   | 读取当前时间，单位为毫秒。             |
+
+每次回调通过 `this.subject.next(timestamp)` 发出时间戳。`start()`、`now()` 和回调必须使用同一个时间基准；不要把系统时间与页面启动后的相对时间混在一起。基类的 `destroy()` 会停止运行中的驱动并结束订阅。
+
+如果只是想让文字更快、更慢，或每次固定显示几个字，接着看[插值](./interpolation.mdx)。

@@ -64,7 +64,7 @@ export const Custom: Story = {
           h1: { fontSize: '2.5rem', fontWeight: 600, lineHeight: 1.2 },
         },
         typography: {
-          fontSans: "Georgia, 'Times New Roman', serif",
+          fontSans: "'Avenir Next', 'Segoe UI', system-ui, sans-serif",
           lineHeight: { md: 1.8 },
         },
       },

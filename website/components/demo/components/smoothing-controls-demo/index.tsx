@@ -7,42 +7,42 @@ import { ReplayIcon } from '../../../icons';
 import { useDemoStream } from '../../hooks';
 import { getDemoTheme } from '../../utils';
 import { StreamAccelerator } from '../stream-accelerator';
-import { COPY, SCHEDULERS, TICKERS, TIMING } from './consts';
+import { COPY, DRIVERS, INTERPOLATORS, TIMING } from './consts';
 import styles from './index.module.scss';
-import { SteadyTicker } from './strategies';
+import { SteadyDriver } from './strategies';
 
-const SmoothingControlsDemo = ({ mode }: { mode: 'ticker' | 'scheduler' }) => {
+const SmoothingControlsDemo = ({ mode }: { mode: 'driver' | 'interpolation' }) => {
   const { lang } = useLocale();
   const dark = useDark();
   const labels = COPY[lang];
   const stream = useDemoStream(labels.source, TIMING);
   const [selection, setSelection] = useState(1);
-  const isTicker = mode === 'ticker';
-  const options = isTicker ? [50, 160, 320] : [1, 2, 4];
-  const unit = isTicker ? 'ms' : labels.units;
+  const isDriver = mode === 'driver';
+  const options = isDriver ? [50, 160, 320] : [1, 2, 4];
+  const unit = isDriver ? 'ms' : labels.units;
   const customLabel = `${options[selection]} ${unit}`;
 
   const baseline = {
     enabled: true,
-    ticker: isTicker ? ('raf' as const) : SteadyTicker,
-    scheduler: 'spring' as const,
+    driver: isDriver ? ('raf' as const) : SteadyDriver,
+    interpolation: 'spring' as const,
   };
   const custom = {
     enabled: true,
-    ticker: isTicker ? TICKERS[selection]! : SteadyTicker,
-    scheduler: isTicker ? ('spring' as const) : SCHEDULERS[selection]!,
+    driver: isDriver ? DRIVERS[selection]! : SteadyDriver,
+    interpolation: isDriver ? ('spring' as const) : INTERPOLATORS[selection]!,
   };
 
   return (
     <section
-      aria-label={isTicker ? labels.tickerLabel : labels.schedulerLabel}
+      aria-label={isDriver ? labels.driverLabel : labels.interpolationLabel}
       className={styles.demo}
       data-demo={mode}
       ref={stream.containerRef}
     >
       <div className={styles.toolbar}>
         <label>
-          {isTicker ? labels.ticker : labels.scheduler}
+          {isDriver ? labels.driver : labels.interpolation}
           <span className={styles.select}>
             <select
               onChange={(event) => {
@@ -82,7 +82,7 @@ const SmoothingControlsDemo = ({ mode }: { mode: 'ticker' | 'scheduler' }) => {
         complete={stream.complete}
       >
         {[
-          { id: 'baseline', label: isTicker ? labels.raf : labels.spring, smooth: baseline },
+          { id: 'baseline', label: isDriver ? labels.raf : labels.spring, smooth: baseline },
           { id: 'custom', label: customLabel, smooth: custom },
         ].map(({ id, label, smooth }) => (
           <div className={styles.panel} key={id}>
@@ -96,11 +96,11 @@ const SmoothingControlsDemo = ({ mode }: { mode: 'ticker' | 'scheduler' }) => {
           </div>
         ))}
       </StreamAccelerator>
-      <p className={styles.note}>{isTicker ? labels.tickerNote : labels.schedulerNote}</p>
+      <p className={styles.note}>{isDriver ? labels.driverNote : labels.interpolationNote}</p>
     </section>
   );
 };
 
-export const TickerDemo = () => <SmoothingControlsDemo mode="ticker" />;
+export const DriverDemo = () => <SmoothingControlsDemo mode="driver" />;
 
-export const SchedulerDemo = () => <SmoothingControlsDemo mode="scheduler" />;
+export const InterpolationDemo = () => <SmoothingControlsDemo mode="interpolation" />;

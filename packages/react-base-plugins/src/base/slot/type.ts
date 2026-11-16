@@ -178,14 +178,7 @@ export type ScaleProps = SlotBaseProps<
 
 export type ScaleWordProps = SlotBaseProps<{}, true>;
 
-export type ShadProps = SlotBaseProps<{
-  leading: ReactNode;
-  active: ReactNode;
-  isActive: boolean;
-  maskWidth: number;
-  /** Grapheme offset of the shaded tail within its parent. */
-  offset?: number;
-}>;
+export type ShadProps = SlotBaseProps<{ start: number; duration: number }, true>;
 
 export type SuffixProps = SlotBaseProps<{ type: SuffixType }, true>;
 

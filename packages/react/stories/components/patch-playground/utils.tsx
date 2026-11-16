@@ -34,6 +34,6 @@ export const createPatches = (
   },
   {
     range: getRange(PATCH_MARKDOWN, KEYLESS_ANCHOR),
-    render: (text) => <mark>{text}</mark>,
+    render: (text) => <mark className="playground-patch-highlight">{text}</mark>,
   },
 ];

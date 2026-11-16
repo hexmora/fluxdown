@@ -1,68 +1,37 @@
-import { flushPromises, mount } from '@vue/test-utils';
-import { defineComponent, h } from 'vue';
-
-import type { RendererProps } from '../type';
+import { mount } from '@vue/test-utils';
+import { h } from 'vue';
 
 import { ShadRenderer } from '..';
-import { MaskedText } from '../../../../../../base/components/masked-text';
-import { provideSlots } from '../../../../../../base/slot/context';
-import { ShadText } from '../components/text';
+import { InheritedText } from '../../../../../../base/components/inherited-text';
 
-const Host = /*#__PURE__*/ defineComponent(
-  (props: RendererProps) => {
-    provideSlots(() => []);
+// Text inside the renderer inherits its opacity, as rendered children do.
+const fade = () => h(InheritedText, { text: 'fade' });
 
-    return () => h(ShadRenderer, props);
-  },
-  { props: ['leading', 'active', 'isActive', 'maskWidth', 'offset'] },
-);
+test('resumes a fade from its own start time and settles once it has finished', async () => {
+  const now = vi.spyOn(performance, 'now').mockReturnValue(1100);
 
-test('retains native text instances while words enter and leave the active tail', async () => {
-  const wrapper = mount(Host, {
-    props: { leading: 'Streaming ', active: 'te', isActive: true, maskWidth: 15, offset: 0 },
+  const wrapper = mount(ShadRenderer, {
+    props: { start: 1000, duration: 400 },
+    slots: { default: fade },
   });
 
-  await flushPromises();
+  const opacity = () => Number(wrapper.find<HTMLElement>('text').element.style.opacity);
 
-  const text = wrapper.getComponent(ShadText).vm.$;
+  // Linear, unlike chunk's ease-out.
+  expect(opacity()).toBeCloseTo(0.25);
 
-  const first = wrapper.findAllComponents(MaskedText)[1].vm.$;
+  now.mockReturnValue(1500);
 
-  await wrapper.setProps({ leading: '', active: 'text sta', offset: 10 });
+  await wrapper.setProps({ start: 1000, duration: 401 });
 
-  expect(wrapper.getComponent(ShadText).vm.$).toBe(text);
+  expect(opacity()).toBe(1);
+});
 
-  const words = wrapper.findAllComponents(MaskedText);
+test('does not animate content that was already settled', () => {
+  const wrapper = mount(ShadRenderer, {
+    props: { start: -1, duration: 400 },
+    slots: { default: fade },
+  });
 
-  expect(words[0].props('text')).toBe('text\u00a0');
-
-  expect(words[0].vm.$).toBe(first);
-
-  expect(words[1].vm.$).not.toBe(first);
-
-  const next = words[1].vm.$;
-
-  await wrapper.setProps({ leading: 'text ', active: 'stays on', offset: 10 });
-
-  expect(wrapper.findAllComponents(MaskedText)[0].vm.$).toBe(first);
-
-  expect(wrapper.findAllComponents(MaskedText)[0].props('maskText')).toBe('');
-
-  expect(wrapper.findAllComponents(MaskedText)[1].vm.$).toBe(next);
-
-  await wrapper.setProps({ leading: '', active: 'stays on', offset: 15 });
-
-  expect(wrapper.getComponent(ShadText).vm.$).toBe(text);
-
-  expect(wrapper.findAllComponents(MaskedText)[0].vm.$).toBe(next);
-
-  const placeholder = wrapper.getComponent(MaskedText).find('text').element;
-
-  await wrapper.setProps({ isActive: false });
-
-  expect(wrapper.getComponent(MaskedText).vm.$).toBe(next);
-
-  expect(wrapper.getComponent(MaskedText).props('maskText')).toBe('');
-
-  expect(wrapper.getComponent(MaskedText).find('text').element).toBe(placeholder);
+  expect(Number(wrapper.find<HTMLElement>('text').element.style.opacity)).toBe(1);
 });

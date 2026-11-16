@@ -1,15 +1,16 @@
 import { compute } from '@fluxdown/utils';
 import { useDark } from '@rspress/core/runtime';
+import { useId, useState } from 'react';
 
-import type { EditorEffect, EditorProps } from './type';
+import type { AnimationSpeed, ChunkPace, EditorEffect, EditorProps } from './type';
 
 import { useBottomScroll } from '../../../bottom-scroll';
 import { DEMO_BUILD, RendererPreview, RENDERERS } from '../../../demo';
 import { PauseIcon, PlayIcon, ReplayIcon, ResetIcon } from '../../../icons';
-import { COPY } from './consts';
+import { ANIMATION_SPEEDS, CHUNK_PACES, COPY, DEFAULT_TUNING } from './consts';
 import { useEditor } from './hooks';
 import styles from './index.module.scss';
-import { getEditorEffect } from './utils';
+import { getDampingKind, getEffectConfig } from './utils';
 
 export const Editor = ({ lang }: EditorProps) => {
   const copy = COPY[lang];
@@ -26,6 +27,12 @@ export const Editor = ({ lang }: EditorProps) => {
     setRepair,
     effect,
     setEffect,
+    speed,
+    changeSpeed,
+    driver,
+    interpolation,
+    tuning,
+    changeTuning,
     playback,
     stream,
     previewText,
@@ -38,6 +45,16 @@ export const Editor = ({ lang }: EditorProps) => {
   const preview = useBottomScroll(false, scrollMode, renderer);
 
   const playLabel = stream.playing ? copy.pause : copy.play;
+
+  const [tuningOpen, setTuningOpen] = useState(false);
+
+  const tuningId = useId();
+
+  const paceLabels: Record<ChunkPace, string> = {
+    fast: copy.paceFast,
+    steady: copy.paceSteady,
+    slow: copy.paceSlow,
+  };
 
   return (
     <main className={styles.playground}>
@@ -81,7 +98,7 @@ export const Editor = ({ lang }: EditorProps) => {
             </label>
             <label className={styles.effect}>
               {copy.effect}
-              <span className={styles.effectSelect}>
+              <span className={styles.select}>
                 <select
                   aria-label={copy.effect}
                   onChange={(event) => setEffect(event.currentTarget.value as EditorEffect)}
@@ -96,6 +113,32 @@ export const Editor = ({ lang }: EditorProps) => {
                 </select>
               </span>
             </label>
+            <label className={styles.effect}>
+              {copy.speed}
+              <span className={styles.select}>
+                <select
+                  aria-label={copy.speed}
+                  onChange={(event) =>
+                    changeSpeed(Number(event.currentTarget.value) as AnimationSpeed)
+                  }
+                  value={speed}
+                >
+                  {ANIMATION_SPEEDS.map((value) => (
+                    <option key={value} value={value}>
+                      {value}×
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
+            <button
+              aria-controls={tuningId}
+              aria-expanded={tuningOpen}
+              onClick={() => setTuningOpen((open) => !open)}
+              type="button"
+            >
+              {copy.tune}
+            </button>
           </div>
           <div className={styles.actions}>
             <button
@@ -124,6 +167,97 @@ export const Editor = ({ lang }: EditorProps) => {
             </button>
           </div>
         </div>
+
+        {tuningOpen ? (
+          <div className={styles.tuning} id={tuningId}>
+            <label>
+              {copy.frequency}
+              <input
+                aria-label={copy.frequency}
+                max={20}
+                min={1}
+                onChange={(event) => changeTuning({ frequency: Number(event.currentTarget.value) })}
+                step={0.5}
+                type="range"
+                value={tuning.frequency}
+              />
+              <output>{tuning.frequency.toFixed(1)} rad/s</output>
+            </label>
+            <label>
+              {copy.damping}
+              <input
+                aria-label={copy.damping}
+                max={2}
+                min={0.2}
+                onChange={(event) =>
+                  changeTuning({ dampingRatio: Number(event.currentTarget.value) })
+                }
+                step={0.05}
+                type="range"
+                value={tuning.dampingRatio}
+              />
+              <output>
+                {tuning.dampingRatio.toFixed(2)} · {copy[getDampingKind(tuning.dampingRatio)]}
+              </output>
+            </label>
+            <label>
+              {copy.pace}
+              <span className={styles.select}>
+                <select
+                  aria-label={copy.pace}
+                  onChange={(event) =>
+                    changeTuning({ pace: event.currentTarget.value as ChunkPace })
+                  }
+                  value={tuning.pace}
+                >
+                  {(Object.keys(CHUNK_PACES) as ChunkPace[]).map((pace) => (
+                    <option key={pace} value={pace}>
+                      {paceLabels[pace]}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
+            {effect === 'shad' ? (
+              <label>
+                {copy.fadeLength}
+                <input
+                  aria-label={copy.fadeLength}
+                  max={30}
+                  min={1}
+                  onChange={(event) =>
+                    changeTuning({ fadeLength: Number(event.currentTarget.value) })
+                  }
+                  type="range"
+                  value={tuning.fadeLength}
+                />
+                <output>
+                  {tuning.fadeLength} {copy.characters}
+                </output>
+              </label>
+            ) : null}
+            {effect === 'scale' ? (
+              <label>
+                {copy.entranceDuration}
+                <input
+                  aria-label={copy.entranceDuration}
+                  max={800}
+                  min={50}
+                  onChange={(event) =>
+                    changeTuning({ entranceDuration: Number(event.currentTarget.value) })
+                  }
+                  step={10}
+                  type="range"
+                  value={tuning.entranceDuration}
+                />
+                <output>{tuning.entranceDuration} ms</output>
+              </label>
+            ) : null}
+            <button onClick={() => changeTuning(DEFAULT_TUNING)} type="button">
+              {copy.resetTuning}
+            </button>
+          </div>
+        ) : null}
 
         <div className={styles.panels}>
           <div className={styles.source}>
@@ -155,8 +289,15 @@ export const Editor = ({ lang }: EditorProps) => {
                   renderer={renderer}
                   scrollMode={scrollMode}
                   streaming={compute(() => {
-                    if (!playback || stream.complete) return false;
-                    return { smooth, effect: getEditorEffect(effect), repairEnding: repair };
+                    if (!playback || stream.complete) {
+                      return false;
+                    }
+
+                    return {
+                      smooth: smooth && { enabled: true, driver, interpolation },
+                      effect: getEffectConfig(effect, speed, tuning),
+                      repairEnding: repair,
+                    };
                   })}
                   text={previewText}
                 />

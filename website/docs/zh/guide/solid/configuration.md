@@ -51,7 +51,7 @@
 
 **默认值：** `true`（`streaming` 为对象时）
 
-让新增内容逐步显示。`true` 使用内置弹簧调度，并自动选择可用的时钟；`false` 直接显示已收到的内容。传对象可以指定时钟和调度方式：
+让新增内容逐步显示。`true` 使用内置弹簧插值，并自动选择可用的驱动；`false` 直接显示已收到的内容。传对象可以指定驱动和插值方式：
 
 ```tsx
 <Fluxdown
@@ -59,8 +59,8 @@
   streaming={{
     smooth: {
       enabled: true,
-      ticker: 'raf',
-      scheduler: 'spring',
+      driver: 'raf',
+      interpolation: 'spring',
     },
   }}
 />
@@ -74,19 +74,23 @@
 
 使用 `smooth` 对象时，显式设为 `true` 开启平滑输出。关闭后会立即显示当前已收到的内容。
 
-### smooth.ticker <span className="field-tag">必选</span> {#smoothticker}
+### smooth.driver <span className="field-tag">可选</span> {#smoothdriver}
 
-**类型：** `'raf' | 'interval' | SmoothTickerClass`
+**类型：** `'raf' | 'interval' | SmoothDriverClass`
 
-选择输出节奏的时钟：`'raf'` 跟随动画帧，`'interval'` 使用定时器，也可以传自定义时钟类。
+**默认值：** 支持动画帧时为 `'raf'`，否则为 `'interval'`
 
-### smooth.scheduler <span className="field-tag">必选</span> {#smoothscheduler}
+选择驱动输出的时钟：`'raf'` 跟随动画帧，`'interval'` 使用定时器，也可以传自定义驱动类。
 
-**类型：** `'spring' | SmoothSchedulerClass`
+### smooth.interpolation <span className="field-tag">可选</span> {#smoothinterpolation}
 
-决定每次更新显示多少内容。`'spring'` 使用内置弹簧调度，也可以传自定义调度类。
+**类型：** `'spring' | SmoothInterpolatorClass`
 
-> 通常直接使用 `smooth: true` 即可。`SmoothTickerClass` 和 `SmoothSchedulerClass` 从 `@fluxdown/core-plugins/plugins/mapper/smooth` 导入。
+**默认值：** `'spring'`
+
+把经过的时间换算成显示进度。`'spring'` 使用内置的弹簧精确解，也可以传自定义插值类。
+
+> 通常直接使用 `smooth: true` 即可。`SmoothDriverClass` 和 `SmoothInterpolatorClass` 从 `@fluxdown/core-plugins/plugins/mapper/smooth` 导入。旧名称 `ticker` 和 `scheduler` 在下一个版本前仍可使用，但已弃用。
 
 ### streaming.effect <span className="field-tag">可选</span> {#streamingeffect}
 
@@ -127,13 +131,13 @@
 
 #### shad：末尾渐变 {#effectshad}
 
-| 字段        | 类型      | 默认值 | 含义                       |
-| ----------- | --------- | ------ | -------------------------- |
-| `enabled`   | `boolean` | `true` | 启用末尾渐变。             |
-| `length`    | `number`  | `10`   | 参与渐变的末尾字符数。     |
-| `maskWidth` | `number`  | `15`   | 渐变遮罩宽度，单位为像素。 |
+| 字段       | 类型      | 默认值 | 含义                                 |
+| ---------- | --------- | ------ | ------------------------------------ |
+| `enabled`  | `boolean` | `true` | 启用末尾渐变。                       |
+| `length`   | `number`  | `10`   | 希望同时保持在淡入中的字符数。       |
+| `duration` | `number`  | `400`  | 单个字符最长的淡入时长，单位为毫秒。 |
 
-`length` 的小数部分会被舍去，负数按 `0` 处理。`maskWidth: 0` 隐藏遮罩。
+每个新出现的字符按各自的时钟淡入，与显示进度无关。同时淡入的字符超过 `length` 时，新字符的淡入会相应缩短。`length` 的小数部分会被舍去，`0` 关闭渐变，负数按 `0` 处理。
 
 #### chunk：分块入场 {#effectchunk}
 

@@ -23,9 +23,9 @@ import type { CoreInputs } from '../type';
 
 import { Core } from '..';
 import {
-  DoubleStepSmoothScheduler,
-  FakeSmoothTicker,
-  StepSmoothScheduler,
+  DoubleStepSmoothInterpolator,
+  FakeSmoothDriver,
+  StepSmoothInterpolator,
 } from '../../../__tests__/utils/smooth';
 import { restoreGlobals, stubGlobal } from '../../../../../../scripts/testing/globals';
 import { BaseRenderer } from '../../../externals';
@@ -38,17 +38,17 @@ class BlockRenderer extends BaseRenderer<HastRoot, ElementContent, Parent, Block
   }
 }
 
-class ManualTicker extends FakeSmoothTicker {
-  static instances: ManualTicker[] = [];
+class ManualDriver extends FakeSmoothDriver {
+  static instances: ManualDriver[] = [];
 
   constructor() {
     super();
 
-    ManualTicker.instances.push(this);
+    ManualDriver.instances.push(this);
   }
 }
 
-class ReplacementTicker extends ManualTicker {}
+class ReplacementDriver extends ManualDriver {}
 
 const compiled = jest.fn();
 
@@ -73,8 +73,8 @@ const build = {
 
 const enabled: BaseSmoothConfig = {
   enabled: true,
-  ticker: ManualTicker,
-  scheduler: StepSmoothScheduler,
+  driver: ManualDriver,
+  interpolation: StepSmoothInterpolator,
 };
 
 const ConfiguredCore = once(
@@ -129,22 +129,22 @@ const setup = (initialText = '', initialSmooth?: BaseSmoothConfig) => {
   const read = () => core.value.value.map((block) => collectText(block.value.value));
 
   const tick = (timestamp: number) => {
-    const ticker = last(ManualTicker.instances);
+    const driver = last(ManualDriver.instances);
 
-    assert(ticker);
+    assert(driver);
 
-    ticker.tick(timestamp);
+    driver.tick(timestamp);
   };
 
   return { core, read, smooth, text, tick };
 };
 
 beforeEach(() => {
-  ManualTicker.instances = [];
+  ManualDriver.instances = [];
 
-  StepSmoothScheduler.instances = [];
+  StepSmoothInterpolator.instances = [];
 
-  DoubleStepSmoothScheduler.instances = [];
+  DoubleStepSmoothInterpolator.instances = [];
 
   compiled.mockClear();
 });
@@ -173,7 +173,7 @@ describe('Core smooth pipeline', () => {
 
       expect(view.read()).toEqual(['plain stream']);
 
-      expect(ManualTicker.instances).toHaveLength(0);
+      expect(ManualDriver.instances).toHaveLength(0);
 
       expect(requestFrame).not.toHaveBeenCalled();
     },
@@ -218,13 +218,13 @@ describe('Core smooth pipeline', () => {
 
     expect(view.read()).toEqual(['a']);
 
-    const previousTicker = last(ManualTicker.instances)!;
+    const previousDriver = last(ManualDriver.instances)!;
 
     view.smooth.next({ ...enabled, enabled: false });
 
     expect(view.read()).toEqual(['abc']);
 
-    expect(previousTicker.destroyCalls).toBe(1);
+    expect(previousDriver.destroyCalls).toBe(1);
 
     view.smooth.next(enabled);
 
@@ -237,7 +237,7 @@ describe('Core smooth pipeline', () => {
     expect(view.read()).toEqual(['abcd']);
   });
 
-  test('switches ticker and scheduler together without losing visible progress', () => {
+  test('switches driver and interpolation together without losing visible progress', () => {
     const view = setup('', enabled);
 
     view.read();
@@ -246,15 +246,15 @@ describe('Core smooth pipeline', () => {
 
     view.tick(16);
 
-    const previousTicker = last(ManualTicker.instances)!;
+    const previousDriver = last(ManualDriver.instances)!;
 
     view.smooth.next({
       enabled: true,
-      ticker: ReplacementTicker,
-      scheduler: DoubleStepSmoothScheduler,
+      driver: ReplacementDriver,
+      interpolation: DoubleStepSmoothInterpolator,
     });
 
-    expect(previousTicker.destroyCalls).toBe(1);
+    expect(previousDriver.destroyCalls).toBe(1);
 
     expect(view.read()).toEqual(['a']);
 
@@ -291,20 +291,20 @@ describe('Core smooth pipeline', () => {
     expect(first(view.core.value.value)).toBe(firstBlock);
   });
 
-  test('releases its ticker while leaving caller-owned inputs usable', () => {
+  test('releases its driver while leaving caller-owned inputs usable', () => {
     const view = setup('', enabled);
 
     view.read();
 
     view.text.next('pending');
 
-    const ticker = last(ManualTicker.instances)!;
+    const driver = last(ManualDriver.instances)!;
 
     view.core.destroy();
 
     view.core.destroy();
 
-    expect(ticker.destroyCalls).toBe(1);
+    expect(driver.destroyCalls).toBe(1);
 
     expect(view.text.closed).toBe(false);
 
@@ -336,6 +336,6 @@ describe('Core smooth pipeline', () => {
 
     expect(core.value.closed).toBe(true);
 
-    expect(ManualTicker.instances.every((ticker) => !ticker.running)).toBe(true);
+    expect(ManualDriver.instances.every((driver) => !driver.running)).toBe(true);
   });
 });

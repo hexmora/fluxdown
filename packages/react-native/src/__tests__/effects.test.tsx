@@ -278,6 +278,51 @@ describe('native streaming effects', () => {
     expect(clock.pending.size).toBe(0);
   });
 
+  test('fades shad text linearly through its alpha on its own clock', async () => {
+    const clock = createRafClock();
+
+    jest.spyOn(Date, 'now').mockImplementation(() => performance.now());
+
+    await render(
+      <ShadRenderer Raw={null} start={performance.now()} duration={400}>
+        A
+      </ShadRenderer>,
+    );
+
+    const original = screen.getByText('A');
+
+    const alpha = () => {
+      const value = processColor(StyleSheet.flatten(original.props.style)?.color);
+
+      return typeof value === 'number' ? value >>> 24 : undefined;
+    };
+
+    expect(alpha()).toBe(0);
+
+    await clock.advanceUntil(() => performance.now() >= 200);
+
+    // Halfway through a linear fade the text is roughly half opaque.
+    expect(alpha()).toBeGreaterThan(100);
+
+    expect(alpha()).toBeLessThan(155);
+
+    await clock.advanceUntil(() => clock.pending.size === 0);
+
+    expect(alpha()).toBe(255);
+
+    await screen.rerender(
+      <ShadRenderer Raw={null} start={-1} duration={400}>
+        A
+      </ShadRenderer>,
+    );
+
+    expect(screen.getByText('A')).toBe(original);
+
+    expect(alpha()).toBe(255);
+
+    expect(clock.pending.size).toBe(0);
+  });
+
   test('preserves chunk RGB and existing alpha through every frame and reparse', async () => {
     const clock = createRafClock();
 
@@ -543,91 +588,75 @@ describe('native streaming effects', () => {
     expect(text?.parent).toHaveStyle({ flexDirection: 'row' });
   });
 
-  test.each(['scale', 'shad'] as const)(
-    '%s keeps inline geometry unchanged when asynchronous baseline measurements arrive',
-    async (effect) => {
-      createRafClock();
+  test('scale keeps inline geometry unchanged when asynchronous baseline measurements arrive', async () => {
+    createRafClock();
 
-      jest.spyOn(Date, 'now').mockImplementation(() => performance.now());
+    jest.spyOn(Date, 'now').mockImplementation(() => performance.now());
 
-      await render(
-        <ThemeProvider value={DARK_THEME}>
-          <InheritedText style={{ fontSize: 20, lineHeight: 33 }}>
-            Settled text
-            {effect === 'scale' ? (
-              <ScaleRenderer Raw={null} start={0} duration={200} from={0.75} blur={0.2}>
-                A
-              </ScaleRenderer>
-            ) : (
-              <ShadRenderer Raw={null} leading="" active="A" isActive maskWidth={15} />
-            )}
-          </InheritedText>
-        </ThemeProvider>,
-      );
+    await render(
+      <ThemeProvider value={DARK_THEME}>
+        <InheritedText style={{ fontSize: 20, lineHeight: 33 }}>
+          Settled text
+          <ScaleRenderer Raw={null} start={0} duration={200} from={0.75} blur={0.2}>
+            A
+          </ScaleRenderer>
+        </InheritedText>
+      </ThemeProvider>,
+    );
 
-      const text = screen.getByText('A');
+    const text = screen.getByText('A');
 
-      const anchor = screen.container.queryAll(
-        (node) =>
-          node.type === 'View' && node.props.importantForAccessibility === 'no-hide-descendants',
-      )[0];
+    const anchor = screen.container.queryAll(
+      (node) =>
+        node.type === 'View' && node.props.importantForAccessibility === 'no-hide-descendants',
+    )[0];
 
-      expect(anchor).toHaveStyle({ width: 0, height: 0 });
+    expect(anchor).toHaveStyle({ width: 0, height: 0 });
 
-      expect(text).toHaveStyle({ color: 'rgba(255,255,255,0)' });
+    expect(text).toHaveStyle({ color: 'rgba(255,255,255,0)' });
 
-      await measureText(text, { width: 20, height: 33 }, 24);
+    await measureText(text, { width: 20, height: 33 }, 24);
 
-      const drawing = screen.container.queryAll((node) => node.type === 'RNSVGForeignObject')[0];
+    const drawing = screen.container.queryAll((node) => node.type === 'RNSVGForeignObject')[0];
 
-      expect(drawing?.props.height).toBe(34);
+    expect(drawing?.props.height).toBe(34);
 
-      const positioned = anchor?.queryAll(
-        (node) => node.type === 'View' && StyleSheet.flatten(node.props.style)?.left === -20,
-      )[0];
+    const positioned = anchor?.queryAll(
+      (node) => node.type === 'View' && StyleSheet.flatten(node.props.style)?.left === -20,
+    )[0];
 
-      // An inline attachment's bottom remains on the text baseline even when
-      // the renderer rounds its nominal zero height to a physical pixel.
-      expect(positioned).toHaveStyle({ bottom: -9, height: 33 });
+    // An inline attachment's bottom remains on the text baseline even when
+    // the renderer rounds its nominal zero height to a physical pixel.
+    expect(positioned).toHaveStyle({ bottom: -9, height: 33 });
 
-      expect(StyleSheet.flatten(positioned?.props.style)?.top).toBeUndefined();
+    expect(StyleSheet.flatten(positioned?.props.style)?.top).toBeUndefined();
 
-      expect(anchor).toHaveStyle({ width: 0, height: 0 });
+    expect(anchor).toHaveStyle({ width: 0, height: 0 });
 
-      await measureText(text, { width: 20, height: 33 }, 22);
+    await measureText(text, { width: 20, height: 33 }, 22);
 
-      expect(screen.getByText('A')).toBe(text);
+    expect(screen.getByText('A')).toBe(text);
 
-      expect(anchor).toHaveStyle({ width: 0, height: 0 });
+    expect(anchor).toHaveStyle({ width: 0, height: 0 });
 
-      expect(drawing?.props.height).toBe(34);
+    expect(drawing?.props.height).toBe(34);
 
-      expect(positioned).toHaveStyle({ bottom: -11, height: 33 });
+    expect(positioned).toHaveStyle({ bottom: -11, height: 33 });
 
-      expect(screen.getByText('Settled text', { exact: false })).not.toHaveStyle({ height: 22 });
-    },
-  );
+    expect(screen.getByText('Settled text', { exact: false })).not.toHaveStyle({ height: 22 });
+  });
 
-  test.each([
-    { effect: 'scale', value: 'M', width: 14, length: 1 },
-    { effect: 'shad', value: 'word', width: 38, length: 4 },
-    { effect: 'shad', value: 'क्ष', width: 16, length: 1 },
-    { effect: 'shad', value: 'क्‍ष', width: 16, length: 1 },
-  ] as const)(
-    '$effect compensates only the measured attachment advance and keeps drawing typography',
-    async ({ effect, value, width, length }) => {
+  test.each([{ value: 'M', width: 14, length: 1 }] as const)(
+    'scale compensates only the measured attachment advance and keeps drawing typography',
+    async ({ value, width, length }) => {
       createRafClock();
 
       await render(
         <ThemeProvider value={DARK_THEME}>
           <InheritedText style={{ fontSize: 16, lineHeight: 26, letterSpacing: 0.25 }}>
-            {effect === 'scale' ? (
-              <ScaleRenderer Raw={null} start={0} duration={200} from={0.75} blur={0.2}>
-                {value}
-              </ScaleRenderer>
-            ) : (
-              <ShadRenderer Raw={null} leading="" active={value} isActive maskWidth={15} />
-            )}
+            <ScaleRenderer Raw={null} start={0} duration={200} from={0.75} blur={0.2}>
+              {value}
+            </ScaleRenderer>
           </InheritedText>
         </ThemeProvider>,
       );
@@ -660,463 +689,6 @@ describe('native streaming effects', () => {
       expect(offset[0]).toHaveStyle({ left: -width });
     },
   );
-
-  test('retains the measured shade when a native glyph changes without a new layout', async () => {
-    await render(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="" active="中" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')).toHaveLength(
-      0,
-    );
-
-    const original = screen.getByText('中');
-
-    await measureText(original, { width: 16, height: 26 });
-
-    const gradient = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0];
-
-    const mask = screen.container.queryAll((node) => node.type === 'RNSVGMask')[0];
-
-    const drawing = screen.container.queryAll((node) => node.type === 'RNSVGForeignObject')[0];
-
-    expect(gradient?.props).toMatchObject({ x1: 0, x2: 16, gradientUnits: 1 });
-
-    expect(gradient?.props.gradient[1] >>> 24).toBe(255);
-
-    expect(gradient?.props.gradient[3] >>> 24).toBe(0);
-
-    expect(drawing?.parent?.props.mask).toBe(mask?.props.name);
-
-    expect(screen.getAllByText('中')).toHaveLength(1);
-
-    expect(screen.getAllByText('中', { includeHiddenElements: true })).toHaveLength(3);
-
-    await screen.rerender(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="" active="文" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    expect(screen.getByText('文')).toBe(original);
-
-    expect(original).toHaveStyle({ color: 'rgba(255,255,255,0)' });
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0]).toBe(
-      gradient,
-    );
-
-    expect(gradient?.props).toMatchObject({ x1: 0, x2: 16 });
-
-    await measureText(original, { width: 24, height: 32 });
-
-    expect(gradient?.props.x2).toBe(24);
-  });
-
-  test('keeps the existing word prefix visible until its first gradient is ready', async () => {
-    await render(
-      <InheritedText style={{ color: 'purple' }}>
-        <ShadRenderer Raw={null} leading="wo" active="rd" isActive maskWidth={15} />
-      </InheritedText>,
-    );
-
-    expect(screen.getByText('wo')).toHaveStyle({ color: 'purple' });
-
-    await measureText(screen.getByText('word'), { width: 38, height: 26 });
-
-    expect(screen.getByText('wo')).toHaveStyle({ color: 'purple' });
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')).toHaveLength(
-      0,
-    );
-
-    await fireEvent.layout(getPrefixMeasurement('wo'), { width: 19, height: 26 });
-
-    expect(screen.queryByText('wo')).toBeNull();
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')).toHaveLength(
-      1,
-    );
-  });
-
-  test('keeps the last valid gradient when an empty prefix starts growing', async () => {
-    await render(
-      <InheritedText>
-        <ShadRenderer Raw={null} leading="" active="word" isActive maskWidth={15} />
-      </InheritedText>,
-    );
-
-    await measureText(screen.getByText('word'), { width: 38, height: 26 });
-
-    await fireEvent.layout(getPrefixMeasurement('\u2060'), { width: 0, height: 26 });
-
-    const gradient = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0];
-
-    await screen.rerender(
-      <InheritedText>
-        <ShadRenderer Raw={null} leading="w" active="ord" isActive maskWidth={15} />
-      </InheritedText>,
-    );
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0]).toBe(
-      gradient,
-    );
-
-    expect(gradient?.props.x1).toBe(0);
-
-    await fireEvent.layout(getPrefixMeasurement('w'), { width: 10, height: 26 });
-
-    expect(gradient?.props.x1).toBe(10);
-  });
-
-  test('uses measured advances for one continuous shade across a partial word and CJK', async () => {
-    await render(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="wo" active="rd中" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    await measureText(screen.getByText('word'), { width: 38, height: 26 });
-
-    await fireEvent.layout(getPrefixMeasurement('wo'), {
-      width: 19,
-      height: 26,
-    });
-
-    await measureText(screen.getByText('中'), { width: 16, height: 26 });
-
-    const gradients = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient');
-
-    expect(gradients).toHaveLength(2);
-
-    expect(gradients[0]?.props).toMatchObject({ x1: 19, x2: 54 });
-
-    expect(gradients[1]?.props).toMatchObject({ x1: -19, x2: 16 });
-
-    expect(screen.getAllByText('word')).toHaveLength(1);
-
-    expect(screen.getAllByText('中')).toHaveLength(1);
-  });
-
-  test('keeps a partial word shaded across equal-size replacements and later layout updates', async () => {
-    await render(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="wo" active="rd" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    const original = screen.getByText('word');
-
-    expect(original).toHaveStyle({ color: 'rgba(255,255,255,0)' });
-
-    // Inject native layout events; host tests do not measure device glyphs.
-    await measureText(original, { width: 38, height: 26 });
-
-    const prefix = getPrefixMeasurement('wo');
-
-    expect(prefix.parent).toHaveStyle({ width: 38, height: 26 });
-
-    await fireEvent.layout(prefix, { width: 19, height: 26 });
-
-    const gradient = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0];
-
-    expect(gradient?.props).toMatchObject({ x1: 19, x2: 38 });
-
-    // Equal-size text changes do not emit a native onLayout event.
-    await screen.rerender(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="he" active="ad" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    expect(screen.getByText('head')).toBe(original);
-
-    expect(getPrefixMeasurement('he')).toBe(prefix);
-
-    expect(original).toHaveStyle({ color: 'rgba(255,255,255,0)' });
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0]).toBe(
-      gradient,
-    );
-
-    expect(gradient?.props).toMatchObject({ x1: 19, x2: 38 });
-
-    await fireEvent.layout(prefix, { width: 24, height: 26 });
-
-    expect(gradient?.props).toMatchObject({ x1: 24, x2: 38 });
-
-    await screen.rerender(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="he" active="ads" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    const appended = screen.getByText('heads');
-
-    expect(appended).toBe(original);
-
-    expect(appended).toHaveStyle({ color: 'rgba(255,255,255,0)' });
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0]).toBe(
-      gradient,
-    );
-
-    expect(gradient?.props).toMatchObject({ x1: 24, x2: 38 });
-
-    await measureText(appended, { width: 48, height: 26 });
-
-    expect(gradient?.props).toMatchObject({ x1: 24, x2: 48 });
-  });
-
-  test('keeps measured text shaded while a new native token awaits layout', async () => {
-    await render(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="" active="中" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    const original = screen.getByText('中');
-
-    await measureText(original, { width: 16, height: 26 });
-
-    await screen.rerender(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="" active="中文" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    const pending = screen.getByText('文');
-
-    expect(screen.getByText('中')).toBe(original);
-
-    expect(pending).toHaveStyle({ color: 'rgba(255,255,255,0)' });
-
-    const previous = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient');
-
-    expect(previous).toHaveLength(1);
-
-    expect(previous[0]?.props).toMatchObject({ x1: 0, x2: 16 });
-
-    await measureText(pending, { width: 16, height: 26 });
-
-    const gradients = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient');
-
-    expect(gradients).toHaveLength(2);
-
-    expect(gradients[0]?.props).toMatchObject({ x1: 0, x2: 32 });
-
-    expect(gradients[1]?.props).toMatchObject({ x1: -16, x2: 16 });
-  });
-
-  test('keeps a new token shaded when an older layout callback arrives late', async () => {
-    await render(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="" active="word" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    const original = screen.getByText('word');
-
-    const previousLayout = getMeasurement(original).props.onLayout;
-
-    await measureText(original, { width: 38, height: 26 });
-
-    await screen.rerender(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="" active="word中" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    await measureText(screen.getByText('中'), { width: 16, height: 26 });
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')).toHaveLength(
-      2,
-    );
-
-    await act(() => {
-      previousLayout({ nativeEvent: { layout: { x: 0, y: 0, width: 48, height: 26 } } });
-    });
-
-    const gradients = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient');
-
-    expect(gradients).toHaveLength(2);
-
-    expect(gradients[0]?.props).toMatchObject({ x1: 0, x2: 64 });
-
-    expect(gradients[1]?.props).toMatchObject({ x1: -48, x2: 16 });
-  });
-
-  test('discards settled measurements while a long paragraph advances', async () => {
-    await render(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="wo" active="rd" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    await measureText(screen.getByText('word'), { width: 38, height: 26 });
-
-    await fireEvent.layout(getPrefixMeasurement('wo'), {
-      width: 19,
-      height: 26,
-    });
-
-    for (let index = 0; index < 32; index += 1) {
-      // Sequential windows preserve the streaming order and exercise cache eviction.
-      // eslint-disable-next-line no-await-in-loop
-      await screen.rerender(
-        <ThemeProvider value={DARK_THEME}>
-          <ShadRenderer
-            Raw={null}
-            leading={`word${'中'.repeat(index)}`}
-            active="中文"
-            isActive
-            maskWidth={15}
-          />
-        </ThemeProvider>,
-      );
-
-      // eslint-disable-next-line no-await-in-loop
-      await measureText(screen.getByText('中'), { width: 16, height: 26 });
-
-      // eslint-disable-next-line no-await-in-loop
-      await measureText(screen.getByText('文'), { width: 16, height: 26 });
-
-      expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')).toHaveLength(
-        2,
-      );
-    }
-
-    await screen.rerender(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="wo" active="rd" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    await measureText(screen.getByText('word'), { width: 42, height: 26 });
-
-    // A removed token must wait for its new prefix layout instead of reusing old geometry.
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')).toHaveLength(
-      0,
-    );
-
-    await fireEvent.layout(getPrefixMeasurement('wo'), {
-      width: 21,
-      height: 26,
-    });
-
-    expect(
-      screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[0]?.props,
-    ).toMatchObject({ x1: 21, x2: 42 });
-  });
-
-  test('ignores a settled token layout without clearing newer token measurements', async () => {
-    await render(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="wo" active="rd" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    await measureText(screen.getByText('word'), { width: 38, height: 26 });
-
-    const previousLayout = getPrefixMeasurement('wo').props.onLayout;
-
-    await screen.rerender(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="word" active="中文" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    await measureText(screen.getByText('中'), { width: 16, height: 26 });
-
-    await measureText(screen.getByText('文'), { width: 16, height: 26 });
-
-    await act(() => {
-      previousLayout({ nativeEvent: { layout: { x: 0, y: 0, width: 19, height: 26 } } });
-    });
-
-    const gradients = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient');
-
-    expect(gradients).toHaveLength(2);
-
-    expect(gradients[0]?.props).toMatchObject({ x1: 0, x2: 32 });
-
-    expect(gradients[1]?.props).toMatchObject({ x1: -16, x2: 16 });
-  });
-
-  test('retains the drawing host when the active window advances through an earlier word', async () => {
-    await render(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="" active="Streaming Mark" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    await measureText(screen.getByText('Streaming'), { width: 80, height: 26 });
-
-    const original = screen.getByText('Mark');
-
-    await measureText(original, { width: 38, height: 26 });
-
-    const gradient = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[1];
-
-    expect(gradient?.props).toMatchObject({ x1: -80, x2: 38 });
-
-    await screen.rerender(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="S" active="treaming Markd" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    expect(screen.getByText('Markd')).toBe(original);
-
-    await fireEvent.layout(getPrefixMeasurement('S'), {
-      width: 8,
-      height: 26,
-    });
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[1]).toBe(
-      gradient,
-    );
-
-    expect(gradient?.props).toMatchObject({ x1: -72, x2: 38 });
-
-    await measureText(original, { width: 46, height: 26 });
-
-    expect(gradient?.props).toMatchObject({ x1: -72, x2: 46 });
-  });
-
-  test('reuses a measured word host when a space moves into the first token position', async () => {
-    await render(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="" active="same paragraph" isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    await measureText(screen.getByText('same'), { width: 38, height: 26 });
-
-    const original = screen.getByText('paragraph');
-
-    await measureText(original, { width: 80, height: 26 });
-
-    const gradient = screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')[1];
-
-    await screen.rerender(
-      <ThemeProvider value={DARK_THEME}>
-        <ShadRenderer Raw={null} leading="same" active=" paragraph..." isActive maskWidth={15} />
-      </ThemeProvider>,
-    );
-
-    expect(screen.getByText('paragraph...')).toBe(original);
-
-    expect(screen.container.queryAll((node) => node.type === 'RNSVGLinearGradient')).toEqual([
-      gradient,
-    ]);
-
-    await measureText(original, { width: 92, height: 26 });
-
-    expect(gradient?.props.x2).toBe(92);
-  });
 
   test.each([
     { type: 'cursor', width: 7.8, height: 20, borderRadius: 1.2 },

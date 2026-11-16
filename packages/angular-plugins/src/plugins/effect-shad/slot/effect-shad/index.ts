@@ -10,4 +10,6 @@ export class EffectShadSlotPlugin extends BaseSlotPlugin<'Shad'> {
   readonly Component = ShadRenderer;
 
   readonly type = 'Shad';
+
+  readonly tagName = 'span';
 }

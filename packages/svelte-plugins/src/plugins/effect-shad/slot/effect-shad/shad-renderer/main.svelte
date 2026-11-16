@@ -1,20 +1,28 @@
 <script lang="ts">
   import type { ShadRendererProps } from './type';
 
-  import { NodeRenderer } from '../../../../../base';
+  import { createAnimationDelay, resumeAnimation } from '../../../../../base';
 
-  let { active, isActive, leading, maskWidth }: ShadRendererProps = $props();
+  let { children, start, duration }: ShadRendererProps = $props();
+
+  const getDelay = /*#__PURE__*/ createAnimationDelay();
+
+  // Negative delay resumes the original fade when reparsing remounts an inline element, so
+  // each character keeps its own clock instead of following the reveal position.
+  const delay = $derived(getDelay(start));
+
+  const active = $derived(start >= 0 && delay > -duration);
 </script>
 
-<span class="fluxdown-svelte-effect-shad"
-  ><span class="leading"><NodeRenderer node={leading} /></span><span class="active"
-    ><NodeRenderer node={active} /></span
-  ><span
-    aria-hidden="true"
-    class={isActive ? 'mask' : 'mask-hidden'}
-    style={`width: ${maskWidth}px; margin-left: ${-maskWidth}px`}
-  ></span></span
->
+{#key start}
+  <span
+    class="fluxdown-svelte-effect-shad"
+    class:active
+    data-fluxdown-shad="fade"
+    onanimationstart={(event) => resumeAnimation(event, start)}
+    style={`--fluxdown-shad-duration: ${duration}ms; animation-delay: ${delay}ms`}
+  >{@render children?.()}</span>
+{/key}
 
 <style lang="scss">
   @use './index.scss';

@@ -8,11 +8,7 @@ export type GetPropsFunction = (node?: Element) => Record<string, unknown>;
 export type InlineEffect =
   | { type: 'scale'; start: number; duration: number; from: number; blur: number }
   | { type: 'chunk'; start: number; duration: number }
-  | {
-      type: 'shad';
-      maskText: string;
-      trailingText: string;
-    };
+  | { type: 'shad'; start: number; duration: number };
 
 export interface UniSlotNode {
   type: SlotType;

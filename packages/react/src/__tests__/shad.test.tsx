@@ -6,7 +6,16 @@ import type { FluxdownRef, StreamingConfig } from '../packs/full';
 
 import styles from '../../../react-plugins/src/plugins/effect-shad/slot/effect-shad/renderer/index.module.scss';
 import { Fluxdown } from '../packs/full';
-import { createManualTicker, createStepScheduler } from './utils/smooth';
+import { createManualDriver, createStepInterpolator } from './utils/smooth';
+
+const FADE = '[data-fluxdown-shad="fade"]';
+
+const readFades = (container: HTMLElement) =>
+  Array.from(container.querySelectorAll<HTMLElement>(FADE), (node) => ({
+    text: node.textContent,
+    duration: node.style.getPropertyValue('--fluxdown-shad-duration'),
+    active: node.classList.contains(styles.active!),
+  }));
 
 afterEach(async () => {
   cleanup();
@@ -17,68 +26,56 @@ afterEach(async () => {
 });
 
 describe('Fluxdown shad streaming', () => {
-  test('leaves initial content unfaded and hides the mask again after appended text settles', async () => {
+  test('fades appended characters on their own clock and leaves settled text plain', () => {
     jest.useFakeTimers();
 
-    const view = render(<Fluxdown streaming={{ effect: 'shad', smooth: false }} text="abc" />);
+    const streaming = { effect: 'shad' as const, smooth: false };
+
+    const view = render(<Fluxdown streaming={streaming} text="abc" />);
 
     expect(view.container.textContent).toBe('abc');
 
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('');
+    expect(readFades(view.container)).toEqual([]);
 
-    expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
+    view.rerender(<Fluxdown streaming={streaming} text="abcde" />);
 
-    view.rerender(
-      <Fluxdown streaming={{ effect: 'shad', smooth: false }} text="abcdefghijklmnop" />,
-    );
+    expect(readFades(view.container)).toEqual([{ text: 'de', duration: '400ms', active: true }]);
 
-    expect(view.container.textContent).toBe('abcdefghijklmnop');
+    act(() => jest.advanceTimersByTime(250));
 
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('ghijklmnop');
+    view.rerender(<Fluxdown streaming={streaming} text="abcdef" />);
 
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      '--mask-width': `15px`,
-    });
+    // 'de' keeps fading from its own start; 'f' begins a new fade.
+    expect(readFades(view.container)).toEqual([
+      { text: 'de', duration: '400ms', active: true },
+      { text: 'f', duration: '400ms', active: true },
+    ]);
 
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveTextContent('ghijklmnop');
+    act(() => jest.advanceTimersByTime(200));
 
-    expect(view.container.querySelector(`.${styles.mask}`)).not.toHaveAttribute('aria-hidden');
+    view.rerender(<Fluxdown streaming={streaming} text="abcdefg" />);
 
-    expect(view.container.firstElementChild?.getAttribute('style')).not.toContain('shad');
+    expect(readFades(view.container).map(({ text }) => text)).toEqual(['f', 'g']);
 
-    await act(async () => jest.advanceTimersByTime(200));
-
-    expect(view.container.textContent).toBe('abcdefghijklmnop');
-
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('');
-
-    expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
+    expect(view.container.textContent).toBe('abcdefg');
   });
 
-  test.each([
-    { maskWidth: undefined, expected: 15 },
-    { maskWidth: NaN, expected: 15 },
-    { maskWidth: Infinity, expected: 15 },
-    { maskWidth: -10, expected: 0 },
-    { maskWidth: 0, expected: 0 },
-    { maskWidth: 24.5, expected: 24.5 },
-  ])('keeps maskWidth=$maskWidth local to the mask', ({ maskWidth, expected }) => {
+  test('shortens the fade of a burst that is larger than the fade length', () => {
     jest.useFakeTimers();
 
-    const streaming: StreamingConfig = { effect: ['shad', { maskWidth }], smooth: false };
+    const streaming = { effect: 'shad' as const, smooth: false };
 
     const view = render(<Fluxdown streaming={streaming} text="a" />);
 
-    view.rerender(<Fluxdown streaming={streaming} text="abc" />);
+    view.rerender(<Fluxdown streaming={streaming} text={'a' + 'b'.repeat(40)} />);
 
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      '--mask-width': `${expected}px`,
-    });
-
-    expect(view.container.firstElementChild?.getAttribute('style')).not.toContain('shad');
+    // Forty characters against the default length of ten: a quarter of the default 400 ms.
+    expect(readFades(view.container)).toEqual([
+      { text: 'b'.repeat(40), duration: '100ms', active: true },
+    ]);
   });
 
-  test('supports enablement, tail length, and mask width changes without replacing the core', () => {
+  test('supports enablement, length, and duration changes without replacing the core', () => {
     jest.useFakeTimers();
 
     const ref = createRef<FluxdownRef>();
@@ -87,92 +84,51 @@ describe('Fluxdown shad streaming', () => {
 
     const closure = ref.current;
 
-    expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
-
-    view.rerender(
-      <Fluxdown
-        ref={ref}
-        streaming={{ effect: ['shad', { length: 2, maskWidth: 24 }], smooth: false }}
-        text="abc"
-      />,
-    );
-
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('');
-
-    view.rerender(
-      <Fluxdown
-        ref={ref}
-        streaming={{ effect: ['shad', { length: 2, maskWidth: 24 }], smooth: false }}
-        text="abcdefgh"
-      />,
-    );
-
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('gh');
-
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      '--mask-width': `24px`,
+    const shad = (config: { length?: number; duration?: number; enabled?: boolean }) => ({
+      effect: ['shad', config] as ['shad', typeof config],
+      smooth: false,
     });
 
-    const active = view.container.querySelector(`.${styles.active}`);
+    view.rerender(<Fluxdown ref={ref} streaming={shad({ length: 2 })} text="abc" />);
 
+    expect(readFades(view.container)).toEqual([]);
+
+    view.rerender(<Fluxdown ref={ref} streaming={shad({ length: 2 })} text="abcdefgh" />);
+
+    // Five characters against a length of two: two fifths of 400 ms.
+    expect(readFades(view.container)).toEqual([{ text: 'defgh', duration: '160ms', active: true }]);
+
+    act(() => jest.advanceTimersByTime(200));
+
+    // A new duration applies to the next batch; characters already fading keep theirs.
     view.rerender(
-      <Fluxdown
-        ref={ref}
-        streaming={{ effect: ['shad', { length: 2, maskWidth: 10 }], smooth: false }}
-        text="abcdefgh"
-      />,
+      <Fluxdown ref={ref} streaming={shad({ length: 2, duration: 1000 })} text="abcdefgh" />,
     );
 
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      '--mask-width': `10px`,
-    });
-
-    expect(view.container.querySelector(`.${styles.active}`)).toBe(active);
-
     view.rerender(
-      <Fluxdown
-        ref={ref}
-        streaming={{ effect: ['shad', { length: 4, maskWidth: 0 }], smooth: false }}
-        text="abcdefgh"
-      />,
+      <Fluxdown ref={ref} streaming={shad({ length: 2, duration: 1000 })} text="abcdefghi" />,
     );
 
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('efgh');
+    expect(readFades(view.container)).toEqual([{ text: 'i', duration: '1000ms', active: true }]);
 
-    expect(view.container.querySelector(`.${styles.mask}`)).toHaveStyle({
-      '--mask-width': `0px`,
-    });
+    view.rerender(<Fluxdown ref={ref} streaming={shad({ enabled: false })} text="abcdefghij" />);
 
-    view.rerender(
-      <Fluxdown
-        ref={ref}
-        streaming={{ effect: ['shad', { enabled: false }], smooth: false }}
-        text="abcdefgh"
-      />,
-    );
+    expect(readFades(view.container)).toEqual([]);
 
-    expect(view.container.querySelector(`.${styles.active}`)).toBeNull();
-
-    expect(view.container.textContent).toBe('abcdefgh');
-
-    view.rerender(
-      <Fluxdown ref={ref} streaming={{ effect: 'shad', smooth: false }} text="abcdefgh" />,
-    );
-
-    expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
+    expect(view.container.textContent).toBe('abcdefghij');
 
     expect(ref.current).toBe(closure);
   });
 
-  test('fades revealed text from smooth ticks while preserving inline markup and completed blocks', async () => {
+  test('fades text as smooth ticks reveal it, inside inline markup and only in the growing block', async () => {
     jest.useFakeTimers();
 
-    const ticker = createManualTicker();
+    const driver = createManualDriver();
 
     const smooth = {
       enabled: true,
-      ticker: ticker.Ticker,
-      scheduler: createStepScheduler(2),
+      driver: driver.Driver,
+      interpolation: createStepInterpolator(2),
     };
 
     const view = render(<Fluxdown streaming={{ effect: 'shad', smooth }} text="first" />);
@@ -183,53 +139,23 @@ describe('Fluxdown shad streaming', () => {
 
     expect(view.container.textContent).toBe('first');
 
-    await act(async () => ticker.current().tick(16));
+    await act(async () => driver.current().tick(16));
 
     expect(view.container.textContent).toBe('firstse');
 
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('se');
-
-    expect(view.container.querySelector('strong')).toHaveTextContent('se');
+    expect(view.container.querySelector('strong')?.querySelector(FADE)).toHaveTextContent('se');
 
     expect(view.container.querySelector('p')).toBe(firstParagraph);
 
-    expect(firstParagraph?.querySelector(`.${styles.active}`)).toBeNull();
+    expect(firstParagraph?.querySelector(FADE)).toBeNull();
 
-    await act(async () => ticker.current().tick(32));
+    act(() => jest.advanceTimersByTime(16));
+
+    await act(async () => driver.current().tick(32));
 
     expect(view.container.textContent).toBe('firstseco');
 
-    expect(view.container.querySelector(`.${styles.active}`)).toHaveTextContent('seco');
-
-    await act(async () => ticker.current().tick(48));
-
-    expect(view.container.textContent).toBe('firstsecond');
-
-    await act(async () => jest.advanceTimersByTime(200));
-
-    expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
-  });
-
-  test('renders full server content without an active fade or timers', () => {
-    jest.useFakeTimers();
-
-    const timers = jest.getTimerCount();
-
-    const markup = renderToStaticMarkup(
-      <Fluxdown streaming={{ effect: 'shad' }} text="Server content" />,
-    );
-
-    const container = document.createElement('div');
-
-    container.innerHTML = markup;
-
-    expect(container.textContent).toBe('Server content');
-
-    expect(container.querySelector(`.${styles.mask}`)).toBeNull();
-
-    expect(container.querySelector(`.${styles.active}`)).toHaveTextContent('');
-
-    expect(jest.getTimerCount()).toBe(timers);
+    expect(readFades(view.container).map(({ text }) => text)).toEqual(['se', 'co']);
   });
 
   test.each([
@@ -237,28 +163,26 @@ describe('Fluxdown shad streaming', () => {
     { prefix: '> > ', selector: 'blockquote > blockquote > p' },
     { prefix: '> - ', selector: 'blockquote > ul > li' },
     { prefix: '> ## ', selector: 'blockquote > h2' },
-  ])('fades new text inside $selector without hiding its content', async ({ prefix, selector }) => {
+  ])('fades new text inside $selector without hiding its content', ({ prefix, selector }) => {
     jest.useFakeTimers();
 
     const streaming: StreamingConfig = { effect: ['shad', { length: 20 }], smooth: false };
+
     const view = render(<Fluxdown streaming={streaming} text={`${prefix}Start `} />);
 
     view.rerender(
       <Fluxdown streaming={streaming} text={`${prefix}Start *soft* **strong** tail`} />,
     );
 
-    const container = view.container.querySelector(selector);
-    const active = container?.querySelector(`.${styles.mask}`);
-
-    expect(active).toHaveTextContent('soft strong tail');
-    expect(active).not.toHaveAttribute('aria-hidden');
-    expect(active?.querySelector('em')).toHaveTextContent('soft');
-    expect(active?.querySelector('strong')).toHaveTextContent('strong');
-
-    await act(async () => jest.advanceTimersByTime(200));
+    const container = view.container.querySelector(selector)!;
 
     expect(container).toHaveTextContent('Start soft strong tail');
-    expect(container?.querySelector(`.${styles.mask}`)).toBeNull();
+
+    expect(container.querySelector(`em ${FADE}`)).toHaveTextContent('soft');
+
+    expect(container.querySelector(`strong ${FADE}`)).toHaveTextContent('strong');
+
+    expect(container.querySelector('[aria-hidden]')).toBeNull();
   });
 
   test.each([
@@ -271,12 +195,28 @@ describe('Fluxdown shad streaming', () => {
   ])('keeps $selector unshaded as its text grows', ({ initial, appended, selector }) => {
     jest.useFakeTimers();
 
-    const streaming: StreamingConfig = { effect: 'shad', smooth: false };
+    const streaming = { effect: 'shad' as const, smooth: false };
+
     const view = render(<Fluxdown streaming={streaming} text={initial} />);
 
     view.rerender(<Fluxdown streaming={streaming} text={appended} />);
 
     expect(view.container.querySelector(selector)).toHaveTextContent('code grows');
-    expect(view.container.querySelector(`.${styles.mask}`)).toBeNull();
+
+    expect(view.container.querySelector(`${selector} ${FADE}`)).toBeNull();
+  });
+
+  test('renders full server content without fades', () => {
+    const markup = renderToStaticMarkup(
+      <Fluxdown streaming={{ effect: 'shad' }} text="Server content" />,
+    );
+
+    const container = document.createElement('div');
+
+    container.innerHTML = markup;
+
+    expect(container.textContent).toBe('Server content');
+
+    expect(container.querySelector(FADE)).toBeNull();
   });
 });

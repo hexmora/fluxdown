@@ -38,7 +38,7 @@ description: 在 Svelte 中通过属性向 Fluxdown 传入累积文本，渲染�
 内置四种效果：
 
 - `scale`：文字从模糊、缩小的状态显现。
-- `shad`：末尾文字通过渐变逐步显现。
+- `shad`：每个新出现的字符按各自的时钟淡入。
 - `chunk`：新增文本片段逐步淡入。
 - `suffix`：在末尾显示呼吸闪烁的光标或圆点。
 
@@ -51,7 +51,7 @@ description: 在 Svelte 中通过属性向 Fluxdown 传入累积文本，渲染�
 />
 ```
 
-关闭视觉效果、保留平滑输出时，设置 `effect: false`。时钟、调度器与效果组合的参数见[自定义配置](./configuration.md#streaming)。
+关闭视觉效果、保留平滑输出时，设置 `effect: false`。驱动、插值方式与效果组合的参数见[自定义配置](./configuration.md#streaming)。
 
 ## 完成与取消
 

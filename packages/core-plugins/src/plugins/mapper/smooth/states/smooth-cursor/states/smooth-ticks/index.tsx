@@ -5,26 +5,26 @@
 import { sumBy } from 'lodash-es';
 import { D, type JSXDescriptor, once, useMap, useSwitchMap } from 'stative';
 
-import type { SmoothTickerClass } from '../../../../type';
+import type { SmoothDriverClass } from '../../../../type';
 import type { SmoothTicksInputs } from './type';
 
-import { type SmoothTick, TickerFrames } from './states';
+import { DriverFrames, type SmoothTick } from './states';
 
 export * from './type';
 
 export const SmoothTicks = /*#__PURE__*/ once(function SmoothTicks({
   enabled: _enabled,
-  ticker: _ticker,
+  driver: _driver,
   revisions: _revisions,
 }: SmoothTicksInputs) {
   const active = useMap(
-    [_enabled, _ticker, _revisions],
-    ([enabled, Ticker, revisions], previous): SmoothTickerClass | null => {
+    [_enabled, _driver, _revisions],
+    ([enabled, Driver, revisions], previous): SmoothDriverClass | null => {
       if (!previous) {
         return null;
       }
 
-      const [[, , previousRevisions], prevTicker] = previous;
+      const [[, , previousRevisions], prevDriver] = previous;
 
       const replaced = revisions.some(
         (revision, index) =>
@@ -32,13 +32,13 @@ export const SmoothTicks = /*#__PURE__*/ once(function SmoothTicks({
       );
 
       return enabled &&
-        (prevTicker || replaced || sumBy(revisions, 'length') > sumBy(previousRevisions, 'length'))
-        ? Ticker
+        (prevDriver || replaced || sumBy(revisions, 'length') > sumBy(previousRevisions, 'length'))
+        ? Driver
         : null;
     },
   );
 
-  return useSwitchMap(active, (Ticker): JSXDescriptor<SmoothTick> | null =>
-    Ticker ? <TickerFrames Ticker={D(Ticker)} /> : null,
+  return useSwitchMap(active, (Driver): JSXDescriptor<SmoothTick> | null =>
+    Driver ? <DriverFrames Driver={D(Driver)} /> : null,
   );
 });

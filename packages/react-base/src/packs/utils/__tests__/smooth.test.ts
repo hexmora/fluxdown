@@ -1,24 +1,24 @@
 import type {
   BaseSmoothConfig,
-  SchedulerParams,
-  SchedulerType,
-  SmoothSchedulerClass,
-  SmoothTickerClass,
-  TickerParams,
-  TickerType,
+  DriverParams,
+  DriverType,
+  InterpolationType,
+  InterpolatorParams,
+  SmoothDriverClass,
+  SmoothInterpolatorClass,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 
 import {
-  IntervalSmoothTicker,
-  RafSmoothTicker,
-  SpringSmoothScheduler,
+  IntervalSmoothDriver,
+  RafSmoothDriver,
+  SpringSmoothInterpolator,
 } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { isEnableRAF } from '@fluxdown/utils';
 import { expectTypeOf } from 'expect-type';
 
-import { getSchedulerByType, getTickerByType, toSmoothConfig, toStreamingConfig } from '..';
+import { getDriverByType, getInterpolationByType, toSmoothConfig, toStreamingConfig } from '..';
 import { restoreGlobals, stubGlobal } from '../../../../../../scripts/testing/globals';
-import { ALL_SCHEDULERS, ALL_TICKERS } from '../../../consts';
+import { ALL_DRIVERS, ALL_INTERPOLATORS } from '../../../consts';
 
 afterEach(() => {
   restoreGlobals();
@@ -36,57 +36,57 @@ describe('smooth configuration', () => {
   });
 
   test('exports runtime registries and their public constructor types', () => {
-    expect(ALL_TICKERS).toEqual([RafSmoothTicker, IntervalSmoothTicker]);
+    expect(ALL_DRIVERS).toEqual([RafSmoothDriver, IntervalSmoothDriver]);
 
-    expect(ALL_SCHEDULERS).toEqual([SpringSmoothScheduler]);
+    expect(ALL_INTERPOLATORS).toEqual([SpringSmoothInterpolator]);
 
-    expectTypeOf<TickerType>().toEqualTypeOf<'raf' | 'interval'>();
+    expectTypeOf<DriverType>().toEqualTypeOf<'raf' | 'interval'>();
 
-    expectTypeOf<SchedulerType>().toEqualTypeOf<'spring'>();
+    expectTypeOf<InterpolationType>().toEqualTypeOf<'spring'>();
 
-    expectTypeOf<TickerParams>().toEqualTypeOf<[interval?: number]>();
+    expectTypeOf<DriverParams>().toEqualTypeOf<[interval?: number]>();
 
-    expectTypeOf<SchedulerParams>().toEqualTypeOf<[tuple?: number[]]>();
+    expectTypeOf<InterpolatorParams>().toEqualTypeOf<[tuple?: number[]]>();
 
-    expectTypeOf<typeof RafSmoothTicker>().toMatchTypeOf<SmoothTickerClass>();
+    expectTypeOf<typeof RafSmoothDriver>().toMatchTypeOf<SmoothDriverClass>();
 
-    expectTypeOf<typeof SpringSmoothScheduler>().toMatchTypeOf<SmoothSchedulerClass>();
+    expectTypeOf<typeof SpringSmoothInterpolator>().toMatchTypeOf<SmoothInterpolatorClass>();
   });
 
   test('resolves exact runtime names and preserves custom constructors', () => {
-    expect(getTickerByType('raf')).toBe(RafSmoothTicker);
+    expect(getDriverByType('raf')).toBe(RafSmoothDriver);
 
-    expect(getTickerByType('interval')).toBe(IntervalSmoothTicker);
+    expect(getDriverByType('interval')).toBe(IntervalSmoothDriver);
 
-    expect(getSchedulerByType('spring')).toBe(SpringSmoothScheduler);
+    expect(getInterpolationByType('spring')).toBe(SpringSmoothInterpolator);
 
-    class CustomTicker extends RafSmoothTicker {}
+    class CustomDriver extends RafSmoothDriver {}
 
-    class CustomScheduler extends SpringSmoothScheduler {}
+    class CustomInterpolator extends SpringSmoothInterpolator {}
 
-    expect(getTickerByType(CustomTicker)).toBe(CustomTicker);
+    expect(getDriverByType(CustomDriver)).toBe(CustomDriver);
 
-    expect(getSchedulerByType(CustomScheduler)).toBe(CustomScheduler);
+    expect(getInterpolationByType(CustomInterpolator)).toBe(CustomInterpolator);
   });
 
-  test.each(['RAF', 'r', 'missing'])('rejects the ticker name %s', (name) => {
-    expect(() => getTickerByType(name as TickerType)).toThrow(`Unknown ticker type: ${name}`);
+  test.each(['RAF', 'r', 'missing'])('rejects the driver name %s', (name) => {
+    expect(() => getDriverByType(name as DriverType)).toThrow(`Unknown driver type: ${name}`);
   });
 
-  test.each(['SPRING', 's', 'missing'])('rejects the scheduler name %s', (name) => {
-    expect(() => getSchedulerByType(name as SchedulerType)).toThrow(
-      `Unknown scheduler type: ${name}`,
+  test.each(['SPRING', 's', 'missing'])('rejects the interpolation name %s', (name) => {
+    expect(() => getInterpolationByType(name as InterpolationType)).toThrow(
+      `Unknown interpolation type: ${name}`,
     );
   });
 
   test.each([
-    { request: true, cancel: true, ticker: RafSmoothTicker },
-    { request: true, cancel: false, ticker: IntervalSmoothTicker },
-    { request: false, cancel: true, ticker: IntervalSmoothTicker },
-    { request: false, cancel: false, ticker: IntervalSmoothTicker },
+    { request: true, cancel: true, driver: RafSmoothDriver },
+    { request: true, cancel: false, driver: IntervalSmoothDriver },
+    { request: false, cancel: true, driver: IntervalSmoothDriver },
+    { request: false, cancel: false, driver: IntervalSmoothDriver },
   ])(
-    'selects the default ticker with request=$request and cancel=$cancel',
-    ({ request, cancel, ticker }) => {
+    'selects the default driver with request=$request and cancel=$cancel',
+    ({ request, cancel, driver }) => {
       stubGlobal('requestAnimationFrame', request ? jest.fn() : undefined);
 
       stubGlobal('cancelAnimationFrame', cancel ? jest.fn() : undefined);
@@ -96,8 +96,8 @@ describe('smooth configuration', () => {
       for (const enabled of [true, false]) {
         expect(toSmoothConfig(enabled)).toEqual({
           enabled,
-          ticker,
-          scheduler: SpringSmoothScheduler,
+          driver,
+          interpolation: SpringSmoothInterpolator,
         });
       }
     },
@@ -108,16 +108,45 @@ describe('smooth configuration', () => {
 
     stubGlobal('cancelAnimationFrame', jest.fn());
 
-    const result = toSmoothConfig({ enabled: true, ticker: 'interval', scheduler: 'spring' });
+    const result = toSmoothConfig({ enabled: true, driver: 'interval', interpolation: 'spring' });
 
     expect(result).toEqual({
       enabled: true,
-      ticker: IntervalSmoothTicker,
-      scheduler: SpringSmoothScheduler,
+      driver: IntervalSmoothDriver,
+      interpolation: SpringSmoothInterpolator,
     });
 
     expectTypeOf(result).toEqualTypeOf<BaseSmoothConfig>();
 
-    expect(toSmoothConfig({ ticker: 'raf', scheduler: 'spring' }).enabled).toBe(false);
+    expect(toSmoothConfig({ driver: 'raf', interpolation: 'spring' }).enabled).toBe(false);
+  });
+
+  test('defaults omitted driver and interpolation like the boolean form', () => {
+    stubGlobal('requestAnimationFrame', jest.fn());
+
+    stubGlobal('cancelAnimationFrame', jest.fn());
+
+    expect(toSmoothConfig({ enabled: true })).toEqual({
+      enabled: true,
+      driver: RafSmoothDriver,
+      interpolation: SpringSmoothInterpolator,
+    });
+  });
+
+  test('accepts the deprecated ticker and scheduler names when the new ones are absent', () => {
+    class CustomInterpolator extends SpringSmoothInterpolator {}
+
+    expect(
+      toSmoothConfig({ enabled: true, ticker: 'interval', scheduler: CustomInterpolator }),
+    ).toEqual({ enabled: true, driver: IntervalSmoothDriver, interpolation: CustomInterpolator });
+
+    expect(
+      toSmoothConfig({
+        ticker: 'interval',
+        driver: 'raf',
+        scheduler: CustomInterpolator,
+        interpolation: 'spring',
+      }),
+    ).toEqual({ enabled: false, driver: RafSmoothDriver, interpolation: SpringSmoothInterpolator });
   });
 });
