@@ -64,9 +64,12 @@ import "fluxdown/styles.css";
 
 ## 文档
 
-- [React 流式内容](https://fluxdown.dev/zh/guide/react/streaming.html) — 接入文本流，调整流式效果。
-- [React 样式定制](https://fluxdown.dev/zh/guide/react/customization.html) — 调整主题、排版和布局。
-- [React 插件](https://fluxdown.dev/zh/guide/react/plugins.html) — 定制语法、内容和交互。
+- [认识 Fluxdown](https://fluxdown.dev/zh/guide/index.html) — 了解流式 Markdown，选择适合的渲染库。
+- [架构介绍](https://fluxdown.dev/zh/guide/architecture.html) — 了解共享核心与渲染层的分工。
+- [平滑化](https://fluxdown.dev/zh/guide/common/streaming-effects/smoothing.html) — 调整新文本的显示节奏。
+- [动画效果](https://fluxdown.dev/zh/guide/common/streaming-effects/animation/index.html) — 选择新内容的入场方式。
+- [插件设计](https://fluxdown.dev/zh/guide/common/plugin-design.html) — 扩展内容处理与渲染。
+- [横向演示](https://fluxdown.dev/zh/guide/common/features/renderers.html) — 对比同一份内容在各渲染库中的呈现。
 - [Core](https://fluxdown.dev/zh/guide/core/quick-start.html) — 直接处理响应式内容块。
 - [Stative](https://fluxdown.dev/zh/stative/getting-started.html) — 创建和组合状态流。
 
