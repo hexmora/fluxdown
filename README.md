@@ -64,9 +64,12 @@ See the quick starts for [React](https://fluxdown.dev/guide/react/quick-start.ht
 
 ## Documentation
 
-- [React streaming](https://fluxdown.dev/guide/react/streaming.html) — connect incoming text and control streaming effects.
-- [React styling](https://fluxdown.dev/guide/react/customization.html) — adjust themes, typography, and layout.
-- [React plugins](https://fluxdown.dev/guide/react/plugins.html) — customize syntax, content, and interactions.
+- [Meet Fluxdown](https://fluxdown.dev/guide/index.html) — explore streaming Markdown and choose a renderer.
+- [Architecture](https://fluxdown.dev/guide/architecture.html) — understand the shared core and renderer layers.
+- [Smoothing](https://fluxdown.dev/guide/common/streaming-effects/smoothing.html) — control the pace of incoming text.
+- [Animation](https://fluxdown.dev/guide/common/streaming-effects/animation/index.html) — choose how new content appears.
+- [Plugin design](https://fluxdown.dev/guide/common/plugin-design.html) — extend content processing and rendering.
+- [Side-by-side demo](https://fluxdown.dev/guide/common/features/renderers.html) — compare the same content across renderers.
 - [Core](https://fluxdown.dev/guide/core/quick-start.html) — work with reactive content blocks directly.
 - [Stative](https://fluxdown.dev/stative/getting-started.html) — create and compose state flows.
 
