@@ -4,4 +4,6 @@ import { Shad } from '../../plugins/mapper/shad';
 import { Smooth } from '../../plugins/mapper/smooth';
 import { Suffix } from '../../plugins/mapper/suffix';
 
+export * from '../../plugins/mapper/keys';
+
 export const PRESET_MAPPER_PLUGINS = [Smooth, Shad, Scale, Chunk, Suffix];

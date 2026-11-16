@@ -15,11 +15,13 @@ type ChunkCase = {
   expected: string[];
 };
 
-const chunks = (name: string, ...expected: string[]): ChunkCase => ({
-  name,
-  text: expected.join(''),
-  expected,
-});
+const chunks = (name: string, ...expected: string[]): ChunkCase => {
+  return {
+    name,
+    text: expected.join(''),
+    expected,
+  };
+};
 
 const expectChunks = (text: string, expected: string[]) => {
   const result = new LexerChunker().chunk(text);
@@ -293,6 +295,47 @@ $$
 ];
 
 const DOCUMENT_SCOPED_CASES: ChunkCase[] = [
+  ...[
+    '[label][manual]',
+    '[manual][]',
+    '[manual' + ' '.repeat(1000) + '][]',
+    '[**label**][manual]',
+    '**[label][manual]**',
+    '[label `code`][manual]',
+    '[outer [inner]][manual]',
+    '![image][manual]',
+    '> [label][manual]',
+    '- [label][manual]',
+    '| Key |\n| --- |\n| [**label**][manual] |',
+  ].map((reference) =>
+    chunks(
+      'retains document scope for unresolved references: ' + reference,
+      reference + '\n\nNext',
+    ),
+  ),
+  ...[
+    '`[code][manual]`',
+    '- `[code][manual]`',
+    '> `[code][manual]`',
+    '```md\n[label][manual]\n```',
+    '    [label][manual]',
+    String.raw`\[escaped][manual]`,
+    String.raw`[escaped\][manual]`,
+    '[label][ ]',
+    '[label][\t]',
+    '[label][' + 'x'.repeat(1000) + ']',
+    'literal ][manual]',
+    '[label] [manual]',
+    '[label](https://example.test)',
+    '<https://example.test/[label][manual]>',
+    '<span title="[label][manual]">text</span>',
+  ].map((literal) =>
+    chunks(
+      'keeps independent blocks for reference-like literals: ' + literal,
+      literal + '\n\n',
+      'Next',
+    ),
+  ),
   chunks(
     'retains document scope when an EOF list needs whitespace alignment',
     'before\n\n- first[^note] ',
@@ -367,7 +410,7 @@ const DOCUMENT_SCOPED_CASES: ChunkCase[] = [
   chunks(
     'keeps definition-looking text in the table body',
     `${TABLE}[ref]: https://example.test/a|b\n\n`,
-    'Use [the reference][ref].\n',
+    'Next paragraph.\n',
   ),
 ];
 

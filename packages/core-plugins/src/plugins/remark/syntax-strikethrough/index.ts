@@ -11,6 +11,7 @@ import { gfmStrikethrough } from 'micromark-extension-gfm-strikethrough';
 
 import { appendRemarkExtensions } from '../../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 
 export interface SyntaxStrikethroughRemarkPluginConfig {
   singleTilde?: boolean | null;
@@ -29,7 +30,7 @@ declare global {
 }
 
 export class SyntaxStrikethroughRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-syntax-strikethrough';
+  static readonly key = RemarkPluginKeys.SyntaxStrikethrough;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Highest,

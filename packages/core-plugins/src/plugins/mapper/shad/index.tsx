@@ -10,6 +10,7 @@ import { type IReadableClosure, once, useDefaults, useSwitchMap } from 'stative'
 import type { ShadInputs, ShadPluginConfig } from './type';
 
 import { withKey } from '../../../utils';
+import { MapperPluginKeys } from '../keys';
 import { ShadBlocks, ShadProgress } from './states';
 
 export * from './type';
@@ -26,7 +27,7 @@ declare global {
 }
 
 export const Shad = /*#__PURE__*/ withKey(
-  'shad',
+  MapperPluginKeys.Shad,
   /*#__PURE__*/ once(function Shad({
     source,
     enabled: _enabled,

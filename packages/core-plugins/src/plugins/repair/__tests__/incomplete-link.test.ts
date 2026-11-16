@@ -22,6 +22,7 @@ const linkCases: LinkCase[] = [
 
 const tailLink = (source: string): Link | undefined => {
   const tree = repairMarkdown(source, new IncompleteLinkRepairPlugin());
+
   const container = first(tree.children);
 
   if (container?.type !== 'paragraph') {
@@ -38,6 +39,7 @@ describe('IncompleteLinkRepairPlugin', () => {
     const plugin = new IncompleteLinkRepairPlugin();
 
     expect(IncompleteLinkRepairPlugin.key).toBe('repair-incomplete-link');
+
     expect(plugin.config).toMatchObject({
       ending: true,
       priority: PluginPriority.Default,
@@ -55,9 +57,12 @@ describe('IncompleteLinkRepairPlugin', () => {
 
   test('removes an empty trailing link opener', () => {
     const tree = repairMarkdown('prefix [', new IncompleteLinkRepairPlugin());
+
     const container = first(tree.children) as Paragraph;
 
-    expect(container.children).toEqual([{ type: 'text', value: 'prefix ' }]);
+    expect(container.children).toEqual([
+      { type: 'text', value: 'prefix ', data: { source: 'prefix ' } },
+    ]);
   });
 
   test.each(linkCases)('creates a placeholder link for $source', ({ source, label }) => {
@@ -92,11 +97,13 @@ describe('IncompleteLinkRepairPlugin', () => {
   test('repairs only the final structural branch', () => {
     const tree = root([
       paragraph([{ type: 'text', value: 'first [not-tail' }]),
-      paragraph([{ type: 'text', value: 'last [tail' }]),
+      paragraph([{ type: 'text', value: 'last [tail', data: { source: 'last [tail' } }]),
     ]);
+
     const result = runRepairs(tree, new IncompleteLinkRepairPlugin());
 
     expect(first(result.children)).toEqual(first(tree.children));
+
     expect(last(result.children)).toMatchObject({
       type: 'paragraph',
       children: [
@@ -110,12 +117,12 @@ describe('IncompleteLinkRepairPlugin', () => {
     });
   });
 
-  test('uses the nearest unmatched opener on the final line', () => {
+  test('keeps nested brackets inside the provisional outer label', () => {
     const link = tailLink('prefix [literal and [target');
 
     expect(link).toMatchObject({
       type: 'link',
-      children: [{ type: 'text', value: 'target' }],
+      children: [{ type: 'text', value: 'literal and [target' }],
     });
   });
 

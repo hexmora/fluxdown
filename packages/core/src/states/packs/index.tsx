@@ -20,10 +20,10 @@ import {
   RemarkPlugins,
   RenderPatchesMapper,
   RenderPluggables,
-  RepairPluggables,
 } from './states';
 
 export * from './states';
+
 export * from './type';
 
 export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
@@ -47,8 +47,6 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
 
   const mapperSources = useDefaults(mappers, {});
 
-  const repairPluggables = useCreate(<RepairPluggables config={build} extras={repairSources} />);
-
   const rehypePluggables = useCreate(<RehypePluggables config={build} extras={rehypeSources} />);
 
   return (
@@ -57,12 +55,14 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
       plugins={
         <PluginBuilder<IRenderPlugin<ElementContent, Parent, R, C>>
           cacheStore={D(cacheStore)}
-          plugins={<RenderPluggables<ElementContent, Parent, R, C> extras={renders} />}
+          plugins={
+            <RenderPluggables<ElementContent, Parent, R, C> config={build} extras={renders} />
+          }
         />
       }
       source={
         <MapperComposer
-          mappers={<MapperPluggables extras={mapperSources} />}
+          mappers={<MapperPluggables config={build} extras={mapperSources} />}
           source={
             <BlockCompiler
               sections={
@@ -78,7 +78,7 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
                   cacheStore={D(cacheStore)}
                   config={config}
                   extras={remarkSources}
-                  repairs={repairPluggables}
+                  repairs={repairSources}
                 />
               )}
               getRehypes={() => (

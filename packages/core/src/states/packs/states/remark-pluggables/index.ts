@@ -1,17 +1,18 @@
-import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
+import type {
+  IPluggable,
+  IRemarkPlugin,
+  IRepairPlugin,
+  RemarkPluginConfigContext,
+  RepairPluginEnabledContext,
+} from '@fluxdown/types';
 
-import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/apply-repairs';
-import { PatchesRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/patches';
-import { SyntaxFootnoteRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-footnote';
-import { SyntaxMathRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-math';
-import { SyntaxPolicyRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-policy';
 import { PRESET_REMARK_PLUGINS } from '@fluxdown/core-plugins/presets/remark';
+import { PRESET_REPAIR_PLUGINS } from '@fluxdown/core-plugins/presets/repair';
 import { memoReturns } from 'stative';
 
 import type { RemarkPluggablesInputs } from './type';
 
-import { isPluggablesEqual, toPluggable } from '../../../base';
-import { getPluggableClass, getPluggableConfig } from '../utils';
+import { isPluggablesEqual, PluginBuilder, preparePluggables, toPluggable } from '../../../base';
 
 export * from './type';
 
@@ -19,72 +20,20 @@ export const RemarkPluggables = /*#__PURE__*/ memoReturns(function RemarkPluggab
   config,
   extras,
   repairs,
+  cacheStore,
 }: RemarkPluggablesInputs): IPluggable<IRemarkPlugin, unknown>[] {
-  const pluggables = toPluggable(extras, PRESET_REMARK_PLUGINS).filter((pluggable) => {
-    const Plugin = getPluggableClass(pluggable);
+  const remarks = toPluggable(extras, PRESET_REMARK_PLUGINS);
 
-    if (Plugin === SyntaxFootnoteRemarkPlugin) {
-      return config.footnote;
-    }
+  const repairSources = config.repair ? toPluggable(repairs, PRESET_REPAIR_PLUGINS) : [];
 
-    if (Plugin === SyntaxMathRemarkPlugin) {
-      return config.tex;
-    }
+  const repairContext: RepairPluginEnabledContext = { config, remarks, repairs: repairSources };
 
-    if (Plugin === ApplyRepairsRemarkPlugin) {
-      return config.repair;
-    }
-
-    return true;
+  const repairPlugins = PluginBuilder<IRepairPlugin>({
+    plugins: preparePluggables(repairSources, repairContext),
+    cacheStore,
   });
 
-  return pluggables.map((pluggable) => {
-    const Plugin = getPluggableClass(pluggable);
+  const context: RemarkPluginConfigContext = { config, remarks, repairs: repairPlugins };
 
-    const pluginConfig = getPluggableConfig(pluggable);
-
-    if (Plugin === SyntaxPolicyRemarkPlugin) {
-      return [
-        Plugin,
-        {
-          indentedCode: config.indentedCode,
-          setextHeading: config.setextHeading,
-          ...pluginConfig,
-        },
-      ];
-    }
-
-    if (Plugin === PatchesRemarkPlugin) {
-      return [
-        Plugin,
-        {
-          ...pluginConfig,
-          patches: config.patches,
-        },
-      ];
-    }
-
-    if (Plugin === SyntaxMathRemarkPlugin) {
-      return [
-        Plugin,
-        {
-          ...pluginConfig,
-          repairEnding: config.repair && config.repairEnding,
-        },
-      ];
-    }
-
-    if (Plugin === ApplyRepairsRemarkPlugin) {
-      return [
-        Plugin,
-        {
-          ...pluginConfig,
-          plugins: repairs,
-          ending: config.repairEnding,
-        },
-      ];
-    }
-
-    return pluggable;
-  });
+  return preparePluggables(remarks, context);
 }, isPluggablesEqual);

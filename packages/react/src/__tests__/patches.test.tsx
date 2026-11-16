@@ -1,24 +1,23 @@
-import type { IPluggable, IRemarkPlugin } from '@fluxdown/types';
-
+import { BaseRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/base';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import type { IPluginItem } from '../packs/full';
 
 import { Fluxdown } from '../packs/full';
 
-type RemarkPluggable = IPluggable<IRemarkPlugin, unknown>;
-
-const createPatches = (label: string) => [
-  {
-    key: 'stable-range',
-    range: [6, 11] as [number, number],
-    render: (text?: string) => (
-      <mark data-testid="replacement">
-        {label}:{text}
-      </mark>
-    ),
-  },
-];
+const createPatches = (label: string) => {
+  return [
+    {
+      key: 'stable-range',
+      range: [6, 11] as [number, number],
+      render: (text?: string) => (
+        <mark data-testid="replacement">
+          {label}:{text}
+        </mark>
+      ),
+    },
+  ];
+};
 
 describe('Fluxdown patches', () => {
   test('renders point and replacement patches in source order and passes replaced text', () => {
@@ -48,21 +47,17 @@ describe('Fluxdown patches', () => {
   test('reacts to patch render changes even when text and patch range stay unchanged', async () => {
     let compileCount = 0;
 
-    class CompileCounterRemarkPlugin {
+    class CompileCounterRemarkPlugin extends BaseRemarkPlugin {
       static readonly key = 'test-patch-compile-counter';
 
-      readonly config = {};
-
-      readonly plugin = () => () => {
+      override readonly plugin = () => () => {
         compileCount += 1;
       };
-
-      destroy() {}
     }
 
     const plugins: IPluginItem[] = [
       {
-        remarks: [CompileCounterRemarkPlugin as unknown as RemarkPluggable],
+        remarks: [CompileCounterRemarkPlugin],
       },
     ];
     const { rerender } = render(

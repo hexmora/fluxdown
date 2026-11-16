@@ -12,5 +12,8 @@ declare module 'unist' {
 
     /** Stable identity of generated nodes across streaming tree updates. */
     renderKey?: string;
+
+    /** An unclosed trailing formula while ending repairs are enabled; never a DOM property. */
+    repairEnding?: boolean;
   }
 }

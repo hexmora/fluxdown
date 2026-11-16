@@ -1,11 +1,11 @@
 import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/types';
-import type { Parent } from 'mdast';
 
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
-import { last, nth } from 'lodash-es';
 
-import { isRepairNodeType } from '../../../utils';
+import { isRepairNodeType, isRepairTreeTail } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
+import { RepairPluginKeys } from '../keys';
+import { getTrailingEscapeValue } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -14,45 +14,23 @@ declare global {
 }
 
 export class TrailingEscapeRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-trailing-escape';
+  static readonly key = RepairPluginKeys.TrailingEscape;
 
-  readonly config: RepairPluginSystemConfig = {
+  override readonly config: RepairPluginSystemConfig = {
     scope: 'tail',
     ending: true,
-    priority: PluginPriority.Default,
+    priority: PluginPriority.Low,
   };
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
-    if (!isRepairNodeType(node, 'text') || !this.isStructuralTail(node, parents)) {
+  override runner: RepairPluginRunner = ({ node, parents }) => {
+    if (!isRepairNodeType(node, 'text') || !isRepairTreeTail(node, parents)) {
       return;
     }
 
-    let trailingEscapes = 0;
+    const value = getTrailingEscapeValue(node);
 
-    for (
-      let index = node.value.length - 1;
-      index >= 0 && nth(node.value, index) === '\\';
-      index -= 1
-    ) {
-      trailingEscapes += 1;
-    }
-
-    if (trailingEscapes % 2 === 1) {
-      node.value = node.value.slice(0, -1);
+    if (value !== undefined) {
+      node.value = value;
     }
   };
-
-  private isStructuralTail(node: unknown, parents: Parent[]): boolean {
-    let child = node;
-
-    for (const parent of parents) {
-      if (last(parent.children) !== child) {
-        return false;
-      }
-
-      child = parent;
-    }
-
-    return true;
-  }
 }

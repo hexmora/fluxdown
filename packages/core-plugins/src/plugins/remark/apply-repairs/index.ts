@@ -1,4 +1,8 @@
-import type { IRepairPlugin } from '@fluxdown/types';
+import type {
+  IRepairPlugin,
+  RemarkPluginConfigContext,
+  RemarkPluginEnabledContext,
+} from '@fluxdown/types';
 import type { Root } from 'mdast';
 import type { Plugin } from 'unified';
 
@@ -6,9 +10,11 @@ import { type IBasePluginConfig, type IPluggableConfig, PluginPriority } from '@
 
 import { processRepairByPlugins } from '../../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
+import { setTextSource } from '../utils';
 
 export interface ApplyRepairsRemarkPluginConfig {
-  plugins: IRepairPlugin[];
+  plugins?: IRepairPlugin[];
   ending?: boolean;
   safe?: boolean;
 }
@@ -22,7 +28,7 @@ declare global {
 }
 
 export class ApplyRepairsRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-apply-repairs';
+  static readonly key = RemarkPluginKeys.ApplyRepairs;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.High,
@@ -32,21 +38,38 @@ export class ApplyRepairsRemarkPlugin extends BaseRemarkPlugin {
 
   plugin: Plugin<[], Root, Root>;
 
-  constructor(config: ApplyRepairsRemarkPluginConfig = { plugins: [] }) {
+  constructor(config: ApplyRepairsRemarkPluginConfig = {}) {
     super();
 
     this.innerConfig = {
-      plugins: [...config.plugins],
+      plugins: [...(config.plugins ?? [])],
       ending: config.ending ?? false,
       safe: config.safe ?? true,
     };
-    this.plugin = () => (tree) => {
-      processRepairByPlugins({
-        node: tree,
-        plugins: this.innerConfig.plugins,
-        ending: this.innerConfig.ending,
-        safe: this.innerConfig.safe,
-      });
+
+    const { plugins, ending, safe } = this.innerConfig;
+
+    this.plugin = function () {
+      this.use(setTextSource);
+
+      return (tree) => {
+        processRepairByPlugins({ node: tree, plugins, ending, safe });
+      };
     };
+  }
+
+  static override prepareConfig(
+    context: RemarkPluginConfigContext,
+    outerConfig: IPluggableConfig<ApplyRepairsRemarkPluginConfig>,
+  ): IPluggableConfig<ApplyRepairsRemarkPluginConfig> {
+    const { config, repairs } = context;
+
+    return { ...outerConfig, plugins: repairs, ending: config.repairEnding };
+  }
+
+  static override enabled(context: RemarkPluginEnabledContext): boolean {
+    const { config } = context;
+
+    return config.repair;
   }
 }

@@ -1,3 +1,4 @@
+import { BaseRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/base';
 import { flushPromises, mount } from '@vue/test-utils';
 
 import { Fluxdown } from '../packs/full';
@@ -5,20 +6,29 @@ import { FluxdownLite } from '../packs/lite';
 import { Patch } from './fixtures/patch';
 import { getText } from './utils/text';
 
-const createPatches = (label: string) => [
-  {
-    key: 'stable-range',
-    range: [6, 11] as [number, number],
-    render: (text?: string) => `${label}:${text}`,
-  },
-];
+const createPatches = (label: string) => {
+  return [
+    {
+      key: 'stable-range',
+      range: [6, 11] as [number, number],
+      render: (text?: string) => `${label}:${text}`,
+    },
+  ];
+};
 
 describe('render patches', () => {
   test('renders point and range patches in source order', async () => {
     const wrapper = mount(FluxdownLite, {
       props: {
         text: 'Hello world',
-        patches: [{ key: 'point', range: 5, render: () => '|' }, ...createPatches('replacement')],
+        patches: [
+          {
+            key: 'point',
+            range: 5,
+            render: () => '|',
+          },
+          ...createPatches('replacement'),
+        ],
       },
     });
 
@@ -61,16 +71,12 @@ describe('render patches', () => {
   test('updates patch callbacks without recompiling unchanged Markdown', async () => {
     const compile = vi.fn();
 
-    class CompileCounter {
+    class CompileCounter extends BaseRemarkPlugin {
       static readonly key = 'test-compile-counter';
 
-      readonly config = {};
-
-      readonly plugin = () => () => {
+      override readonly plugin = () => () => {
         compile();
       };
-
-      destroy() {}
     }
 
     const wrapper = mount(FluxdownLite, {
@@ -96,7 +102,12 @@ describe('render patches', () => {
     const wrapper = mount(FluxdownLite, {
       props: {
         text: 'visible',
-        patches: [{ range: [50, 60], render: () => 'hidden' }],
+        patches: [
+          {
+            range: [50, 60],
+            render: () => 'hidden',
+          },
+        ],
       },
     });
 
@@ -104,7 +115,14 @@ describe('render patches', () => {
 
     expect(getText(wrapper.element)).toBe('visible');
 
-    await wrapper.setProps({ patches: [{ range: [0, 7], render: (text) => `changed:${text}` }] });
+    await wrapper.setProps({
+      patches: [
+        {
+          range: [0, 7],
+          render: (text) => `changed:${text}`,
+        },
+      ],
+    });
 
     await flushPromises();
 

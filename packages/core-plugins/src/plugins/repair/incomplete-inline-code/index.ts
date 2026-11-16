@@ -1,10 +1,12 @@
 import type { RepairPluginRunner, RepairPluginSystemConfig } from '@fluxdown/types';
-import type { PhrasingContent } from 'mdast';
 
 import { type IPluggableConfig, PluginPriority } from '@fluxdown/types';
-import { last, nth } from 'lodash-es';
 
+import { isRepairTreeTail } from '../../../utils';
 import { BaseRepairPlugin } from '../base';
+import { RepairPluginKeys } from '../keys';
+import { isOpenRepairTableCell } from '../utils';
+import { getIncompleteInlineCodeChildren } from './utils';
 
 declare global {
   interface RepairConfigs {
@@ -13,87 +15,35 @@ declare global {
 }
 
 export class IncompleteInlineCodeRepairPlugin extends BaseRepairPlugin {
-  static readonly key = 'repair-incomplete-inline-code';
+  static readonly key = RepairPluginKeys.IncompleteInlineCode;
 
-  readonly config: RepairPluginSystemConfig = {
+  override readonly config: RepairPluginSystemConfig = {
     scope: 'tail',
     ending: true,
-    priority: PluginPriority.Default,
+    priority: PluginPriority.High,
   };
 
-  runner: RepairPluginRunner = ({ node, parents }) => {
-    if (node.type !== 'paragraph') {
+  override runner: RepairPluginRunner = ({ node, parents }) => {
+    if (
+      node.type !== 'paragraph' &&
+      node.type !== 'heading' &&
+      !isOpenRepairTableCell(node, parents)
+    ) {
       return;
     }
 
-    let branch = node;
-
-    for (const parent of parents) {
-      if (last(parent.children) !== branch) {
-        return;
-      }
-
-      branch = parent;
+    if (!('children' in node)) {
+      return;
     }
 
-    const { children } = node;
+    if (!isRepairTreeTail(node, parents)) {
+      return;
+    }
 
-    for (let childIndex = children.length - 1; childIndex >= 0; childIndex -= 1) {
-      const child = nth(children, childIndex);
+    const children = getIncompleteInlineCodeChildren(node);
 
-      if (!child || (child.type !== 'text' && child.type !== 'html')) {
-        return;
-      }
-
-      if (child.type !== 'text') {
-        continue;
-      }
-
-      for (let offset = child.value.length - 1; offset >= 0; offset -= 1) {
-        if (child.value.charAt(offset) !== '`') {
-          continue;
-        }
-
-        if (child.value.charAt(offset - 1) === '`' || child.value.charAt(offset + 1) === '`') {
-          continue;
-        }
-
-        let slashCount = 0;
-
-        for (
-          let slashOffset = offset - 1;
-          slashOffset >= 0 && child.value.charAt(slashOffset) === '\\';
-          slashOffset -= 1
-        ) {
-          slashCount += 1;
-        }
-
-        if (slashCount % 2 === 1) {
-          continue;
-        }
-
-        const prefix = child.value.slice(0, offset);
-        const suffix = child.value.slice(offset + 1);
-        const following = children
-          .slice(childIndex + 1)
-          .map((item) => ('value' in item && typeof item.value === 'string' ? item.value : ''))
-          .join('');
-        const value = suffix + following;
-        const replacement: PhrasingContent[] = [];
-
-        if (prefix.length > 0) {
-          child.value = prefix;
-          replacement.push(child);
-        }
-
-        if (value.length > 0) {
-          replacement.push({ type: 'inlineCode', value });
-        }
-
-        children.splice(childIndex, children.length - childIndex, ...replacement);
-
-        return;
-      }
+    if (children) {
+      node.children = children;
     }
   };
 }

@@ -10,6 +10,7 @@ import { type IReadableClosure, once, useDefaults, useSwitchMap } from 'stative'
 import type { ScaleInputs, ScalePluginConfig } from './type';
 
 import { withKey } from '../../../utils';
+import { MapperPluginKeys } from '../keys';
 import { ScaleBlocks } from './states';
 
 export * from './type';
@@ -26,7 +27,7 @@ declare global {
 }
 
 export const Scale = /*#__PURE__*/ withKey(
-  'scale',
+  MapperPluginKeys.Scale,
   /*#__PURE__*/ once(function Scale({
     source,
     enabled: _enabled,

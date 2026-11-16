@@ -7,6 +7,7 @@ import { gfmTable } from 'micromark-extension-gfm-table';
 
 import { appendRemarkExtensions } from '../../../utils';
 import { BaseRemarkPlugin } from '../base';
+import { RemarkPluginKeys } from '../keys';
 
 declare global {
   interface RemarkConfigs {
@@ -15,7 +16,7 @@ declare global {
 }
 
 export class SyntaxTableRemarkPlugin extends BaseRemarkPlugin {
-  static readonly key = 'remark-syntax-table';
+  static readonly key = RemarkPluginKeys.SyntaxTable;
 
   readonly config: IBasePluginConfig = {
     priority: PluginPriority.Highest,

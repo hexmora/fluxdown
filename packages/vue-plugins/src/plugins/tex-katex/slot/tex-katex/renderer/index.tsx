@@ -8,7 +8,6 @@ export type { TexKatexRendererProps } from './type';
 
 const KatexTexRenderer = /*#__PURE__*/ defineAsyncComponent({
   loader: () => import('./components/katex-tex').then((module) => module.default),
-  loadingComponent: TexRenderer,
   errorComponent: TexRenderer,
   delay: 0,
 });

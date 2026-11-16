@@ -14,12 +14,16 @@ declare global {
   interface RenderConfigs {}
 }
 
-/** Optional plugin entries with the shared options consumed by plugin composition. */
+/**
+ * Optional plugin entries with the shared options consumed by plugin composition.
+ */
 export type PluggableConfigs<C> = {
   [K in keyof C]?: IPluggableConfig<C[K]>;
 };
 
-/** A plugin list, preset configuration, or a list with configuration overrides. */
+/**
+ * A plugin list, preset configuration, or a list with configuration overrides.
+ */
 export type PluginSet<T, C> = [T[], Partial<C>] | Partial<C> | T[];
 
 /**
@@ -64,6 +68,16 @@ export type IPluginWithConfig<C = {}> = {
   readonly config: IBasePluginConfig & C;
 };
 
+/** Static hooks evaluated while resolving a pluggable list. */
+export type PluginHooks<C> = {
+  enabled?: (context: C) => boolean;
+
+  prepareConfig?: (
+    context: C,
+    outerConfig: IPluggableConfig<unknown>,
+  ) => IPluggableConfig<unknown> | null;
+};
+
 export type PluginClass<T extends IPluginWithConfig, O = void> = Newable<
   T,
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type, @typescript-eslint/no-explicit-any
@@ -82,7 +96,9 @@ export type IPluggableConfig<C = unknown> = (unknown extends C
    */
   priority?: PluginPriority | number;
 
-  /** Excludes this plugin from the configured list without constructing it. */
+  /**
+   * Excludes this plugin from the configured list without constructing it.
+   */
   disabled?: boolean;
 };
 

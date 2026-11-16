@@ -10,6 +10,7 @@ import { type IReadableClosure, once, useDefaults, useSwitchMap } from 'stative'
 import type { ChunkInputs, ChunkPluginConfig } from './type';
 
 import { withKey } from '../../../utils';
+import { MapperPluginKeys } from '../keys';
 import { ChunkBlocks } from './states';
 
 export * from './type';
@@ -26,7 +27,7 @@ declare global {
 }
 
 export const Chunk = /*#__PURE__*/ withKey(
-  'chunk',
+  MapperPluginKeys.Chunk,
   /*#__PURE__*/ once(function Chunk({
     source,
     enabled: _enabled,
