@@ -1,5 +1,19 @@
 # @fluxdown/types
 
+## 0.11.0
+
+### Minor Changes
+
+- fba214a: Resolve plugin enablement and constructor configuration through optional static `enabled` and `prepareConfig` hooks across all plugin types. Keep context outside instances and refresh active pluggables when reactive inputs change.
+
+  Include `TexRepairPlugin` in the default core repair preset. Core plugins depend on KaTeX to select a valid streaming prefix when no custom `render` is supplied; renderer plugins use this preset without separate repair registration.
+
+  Keep repair output intact across all renderer adapters, including trailing TeX whitespace and empty pending formulas. Validate streaming TeX in the repair layer and preserve lazy loading in renderer components, with an empty loading placeholder instead of raw-source flashes. Default compiler presets now include KaTeX; MathJax-only syntax is deferred until the formula closes unless a custom validator is configured.
+
+### Patch Changes
+
+- fba214a: Hold ambiguous streaming table headers and incomplete delimiter rows until their syntax resolves, preserving literal pipes and restoring non-table prose. Capture original Markdown fragments in parsed nodes' data.source, clear stale source after repair mutations, and disable table repair when the table syntax plugin is disabled.
+
 ## 0.10.2
 
 ### Patch Changes

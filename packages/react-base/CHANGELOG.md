@@ -1,5 +1,18 @@
 # @fluxdown/react-base
 
+## 0.14.3
+
+### Patch Changes
+
+- Updated dependencies [fba214a]
+- Updated dependencies [fba214a]
+- Updated dependencies [fba214a]
+- Updated dependencies [fba214a]
+  - @fluxdown/core-plugins@0.14.0
+  - @fluxdown/core@0.13.0
+  - @fluxdown/react-base-plugins@0.11.3
+  - @fluxdown/types@0.11.0
+
 ## 0.14.2
 
 ### Patch Changes
