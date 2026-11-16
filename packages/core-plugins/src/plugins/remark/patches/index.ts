@@ -55,10 +55,12 @@ export class PatchesRemarkPlugin extends BaseRemarkPlugin {
     };
   }
 
-  static override config(
-    { config }: RemarkPluginConfigContext,
+  static override prepareConfig(
+    context: RemarkPluginConfigContext,
     outerConfig: IPluggableConfig<PatchesRemarkPluginConfig>,
   ): IPluggableConfig<PatchesRemarkPluginConfig> {
+    const { config } = context;
+
     return { ...outerConfig, patches: config.patches };
   }
 }

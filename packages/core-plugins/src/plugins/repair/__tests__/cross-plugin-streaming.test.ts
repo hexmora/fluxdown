@@ -118,7 +118,6 @@ describe('block boundary repairs after inline replacements', () => {
 const inspectPlugin = (runner: RepairPluginRunner): IRepairPlugin => {
   return {
     config: { scope: 'tail' },
-    enabled: () => true,
     prepare: noop,
     runner,
     before: noop,
@@ -348,7 +347,7 @@ describe('per-pass open-cell boundary lifetime', () => {
       node: tree,
       ending: true,
       plugins: [
-        ...(plugin.enabled(context) ? [plugin] : []),
+        ...(IncompleteTableRepairPlugin.enabled(context) ? [plugin] : []),
         inspectPlugin(({ node }) => {
           retained ||= OPEN_REPAIR_TABLE_CELL in node;
         }),

@@ -32,7 +32,9 @@ export class IncompleteTableRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Highest,
   };
 
-  override enabled({ remarks }: RepairPluginEnabledContext): boolean {
+  static override enabled(context: RepairPluginEnabledContext): boolean {
+    const { remarks } = context;
+
     return getConfigIfEnabled(remarks, RemarkPluginKeys.SyntaxTable) !== undefined;
   }
 

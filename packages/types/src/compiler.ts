@@ -1,5 +1,11 @@
 import type { IRawPatchItem } from './patch';
-import type { IPluggable, IRemarkPlugin, IRepairPlugin } from './plugins';
+import type {
+  IPluggable,
+  IPluginWithConfig,
+  IRehypePlugin,
+  IRemarkPlugin,
+  IRepairPlugin,
+} from './plugins';
 
 export interface CompilerConfig {
   repair: boolean;
@@ -46,3 +52,19 @@ export interface RemarkPluginConfigContext extends RemarkPluginEnabledContext {
 }
 
 export type RepairPluginConfigContext = RepairPluginEnabledContext;
+
+export interface RehypePluginContext {
+  config: CompilerConfig;
+
+  rehypes: IPluggable<IRehypePlugin, unknown>[];
+}
+
+export interface RenderPluginContext {
+  config: CompilerConfig;
+
+  renders: IPluggable<IPluginWithConfig, unknown>[];
+}
+
+export interface SlotPluginContext {
+  plugins: IPluggable<IPluginWithConfig, unknown>[];
+}

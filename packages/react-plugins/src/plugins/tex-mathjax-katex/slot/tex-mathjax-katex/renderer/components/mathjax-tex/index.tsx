@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import type { TexProps } from '../../../../../../../base';
 
 import { getTexRoot } from '../../../../../../tex/utils';
-import { texToSvg } from '../../../../../engine';
+import { texToSvg } from '../../../../../utils';
 import styles from '../../index.module.scss';
 
 export const MathjaxTexRenderer = ({

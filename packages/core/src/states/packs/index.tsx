@@ -55,12 +55,14 @@ export const Core = /*#__PURE__*/ once(function Core<R, C = {}>({
       plugins={
         <PluginBuilder<IRenderPlugin<ElementContent, Parent, R, C>>
           cacheStore={D(cacheStore)}
-          plugins={<RenderPluggables<ElementContent, Parent, R, C> extras={renders} />}
+          plugins={
+            <RenderPluggables<ElementContent, Parent, R, C> config={build} extras={renders} />
+          }
         />
       }
       source={
         <MapperComposer
-          mappers={<MapperPluggables extras={mapperSources} />}
+          mappers={<MapperPluggables config={build} extras={mapperSources} />}
           source={
             <BlockCompiler
               sections={

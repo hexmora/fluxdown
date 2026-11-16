@@ -35,7 +35,9 @@ export class SyntaxFootnoteRemarkPlugin extends BaseRemarkPlugin {
     });
   };
 
-  override enabled({ config }: RemarkPluginEnabledContext): boolean {
+  static override enabled(context: RemarkPluginEnabledContext): boolean {
+    const { config } = context;
+
     return config.footnote;
   }
 }

@@ -1,10 +1,13 @@
-import type { Element } from 'hast';
+import type { Element, Nodes } from 'hast';
 
+import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/apply-repairs';
+import { SyntaxMathRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-math';
+import { TexRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/tex';
 import { render, waitFor } from '@testing-library/react';
 
-import { katexTexToHtml } from '../../../../tex-katex/engine';
-import { TexPrefixParser } from '../../../../tex/repair/prefix';
-import { texToSvg } from '../../../engine';
+import { MarkdownCompiler } from '../../../../../../../core/src/states/hast/block-compiler/exports';
+import { katexTexToHtml } from '../../../../tex-katex/utils';
+import { texToSvg } from '../../../utils';
 import { TexMathjaxKatexRenderer } from '../renderer';
 
 const current: Element = {
@@ -25,6 +28,26 @@ const renderTex = (tex: string) => {
   return katexTexToHtml(tex, 'inline') ?? texToSvg(tex, 'inline');
 };
 
+const getText = (node: Nodes): string => {
+  return 'value' in node
+    ? node.value
+    : 'children' in node
+      ? node.children.map(getText).join('')
+      : '';
+};
+
+const createPrefixRepair = () => {
+  const repair = new TexRepairPlugin({ render: renderTex });
+  const compiler = new MarkdownCompiler();
+  const remarks = [
+    new SyntaxMathRemarkPlugin({ repairEnding: true }),
+    new ApplyRepairsRemarkPlugin({ plugins: [repair], ending: true }),
+  ];
+
+  return (source: string): string =>
+    source ? getText(compiler.build({ text: `$${source}`, remarks })) : '';
+};
+
 describe('streaming TeX prefixes', () => {
   test.each([
     String.raw`x+\frac{a+b}{c+d}`,
@@ -38,11 +61,11 @@ describe('streaming TeX prefixes', () => {
     String.raw`x+\verb|{not a group}|`,
     String.raw`x+\text{中文与 spaces}`,
   ])('never returns invalid TeX or loses an accepted prefix: %s', (source) => {
-    const prefix = new TexPrefixParser(renderTex);
+    const prefix = createPrefixRepair();
     let previous = '';
 
     for (let end = 0; end <= source.length; end += 1) {
-      const result = prefix.parse(source.slice(0, end));
+      const result = prefix(source.slice(0, end));
 
       expect(source.startsWith(result)).toBe(true);
       expect(result.length).toBeGreaterThanOrEqual(previous.length);
@@ -58,20 +81,20 @@ describe('streaming TeX prefixes', () => {
   });
 
   test('does not show a shorter command while a longer control word is arriving', () => {
-    const prefix = new TexPrefixParser(renderTex);
+    const prefix = createPrefixRepair();
 
-    expect(prefix.parse(String.raw`x+\sin`)).toBe('x+');
-    expect(prefix.parse(String.raw`x+\sinh`)).toBe('x+');
-    expect(prefix.parse(String.raw`x+\sinh `)).toBe(String.raw`x+\sinh `);
+    expect(prefix(String.raw`x+\sin`)).toBe('x+');
+    expect(prefix(String.raw`x+\sinh`)).toBe('x+');
+    expect(prefix(String.raw`x+\sinh `)).toBe(String.raw`x+\sinh `);
   });
 
   test('does not leak macro definitions into another validation context', () => {
-    const prefix = new TexPrefixParser(renderTex);
+    const prefix = createPrefixRepair();
 
-    expect(prefix.parse(String.raw`\gdef\privatefoo{x}\privatefoo `)).toBe(
+    expect(prefix(String.raw`\gdef\privatefoo{x}\privatefoo `)).toBe(
       String.raw`\gdef\privatefoo{x}\privatefoo `,
     );
-    expect(prefix.parse(String.raw`\privatefoo `)).toBe('');
+    expect(prefix(String.raw`\privatefoo `)).toBe('');
   });
 
   test('renders its received source without performing repair, even with repair metadata', async () => {

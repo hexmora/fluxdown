@@ -1,11 +1,11 @@
-import type { IPluggable } from '@fluxdown/types';
+import type { IPluggable, RenderPluginContext } from '@fluxdown/types';
 
 import { memoReturns } from 'stative';
 
 import type { IRenderPlugin } from '../../../../externals';
 import type { RenderPluggablesInputs } from './type';
 
-import { isPluggablesEqual, toPluggable } from '../../../base';
+import { isPluggablesEqual, preparePluggables, toPluggable } from '../../../base';
 
 export * from './type';
 
@@ -16,6 +16,11 @@ export const RenderPluggables = /*#__PURE__*/ memoReturns(function RenderPluggab
   C = {},
 >({
   extras,
+  config,
 }: RenderPluggablesInputs<E, P, R, C>): IPluggable<IRenderPlugin<E, P, R, C>, unknown>[] {
-  return toPluggable(extras);
+  const renders = toPluggable(extras);
+
+  const context: RenderPluginContext = { config, renders };
+
+  return preparePluggables(renders, context);
 }, isPluggablesEqual);

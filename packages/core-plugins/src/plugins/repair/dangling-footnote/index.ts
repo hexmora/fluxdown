@@ -20,7 +20,9 @@ declare global {
 export class DanglingFootnoteRepairPlugin extends BaseRepairPlugin {
   static readonly key = RepairPluginKeys.DanglingFootnote;
 
-  override enabled({ config }: RepairPluginEnabledContext): boolean {
+  static override enabled(context: RepairPluginEnabledContext): boolean {
+    const { config } = context;
+
     return config.footnote;
   }
 

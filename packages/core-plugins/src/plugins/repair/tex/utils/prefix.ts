@@ -1,4 +1,4 @@
-import type { TexRenderSource } from './type';
+import type { TexRenderSource } from '../type';
 
 /**
  * A control word at EOF can still grow (for example, \not into \notin).

@@ -77,7 +77,6 @@ const collectText = (node: HastRoot | RootContent): string => {
 
 const createRemarkAppender = (value: string, run = jest.fn()) => {
   const plugin: IRemarkPlugin = {
-    enabled: () => true,
     config: {},
     destroy: jest.fn(),
     plugin: () => (tree) => {
@@ -1166,7 +1165,6 @@ describe('BlockCompiler', () => {
     const failure = new Error('Failed to compile remarks.');
     const throwingRemark: IRemarkPlugin = {
       config: {},
-      enabled: () => true,
       destroy: jest.fn(),
       plugin: () => {
         throw failure;

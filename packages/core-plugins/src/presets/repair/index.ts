@@ -18,6 +18,7 @@ import { IncompleteTableRepairPlugin } from '../../plugins/repair/incomplete-tab
 import { ParagraphHtmlClosureRepairPlugin } from '../../plugins/repair/paragraph-html-closure';
 import { RedundantBreakBeforeHtmlRepairPlugin } from '../../plugins/repair/redundant-break-before-html';
 import { RedundantTrailingBreakRepairPlugin } from '../../plugins/repair/redundant-trailing-break';
+import { TexRepairPlugin } from '../../plugins/repair/tex';
 import { TrailingEmptyCodeBlockRepairPlugin } from '../../plugins/repair/trailing-empty-code-block';
 import { TrailingEmptyHeadingRepairPlugin } from '../../plugins/repair/trailing-empty-heading';
 import { TrailingEscapeRepairPlugin } from '../../plugins/repair/trailing-escape';
@@ -30,6 +31,7 @@ export const PRESET_REPAIR_PLUGINS: PluginClass<IRepairPlugin>[] = [
   IncompleteCodeFenceRepairPlugin,
   IncompleteInlineCodeRepairPlugin,
   IncompleteMathRepairPlugin,
+  TexRepairPlugin,
   IncompleteImageRepairPlugin,
   IncompleteLinkRepairPlugin,
   TrailingEmptyHeadingRepairPlugin,

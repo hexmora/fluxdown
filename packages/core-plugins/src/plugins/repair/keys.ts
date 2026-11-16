@@ -35,6 +35,8 @@ export enum RepairPluginKeys {
 
   RedundantTrailingBreak = 'repair-redundant-trailing-break',
 
+  Tex = 'repair-tex',
+
   TrailingEmptyCodeBlock = 'repair-trailing-empty-code-block',
 
   TrailingEmptyHeading = 'repair-trailing-empty-heading',

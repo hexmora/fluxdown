@@ -1,5 +1,7 @@
+import type { SlotPluginContext } from '@fluxdown/types';
+
 import { isPluggablesEqual, PluginBuilder } from '@fluxdown/core';
-import { set } from 'lodash-es';
+import { identity, set } from 'lodash-es';
 import { createMemo, onCleanup } from 'solid-js';
 import { render, S } from 'stative';
 
@@ -10,7 +12,12 @@ import { createStateOf, createStateValue } from '../primitives';
 export const createSlots = (source: () => readonly AnySlotPluggable[]) => {
   const plugins = createStateOf(() => [...source()], isPluggablesEqual);
 
-  const builder = render(S([PluginBuilder<AnySlotPlugin>, { plugins }]));
+  const builder = render(
+    S([
+      PluginBuilder<AnySlotPlugin>,
+      { plugins, context: S([identity<SlotPluginContext>, { plugins }]) },
+    ]),
+  );
 
   const instances = createStateValue(builder.value);
 

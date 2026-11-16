@@ -87,6 +87,7 @@
     "@types/unist": "catalog:",
     "character-entities": "catalog:",
     "hast-util-sanitize": "catalog:",
+    "katex": "catalog:",
     "lodash-es": "catalog:",
     "mdast-util-from-markdown": "catalog:",
     "mdast-util-gfm-autolink-literal": "catalog:",

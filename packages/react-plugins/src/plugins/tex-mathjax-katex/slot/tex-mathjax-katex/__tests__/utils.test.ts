@@ -1,4 +1,4 @@
-import { texToSvg } from '../../../engine';
+import { texToSvg } from '../../../utils';
 
 describe('MathJax synchronous SVG rendering', () => {
   test.each(['inline', 'display'] as const)('keeps an empty %s formula empty', (mode) => {

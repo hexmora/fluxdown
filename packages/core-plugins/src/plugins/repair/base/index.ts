@@ -26,14 +26,14 @@ export abstract class BaseRepairPlugin extends Destructible implements IRepairPl
 
   afterEach: RepairPluginHookType = noop;
 
-  static config(
+  static prepareConfig(
     _context: RepairPluginConfigContext,
     _outerConfig: IPluggableConfig<unknown>,
   ): IPluggableConfig<unknown> | null {
     return null;
   }
 
-  enabled(_context: RepairPluginEnabledContext): boolean {
+  static enabled(_context: RepairPluginEnabledContext): boolean {
     return true;
   }
 

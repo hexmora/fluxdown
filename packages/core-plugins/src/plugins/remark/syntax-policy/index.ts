@@ -66,10 +66,12 @@ export class SyntaxPolicyRemarkPlugin extends BaseRemarkPlugin {
     };
   }
 
-  static override config(
-    { config }: RemarkPluginConfigContext,
+  static override prepareConfig(
+    context: RemarkPluginConfigContext,
     outerConfig: IPluggableConfig<SyntaxPolicyRemarkPluginConfig>,
   ): IPluggableConfig<SyntaxPolicyRemarkPluginConfig> {
+    const { config } = context;
+
     return {
       indentedCode: config.indentedCode,
       setextHeading: config.setextHeading,

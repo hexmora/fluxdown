@@ -48,18 +48,20 @@ const mathNodes = (tree: Root) => {
 
 describe('math in the streaming remark pipeline', () => {
   test.each([String.raw`$x\notin A$`, String.raw`$x\in A$`, String.raw`$x\subseteq A$`])(
-    'keeps an embedded control word in math as its spaced operand arrives: %s',
+    'holds an embedded control word until its spaced operand arrives: %s',
     (source) => {
       for (let length = 1; length <= source.length; length += 1) {
         const prefix = source.slice(0, length);
 
         const nodes = mathNodes(parseMarkdown(prefix, createPlugins()));
 
+        const value = source.slice(1, Math.min(length, source.length - 1));
+
         expect(
           nodes.map((node) => {
             return node.value;
           }),
-        ).toEqual([source.slice(1, Math.min(length, source.length - 1))]);
+        ).toEqual([length < source.length ? value.replace(/\\[A-Za-z]*$/, '') : value]);
       }
     },
   );
@@ -108,7 +110,7 @@ describe('math in the streaming remark pipeline', () => {
   );
 
   test.each(['$$F=ma$$', '$$W=Fd\\cos\\theta$$'])(
-    'withholds only the first character of a possible double-dollar closer: %s',
+    'withholds unfinished TeX and a possible double-dollar closer: %s',
     (source) => {
       for (let length = 2; length <= source.length; length += 1) {
         const prefix = source.slice(0, length);
@@ -117,11 +119,13 @@ describe('math in the streaming remark pipeline', () => {
 
         const valueEnd = Math.min(length, source.length - 2);
 
+        const value = source.slice(2, valueEnd);
+
         expect(
           nodes.map((node) => {
             return node.value;
           }),
-        ).toEqual([source.slice(2, valueEnd)]);
+        ).toEqual([length < source.length ? value.replace(/\\[A-Za-z]*$/, '') : value]);
 
         expect(nodes[0]?.data?.repairEnding).toBe(length < source.length ? true : undefined);
       }
@@ -147,22 +151,25 @@ describe('math in the streaming remark pipeline', () => {
 
   test.each([
     [String.raw`before $$x\$`, String.raw`x\$`],
-    ['before $$x$y', 'x$y'],
-    ['before $$x$ ', 'x$ '],
+    ['before $$x$y', 'x'],
+    ['before $$x$ ', 'x'],
     ['before $$ $ $$', '$'],
-    ['$$\nx$', 'x$'],
-    ['$$\nx\n$ ', 'x\n$ '],
-    ['$$\nx\n$\n', 'x\n$\n'],
-    ['$$\nx\n$\ny', 'x\n$\ny'],
+    ['$$\nx$', 'x'],
+    ['$$\nx\n$ ', 'x\n'],
+    ['$$\nx\n$\n', 'x\n'],
+    ['$$\nx\n$\ny', 'x\n'],
     ['$$\nx\n\\$', 'x\n\\$'],
     ['$$\nx\n$\n$$', 'x\n$'],
-  ])('keeps escaped or disambiguated literal dollars unchanged: %s', (source, value) => {
-    expect(
-      mathNodes(parseMarkdown(source, createPlugins())).map((node) => {
-        return node.value;
-      }),
-    ).toEqual([value]);
-  });
+  ])(
+    'keeps escaped dollars and trims invalid dollars only in open formulas: %s',
+    (source, value) => {
+      expect(
+        mathNodes(parseMarkdown(source, createPlugins())).map((node) => {
+          return node.value;
+        }),
+      ).toEqual([value]);
+    },
+  );
 
   test('retains an incomplete double-dollar expression literally after repair is disabled', () => {
     const tree = parseMarkdown('before $$F=ma$', createPlugins(false));
@@ -185,6 +192,11 @@ describe('math in the streaming remark pipeline', () => {
         const values = prefix.split('$').filter((_value, index) => {
           return index % 2 === 1;
         });
+
+        // KaTeX rejects bare CJK in strict math mode until a closed formula restores the source.
+        if (!prefix.endsWith('$') && /[甲乙]/.test(values.at(-1) ?? '')) {
+          values[values.length - 1] = '';
+        }
 
         expect(
           nodes.map((node) => {

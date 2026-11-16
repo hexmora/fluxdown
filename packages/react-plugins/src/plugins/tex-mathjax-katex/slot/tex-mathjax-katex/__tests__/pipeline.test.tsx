@@ -13,8 +13,6 @@ import { MarkdownCompiler } from '../../../../../../../core/src/states/hast/bloc
 import { SlotProvider } from '../../../../../../../react-base-plugins/src/base';
 import { TexRenderPlugin } from '../../../../../../../react-base-plugins/src/plugins/tex/render/tex';
 import { getTex } from '../../../../../../../react-base-plugins/src/plugins/tex/render/tex/utils';
-import { TexRepairPlugin } from '../../../../tex/repair';
-import { renderTex } from '../../../repair';
 
 const findMath = (node: Nodes): Element | undefined => {
   if (
@@ -33,10 +31,7 @@ const buildTree = (source: string) => {
     remarks: [
       new SyntaxMathRemarkPlugin(),
       new ApplyRepairsRemarkPlugin({
-        plugins: [
-          ...PRESET_REPAIR_PLUGINS.map((Plugin) => new Plugin()),
-          new TexRepairPlugin({ render: renderTex }),
-        ],
+        plugins: PRESET_REPAIR_PLUGINS.map((Plugin) => new Plugin()),
         ending: true,
       }),
     ],
@@ -136,10 +131,18 @@ test.each(['$x+1$2。', '$ x+1$。', '$x+1 $。'])(
   },
 );
 
-test('renders chemistry arrow paths at the first valid prefix and after closing Markdown', async () => {
+test('defers MathJax-only chemistry until closing Markdown', async () => {
   const source = String.raw`$\ce{H2 + O2 -> H2O}`;
 
   const view = render(renderMath(source));
+
+  await waitFor(() => {
+    expect(view.container.querySelector('[data-tex]')?.getAttribute('data-tex')).toBe('');
+  });
+
+  expect(view.container.textContent).toBe('');
+
+  view.rerender(renderMath(source + '$'));
 
   await waitFor(
     () => {
@@ -147,18 +150,6 @@ test('renders chemistry arrow paths at the first valid prefix and after closing 
     },
     { timeout: 10_000 },
   );
-
-  expect(view.container.querySelector('svg text')).toBeNull();
-
-  expect(view.container.querySelector('[data-tex]')?.getAttribute('data-tex')).toBe(
-    source.slice(1),
-  );
-
-  view.rerender(renderMath(source + '$'));
-
-  await waitFor(() => {
-    expect(view.container.querySelector('mjx-container path[data-c="E429"]')).not.toBeNull();
-  });
 
   expect(view.container.querySelector('svg text')).toBeNull();
 

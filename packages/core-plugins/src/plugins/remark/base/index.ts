@@ -24,14 +24,14 @@ export abstract class BaseRemarkPlugin<
 
   abstract plugin: Plugin<P extends void ? [] : [P], I, O>;
 
-  static config(
+  static prepareConfig(
     _context: RemarkPluginConfigContext,
     _outerConfig: IPluggableConfig<unknown>,
   ): IPluggableConfig<unknown> | null {
     return null;
   }
 
-  enabled(_context: RemarkPluginEnabledContext): boolean {
+  static enabled(_context: RemarkPluginEnabledContext): boolean {
     return true;
   }
 }

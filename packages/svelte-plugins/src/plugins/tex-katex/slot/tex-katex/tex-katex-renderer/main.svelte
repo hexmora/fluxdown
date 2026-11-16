@@ -18,7 +18,11 @@
       if (active) {
         renderFormula = katexTexToHtml;
       }
-    }).catch(() => {});
+    }).catch(() => {
+      if (active) {
+        renderFormula = () => null;
+      }
+    });
 
     void import('katex/dist/katex.min.css').catch(() => {});
 
@@ -32,8 +36,6 @@
   <svelte:element this={mode === 'display' ? 'div' : 'span'} class={['fluxdown-svelte-tex-katex-root', props.class]} data-mode={mode} data-tex={props.tex} style={props.style}>{@html html}</svelte:element>
 {:else if renderFormula}
   <Fallback {...props} />
-{:else}
-  <TexRenderer {...props} />
 {/if}
 
 <style lang="scss">

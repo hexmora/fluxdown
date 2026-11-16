@@ -1,12 +1,12 @@
+import { TexRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/tex';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
 
-import { TexRepairPlugin } from '..';
-import { TexPlugin } from '../..';
-import { Fluxdown } from '../../../../../../react/src/packs/full';
-import { TexKatexPlugin } from '../../../tex-katex';
-import { katexTexToHtml } from '../../../tex-katex/engine';
-import { TexMathjaxKatexPlugin } from '../../../tex-mathjax-katex';
-import { texToSvg } from '../../../tex-mathjax-katex/engine';
+import { TexPlugin } from '..';
+import { Fluxdown } from '../../../../../react/src/packs/full';
+import { TexKatexPlugin } from '../../tex-katex';
+import { katexTexToHtml } from '../../tex-katex/utils';
+import { TexMathjaxKatexPlugin } from '../../tex-mathjax-katex';
+import { texToSvg } from '../../tex-mathjax-katex/utils';
 
 const streaming = { smooth: false, effect: false };
 
@@ -70,18 +70,14 @@ test.each([
   15_000,
 );
 
-test('uses the selected pack engine and resets on pack, source, and ending changes', async () => {
+test('keeps default repair across pack changes and resets on source and ending changes', async () => {
   const source = String.raw`$x+\bbox[5px]{y}`;
 
   const view = render(<Fluxdown build={build} streaming={streaming} text={source} />);
 
   await waitFor(() => {
-    expect(view.container.querySelector('mjx-container')).not.toBeNull();
+    expect(view.container.querySelector('[data-tex]')?.getAttribute('data-tex')).toBe('x+');
   });
-
-  expect(view.container.querySelector('[data-tex]')?.getAttribute('data-tex')).toBe(
-    source.slice(1),
-  );
 
   view.rerender(
     <Fluxdown build={build} plugins={TexKatexPlugin} streaming={streaming} text={source} />,
@@ -96,7 +92,7 @@ test('uses the selected pack engine and resets on pack, source, and ending chang
   );
 
   await waitFor(() => {
-    expect(view.container.querySelector('mjx-container')).not.toBeNull();
+    expect(view.container.querySelector('[data-tex]')?.getAttribute('data-tex')).toBe('x+');
   });
 
   view.rerender(<Fluxdown build={build} streaming={streaming} text="$z+" />);
@@ -111,7 +107,7 @@ test('uses the selected pack engine and resets on pack, source, and ending chang
 
   view.rerender(<Fluxdown build={build} plugins={TexPlugin} streaming={streaming} text={source} />);
 
-  expect(view.container.textContent).toContain(source.slice(1));
+  expect(view.container.textContent).toBe('x+');
 }, 15_000);
 
 test('can disable only engine repair using the existing plugin configuration', async () => {

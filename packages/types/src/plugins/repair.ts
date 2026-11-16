@@ -3,7 +3,6 @@ import type { OmitWithType } from '@fluxdown/utils';
 import type { Parent, RootContent } from 'mdast';
 import type { IDestructible } from 'stative';
 
-import type { RepairPluginEnabledContext } from '../compiler';
 import type { IBasePluginConfig, IPluginWithConfig } from './base';
 
 declare module 'unist' {
@@ -75,8 +74,6 @@ export type RepairPluginPrepare = (node: Parent | RootContent) => void | RepairP
  * Contract implemented by mdast repair plugins.
  */
 export interface IRepairPlugin extends IDestructible, IPluginWithConfig<RepairPluginConfig> {
-  enabled: (context: RepairPluginEnabledContext) => boolean;
-
   /**
    * Framework metadata. Plugin-specific constructor options are intentionally
    * kept separate from this object.

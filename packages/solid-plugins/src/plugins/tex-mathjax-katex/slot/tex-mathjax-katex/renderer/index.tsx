@@ -10,7 +10,7 @@ const MathjaxTexRenderer = /*#__PURE__*/ lazy(() => import('./components/mathjax
 const MathjaxRenderer = (props: TexProps) => {
   return (
     <ErrorBoundary fallback={<TexRenderer {...props} />}>
-      <Suspense fallback={<TexRenderer {...props} />}>
+      <Suspense>
         <MathjaxTexRenderer {...props} />
       </Suspense>
     </ErrorBoundary>

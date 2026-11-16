@@ -28,6 +28,7 @@ import { IncompleteTableRepairPlugin } from '../../repair/incomplete-table';
 import { ParagraphHtmlClosureRepairPlugin } from '../../repair/paragraph-html-closure';
 import { RedundantBreakBeforeHtmlRepairPlugin } from '../../repair/redundant-break-before-html';
 import { RedundantTrailingBreakRepairPlugin } from '../../repair/redundant-trailing-break';
+import { TexRepairPlugin } from '../../repair/tex';
 import { TrailingEmptyCodeBlockRepairPlugin } from '../../repair/trailing-empty-code-block';
 import { TrailingEmptyHeadingRepairPlugin } from '../../repair/trailing-empty-heading';
 import { TrailingEscapeRepairPlugin } from '../../repair/trailing-escape';
@@ -592,6 +593,7 @@ describe('ApplyRepairsRemarkPlugin', () => {
       IncompleteCodeFenceRepairPlugin,
       IncompleteInlineCodeRepairPlugin,
       IncompleteMathRepairPlugin,
+      TexRepairPlugin,
       IncompleteImageRepairPlugin,
       IncompleteLinkRepairPlugin,
       TrailingEmptyHeadingRepairPlugin,

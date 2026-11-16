@@ -9,7 +9,6 @@ import { processRepairByPlugins } from '../../../utils';
 const createPlugin = (events: string[], name: string): IRepairPlugin => {
   return {
     config: { scope: 'tail' },
-    enabled: () => true,
     prepare: () => {
       events.push(`prepare ${name}`);
 
@@ -58,12 +57,10 @@ describe('repair pass lifecycle', () => {
     ]);
   });
 
-  test('leaves feature gating to the caller', () => {
+  test('executes explicitly supplied instances without feature gating', () => {
     const events: string[] = [];
 
     const plugin = createPlugin(events, 'disabled');
-
-    plugin.enabled = () => false;
 
     processRepairByPlugins({ node: tree(), plugins: [plugin], ending: true });
 

@@ -51,11 +51,11 @@ describe('render patches', () => {
 
       readonly config = {};
 
-      static config(): null {
+      static prepareConfig(): null {
         return null;
       }
 
-      enabled(): boolean {
+      static enabled(): boolean {
         return true;
       }
 

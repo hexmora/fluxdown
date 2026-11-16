@@ -1,6 +1,4 @@
-import type { TexProps } from '@fluxdown/react-base-plugins/base';
-
-export type TexMode = NonNullable<TexProps['mode']>;
+export type TexMode = 'inline' | 'display';
 
 export type TexRender = (source: string, mode: TexMode) => string | null;
 

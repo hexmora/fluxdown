@@ -14,7 +14,11 @@
       if (active) {
         renderFormula = texToSvg;
       }
-    }).catch(() => {});
+    }).catch(() => {
+      if (active) {
+        renderFormula = () => null;
+      }
+    });
 
     return () => {
       active = false;
@@ -22,7 +26,7 @@
   });
 </script>
 
-<svelte:element this={mode === 'display' ? 'div' : 'span'} aria-label={html === null ? undefined : tex} class={['fluxdown-svelte-tex-mathjax-katex-root', className]} data-formula-error={html === null || undefined} data-mode={mode} data-tex={tex} role={html === null ? undefined : 'math'} {style}>{#if html === null}{tex}{:else}{@html html}{/if}</svelte:element>
+<svelte:element this={mode === 'display' ? 'div' : 'span'} aria-label={html === null ? undefined : tex} class={['fluxdown-svelte-tex-mathjax-katex-root', className]} data-formula-error={(renderFormula && html === null) || undefined} data-mode={mode} data-tex={tex} role={html === null ? undefined : 'math'} {style}>{#if html !== null}{@html html}{:else if renderFormula}{tex}{/if}</svelte:element>
 
 <style lang="scss">
   @use './index.scss';

@@ -1,5 +1,6 @@
 import type {
   IPluggable,
+  IPluggableConfig,
   IPluginWithConfig,
   IRawPatchItem,
   IRehypePlugin,
@@ -7,6 +8,8 @@ import type {
   IRepairPlugin,
   PluggableConfigs,
   PluginSet,
+  RehypePluginContext,
+  RenderPluginContext,
 } from '@fluxdown/types';
 /** @jsxImportSource stative */
 
@@ -15,11 +18,14 @@ import { Scale } from '@fluxdown/core-plugins/plugins/mapper/scale';
 import { Shad } from '@fluxdown/core-plugins/plugins/mapper/shad';
 import { Smooth } from '@fluxdown/core-plugins/plugins/mapper/smooth';
 import { Suffix } from '@fluxdown/core-plugins/plugins/mapper/suffix';
+import { BaseRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/base';
 import { HoistFootnoteRehypePlugin } from '@fluxdown/core-plugins/plugins/rehype/hoist-footnote';
 import { ApplyRepairsRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/apply-repairs';
 import { SyntaxMathRemarkPlugin } from '@fluxdown/core-plugins/plugins/remark/syntax-math';
 import { expectTypeOf } from 'expect-type';
+import { assign } from 'lodash-es';
 import {
+  D,
   type IReactiveState,
   type IReadableClosure,
   type JSXDescriptor,
@@ -40,6 +46,7 @@ import type { BlockCompilerConfig, BlockRemarksConfig } from '../../../hast';
 
 import {
   MapperPluggables,
+  type MapperPluginContext,
   RawPatchesMapper,
   RehypePluggables,
   RemarkPluggables,
@@ -74,10 +81,163 @@ const getPluggableClass = <T extends IPluginWithConfig>(pluggable: IPluggable<T,
 };
 
 describe('pack state mappers', () => {
+  test('evaluates render hooks from updated compiler context before constructing instances', () => {
+    const constructed = jest.fn();
+
+    class ConditionalRenderPlugin extends TextRenderPlugin {
+      constructor() {
+        super();
+
+        constructed();
+      }
+
+      static override enabled(context: RenderPluginContext): boolean {
+        const { config } = context;
+
+        return config.tex;
+      }
+
+      static override prepareConfig(
+        context: RenderPluginContext,
+        outerConfig: IPluggableConfig<unknown>,
+      ): IPluggableConfig<unknown> {
+        const { config } = context;
+
+        return { ...outerConfig, priority: config.footnote ? 2 : 1 };
+      }
+    }
+
+    const config = MutableState.of(DEFAULT_CONFIG);
+
+    const extras = MutableState.of([ConditionalRenderPlugin]);
+
+    const state = render(S([RenderPluggables<string, string, string>, { config, extras }]));
+
+    expect(state.value.value).toEqual([]);
+
+    config.next({ ...DEFAULT_CONFIG, tex: true });
+
+    expect(state.value.value).toEqual([[ConditionalRenderPlugin, { priority: 1 }]]);
+
+    config.next({ ...DEFAULT_CONFIG, tex: true, footnote: true });
+
+    expect(state.value.value).toEqual([[ConditionalRenderPlugin, { priority: 2 }]]);
+
+    config.next(DEFAULT_CONFIG);
+
+    expect(state.value.value).toEqual([]);
+
+    expect(constructed).not.toHaveBeenCalled();
+
+    state.destroy();
+
+    config.destroy();
+
+    extras.destroy();
+  });
+
+  test('resolves rehype hooks with the original list and preserves null constructor options', () => {
+    class ConditionalRehypePlugin extends BaseRehypePlugin {
+      static readonly key = 'rehype-context';
+
+      plugin = () => {};
+
+      static override enabled(context: RehypePluginContext): boolean {
+        const { config, rehypes } = context;
+
+        return config.tex && rehypes.some((entry) => getPluggableClass(entry) === this);
+      }
+
+      static override prepareConfig(
+        context: RehypePluginContext,
+        outerConfig: IPluggableConfig<unknown>,
+      ): IPluggableConfig<unknown> | null {
+        const { config } = context;
+
+        return config.footnote ? { ...outerConfig, disabled: true } : null;
+      }
+    }
+
+    const config = MutableState.of(DEFAULT_CONFIG);
+
+    const options = { priority: 5 };
+
+    const entry: IPluggable<IRehypePlugin, unknown> = [ConditionalRehypePlugin, options];
+
+    const extras = MutableState.of([entry]);
+
+    const state = render(S([RehypePluggables, { config, extras }]));
+
+    expect(state.value.value).not.toContain(entry);
+
+    config.next({ ...DEFAULT_CONFIG, tex: true });
+
+    expect(state.value.value.at(-1)).toBe(entry);
+
+    config.next({ ...DEFAULT_CONFIG, tex: true, footnote: true });
+
+    expect(state.value.value).not.toContain(entry);
+
+    expect(options).toEqual({ priority: 5 });
+
+    state.destroy();
+
+    config.destroy();
+
+    extras.destroy();
+  });
+
+  test('supports static-style hooks on mapper functions without replacing the function model', () => {
+    const Identity = assign(
+      once(({ source }: MapperInputs) => source),
+      {
+        enabled(context: MapperPluginContext): boolean {
+          const { config } = context;
+
+          return config.tex;
+        },
+        prepareConfig(
+          context: MapperPluginContext,
+          outerConfig: IPluggableConfig<unknown>,
+        ): IPluggableConfig<unknown> {
+          const { config } = context;
+
+          return { ...outerConfig, priority: config.footnote ? 2 : 1 };
+        },
+      },
+    );
+
+    const config = MutableState.of(DEFAULT_CONFIG);
+
+    const extras = MutableState.of([Identity]);
+
+    const state = render(S([MapperPluggables, { config, extras }]));
+
+    expect(state.value.value).not.toContain(Identity);
+
+    config.next({ ...DEFAULT_CONFIG, tex: true });
+
+    expect(state.value.value.at(-1)).toEqual([Identity, { priority: 1 }]);
+
+    config.next({ ...DEFAULT_CONFIG, tex: true, footnote: true });
+
+    expect(state.value.value.at(-1)).toEqual([Identity, { priority: 2 }]);
+
+    config.next(DEFAULT_CONFIG);
+
+    expect(state.value.value).toEqual([Smooth, Shad, Scale, Chunk, Suffix]);
+
+    state.destroy();
+
+    config.destroy();
+
+    extras.destroy();
+  });
+
   test('combines mapper configurations reactively and reuses equivalent outputs', () => {
     const extras = MutableState.of<PluginSet<MapperPluggable, PluggableConfigs<MapperConfigs>>>([]);
 
-    const state = render(S([MapperPluggables, { extras }]));
+    const state = render(S([MapperPluggables, { extras, config: D(DEFAULT_CONFIG) }]));
 
     const initial = state.value.value;
 
@@ -124,7 +284,7 @@ describe('pack state mappers', () => {
       { shad: { enabled } },
     ]);
 
-    const state = render(S([MapperPluggables, { extras }]));
+    const state = render(S([MapperPluggables, { extras, config: D(DEFAULT_CONFIG) }]));
 
     expect(state.value.value).toEqual([
       Smooth,
@@ -164,7 +324,9 @@ describe('pack state mappers', () => {
       PluginSet<IPluggable<IRenderPlugin<string, string, string>, unknown>, RenderConfigs>
     >([[TextRenderPlugin, { priority: 1 }]]);
 
-    const state = render(S([RenderPluggables<string, string, string>, { extras }]));
+    const state = render(
+      S([RenderPluggables<string, string, string>, { extras, config: D(DEFAULT_CONFIG) }]),
+    );
 
     const initial = state.value.value;
 
@@ -364,7 +526,7 @@ const typecheckRenderPluggables = <E, P, R, C>(
   extras: IReactiveState<PluginSet<IPluggable<IRenderPlugin<E, P, R, C>, unknown>, RenderConfigs>>,
 ) => {
   const descriptor = S<IPluggable<IRenderPlugin<E, P, R, C>, unknown>[]>(
-    <RenderPluggables<E, P, R, C> extras={extras} />,
+    <RenderPluggables<E, P, R, C> config={D(DEFAULT_CONFIG)} extras={extras} />,
   );
 
   expectTypeOf<ReturnType<typeof RenderPluggables<E, P, R, C>>>().toEqualTypeOf<

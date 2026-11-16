@@ -3,7 +3,6 @@ import type { IDestructible } from 'stative';
 import type { Plugin } from 'unified';
 import type { Node } from 'unist';
 
-import type { RemarkPluginEnabledContext } from '../compiler';
 import type { IPluginWithConfig } from './base';
 
 export interface IRemarkPlugin<
@@ -12,7 +11,5 @@ export interface IRemarkPlugin<
   Output = Input,
 >
   extends IPluginWithConfig, IDestructible {
-  enabled: (context: RemarkPluginEnabledContext) => boolean;
-
   plugin: Plugin<P extends void ? [] : [P], Input, Output>;
 }

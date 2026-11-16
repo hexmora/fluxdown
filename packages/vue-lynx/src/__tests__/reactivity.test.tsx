@@ -108,11 +108,11 @@ describe('reactive renderer configuration', () => {
 
       readonly config = {};
 
-      static config(): null {
+      static prepareConfig(): null {
         return null;
       }
 
-      enabled(): boolean {
+      static enabled(): boolean {
         return true;
       }
 

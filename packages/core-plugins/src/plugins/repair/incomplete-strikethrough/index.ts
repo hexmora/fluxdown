@@ -46,10 +46,12 @@ export class IncompleteStrikethroughRepairPlugin extends BaseRepairPlugin {
     this.singleTilde = config.singleTilde ?? true;
   }
 
-  static override config(
-    { remarks }: RepairPluginConfigContext,
+  static override prepareConfig(
+    context: RepairPluginConfigContext,
     outerConfig: IPluggableConfig<IncompleteStrikethroughRepairPluginConfig>,
   ): IPluggableConfig<IncompleteStrikethroughRepairPluginConfig> | null {
+    const { remarks } = context;
+
     const strikethrough = getConfigIfEnabled(remarks, RemarkPluginKeys.SyntaxStrikethrough);
 
     if (!strikethrough) {
@@ -59,7 +61,9 @@ export class IncompleteStrikethroughRepairPlugin extends BaseRepairPlugin {
     return { ...outerConfig, singleTilde: strikethrough.singleTilde !== false };
   }
 
-  override enabled({ remarks }: RepairPluginEnabledContext): boolean {
+  static override enabled(context: RepairPluginEnabledContext): boolean {
+    const { remarks } = context;
+
     return getConfigIfEnabled(remarks, RemarkPluginKeys.SyntaxStrikethrough) !== undefined;
   }
 

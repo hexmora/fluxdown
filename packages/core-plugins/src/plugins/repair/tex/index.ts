@@ -5,18 +5,15 @@ import type {
   RepairPluginSystemConfig,
 } from '@fluxdown/types';
 
-import { BaseRepairPlugin } from '@fluxdown/core-plugins/plugins/repair/base';
 import { PluginPriority } from '@fluxdown/types';
 
 import type { TexRender } from './type';
 
-import { TexPrefixCache } from './cache';
+import { BaseRepairPlugin } from '../base';
+import { RepairPluginKeys } from '../keys';
+import { renderTex, TexPrefixCache } from './utils';
 
 export type { TexMode, TexRender } from './type';
-
-export enum TexRepairPluginKeys {
-  Tex = 'repair-tex',
-}
 
 declare global {
   interface RepairConfigs {
@@ -29,7 +26,7 @@ export interface TexRepairPluginConfig {
 }
 
 export class TexRepairPlugin extends BaseRepairPlugin {
-  static readonly key = TexRepairPluginKeys.Tex;
+  static readonly key = RepairPluginKeys.Tex;
 
   override readonly config: RepairPluginSystemConfig = {
     scope: 'tree',
@@ -37,23 +34,22 @@ export class TexRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.Low,
   };
 
-  private cache: TexPrefixCache | undefined;
+  private cache: TexPrefixCache;
 
-  constructor({ render }: TexRepairPluginConfig = {}) {
+  constructor({ render = renderTex }: TexRepairPluginConfig = {}) {
     super();
 
-    if (render) {
-      this.cache = this.clearable(new TexPrefixCache(render));
-    }
+    this.cache = this.clearable(new TexPrefixCache(render));
   }
 
-  override enabled({ config }: RepairPluginEnabledContext): boolean {
-    return config.tex && this.cache !== undefined;
+  static override enabled(context: RepairPluginEnabledContext): boolean {
+    const { config } = context;
+
+    return config.tex;
   }
 
   override runner: RepairPluginRunner = ({ node }) => {
     if (
-      !this.cache ||
       (node.type !== 'inlineMath' && node.type !== 'math') ||
       !('value' in node) ||
       node.data?.repairEnding !== true

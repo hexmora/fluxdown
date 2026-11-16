@@ -67,10 +67,12 @@ export class SyntaxMathRemarkPlugin extends BaseRemarkPlugin {
     };
   }
 
-  static override config(
-    { config, remarks }: RemarkPluginConfigContext,
+  static override prepareConfig(
+    context: RemarkPluginConfigContext,
     outerConfig: IPluggableConfig<SyntaxMathRemarkPluginConfig>,
   ): IPluggableConfig<SyntaxMathRemarkPluginConfig> {
+    const { config, remarks } = context;
+
     const repairEnabled = getConfigIfEnabled(remarks, RemarkPluginKeys.ApplyRepairs) !== undefined;
 
     return {
@@ -79,7 +81,9 @@ export class SyntaxMathRemarkPlugin extends BaseRemarkPlugin {
     };
   }
 
-  override enabled({ config }: RemarkPluginEnabledContext): boolean {
+  static override enabled(context: RemarkPluginEnabledContext): boolean {
+    const { config } = context;
+
     return config.tex;
   }
 }

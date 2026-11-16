@@ -5,7 +5,7 @@ import type { TexKatexRendererProps } from '../../type';
 
 import { TexRenderer } from '../../../../../../tex';
 import { getTexRoot } from '../../../../../../tex/utils';
-import { katexTexToHtml } from '../../../../../engine';
+import { katexTexToHtml } from '../../../../../utils';
 import styles from './index.module.scss';
 
 const TexKatexRenderer = ({ Fallback = TexRenderer, ...props }: TexKatexRendererProps) => {

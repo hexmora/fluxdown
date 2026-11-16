@@ -1,6 +1,6 @@
 import { findLast } from 'lodash-es';
 
-import type { TexMode, TexRender } from './type';
+import type { TexMode, TexRender } from '../type';
 
 import { TexPrefixParser } from './prefix';
 

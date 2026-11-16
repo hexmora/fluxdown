@@ -731,6 +731,16 @@ describe('Core', () => {
       }),
     ).toBe(true);
 
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('x+');
+
+    harness.repairs.next({ 'repair-tex': { disabled: true } });
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('x+\\frac{a}{');
+
+    harness.repairs.next({});
+
+    expect(collectText(getFirstBlockTree(harness.state))).toBe('x+');
+
     harness.build.next({ ...DEFAULT_CONFIG, tex: true, repair: true, repairEnding: false });
 
     expect(collectText(getFirstBlockTree(harness.state))).toBe('$x+\\frac{a}{');
@@ -748,7 +758,7 @@ describe('Core', () => {
     harness.state.destroy();
   });
 
-  test('reuses candidates and rebuilds the processor when enablement changes', () => {
+  test('skips construction until statically enabled and rebuilds the processor on context changes', () => {
     const constructed = jest.fn();
 
     const setup = jest.fn(stableAttacher);
@@ -764,7 +774,9 @@ describe('Core', () => {
         constructed();
       }
 
-      override enabled({ config }: RemarkPluginEnabledContext): boolean {
+      static override enabled(context: RemarkPluginEnabledContext): boolean {
+        const { config } = context;
+
         return config.tex;
       }
     }
@@ -777,7 +789,7 @@ describe('Core', () => {
 
     expect(collectText(getFirstBlockTree(harness.state))).toBe('text');
 
-    expect(constructed).toHaveBeenCalledTimes(1);
+    expect(constructed).not.toHaveBeenCalled();
 
     expect(setup).not.toHaveBeenCalled();
 
@@ -812,7 +824,7 @@ describe('Core', () => {
         constructed();
       }
 
-      static override config(): null {
+      static override prepareConfig(): null {
         configured();
 
         return null;
@@ -854,15 +866,19 @@ describe('Core', () => {
         constructed(config);
       }
 
-      static override config(
+      static override prepareConfig(
         context: RemarkPluginConfigContext,
         outerConfig: IPluggableConfig<AppendRemarkPluginConfig>,
       ): IPluggableConfig<AppendRemarkPluginConfig> {
+        const { config } = context;
+
+        const { suffix } = outerConfig;
+
         configured(context, outerConfig);
 
         return {
           ...outerConfig,
-          suffix: `${outerConfig.suffix}|${context.config.tex ? 'tex' : 'plain'}`,
+          suffix: `${suffix}|${config.tex ? 'tex' : 'plain'}`,
         };
       }
     }
@@ -918,7 +934,7 @@ describe('Core', () => {
 
       override plugin = stableAttacher;
 
-      static override config(): null {
+      static override prepareConfig(): null {
         skipped();
 
         return null;
@@ -936,16 +952,18 @@ describe('Core', () => {
         constructed();
       }
 
-      static override config(
-        { config }: RemarkPluginConfigContext,
+      static override prepareConfig(
+        context: RemarkPluginConfigContext,
         outerConfig: IPluggableConfig<unknown>,
       ): IPluggableConfig<unknown> {
+        const { config } = context;
+
         return { ...outerConfig, disabled: !config.tex };
       }
     }
 
     class NullRemarkPlugin extends AppendRemarkPlugin {
-      static override config(
+      static override prepareConfig(
         _context: RemarkPluginConfigContext,
         outerConfig: IPluggableConfig<AppendRemarkPluginConfig>,
       ): null {
@@ -1002,16 +1020,18 @@ describe('Core', () => {
     class ContextRepairPlugin extends BaseRepairPlugin {
       static readonly key = 'repair-test-context';
 
-      static override config(context: RepairPluginConfigContext): null {
+      static override prepareConfig(context: RepairPluginConfigContext): null {
         configurations.push(context);
 
         return null;
       }
 
-      override enabled(context: RepairPluginEnabledContext): boolean {
+      static override enabled(context: RepairPluginEnabledContext): boolean {
+        const { config } = context;
+
         contexts.push(context);
 
-        return context.config.repairEnding;
+        return config.repairEnding;
       }
 
       runner: RepairPluginRunner = ({ node }) => {
@@ -1031,7 +1051,7 @@ describe('Core', () => {
 
       override plugin: Plugin<[], Root, Root> = () => {};
 
-      static override config(context: RemarkPluginConfigContext): null {
+      static override prepareConfig(context: RemarkPluginConfigContext): null {
         remarkConfigurations.push(context);
 
         return null;
@@ -1060,7 +1080,7 @@ describe('Core', () => {
       }),
     ).toEqual([false, true]);
 
-    expect(configurations.map((context) => context.config.repairEnding)).toEqual([false, true]);
+    expect(configurations.map((context) => context.config.repairEnding)).toEqual([true]);
 
     expect(
       remarkConfigurations.map((context) => {

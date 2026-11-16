@@ -27,7 +27,9 @@ export class IncompleteMathRepairPlugin extends BaseRepairPlugin {
     priority: PluginPriority.High,
   };
 
-  override enabled({ config, remarks }: RepairPluginEnabledContext): boolean {
+  static override enabled(context: RepairPluginEnabledContext): boolean {
+    const { config, remarks } = context;
+
     return config.tex && getConfigIfEnabled(remarks, RemarkPluginKeys.SyntaxMath) !== undefined;
   }
 

@@ -1,9 +1,5 @@
 import type { Newable } from '@fluxdown/utils';
 
-import type { RemarkPluginConfigContext, RepairPluginConfigContext } from '../compiler';
-import type { IRemarkPlugin } from './remark';
-import type { IRepairPlugin } from './repair';
-
 declare global {
   interface MapperConfigs {}
 
@@ -72,19 +68,15 @@ export type IPluginWithConfig<C = {}> = {
   readonly config: IBasePluginConfig & C;
 };
 
-/**
- * Resolves constructor options before an instance is built without mutating the context or options.
- * Null preserves the original descriptor; a returned object replaces its constructor options.
- */
-export interface PluginClassConfig<C> {
-  config(context: C, outerConfig: IPluggableConfig<unknown>): IPluggableConfig<unknown> | null;
-}
+/** Static hooks evaluated while resolving a pluggable list. */
+export type PluginHooks<C> = {
+  enabled?: (context: C) => boolean;
 
-type PluginClassConfigByType<T> = T extends IRepairPlugin
-  ? PluginClassConfig<RepairPluginConfigContext>
-  : T extends IRemarkPlugin
-    ? PluginClassConfig<RemarkPluginConfigContext>
-    : {};
+  prepareConfig?: (
+    context: C,
+    outerConfig: IPluggableConfig<unknown>,
+  ) => IPluggableConfig<unknown> | null;
+};
 
 export type PluginClass<T extends IPluginWithConfig, O = void> = Newable<
   T,
@@ -92,7 +84,7 @@ export type PluginClass<T extends IPluginWithConfig, O = void> = Newable<
   O extends void ? any[] : [O]
 > & {
   readonly key: string;
-} & PluginClassConfigByType<T>;
+};
 
 export type IPluggableConfig<C = unknown> = (unknown extends C
   ? object | Record<string, unknown>

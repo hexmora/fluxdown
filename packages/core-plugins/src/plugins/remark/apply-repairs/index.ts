@@ -58,14 +58,18 @@ export class ApplyRepairsRemarkPlugin extends BaseRemarkPlugin {
     };
   }
 
-  static override config(
-    { config, repairs }: RemarkPluginConfigContext,
+  static override prepareConfig(
+    context: RemarkPluginConfigContext,
     outerConfig: IPluggableConfig<ApplyRepairsRemarkPluginConfig>,
   ): IPluggableConfig<ApplyRepairsRemarkPluginConfig> {
+    const { config, repairs } = context;
+
     return { ...outerConfig, plugins: repairs, ending: config.repairEnding };
   }
 
-  override enabled({ config }: RemarkPluginEnabledContext): boolean {
+  static override enabled(context: RemarkPluginEnabledContext): boolean {
+    const { config } = context;
+
     return config.repair;
   }
 }

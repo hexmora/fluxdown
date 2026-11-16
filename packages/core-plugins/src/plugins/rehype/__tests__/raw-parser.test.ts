@@ -91,7 +91,7 @@ test('preserves ending-repair text metadata through raw parsing and the complete
   });
 
   expect(findElement(tree, 'span')?.children).toEqual([
-    expect.objectContaining({ type: 'text', value: 'x+\\frac{a}{', data: { repairEnding: true } }),
+    expect.objectContaining({ type: 'text', value: 'x+', data: { repairEnding: true } }),
   ]);
   expect(JSON.stringify(tree)).not.toContain('repaired_text');
   expect(findElement(tree, 'span')?.properties).not.toHaveProperty('repairEnding');

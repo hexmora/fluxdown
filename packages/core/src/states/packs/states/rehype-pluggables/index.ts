@@ -1,12 +1,11 @@
-import type { IPluggable, IRehypePlugin } from '@fluxdown/types';
+import type { IPluggable, IRehypePlugin, RehypePluginContext } from '@fluxdown/types';
 
-import { PRESET_REHYPE_PLUGINS, RehypePluginKeys } from '@fluxdown/core-plugins/presets/rehype';
+import { PRESET_REHYPE_PLUGINS } from '@fluxdown/core-plugins/presets/rehype';
 import { memoReturns } from 'stative';
 
 import type { RehypePluggablesInputs } from './type';
 
-import { isPluggablesEqual, toPluggable } from '../../../base';
-import { getPluggableClass } from '../utils';
+import { isPluggablesEqual, preparePluggables, toPluggable } from '../../../base';
 
 export * from './type';
 
@@ -14,8 +13,9 @@ export const RehypePluggables = /*#__PURE__*/ memoReturns(function RehypePluggab
   config,
   extras,
 }: RehypePluggablesInputs): IPluggable<IRehypePlugin, unknown>[] {
-  return toPluggable(extras, PRESET_REHYPE_PLUGINS).filter(
-    (pluggable) =>
-      getPluggableClass(pluggable).key !== RehypePluginKeys.HoistFootnote || config.footnote,
-  );
+  const rehypes = toPluggable(extras, PRESET_REHYPE_PLUGINS);
+
+  const context: RehypePluginContext = { config, rehypes };
+
+  return preparePluggables(rehypes, context);
 }, isPluggablesEqual);

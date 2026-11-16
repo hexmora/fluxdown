@@ -3,7 +3,6 @@ import type {
   IRemarkPlugin,
   IRepairPlugin,
   RemarkPluginConfigContext,
-  RemarkPluginEnabledContext,
   RepairPluginEnabledContext,
 } from '@fluxdown/types';
 
@@ -13,8 +12,7 @@ import { memoReturns } from 'stative';
 
 import type { RemarkPluggablesInputs } from './type';
 
-import { isPluggableEnabled, isPluggablesEqual, PluginBuilder, toPluggable } from '../../../base';
-import { getPluggableClass, getPluggableConfig } from '../utils';
+import { isPluggablesEqual, PluginBuilder, preparePluggables, toPluggable } from '../../../base';
 
 export * from './type';
 
@@ -30,41 +28,12 @@ export const RemarkPluggables = /*#__PURE__*/ memoReturns(function RemarkPluggab
 
   const repairContext: RepairPluginEnabledContext = { config, remarks, repairs: repairSources };
 
-  const repairPluggables = repairSources
-    .filter(isPluggableEnabled)
-    .map((pluggable): IPluggable<IRepairPlugin, unknown> => {
-      const Plugin = getPluggableClass(pluggable);
-
-      const options = Plugin.config(repairContext, getPluggableConfig(pluggable));
-
-      return options === null ? pluggable : [Plugin, options];
-    });
-
-  const repairCandidates = PluginBuilder<IRepairPlugin>({
-    plugins: repairPluggables,
+  const repairPlugins = PluginBuilder<IRepairPlugin>({
+    plugins: preparePluggables(repairSources, repairContext),
     cacheStore,
   });
 
-  const repairPlugins = repairCandidates.filter((plugin) => plugin.enabled(repairContext));
+  const context: RemarkPluginConfigContext = { config, remarks, repairs: repairPlugins };
 
-  const configContext: RemarkPluginConfigContext = { config, remarks, repairs: repairPlugins };
-
-  const pluggables = remarks
-    .filter(isPluggableEnabled)
-    .map((pluggable): IPluggable<IRemarkPlugin, unknown> => {
-      const Plugin = getPluggableClass(pluggable);
-
-      const options = Plugin.config(configContext, getPluggableConfig(pluggable));
-
-      return options === null ? pluggable : [Plugin, options];
-    })
-    .filter(isPluggableEnabled);
-
-  const candidates = PluginBuilder<IRemarkPlugin>({ plugins: pluggables, cacheStore, sort: false });
-
-  const context: RemarkPluginEnabledContext = { config, remarks };
-
-  const enabled = candidates.map((plugin) => plugin.enabled(context));
-
-  return pluggables.filter((_pluggable, index) => enabled[index]);
+  return preparePluggables(remarks, context);
 }, isPluggablesEqual);
