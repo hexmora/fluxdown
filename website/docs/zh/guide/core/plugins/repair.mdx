@@ -88,6 +88,7 @@ const repairs = [StreamingIndicatorPlugin];
 | `IncompleteEmphasisRepairPlugin`     | `incomplete-emphasis`       | <PresetCheck /> | 提前呈现以星号开头、尚未闭合的斜体内容。                            |
 | `IncompleteListMarkerRepairPlugin`   | `incomplete-list-marker`    | <PresetCheck /> | 隐藏末尾孤立的列表标记，等待列表正文。                              |
 | `DanglingFootnoteRepairPlugin`       | `dangling-footnote`         | <PresetCheck /> | 暂时隐藏未解析的脚注引用和末尾未完成的引用；需要 `build.footnote`。 |
+| `TexRepairPlugin`                    | `tex`                       | <PresetCheck /> | 流式时按 KaTeX 保留可用前缀，闭合后保留原文；需 `build.tex`。       |
 
 ### 排版边界整理
 

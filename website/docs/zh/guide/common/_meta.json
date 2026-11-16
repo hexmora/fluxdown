@@ -18,6 +18,11 @@
   },
   {
     "type": "file",
+    "name": "plugin-design",
+    "label": "插件设计"
+  },
+  {
+    "type": "file",
     "name": "features/renderers",
     "label": "横向演示"
   }
